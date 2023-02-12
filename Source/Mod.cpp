@@ -2,6 +2,7 @@
 
 #include "Gameplay/QSSRestore.h"
 
+#include "System/ArchiveTreePatcher.h"
 #include "System/EnemyTrigger.h"
 
 extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
@@ -13,6 +14,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
 	//---------------System---------------
+	ArchiveTreePatcher::applyPatches();
 	EnemyTrigger::applyPatches();
 
 	//---------------Gameplay---------------
