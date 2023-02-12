@@ -97,6 +97,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="Mod.cpp" />
     <ClCompile Include="Pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -104,9 +105,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Gameplay\QSSRestore.cpp" />
+    <ClCompile Include="System\EnemyTrigger.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Configuration.h" />
     <ClInclude Include="Pch.h" />
+    <ClInclude Include="Gameplay\QSSRestore.h" />
+    <ClInclude Include="System\EnemyTrigger.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,0 +1,25 @@
+{
+  "Groups": [
+    {
+      "Name": "Gameplay",
+      "DisplayName": "Gameplay",
+      "Elements": [
+        {
+          "Name": "bQSS",
+          "Description": [
+            "Enable Quick Step/Stomp Slide glitch from Sonic Unleashed"
+          ],
+          "DisplayName": "Enable QSS Glitch",
+          "Type": "bool",
+          "MinValue": null,
+          "MaxValue": null,
+          "DefaultValue": true
+        }
+      ]
+    }
+  ],
+  "Enums": {
+    
+  },
+  "IniFile": "UnleashedAllInOne.ini"
+}

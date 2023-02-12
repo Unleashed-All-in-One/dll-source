@@ -1,0 +1,38 @@
+#include "QSSRestore.h"
+#include "../Configuration.h"
+
+void QSSRestore_IncreaseSpeed(char const* targetState)
+{
+	auto context = Sonic::Player::CPlayerSpeedContext::GetInstance();
+	auto stateName = context->m_pPlayer->m_StateMachine.GetCurrentState()->GetStateName();
+	if (std::string(stateName.c_str()) == std::string(targetState))
+	{
+		Eigen::Vector3f velocity;
+		Common::GetPlayerVelocity(velocity);
+		velocity = (velocity.norm() + 12.0f) * velocity.normalized();
+		Common::SetPlayerVelocity(velocity);
+	}
+}
+
+HOOK(void, __fastcall, QSSRestore_CSonicStateSlidingAdvance, 0x11D69A0, int This)
+{
+	originalQSSRestore_CSonicStateSlidingAdvance(This);
+	QSSRestore_IncreaseSpeed("RunQuickStep");
+}
+
+HOOK(void, __fastcall, QSSRestore_CSonicStateStompingAdvance, 0x12548C0, int This)
+{
+	originalQSSRestore_CSonicStateStompingAdvance(This);
+	QSSRestore_IncreaseSpeed("Sliding");
+}
+
+void QSSRestore::applyPatches()
+{
+	if (!Configuration::m_bQSS)
+	{
+		return;
+	}
+
+	INSTALL_HOOK(QSSRestore_CSonicStateSlidingAdvance);
+	INSTALL_HOOK(QSSRestore_CSonicStateStompingAdvance);
+}
