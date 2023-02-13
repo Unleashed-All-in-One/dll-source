@@ -317,7 +317,7 @@ HOOK(int, __fastcall, Title_CMain, 0x0056FBE0, Sonic::CGameObject* This, void* E
 	auto spCsdProject = wrapper.GetCsdProject("ui_title_unleashed");
 	rcTitleScreen = spCsdProject->m_rcProject;
 	Title::inInstall = false;
-	char buffer[6];
+	char buffer[8];
 	sprintf(buffer, "title_%d", Configuration::logoType + 1);
 	rcTitleLogo_1 = rcTitleScreen->CreateScene(buffer);
 	
