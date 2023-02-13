@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\SoLoud-wav.2020.2.7.1\build\native\SoLoud-wav.props" Condition="Exists('packages\SoLoud-wav.2020.2.7.1\build\native\SoLoud-wav.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -15,6 +16,7 @@
     <ProjectGuid>{672c0b8a-7030-4793-8cf9-f536c84f321b}</ProjectGuid>
     <RootNamespace>UnleashedAllInOne</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>UnleashedConversion</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -70,6 +72,13 @@
       <AdditionalDependencies>detours.lib;syelog.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\Dependencies\Detours\lib\x86;..\Include\BlueBlur;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy "$(ProjectDir)bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -95,6 +104,13 @@
       <AdditionalDependencies>detours.lib;syelog.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\Dependencies\Detours\lib\x86;..\Include\BlueBlur;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy "$(ProjectDir)bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Configuration.cpp" />
@@ -107,16 +123,40 @@
     </ClCompile>
     <ClCompile Include="Gameplay\QSSRestore.cpp" />
     <ClCompile Include="System\ArchiveTreePatcher.cpp" />
+    <ClCompile Include="System\CSDCommon.cpp" />
     <ClCompile Include="System\EnemyTrigger.cpp" />
+    <ClCompile Include="System\LetterboxHelper.cpp" />
+    <ClCompile Include="System\MiniAudioHelper.cpp" />
+    <ClCompile Include="UI\Title.cpp" />
+    <ClCompile Include="UI\TitleOption.cpp" />
+    <ClCompile Include="UI\TitleWorldMap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Pch.h" />
     <ClInclude Include="Gameplay\QSSRestore.h" />
     <ClInclude Include="System\ArchiveTreePatcher.h" />
+    <ClInclude Include="System\CSDCommon.h" />
     <ClInclude Include="System\EnemyTrigger.h" />
+    <ClInclude Include="System\LetterboxHelper.h" />
+    <ClInclude Include="System\MiniAudioHelper.h" />
+    <ClInclude Include="UI\Title.h" />
+    <ClInclude Include="UI\TitleOption.h" />
+    <ClInclude Include="UI\TitleWorldMap.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="UnleashedAllInOne.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets" Condition="Exists('packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets'))" />
+    <Error Condition="!Exists('packages\SoLoud-wav.2020.2.7.1\build\native\SoLoud-wav.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\SoLoud-wav.2020.2.7.1\build\native\SoLoud-wav.props'))" />
+  </Target>
 </Project>

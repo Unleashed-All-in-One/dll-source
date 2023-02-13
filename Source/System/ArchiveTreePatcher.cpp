@@ -93,6 +93,12 @@ boost::shared_ptr<hh::db::CRawData>* __fastcall ArchiveTreePatcher_GetRawDataImp
 
 void ArchiveTreePatcher::applyPatches()
 {
+    m_archiveDependencies.push_back(ArchiveDependency("WorldMap", { "Title" }));
+    m_archiveDependencies.push_back(ArchiveDependency("TitleModel", { "Title" }));
+    m_archiveDependencies.push_back(ArchiveDependency("GenericWindow", { "Title" }));
+    m_archiveDependencies.push_back(ArchiveDependency("myk_cmn", { "ghz_cmn" }));
+    m_archiveDependencies.push_back(ArchiveDependency("JumpSelector", { "cmn200" }));
+
     if (!m_archiveDependencies.empty())
     {
         INSTALL_HOOK(ArchiveTreePatcher_ParseArchiveTree);
