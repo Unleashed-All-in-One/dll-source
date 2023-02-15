@@ -1,12 +1,7 @@
 //	TODO:
 //	Make sun gameobject to spawn the particle that Qution made
-//	Make passing-time mechanic, along with being able to tell if a flag is in the shade or not
 //	Add proper white-world support
-
-//	TODO for Infinite Levels:
-//	Fix MsgResultChangeState from not playing
-//	Fix GoalRing redirecting you to the same stage or another stage (it loads pam000 but it gets replaced)
-//	Fix Enemy archives not loading via archive tree
+//  Make all things related to title custom renderables instead of title renderables
 
 struct FlagUIInformation
 {
@@ -138,6 +133,7 @@ CVector2* offsetRes;
 
 
 static bool isWhiteWorldEnabled = false;
+static float cameraDistance = 5.0f;
 static float rotationPitch = 20.0f;
 static float FOV = 0.84906584f;
 static float rotationYaw = 0.0f;
@@ -171,6 +167,7 @@ static bool camInitialized = false;
 //From Brianuu's 06 Title
 boost::shared_ptr<SaveLoadTestStruct> m_spSave;
 FUNCTION_PTR(void, __thiscall, TitleWorldMap_CTitleOptionCStateOutroSaving, 0xD22A70, boost::shared_ptr<SaveLoadTestStruct>& spSave, void* a2);
+
 void fpAddParticle(DWORD* manager, void* handle, const boost::shared_ptr<Sonic::CMatrixNodeTransform>& node, const hh::base::CSharedString& name, uint32_t flag)
 {
 	uint32_t func = 0x00E8F8A0;
@@ -251,14 +248,16 @@ void CalculateAspectOffsets()
 	}
 }
 void PlayCursorAnim(const char* name, bool reverse = false)
-{
-	CSDCommon::PlayAnimation(*cursorL, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, reverse);
-	CSDCommon::PlayAnimation(*cursorR, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, reverse);
-	CSDCommon::PlayAnimation(*cursorT, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, reverse);
-	CSDCommon::PlayAnimation(*cursorB, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, reverse);
+{		
+	float reversePoint = reverse ? 80 : 0;
+	CSDCommon::PlayAnimation(*cursorT, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, reversePoint, false, reverse);
+	CSDCommon::PlayAnimation(*cursorB, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, reversePoint, false, reverse);
+	CSDCommon::PlayAnimation(*cursorL, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, reversePoint, false, reverse);
+	CSDCommon::PlayAnimation(*cursorR, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, reversePoint, false, reverse);
 }
 void CheckCursorAnimStatus()
 {
+
 	if (cts_guide_window)
 	{
 		if (cts_guide_window->m_MotionFrame >= 85 && cts_guide_window->m_MotionFrame <= 90)
@@ -588,6 +587,7 @@ void __fastcall CTitleWRemoveCallback(Sonic::CGameObject* This, void*, Sonic::CG
 	disabledStick = true;
 	rotationPitch = -0.4f;
 	FOV = 0.84906584f;
+	cameraDistance = 5.0f;
 	rotationYaw = 0.55f;
 	disabledTarget = true;
 	cursorSelected = false;
@@ -1232,6 +1232,7 @@ void PlayPan(CustomCamera* camera, const Hedgehog::Universe::SUpdateInfo& update
 	timePan += updateInfo.DeltaTime;
 	camHeight = LerpEaseInOut(-20, 0, timePan / 2.15f, true, false);
 	rotationPitch = LerpEaseInOut(-0.4f, -0.5f, timePan / 2.15f, true, true);
+	cameraDistance = LerpEaseInOut(5.0f, 20.0f, timePan / 2.15f, true, true);
 	//FOV = LerpEaseInOut(0.84906584f, 0.44906584f, timePan / 2.15f, false, true);
 }
 float VectorAngle(const CVector& a, const CVector& b)
@@ -1295,7 +1296,7 @@ HOOK(void, __fastcall, TitleWorldMap_CameraUpdate, 0x0058CDA0, TransitionTitleCa
 
 	auto input = Sonic::CInputState::GetInstance()->GetPadState();
 
-	constexpr float cameraDistance = 20.0f;
+	
 
 	// HACK: Doing camera position stuff here instead of on a "Start" function, or the constructor, lol
 	
@@ -1313,11 +1314,11 @@ HOOK(void, __fastcall, TitleWorldMap_CameraUpdate, 0x0058CDA0, TransitionTitleCa
 	const CVector cameraPosition = cameraVector + cameraTargetPosition;
 
 	// We can make this a parameter or something later.
-	constexpr float rotationPitchRate = 1.5f;
-	constexpr float rotationYawRate = 1.5f;
+	constexpr float rotationPitchRate = 1.25f;
+	constexpr float rotationYawRate = 1.25f;
 
 	const CVector2 pan(input.LeftStickHorizontal, input.LeftStickVertical);
-	const float deadzone = 0.1f; // TODO: MAKE PARAMETER? USE SOMETHING IN GENS?
+	const float deadzone = 0.2f; // TODO: MAKE PARAMETER? USE SOMETHING IN GENS?
 
 
 	const bool hasInput = pan.squaredNorm() > deadzone * deadzone;
@@ -1519,6 +1520,15 @@ HOOK(Hedgehog::Mirage::CRenderable*, __fastcall, AddRenderableTitle, 0x58E650, D
 {
 	return originalAddRenderableTitle(This, a2, a3, a4, Edx);
 }
+HOOK(int, __cdecl, sub_7C931F, 0x7C931F, int a1, const char* a2)
+{
+	printf(a2);
+	return originalsub_7C931F(a1, a2);
+}HOOK(int, __fastcall, sub_7E27B0, 0x7E27B0, char* a1, ...)
+{
+	printf(a1);
+	return originalsub_7E27B0(a1);
+}
 HOOK(char, __stdcall, SaveRead, 0x00E7A220, int a1, void* file)
 {
 	return originalSaveRead(a1,file);
@@ -1533,6 +1543,8 @@ void TitleWorldMap::applyPatches()
 	//WRITE_JUMP(0x00D76A45, SetCorrectPlayer2);
 	//WRITE_JUMP(0x00D0E164, StageLoader);
 	//WRITE_JUMP(0x010A0B46, SetCorrectPause);
+	INSTALL_HOOK(sub_7C931F);
+	INSTALL_HOOK(sub_7E27B0);
 	INSTALL_HOOK(AddRenderableTitle);
 	WRITE_JUMP(0x00584CEE, (void*)0x00588820);
 	WRITE_JUMP(0x015B8188, (void*)0x015B8198);

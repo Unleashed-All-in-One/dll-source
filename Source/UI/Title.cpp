@@ -1,5 +1,5 @@
 ﻿Chao::CSD::RCPtr<Chao::CSD::CProject> rcTitleScreen;
-Chao::CSD::RCPtr<Chao::CSD::CScene> rcTitleLogo_1, rcTitlebg, rcTitleMenu, rcTitleMenuScroll, rcTitleMenuTXT, black_bg, bg_window, fg_window, txt_window, footer_window;
+Chao::CSD::RCPtr<Chao::CSD::CScene> rcTitleLogo_1, rcTitlebg, rcTitleMenu, rcTitleMenuScroll, rcTitleMenuTXT, black_bg, bg_window, fg_window, txt_window, footer_window, bg_transition;
 boost::shared_ptr<Sonic::CGameObjectCSD> spTitleScreen;
 boost::shared_ptr<Sonic::StageSelectMenu::CDebugStageSelectMenuXml> spDebugMenu;
 
@@ -89,6 +89,13 @@ void ShowInstallScreen()
 	Sonic::CGameDocument::GetInstance()->AddGameObject(spDebugMenu);
 	TitleWorldMap::LoadingReplacementEnabled = false;
 }
+void ShowTransition()
+{
+	bg_transition->SetHideFlag(false);
+	CSDCommon::PlayAnimation(*bg_transition, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+
+	PlayTitleBGM(TitleStateContextBase, "");
+}
 void __declspec(naked) TitleUI_SetCustomExecFunction()
 {
 	//https://godbolt.org/
@@ -103,6 +110,7 @@ void __declspec(naked) TitleUI_SetCustomExecFunction()
 		{
 			cmp     currentTitleIndex, 0
 			jne	Options
+			call ShowTransition
 			jmp[adNewGame]
 			jmp	FunctionFinish
 
@@ -178,6 +186,8 @@ void __declspec(naked) TitleUI_SetCustomExecFunctionAdvance()
 			jmp[pAddr]
 
 			LoadingForContinue :
+			call ShowTransition
+
 			jmp[adContinue]
 	}
 }
@@ -213,13 +223,19 @@ void __declspec(naked) TitleUI_SetCustomExecFunctionAdvance()
 //}
 void __fastcall CTitleRemoveCallback(Sonic::CGameObject* This, void*, Sonic::CGameDocument* pGameDocument)
 {
+	//rcTitleLogo_1, rcTitlebg, rcTitleMenu, rcTitleMenuScroll, rcTitleMenuTXT, black_bg, bg_window, fg_window, txt_window, footer_window, bg_transition
 	Title::killScreen();
-	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), rcTitlebg);
 	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), rcTitleLogo_1);
+	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), rcTitlebg);
 	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), rcTitleMenu);
 	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), rcTitleMenuScroll);
 	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), rcTitleMenuTXT);
 	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), black_bg);
+	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), bg_window);
+	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), fg_window);
+	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), txt_window);
+	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), footer_window);
+	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), bg_transition);
 	rcTitleScreen = nullptr;
 	enteredStart, isInSubmenu, moved, hasSavefile, playingStartAnim, reversedAnim, isStartAnimComplete, startButtonAnimComplete, startBgAnimComplete, showedWindow = false;
 	inTitle, parsedSave = false;
@@ -348,10 +364,12 @@ HOOK(int, __fastcall, Title_CMain, 0x0056FBE0, Sonic::CGameObject* This, void* E
 	fg_window = rcTitleScreen->CreateScene("window_box");
 	txt_window = rcTitleScreen->CreateScene("window_text");
 	footer_window = rcTitleScreen->CreateScene("window_footer");
+	bg_transition = rcTitleScreen->CreateScene("bg_transition");
 	bg_window->SetHideFlag(true);
 	fg_window->SetHideFlag(true);
 	txt_window->SetHideFlag(true);
 	footer_window->SetHideFlag(true);
+	bg_transition->SetHideFlag(true);
 	CSDCommon::PlayAnimation(*fg_window, "Size_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, 0);
 	CSDCommon::FreezeMotion(*fg_window, 48 /* TIMES the maximum characters in a line in the text.*/);
 	black_bg->SetHideFlag(true);

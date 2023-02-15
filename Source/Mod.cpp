@@ -1,5 +1,3 @@
-
-
 extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 {
 	MessageBoxA(NULL, "", "", 0);
@@ -13,7 +11,6 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	ArchiveTreePatcher::applyPatches();
 	EnemyTrigger::applyPatches();
 	LetterboxHelper::initialize(1280, 720);
-	CSDCommon::initialize();
 	MiniAudioHelper::initialize(modInfo->CurrentMod->Path);
 
 	//---------------Gameplay---------------
@@ -50,5 +47,6 @@ extern "C" __declspec(dllexport) void PostInit()
 
 extern "C" void __declspec(dllexport) OnFrame()
 {
-
+	//---------------System---------------
+	CSDCommon::update();
 }

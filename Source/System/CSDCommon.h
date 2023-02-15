@@ -23,8 +23,7 @@ public:
 			auto new_end = std::remove(scenesPlayingBack.begin(), scenesPlayingBack.end(), pScene);
 			scenesPlayingBack.erase(new_end, scenesPlayingBack.end());
 		}
-		pScene->SetMotion(name);
-		pScene->SetMotionFrame(startFrame);
+		
 		float speed = 1;
 		if (startFrame == endFrame)
 			endFrame = pScene->m_MotionEndFrame;
@@ -40,6 +39,8 @@ public:
 		{
 			pScene->m_MotionEndFrame = endFrame;
 		}
+		pScene->SetMotion(name);
+		pScene->SetMotionFrame(startFrame);
 		pScene->m_MotionDisableFlag = false;
 		pScene->m_MotionSpeed = speed;
 		pScene->m_MotionRepeatType = repeatType;
@@ -64,7 +65,7 @@ public:
 		pScene->m_MotionRepeatType = Chao::CSD::eMotionRepeatType_PlayOnce;
 	}
 
-	static void IntroAnim(Chao::CSD::RCPtr<Chao::CSD::CScene> scene)
+	static void IntroAnim(Chao::CSD::CScene* scene)
 	{
 		scene->SetMotion("Intro_Anim");
 		scene->SetMotionFrame(0.0f);
@@ -79,5 +80,7 @@ public:
 	}
 
 	static void SplitTextToSeparateCasts(Chao::CSD::CScene* scene, const char* formatCastName, const char* text, int maxCharacterPerLine, int maxLines);
-	static void initialize();
+	static void CheckSceneAnimation(int i = -1, Chao::CSD::CScene* scene = nullptr);
+	static void update();
+
 };

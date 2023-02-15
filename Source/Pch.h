@@ -30,6 +30,7 @@
 #include <INIReader.h>
 #include <json/json.h>
 #include <Helpers.h>
+#include "UnleashedHUDAPI.h"
 
 // Alternative Audio Backend
 #define WITH_MINIAUDIO
