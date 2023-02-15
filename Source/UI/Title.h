@@ -16,7 +16,10 @@ public:
 	static void setSubmenu(bool enabled);
 	static void setScrollDirection(bool horizontal);
 	static void introAnim(Chao::CSD::RCPtr<Chao::CSD::CScene> scene);
+	static void ShowWindow(const char* text);
+	static void HideWindow();
 	static bool canLoad;
+	static bool inWorldMap;
 	static bool inInstall;
 
 	static enum TitleIndexState {

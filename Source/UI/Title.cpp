@@ -5,7 +5,8 @@ boost::shared_ptr<Sonic::StageSelectMenu::CDebugStageSelectMenuXml> spDebugMenu;
 
 Title::TitleIndexState currentTitleIndex = Title::TitleIndexState::New_Game;
 Hedgehog::Math::CVector2* scale = new Hedgehog::Math::CVector2(1, 1);
-bool enteredStart, isInSubmenu, moved, hasSavefile, playingStartAnim, reversedAnim, isStartAnimComplete, startButtonAnimComplete, startBgAnimComplete, parsedSave, showedWindow, inWorldMap = false;
+bool enteredStart, isInSubmenu, moved, hasSavefile, playingStartAnim, reversedAnim, isStartAnimComplete, startButtonAnimComplete, startBgAnimComplete, parsedSave, showedWindow = false;
+bool Title::inWorldMap = false;
 bool inTitle, scrollHorizontally = true;
 bool Title::canLoad = 0;
 bool Title::inInstall = 0;
@@ -63,9 +64,9 @@ void __declspec(naked) TitleUI_SetCutsceneTimer()
 }
 void ContinueToWM()
 {
-	if (!inWorldMap)
+	if (!Title::inWorldMap)
 	{
-		inWorldMap = true;
+		Title::inWorldMap = true;
 		Title::setHideEverything(true, true);
 		PlayTitleBGM(TitleStateContextBase, "Option");
 		CSDCommon::FreezeMotion(*rcTitleLogo_1);
@@ -242,7 +243,7 @@ void __fastcall CTitleRemoveCallback(Sonic::CGameObject* This, void*, Sonic::CGa
 	currentTitleIndex = Title::TitleIndexState::New_Game;
 	holdTimer = 0;
 	Title::canLoad = 0;
-	inWorldMap = 0;
+	Title::inWorldMap = 0;
 }
 void Title::setHideEverything(bool visible, bool logoVisible)
 {
@@ -465,7 +466,7 @@ HOOK(void*, __fastcall, Title_UpdateApplication, 0xE7BED0, Sonic::CGameObject* T
 	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
 
 
-	if (inTitle && !inWorldMap)
+	if (inTitle && !Title::inWorldMap)
 	{
 
 		if (currentTitleIndex == 3 && isInSubmenu && inputPtr->IsDown(Sonic::eKeyState_B)) //janky way of knowing when the quit prompt is aborted
@@ -589,6 +590,29 @@ void ShowWindowWithTextMaybe(const char* cast, void* handle, const char* display
 		call    func
 	};
 };
+void Title::HideWindow()
+{
+	MiniAudioHelper::playSound(stageSelectHandle, 1000005, "", false, false);
+	bg_window->SetHideFlag(true);
+	fg_window->SetHideFlag(true);
+	txt_window->SetHideFlag(true);
+	footer_window->SetHideFlag(true);
+}
+void Title::ShowWindow(const char* text)
+{
+	CSDCommon::SplitTextToSeparateCasts(*txt_window, "text_line_%d", "\n\n\n\n\n\n\n", 199, 7);
+	CSDCommon::PlayAnimation(*bg_window, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+	CSDCommon::PlayAnimation(*fg_window, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+	CSDCommon::PlayAnimation(*txt_window, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+	CSDCommon::PlayAnimation(*footer_window, "Usual_Anim_1", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+	bg_window->SetHideFlag(false);
+	fg_window->SetHideFlag(false);
+	txt_window->SetHideFlag(false);
+	footer_window->SetHideFlag(false);
+	auto pos = fg_window->GetNode("text_area")->GetPosition();
+	txt_window->SetPosition(pos.x(), pos.y());
+	CSDCommon::SplitTextToSeparateCasts(*txt_window, "text_line_%d", text, 199, 7);
+}
 HOOK(void, __fastcall, sub_571F80, 0x571F80, int This)
 {
 	auto inputState = Sonic::CInputState::GetInstance();
@@ -600,28 +624,13 @@ HOOK(void, __fastcall, sub_571F80, 0x571F80, int This)
 
 		if (!showedWindow)
 		{
-			CSDCommon::PlayAnimation(*bg_window, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-			CSDCommon::PlayAnimation(*fg_window, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-			CSDCommon::PlayAnimation(*txt_window, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-			CSDCommon::PlayAnimation(*footer_window, "Usual_Anim_1", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-			bg_window->SetHideFlag(false);
-			fg_window->SetHideFlag(false);
-			txt_window->SetHideFlag(false);
-			footer_window->SetHideFlag(false);
-			auto pos = fg_window->GetNode("text_area")->GetPosition();
-			txt_window->SetPosition(pos.x(), pos.y());
-			CSDCommon::SplitTextToSeparateCasts(*txt_window, "text_line_%d", "This game utilizes\nan autosave feature.\nPlease do not turn off\nthe console or remove\nany storage device when\nthe autosave icon º appears\non the screen.", 199, 7);
-			//txt_window->GetNode("text_line_0")->SetText("#autosave_txt");
+			Title::ShowWindow("This game utilizes\nan autosave feature.\nPlease do not turn off\nthe console or remove\nany storage device when\nthe autosave icon º appears\non the screen.");
 			showedWindow = true;
 		}
 
 		if (inputPtr->IsTapped(Sonic::eKeyState_A))
 		{
-			MiniAudioHelper::playSound(stageSelectHandle, 1000005, "", false, false);
-			bg_window->SetHideFlag(true);
-			fg_window->SetHideFlag(true);
-			txt_window->SetHideFlag(true);
-			footer_window->SetHideFlag(true);
+			Title::HideWindow();
 			originalsub_571F80(This);
 		}
 		return;

@@ -3,107 +3,11 @@
 //	Add proper white-world support
 //  Make all things related to title custom renderables instead of title renderables
 
-struct FlagUIInformation
-{
-	Chao::CSD::RCPtr<Chao::CSD::CScene> flag;
-	Chao::CSD::RCPtr<Chao::CSD::CScene> sun_moon;
-	int id;
-	bool night, playingMedalTransition;
-	float visibility;
-};
+using namespace hh::math;
+
 //vs shits itself if these are in pch, no idea why
 constexpr double RAD2DEG = 57.29578018188477;
 constexpr double DEG2RAD = 0.01745329238474369; 
-using namespace hh::math;
-class CObjDropRing : public Sonic::CGameObject3D
-{
-	hh::math::CMatrix44 m_Transform;
-	hh::math::CQuaternion m_Rotation;
-	hh::math::CQuaternion m_TargetRotation;
-
-	float m_LifeTime{};
-	boost::shared_ptr<hh::mr::CSingleElement> m_spModel;
-
-public:
-	CObjDropRing()
-	{
-		const auto spCamera = Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera();
-		const hh::math::CMatrix viewTransform = spCamera->m_MyCamera.m_View * hh::math::CMatrix::Identity();
-		m_TargetRotation = viewTransform.rotation().inverse();
-		m_Transform = spCamera->m_MyCamera.m_Projection * viewTransform.matrix();
-		m_Transform.normalize();
-		m_Rotation = m_TargetRotation;
-	}
-
-	void AddCallback(const Hedgehog::Base::THolder<Sonic::CWorld>& worldHolder, Sonic::CGameDocument* pGameDocument,
-		const boost::shared_ptr<Hedgehog::Database::CDatabase>& spDatabase) override
-	{
-		Sonic::CApplicationDocument::GetInstance()->AddMessageActor("GameObject", this);
-		pGameDocument->AddUpdateUnit("f", this);
-
-		m_spModel = boost::make_shared<hh::mr::CSingleElement>(hh::mr::CMirageDatabaseWrapper(spDatabase.get()).GetModelData("title_parts"));		
-		m_LifeTime = 0.0f;
-	}
-
-	void UpdateParallel(const Hedgehog::Universe::SUpdateInfo& updateInfo) override
-	{
-		/*const auto spCamera = m_pMember->m_pGameDocument->GetWorld()->GetCamera();
-
-		const hh::math::CMatrix44 invProj = spCamera->m_MyCamera.m_Projection.inverse();
-		const hh::math::CMatrix invView = spCamera->m_MyCamera.m_View.inverse();
-
-		constexpr float gravity = -9.81f;
-		Hedgehog::Math::CVector2 const velPrev = m_2DVelocity;
-		m_2DVelocity += Hedgehog::Math::CVector2::UnitY() * gravity * updateInfo.DeltaTime;
-		m_2DPosition += (velPrev + m_2DVelocity) * 0.5f * updateInfo.DeltaTime;
-
-		auto& rTransform = m_spModel->m_spInstanceInfo->m_Transform;
-		auto& rMatrix = rTransform.matrix();
-
-		rTransform = m_Transform;
-
-		const float scale = max(rMatrix.col(0).head<3>().norm(),
-			max(rMatrix.col(1).head<3>().norm(), rMatrix.col(2).head<3>().norm()));
-
-		rMatrix.col(0) /= (scale / 0.2f);
-		rMatrix.col(1) /= (scale / 0.2f);
-		rMatrix.col(2) /= (scale / 0.2f);
-
-		rTransform(0, 3) = m_2DPosition.x();
-		rTransform(1, 3) = m_2DPosition.y();
-		rTransform(2, 3) = 0.1f;
-		rTransform(3, 3) = 1.0f;
-
-		rTransform = invProj * rTransform.matrix();
-		rTransform.rotate(m_Rotation);
-		rTransform = invView * rTransform;
-
-		(&rTransform)[1] = rTransform;
-
-		m_Rotation = m_TargetRotation;
-
-		m_LifeTime += updateInfo.DeltaTime;
-		if (m_LifeTime > 2.0f)
-		{
-			SendMessage(m_ActorID, boost::make_shared<Sonic::Message::MsgKill>());
-		}*/
-	}
-
-	bool ProcessMessage(Hedgehog::Universe::Message& message, bool flag) override
-	{
-		if (flag)
-		{
-			if (std::strstr(message.GetType(), "MsgRestartStage") != nullptr
-				|| std::strstr(message.GetType(), "MsgStageClear") != nullptr)
-			{
-				SendMessage(m_ActorID, boost::make_shared<Sonic::Message::MsgKill>());
-				return true;
-			}
-		}
-
-		return Sonic::CGameObject::ProcessMessage(message, flag);
-	}
-};
 bool  TitleWorldMap::LoadingReplacementEnabled= true;
 bool  TitleWorldMap::ForceLoadToFlowTitle = false;
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcWorldMap;
@@ -146,8 +50,8 @@ int selectedCapital = 0;
 bool isStageWindowOpen, capitalWindowOpen = false;
 bool playingPointerMove;
 bool introPlayed = false;
-bool disabledStick = true;
-bool disabledTarget = true;
+bool TitleWorldMap::TitleWorldMap::DisabledStick = true;
+bool TitleWorldMap::TitleWorldMap::DisabledTarget = true;
 bool cursorSelected = false;
 bool playingPan = false;
 float timePan, timeStageSelectDelay = 0;
@@ -194,7 +98,7 @@ Sonic::CGameObject* PauseInitTest(Sonic::CGameObject* objectt, int PAUSEtype)
 	};
 };
 
-void SetHideEverythingWM(bool hide)
+void TitleWorldMap::SetHideEverything(bool hide)
 {
 	infobg1->SetHideFlag(hide);
 	worldmap_footer_img_A->SetHideFlag(hide);
@@ -313,7 +217,7 @@ void SetCursorPos(const CVector2& pos)
 }
 bool IsInsideCursorRange(const CVector2& input, float visibility, int flagID)
 {
-	if (!cursorL || disabledStick)
+	if (!cursorL || TitleWorldMap::DisabledStick)
 		return false;
 	bool result = false;
 	float range = 100;
@@ -496,7 +400,7 @@ void TitleWorldMap::Start()
 	//Set lives text
 	infoimg1->GetNode("num")->SetText(Common::IntToString(Common::GetLivesCount(), "%02d"));
 	introPlayed = false;
-	SetHideEverythingWM(false);
+	TitleWorldMap::SetHideEverything(false);
 	PlayCursorAnim("Intro_Anim");
 	CSDCommon::PlayAnimation(*infobg1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 	CSDCommon::PlayAnimation(*infoimg1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
@@ -514,17 +418,16 @@ void TitleWorldMap::Start()
 	PlayCursorAnim("Intro_Anim");
 	for (size_t i = 0; i < 9; i++)	CSDCommon::PlayAnimation(*flag[i].flag, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 	
-	Sonic::CGameDocument::GetInstance()->AddGameObject(earth = boost::make_shared<CObjDropRing>());
 }
 void TitleWorldMap::PlayPanningAnim()
 {
-	disabledTarget = true;
-	disabledStick = true;
+	TitleWorldMap::DisabledTarget = true;
+	TitleWorldMap::DisabledStick = true;
 	playingPan = true;
 }
 void TitleWorldMap::EnableInput()
 {
-	disabledStick = false;
+	TitleWorldMap::DisabledStick = false;
 }
 
 
@@ -584,12 +487,12 @@ void __fastcall CTitleWRemoveCallback(Sonic::CGameObject* This, void*, Sonic::CG
 	editorMulti = 1;
 	playingPan = false;
 	introPlayed = false;
-	disabledStick = true;
+	TitleWorldMap::DisabledStick = true;
 	rotationPitch = -0.4f;
 	FOV = 0.84906584f;
 	cameraDistance = 5.0f;
 	rotationYaw = 0.55f;
-	disabledTarget = true;
+	TitleWorldMap::DisabledTarget = true;
 	cursorSelected = false;
 	stageSelectedWindow = 0;
 	isStageWindowOpen = false;
@@ -853,7 +756,7 @@ HOOK(int, __fastcall, TitleWorldMap_CTitleMain, 0x0056FBE0, Sonic::CGameObject* 
 	TitleWorldMap::CreateScreen(This);
 	for (auto e : flag)	e.flag->SetHideFlag(true);
 	
-	SetHideEverythingWM(true);
+	TitleWorldMap::SetHideEverything(true);
 	cts_guide_4_misson->SetHideFlag(true);
 	cts_guide_5_medal->SetHideFlag(true);
 	cts_stage_window->SetHideFlag(true);
@@ -1227,12 +1130,12 @@ void PlayPan(CustomCamera* camera, const Hedgehog::Universe::SUpdateInfo& update
 	if (timePan >= 2.5f)
 	{
 		playingPan = false;
-		disabledTarget = false;
+		TitleWorldMap::DisabledTarget = false;
 	}
 	timePan += updateInfo.DeltaTime;
 	camHeight = LerpEaseInOut(-20, 0, timePan / 2.15f, true, false);
 	rotationPitch = LerpEaseInOut(-0.4f, -0.5f, timePan / 2.15f, true, true);
-	cameraDistance = LerpEaseInOut(5.0f, 20.0f, timePan / 2.15f, true, true);
+	cameraDistance = LerpEaseInOut(5.0f, 20.0f, timePan / 2.2f, true, true);
 	//FOV = LerpEaseInOut(0.84906584f, 0.44906584f, timePan / 2.15f, false, true);
 }
 float VectorAngle(const CVector& a, const CVector& b)
@@ -1253,7 +1156,7 @@ inline float lerpf(float a, float b, float t)
 }
 void MagnetizeToFlag(const CVector& flagPosition, float deltaTime)
 {
-	if (playingPan || disabledTarget || !TitleWorldMap::Active)
+	if (playingPan || TitleWorldMap::DisabledTarget || !TitleWorldMap::Active)
 		return;
 	// Helpful thing here
 	constexpr float halfway = (180.0f * DEG2RAD);
@@ -1323,7 +1226,7 @@ HOOK(void, __fastcall, TitleWorldMap_CameraUpdate, 0x0058CDA0, TransitionTitleCa
 
 	const bool hasInput = pan.squaredNorm() > deadzone * deadzone;
 
-	if (!disabledStick && hasInput && !isStageWindowOpen)
+	if (!TitleWorldMap::DisabledStick && hasInput && !isStageWindowOpen)
 	{
 		rotationPitch -= input.LeftStickVertical * rotationPitchRate * updateInfo.DeltaTime;
 		rotationYaw += input.LeftStickHorizontal * rotationYawRate * updateInfo.DeltaTime;
@@ -1529,6 +1432,7 @@ HOOK(int, __cdecl, sub_7C931F, 0x7C931F, int a1, const char* a2)
 	printf(a1);
 	return originalsub_7E27B0(a1);
 }
+
 HOOK(char, __stdcall, SaveRead, 0x00E7A220, int a1, void* file)
 {
 	return originalSaveRead(a1,file);

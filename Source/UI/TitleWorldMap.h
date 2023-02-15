@@ -1,4 +1,12 @@
 #pragma once
+struct FlagUIInformation
+{
+	Chao::CSD::RCPtr<Chao::CSD::CScene> flag;
+	Chao::CSD::RCPtr<Chao::CSD::CScene> sun_moon;
+	int id;
+	bool night, playingMedalTransition;
+	float visibility;
+};
 class CustomCamera : public Sonic::CGameObject, public Hedgehog::Universe::TStateMachine<CustomCamera>
 {
 public:
@@ -19,6 +27,7 @@ public:
 	float m_FieldOfViewTarget;
 	BB_INSERT_PADDING(0x50);
 };
+
 class TitleWorldMap
 {
 
@@ -41,6 +50,8 @@ public:
 	static bool Active;
 	static bool LoadingReplacementEnabled;
 	static bool ForceLoadToFlowTitle;
+	static bool DisabledStick;
+	static bool DisabledTarget;
 
 	
 	struct SaveStageInfo

@@ -128,9 +128,11 @@
     <ClCompile Include="System\EnemyTrigger.cpp" />
     <ClCompile Include="System\LetterboxHelper.cpp" />
     <ClCompile Include="System\MiniAudioHelper.cpp" />
+    <ClCompile Include="System\UpdateDirector.cpp" />
     <ClCompile Include="UI\Title.cpp" />
     <ClCompile Include="UI\TitleOption.cpp" />
     <ClCompile Include="UI\TitleWorldMap.cpp" />
+    <ClCompile Include="UI\TitleWorldMapPause.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Configuration.h" />
@@ -141,9 +143,11 @@
     <ClInclude Include="System\EnemyTrigger.h" />
     <ClInclude Include="System\LetterboxHelper.h" />
     <ClInclude Include="System\MiniAudioHelper.h" />
+    <ClInclude Include="System\UpdateDirector.h" />
     <ClInclude Include="UI\Title.h" />
     <ClInclude Include="UI\TitleOption.h" />
     <ClInclude Include="UI\TitleWorldMap.h" />
+    <ClInclude Include="UI\TitleWorldMapPause.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

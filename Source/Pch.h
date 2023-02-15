@@ -49,7 +49,9 @@
 #include "System/MiniAudioHelper.h"
 #include "System/LetterboxHelper.h"
 #include "System/CSDCommon.h"
+#include "System/UpdateDirector.h"
 
 #include "UI/Title.h"
 #include "UI/TitleWorldMap.h"
 #include "UI/TitleOption.h"
+#include "UI/TitleWorldMapPause.h"
