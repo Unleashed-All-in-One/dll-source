@@ -157,8 +157,8 @@ void PauseCase(int pos)
 HOOK(void*, __fastcall, TitleWorldMapPause_UpdateApplication, 0xE7BED0, Sonic::CGameObject* This, void* Edx, float elapsedTime, uint8_t a3)
 {
 	if(!TitleWorldMap::Active)
-
 		return originalTitleWorldMapPause_UpdateApplication(This, Edx, elapsedTime, a3);
+
 	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
 	if (inputPtr->IsTapped(Sonic::eKeyState_Start) && TitleWorldMap::Active && !active)
 	{

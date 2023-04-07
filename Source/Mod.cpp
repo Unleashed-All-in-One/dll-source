@@ -12,7 +12,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	EnemyTrigger::applyPatches();
 	LetterboxHelper::initialize(1280, 720);
 	MiniAudioHelper::initialize(modInfo->CurrentMod->Path);
-
+	DiscordStatus::Initialize();
 	//---------------Gameplay---------------
 	QSSRestore::applyPatches();
 
@@ -50,4 +50,5 @@ extern "C" void __declspec(dllexport) OnFrame()
 {
 	//---------------System---------------
 	CSDCommon::update();
+	DiscordStatus::Update();
 }

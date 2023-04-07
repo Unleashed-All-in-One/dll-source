@@ -30,6 +30,7 @@
 #include <INIReader.h>
 #include <json/json.h>
 #include <Helpers.h>
+#include "System/DiscordGameSDK/discord.h"
 #include "UnleashedHUDAPI.h"
 
 // Alternative Audio Backend
@@ -44,6 +45,7 @@
 
 #include "Gameplay/QSSRestore.h"
 
+#include "System/DiscordStatus.h"
 #include "System/ArchiveTreePatcher.h"
 #include "System/EnemyTrigger.h"
 #include "System/MiniAudioHelper.h"

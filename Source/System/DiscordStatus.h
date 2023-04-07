@@ -1,5 +1,5 @@
 #pragma once
-#define CLIENT_ID "1092192076260704345"
+#define CLIENT_ID 1092192076260704345
 
 enum class StageType {
 	Day,
@@ -75,7 +75,7 @@ static std::vector<DiscordPresenceData> presenceData = {
 	}
 };
 
-class Discord {
+class DiscordStatus {
 public:
 	static void Initialize();
 	static void ChangeInformationFromStageInfo() {
@@ -108,8 +108,9 @@ public:
 			break;
 		}
 
-		Update();
+		UpdateActivityInformation();
 	}
+	static void UpdateActivityInformation();
 	static void Update();
 
 	static inline std::string StageTypeText = "Day";

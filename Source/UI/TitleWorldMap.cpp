@@ -8,7 +8,7 @@ using namespace hh::math;
 //vs shits itself if these are in pch, no idea why
 constexpr double RAD2DEG = 57.29578018188477;
 constexpr double DEG2RAD = 0.01745329238474369; 
-bool  TitleWorldMap::LoadingReplacementEnabled= true;
+bool  TitleWorldMap::LoadingReplacementEnabled= false;
 bool  TitleWorldMap::ForceLoadToFlowTitle = false;
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcWorldMap;
 boost::shared_ptr<Sonic::CGameObjectCSD> spWorldMap;
@@ -1384,8 +1384,8 @@ void __declspec(naked) InterceptGameplayFlowLoading()
 	static uint32_t loc_D0E170 = 0xD0E170;
 	__asm
 	{ 
-		cmp TitleWorldMap::LoadingReplacementEnabled, 1
-		jne FunctionFinish
+		/*cmp TitleWorldMap::LoadingReplacementEnabled, 1
+		jne FunctionFinish*/
 		//Original function
 		mov     esi, eax
 		xor eax, eax

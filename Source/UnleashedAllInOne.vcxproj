@@ -62,7 +62,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\Dependencies;..\Dependencies\Detours\include;..\Dependencies\Loaders;..\Include\BlueBlur;..\Include\BlueBlurCustom;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Dependencies;..\Dependencies\Detours\include;..\Dependencies\Loaders;..\Include\BlueBlur;..\Include\BlueBlurCustom;..\Dependencies\Discord;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Pch.h</ForcedIncludeFiles>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -70,8 +70,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>detours.lib;syelog.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\Dependencies\Detours\lib\x86;..\Include\BlueBlur;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>detours.lib;syelog.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\Dependencies\Detours\lib\x86;..\Include\BlueBlur;..\Dependencies\Discord\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -102,8 +102,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>detours.lib;syelog.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\Dependencies\Detours\lib\x86;..\Include\BlueBlur;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>detours.lib;syelog.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\Dependencies\Detours\lib\x86;..\Include\BlueBlur;..\Dependencies\Discord\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -125,6 +125,21 @@
     <ClCompile Include="Gameplay\QSSRestore.cpp" />
     <ClCompile Include="System\ArchiveTreePatcher.cpp" />
     <ClCompile Include="System\CSDCommon.cpp" />
+    <ClCompile Include="System\DiscordStatus.cpp" />
+    <ClCompile Include="System\DiscordGameSDK\achievement_manager.cpp" />
+    <ClCompile Include="System\DiscordGameSDK\activity_manager.cpp" />
+    <ClCompile Include="System\DiscordGameSDK\application_manager.cpp" />
+    <ClCompile Include="System\DiscordGameSDK\core.cpp" />
+    <ClCompile Include="System\DiscordGameSDK\image_manager.cpp" />
+    <ClCompile Include="System\DiscordGameSDK\lobby_manager.cpp" />
+    <ClCompile Include="System\DiscordGameSDK\network_manager.cpp" />
+    <ClCompile Include="System\DiscordGameSDK\overlay_manager.cpp" />
+    <ClCompile Include="System\DiscordGameSDK\relationship_manager.cpp" />
+    <ClCompile Include="System\DiscordGameSDK\storage_manager.cpp" />
+    <ClCompile Include="System\DiscordGameSDK\store_manager.cpp" />
+    <ClCompile Include="System\DiscordGameSDK\types.cpp" />
+    <ClCompile Include="System\DiscordGameSDK\user_manager.cpp" />
+    <ClCompile Include="System\DiscordGameSDK\voice_manager.cpp" />
     <ClCompile Include="System\EnemyTrigger.cpp" />
     <ClCompile Include="System\LetterboxHelper.cpp" />
     <ClCompile Include="System\MiniAudioHelper.cpp" />
@@ -140,6 +155,24 @@
     <ClInclude Include="Gameplay\QSSRestore.h" />
     <ClInclude Include="System\ArchiveTreePatcher.h" />
     <ClInclude Include="System\CSDCommon.h" />
+    <ClInclude Include="System\DiscordStatus.h" />
+    <ClInclude Include="System\DiscordGameSDK\achievement_manager.h" />
+    <ClInclude Include="System\DiscordGameSDK\activity_manager.h" />
+    <ClInclude Include="System\DiscordGameSDK\application_manager.h" />
+    <ClInclude Include="System\DiscordGameSDK\core.h" />
+    <ClInclude Include="System\DiscordGameSDK\discord.h" />
+    <ClInclude Include="System\DiscordGameSDK\event.h" />
+    <ClInclude Include="System\DiscordGameSDK\ffi.h" />
+    <ClInclude Include="System\DiscordGameSDK\image_manager.h" />
+    <ClInclude Include="System\DiscordGameSDK\lobby_manager.h" />
+    <ClInclude Include="System\DiscordGameSDK\network_manager.h" />
+    <ClInclude Include="System\DiscordGameSDK\overlay_manager.h" />
+    <ClInclude Include="System\DiscordGameSDK\relationship_manager.h" />
+    <ClInclude Include="System\DiscordGameSDK\storage_manager.h" />
+    <ClInclude Include="System\DiscordGameSDK\store_manager.h" />
+    <ClInclude Include="System\DiscordGameSDK\types.h" />
+    <ClInclude Include="System\DiscordGameSDK\user_manager.h" />
+    <ClInclude Include="System\DiscordGameSDK\voice_manager.h" />
     <ClInclude Include="System\EnemyTrigger.h" />
     <ClInclude Include="System\LetterboxHelper.h" />
     <ClInclude Include="System\MiniAudioHelper.h" />
