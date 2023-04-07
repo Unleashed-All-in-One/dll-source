@@ -78,11 +78,11 @@ static std::vector<DiscordPresenceData> presenceData = {
 class DiscordStatus {
 public:
 	static void Initialize();
-	static void ChangeInformationFromStageInfo() {
+	static void ChangeInformationFromStageInfo(bool timestamp) {
 		uint8_t stageID = Common::GetCurrentStageID() & 0xFF;
 		static char* stageName = *(char**)(4 * stageID + 0x1E66B48);
 		stageName[5] = '0' + ((Common::GetCurrentStageID() & 0xFF00) >> 8);
-
+		useTimestamp = timestamp;
 		for (DiscordPresenceData data : presenceData) {
 			if (std::string(stageName) == data.id) {
 				ChangeInformation(data);
@@ -90,12 +90,6 @@ public:
 		}
 	}
 	static void ChangeInformation(DiscordPresenceData data) {
-		TopText = data.action;
-		BottomText = data.stage + ", Act";
-
-		partySize = data.act;
-		partyMax = data.maxAct;
-
 		switch (data.stageType)
 		{
 		case StageType::Day:
@@ -108,6 +102,14 @@ public:
 			break;
 		}
 
+		TopText = data.action;
+		char buffer[64];
+		snprintf(buffer,64, "%s %s, Act %d", data.stage.c_str(), StageTypeText.c_str(), data.act);
+		BottomText = buffer;
+
+
+		
+
 		UpdateActivityInformation();
 	}
 	static void UpdateActivityInformation();
@@ -116,7 +118,7 @@ public:
 	static inline std::string StageTypeText = "Day";
 	static inline std::string Thumbnail = "icon";
 	static inline std::string ThumbnailSmall = "day";
-
+	static inline bool useTimestamp = false;
 	static inline int partySize = 1;
 	static inline int partyMax = 1;
 

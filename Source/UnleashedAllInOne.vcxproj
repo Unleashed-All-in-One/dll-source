@@ -78,7 +78,8 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E</Command>
+      <Command>xcopy "$(ProjectDir)bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E
+xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -110,7 +111,8 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E</Command>
+      <Command>xcopy "$(ProjectDir)bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E
+xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

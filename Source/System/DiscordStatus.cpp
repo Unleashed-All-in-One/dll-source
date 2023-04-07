@@ -11,7 +11,7 @@ HOOK(void, __fastcall, HudLoading_CHudLoadingCStateIntroBegin, 0x10938F0, hh::fn
 	m_isEvent = !std::string(eventName).empty();
 
 	if (!m_isEvent) {
-		DiscordStatus::ChangeInformationFromStageInfo();
+		DiscordStatus::ChangeInformationFromStageInfo(true);
 	}
 
 	originalHudLoading_CHudLoadingCStateIntroBegin(This);
@@ -27,7 +27,10 @@ void DiscordStatus::Initialize()
 	coreResult == discord::Result::Ok && core
 		? printf("[DiscordStatus] Core Initialized Successfully!\n")
 		: printf("[DiscordStatus] Core Initialization failed!\n");
-	currentActivity.GetTimestamps().SetStart(time(0));
+	core->SetLogHook(discord::LogLevel::Debug, Log);
+	core->SetLogHook(discord::LogLevel::Info, Log);
+	core->SetLogHook(discord::LogLevel::Warn, Log);
+	core->SetLogHook(discord::LogLevel::Error, Log);
 }
 void DiscordStatus::Update()
 {
@@ -36,24 +39,22 @@ void DiscordStatus::Update()
 
 void DiscordStatus::UpdateActivityInformation()
 {
+	if (useTimestamp)
+	{
+		currentActivity.GetTimestamps().SetStart(time(0));
+	}
 	currentActivity.SetType(discord::ActivityType::Playing);
 	currentActivity.SetDetails(TopText.c_str());
 	currentActivity.SetState(BottomText.c_str());
 
 	currentActivity.GetAssets().SetLargeImage(Thumbnail.c_str());
-	//currentActivity.largeImageText = Country;
-
-  /*  currentActivity.GetParty(). = partySize;
-	currentActivity.partyMax = partyMax;*/
-
 	currentActivity.GetAssets().SetSmallImage(ThumbnailSmall.c_str());
 	currentActivity.GetAssets().SetSmallText(StageTypeText.c_str());
 	core->ActivityManager().UpdateActivity(currentActivity, [](discord::Result result) {
-		std::cout << "Activity callback begin\n";
 
 	result == discord::Result::Ok
-		? std::cout << "Activity Callback Ok\n"
-		: std::cout << "Activity Callback Not Ok\n";
+		? std::cout << "[DiscordStatus] Activity Update Success!\n"
+		: std::cout << "[DiscordStatus] Activity Update Failed!\n";
 		});
 
 }
