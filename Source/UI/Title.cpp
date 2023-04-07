@@ -504,6 +504,9 @@ HOOK(void*, __fastcall, Title_UpdateApplication, 0xE7BED0, Sonic::CGameObject* T
 				currentTitleIndex = (Title::TitleIndexState)((int)(currentTitleIndex)+1);
 				if (currentTitleIndex > maxTitleIndex)
 					currentTitleIndex = Title::TitleIndexState::New_Game;
+
+				if (currentTitleIndex == Title::TitleIndexState::Continue && !hasSavefile)
+					currentTitleIndex = Title::TitleIndexState::Options;
 				MiniAudioHelper::playSound(stageSelectHandle, 0, "Cursor", false);
 				CSDCommon::PlayAnimation(*rcTitleMenuScroll, "Scroll_Anim_2_1", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 				CSDCommon::PlayAnimation(*rcTitleMenu, "Scroll_Anim_2_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 100, false, true);
@@ -517,6 +520,8 @@ HOOK(void*, __fastcall, Title_UpdateApplication, 0xE7BED0, Sonic::CGameObject* T
 				if (currentTitleIndex < 0 || currentTitleIndex > maxTitleIndex) //uint32s become huge when going negative
 					currentTitleIndex = (Title::TitleIndexState)maxTitleIndex;
 
+				if (currentTitleIndex == Title::TitleIndexState::Continue && !hasSavefile)
+					currentTitleIndex = Title::TitleIndexState::New_Game;
 				CSDCommon::PlayAnimation(*rcTitleMenuScroll, "Scroll_Anim_2_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 				CSDCommon::PlayAnimation(*rcTitleMenu, "Scroll_Anim_2_1", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 100, false, true);
 				UpdateTitleText();
@@ -531,7 +536,6 @@ HOOK(void*, __fastcall, Title_UpdateApplication, 0xE7BED0, Sonic::CGameObject* T
 			}
 			if ((IsLeftDown() || IsRightDown()) && moved)
 			{
-
 				holdTimer = holdTimer + 1.0f;
 				printf("\nTIMER %d", holdTimer);
 				if (holdTimer > 20)
@@ -541,6 +545,7 @@ HOOK(void*, __fastcall, Title_UpdateApplication, 0xE7BED0, Sonic::CGameObject* T
 					holdTimer = 0;
 				}
 			}
+				
 		}
 #pragma endregion
 	}
