@@ -47,11 +47,18 @@ public:
 	static hh::math::CQuaternion QuaternionFromAngleAxis(float angle, const hh::math::CVector& axis);
 	static void PlayPanningAnim();
 	static void EnableInput();
+
+
 	static bool Active;
 	static bool LoadingReplacementEnabled;
 	static bool ForceLoadToFlowTitle;
 	static bool DisabledStick;
 	static bool DisabledTarget;
+	static bool CapitalWindowOpen;
+	static bool CamInitialized;
+	static int LastValidFlagSelected;
+	static int StageSelectedWindow;
+	static FlagUIInformation Flag[9];
 
 	
 	struct SaveStageInfo

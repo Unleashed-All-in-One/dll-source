@@ -144,8 +144,10 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="System\DiscordGameSDK\voice_manager.cpp" />
     <ClCompile Include="System\EnemyTrigger.cpp" />
     <ClCompile Include="System\LetterboxHelper.cpp" />
+    <ClCompile Include="System\LevelLoadingManager.cpp" />
     <ClCompile Include="System\MiniAudioHelper.cpp" />
     <ClCompile Include="System\UpdateDirector.cpp" />
+    <ClCompile Include="Testing\TestingCode.cpp" />
     <ClCompile Include="UI\Title.cpp" />
     <ClCompile Include="UI\TitleOption.cpp" />
     <ClCompile Include="UI\TitleWorldMap.cpp" />
@@ -177,8 +179,10 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="System\DiscordGameSDK\voice_manager.h" />
     <ClInclude Include="System\EnemyTrigger.h" />
     <ClInclude Include="System\LetterboxHelper.h" />
+    <ClInclude Include="System\LevelLoadingManager.h" />
     <ClInclude Include="System\MiniAudioHelper.h" />
     <ClInclude Include="System\UpdateDirector.h" />
+    <ClInclude Include="Testing\TestingCode.h" />
     <ClInclude Include="UI\Title.h" />
     <ClInclude Include="UI\TitleOption.h" />
     <ClInclude Include="UI\TitleWorldMap.h" />

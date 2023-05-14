@@ -8,6 +8,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
 	//---------------System---------------
+	LevelLoadingManager::initialize();
 	ArchiveTreePatcher::applyPatches();
 	EnemyTrigger::applyPatches();
 	LetterboxHelper::initialize(1280, 720);
@@ -24,6 +25,8 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	// same way unleashed does it (via an small options sub-tab-thing and remove TitleOption entirely.
 	// Right now, exiting from Options will cause a crash due to the saving/loading in the WorldMap.
 	TitleOption::applyPatches();
+
+	TestingCode::applyPatches();
 }
 
 extern "C" __declspec(dllexport) void PostInit()
@@ -50,5 +53,6 @@ extern "C" void __declspec(dllexport) OnFrame()
 {
 	//---------------System---------------
 	CSDCommon::update();
-	DiscordStatus::Update();
+	DiscordStatus::update();
+	LevelLoadingManager::update();
 }

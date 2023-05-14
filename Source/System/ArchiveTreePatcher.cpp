@@ -96,9 +96,14 @@ void ArchiveTreePatcher::applyPatches()
     m_archiveDependencies.push_back(ArchiveDependency("WorldMap", { "Title" }));
     m_archiveDependencies.push_back(ArchiveDependency("TitleModel", { "Title" }));
     m_archiveDependencies.push_back(ArchiveDependency("GenericWindow", { "Title" }));
+    std::vector<std::string> whiteworld = Configuration::getAllWhiteWorld();
+    for (size_t i = 0; i < whiteworld.size(); i++)
+    {
+        m_archiveDependencies.push_back(ArchiveDependency("etfdoor", { whiteworld[i] }));
+        m_archiveDependencies.push_back(ArchiveDependency("SonicPam", { whiteworld[i] }));      
+    }
     m_archiveDependencies.push_back(ArchiveDependency("myk_cmn", { "ghz_cmn" }));
     m_archiveDependencies.push_back(ArchiveDependency("JumpSelector", { "cmn200" }));
-
     if (!m_archiveDependencies.empty())
     {
         INSTALL_HOOK(ArchiveTreePatcher_ParseArchiveTree);

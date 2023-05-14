@@ -32,7 +32,7 @@ void DiscordStatus::Initialize()
 	core->SetLogHook(discord::LogLevel::Warn, Log);
 	core->SetLogHook(discord::LogLevel::Error, Log);
 }
-void DiscordStatus::Update()
+void DiscordStatus::update()
 {
 	core->RunCallbacks();
 }

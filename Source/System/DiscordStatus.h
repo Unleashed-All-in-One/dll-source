@@ -113,7 +113,7 @@ public:
 		UpdateActivityInformation();
 	}
 	static void UpdateActivityInformation();
-	static void Update();
+	static void update();
 
 	static inline std::string StageTypeText = "Day";
 	static inline std::string Thumbnail = "icon";

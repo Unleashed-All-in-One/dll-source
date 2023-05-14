@@ -3,6 +3,7 @@
 //	Add proper white-world support
 //  Make all things related to title custom renderables instead of title renderables
 
+boost::shared_ptr<Sonic::CGameObject3D> m_spSkyGemSingleton;
 using namespace hh::math;
 
 //vs shits itself if these are in pch, no idea why
@@ -19,7 +20,8 @@ Chao::CSD::RCPtr<Chao::CSD::CScene> cts_stage_window, cts_stage_select, cts_name
 Chao::CSD::RCPtr<Chao::CSD::CScene> cts_choices_bg, cts_choices_window, cts_choices_select;
 
 
-FlagUIInformation flag[9];
+bool TitleWorldMap::CamInitialized = false;
+FlagUIInformation TitleWorldMap::Flag[9];
 //	theres defo a better way to handle this
 bool isInShade[9];
 bool sunMoonPlayingTransition[9];
@@ -36,18 +38,17 @@ CVector2* offsetAspect;
 CVector2* offsetRes;
 
 
-static bool isWhiteWorldEnabled = false;
 static float cameraDistance = 5.0f;
 static float rotationPitch = 20.0f;
 static float FOV = 0.84906584f;
 static float rotationYaw = 0.0f;
 float cursorMultiplier = 24;
-int stageSelectedWindow = 0;
+int TitleWorldMap::TitleWorldMap::StageSelectedWindow = 0;
 int stageSelectedWindowMax = 6;
 int flagSelectionAmount = 0;
 
 int selectedCapital = 0;
-bool isStageWindowOpen, capitalWindowOpen = false;
+bool isStageWindowOpen, TitleWorldMap::TitleWorldMap::CapitalWindowOpen = false;
 bool playingPointerMove;
 bool introPlayed = false;
 bool TitleWorldMap::TitleWorldMap::DisabledStick = true;
@@ -58,16 +59,98 @@ float timePan, timeStageSelectDelay = 0;
 float camHeight = -20;
 float lastflagSelectionAmount = 0;
 float editorMulti = 1;
-int currentFlagSelected, lastValidFlagSelected, lastFlagIn = 0;
+int currentFlagSelected, TitleWorldMap::TitleWorldMap::LastValidFlagSelected, lastFlagIn = 0;
 hh::fnd::CStateMachineBase::CStateBase* testState;
 boost::shared_ptr<Sonic::CLightManager> light;
-const char* lastStageID = "";
 boost::shared_ptr<Sonic::CGameObject3D> earth;
 bool TitleWorldMap::Active = false;
 float multiplierRotationLight = 0.1f;
 
+hh::math::CQuaternion rotationEarth;
 
-static bool camInitialized = false;
+class CTitleGameObject : public Sonic::CGameObject3D
+{
+	INSERT_PADDING(0x4);
+	void* m_GlitterPlayer;
+	boost::shared_ptr<hh::mr::CSingleElement> m_spModel;
+	Hedgehog::Math::CVector m_Position;
+	Hedgehog::Math::CVector m_Velocity;
+	float m_Gravity;
+	float m_LifeTime;
+	float m_DistTravelled; 
+	const char* name;
+
+public:
+	CTitleGameObject(Hedgehog::Math::CVector const& _Position,const char* _Name)
+		: m_Position(_Position)
+		, name(_Name)
+	{}
+
+	~CTitleGameObject()
+	{
+		if (m_GlitterPlayer)
+		{
+			typedef void* __fastcall CGlitterPlayerDestructor(void* This, void* Edx, bool freeMem);
+			CGlitterPlayerDestructor* destructorFunc = *(CGlitterPlayerDestructor**)(*(uint32_t*)m_GlitterPlayer);
+			destructorFunc(m_GlitterPlayer, nullptr, true);
+		}
+	}
+
+	void AddCallback
+	(
+		const Hedgehog::Base::THolder<Sonic::CWorld>& worldHolder,
+		Sonic::CGameDocument* pGameDocument,
+		const boost::shared_ptr<Hedgehog::Database::CDatabase>& spDatabase
+	) override
+	{
+		// Base on sub_1058B00
+		FUNCTION_PTR(void, __thiscall, FuncNeededToMakeGlitterWork, 0xD5CB80,
+			void* This,
+			const Hedgehog::Base::THolder<Sonic::CWorld>&worldHolder,
+			Sonic::CGameDocument * pGameDocument,
+			const boost::shared_ptr<Hedgehog::Database::CDatabase>&spDatabase);
+		FUNCTION_PTR(void*, __cdecl, CGlitterPlayerInit, 0x1255B40, Sonic::CGameDocument * pGameDocument);
+		FuncNeededToMakeGlitterWork(this, worldHolder, pGameDocument, spDatabase);
+		m_GlitterPlayer = CGlitterPlayerInit(pGameDocument);
+
+		// Prevent fpCGameObject3DMatrixNodeChangedCallback crashing
+		*(uint32_t*)((uint32_t)this + 0x1C) = 0;
+
+
+
+
+
+		FUNCTION_PTR(int, __thiscall, PlayUVAnimMaybe, 0x00752F00, Sonic::CGameObject3D * This, float a2);
+		FUNCTION_PTR(int, __thiscall, UVAnimStartM, 0x007597E0, Sonic::CGameObject * This, void* Edx, int a2, Hedgehog::Base::CSharedString * modelName, int flag);
+
+		Sonic::CApplicationDocument::GetInstance()->AddMessageActor("GameObject", this);
+		pGameDocument->AddUpdateUnit("0", this);
+
+		m_spModel = boost::make_shared<hh::mr::CSingleElement>(hh::mr::CMirageDatabaseWrapper(spDatabase.get()).GetModelData(name));
+		
+
+		AddRenderable("Object", m_spModel, false);
+		Common::ObjectCGlitterPlayerOneShot(this, "worldmap_sun");
+
+	}
+
+	void UpdateParallel
+	(
+		const Hedgehog::Universe::SUpdateInfo& updateInfo
+	) override
+	{
+		m_spMatrixNodeTransform->m_Transform.SetRotation(rotationEarth);
+	}
+
+	void Kill()
+	{
+		printf("[Sky Gem] Killed\n");
+		SendMessage(m_ActorID, boost::make_shared<Sonic::Message::MsgKill>());
+		m_spSkyGemSingleton = nullptr;
+	}
+};
+
+
 //From Brianuu's 06 Title
 boost::shared_ptr<SaveLoadTestStruct> m_spSave;
 FUNCTION_PTR(void, __thiscall, TitleWorldMap_CTitleOptionCStateOutroSaving, 0xD22A70, boost::shared_ptr<SaveLoadTestStruct>& spSave, void* a2);
@@ -124,8 +207,8 @@ void TitleWorldMap::SetHideEverything(bool hide)
 	
 	for (size_t i = 0; i < 9; i++)
 	{
-		flag[i].flag->SetHideFlag(hide);
-		flag[i].sun_moon->SetHideFlag(hide);
+		Flag[i].flag->SetHideFlag(hide);
+		Flag[i].sun_moon->SetHideFlag(hide);
 	}
 }
 void CalculateAspectOffsets()
@@ -276,7 +359,7 @@ void PopulateStageSelect(int id)
 		printf("\n[WorldMap] Missing config for FlagID %d", id);
 		return;
 	}
-	stageSelectedWindowMax = flag[id].night && Configuration::worldData.data[id].dataNight.size() != 0 ? Configuration::worldData.data[id].dataNight.size() - 1 : Configuration::worldData.data[id].data.size() - 1;
+	stageSelectedWindowMax = TitleWorldMap::Flag[id].night && Configuration::worldData.data[id].dataNight.size() != 0 ? Configuration::worldData.data[id].dataNight.size() - 1 : Configuration::worldData.data[id].data.size() - 1;
 	Common::ClampInt(stageSelectedWindowMax, 0, 6);
 	for (size_t i = 0; i < 6; i++)
 	{
@@ -289,7 +372,7 @@ void PopulateStageSelect(int id)
 			break;
 
 		const char* optionName;
-		if(flag[id].night && Configuration::worldData.data[id].dataNight.size() != 0)
+		if(TitleWorldMap::Flag[id].night && Configuration::worldData.data[id].dataNight.size() != 0)
 			optionName = Configuration::worldData.data[id].dataNight[i].optionName.c_str();
 		else
 			optionName = Configuration::worldData.data[id].data[i].optionName.c_str();
@@ -416,7 +499,7 @@ void TitleWorldMap::Start()
 	CSDCommon::PlayAnimation(*worldmap_footer_img_A, "Intro_Anim_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 
 	PlayCursorAnim("Intro_Anim");
-	for (size_t i = 0; i < 9; i++)	CSDCommon::PlayAnimation(*flag[i].flag, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+	for (size_t i = 0; i < 9; i++)	CSDCommon::PlayAnimation(*Flag[i].flag, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 	
 }
 void TitleWorldMap::PlayPanningAnim()
@@ -475,8 +558,8 @@ void __fastcall CTitleWRemoveCallback(Sonic::CGameObject* This, void*, Sonic::CG
 
 	for (size_t i = 0; i < 9; i++)
 	{
-		Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), flag[i].flag);
-		Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), flag[i].sun_moon);
+		Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), TitleWorldMap::Flag[i].flag);
+		Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), TitleWorldMap::Flag[i].sun_moon);
 	}
 	for (size_t i = 0; i < 8; i++)	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), deco_text[i]);
 
@@ -494,25 +577,11 @@ void __fastcall CTitleWRemoveCallback(Sonic::CGameObject* This, void*, Sonic::CG
 	rotationYaw = 0.55f;
 	TitleWorldMap::DisabledTarget = true;
 	cursorSelected = false;
-	stageSelectedWindow = 0;
+	TitleWorldMap::StageSelectedWindow = 0;
 	isStageWindowOpen = false;
 	timeStageSelectDelay = 0;
 	lastflagSelectionAmount = 0;
 
-}
-const char* GetStageToLoad()
-{
-	const char* stageToLoad = "ghz200";
-	if (capitalWindowOpen)
-		stageToLoad = Configuration::worldData.data[lastValidFlagSelected].data[Configuration::getCapital(lastValidFlagSelected)].levelID.c_str();
-	else
-	{
-		if (Configuration::worldData.data[lastValidFlagSelected].dataNight.size() != 0 && flag[lastValidFlagSelected].night)
-			stageToLoad = Configuration::worldData.data[lastValidFlagSelected].dataNight[stageSelectedWindow].levelID.c_str();
-		else
-			stageToLoad = Configuration::worldData.data[lastValidFlagSelected].data[stageSelectedWindow].levelID.c_str();
-	}
-	return stageToLoad;
 }
 void ShowTextAct(bool visible)
 {
@@ -566,7 +635,7 @@ void SetVisibilityStageWindow(bool visible)
 	CSDCommon::PlayAnimation(*cts_stage_info_window, "Intro_Anim_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true, !visible);
 	CSDCommon::FreezeMotion(*cts_stage_select, 0);
 
-	PopulateStageSelect(lastValidFlagSelected);
+	PopulateStageSelect(TitleWorldMap::LastValidFlagSelected);
 	cts_stage_select->SetHideFlag(!visible);
 	cts_stage_5_medal->SetHideFlag(!visible);
 	cts_guide_3_rank->SetHideFlag(!visible);
@@ -716,7 +785,7 @@ HOOK(int, __fastcall, TitleWorldMap_CTitleMain, 0x0056FBE0, Sonic::CGameObject* 
 	cursorT = rcWorldMap->CreateScene("cts_cursor");
 	cursorB = rcWorldMap->CreateScene("cts_cursor");
 	cursorR = rcWorldMap->CreateScene("cts_cursor");
-	camInitialized = false;
+	TitleWorldMap::CamInitialized = false;
 	constexpr float earthRadius = 5.25f; //Used to normalize flag positions to the globe's curvature
 	flagPositions.push_back(CVector(0.31f, 0.36f, 2.28f));
 	flagPositions.push_back(CVector(2.310000f, 2.360000f, 1.111371f));
@@ -736,25 +805,25 @@ HOOK(int, __fastcall, TitleWorldMap_CTitleMain, 0x0056FBE0, Sonic::CGameObject* 
 	//Set up sun/moon medals' animations
 	for (size_t i = 0; i < 9; i++)
 	{
-		flag[i] = FlagUIInformation();
+		TitleWorldMap::Flag[i] = FlagUIInformation();
 		
-		flag[i].flag = rcWorldMap->CreateScene("cts_parts_flag");
-		flag[i].sun_moon = rcWorldMap->CreateScene("cts_parts_sun_moon");
+		TitleWorldMap::Flag[i].flag = rcWorldMap->CreateScene("cts_parts_flag");
+		TitleWorldMap::Flag[i].sun_moon = rcWorldMap->CreateScene("cts_parts_sun_moon");
 
-		flag[i].playingMedalTransition = false;
-		CSDCommon::PlayAnimation(*flag[i].flag, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-		flag[i].flag->GetNode("img")->SetPatternIndex(i);
+		TitleWorldMap::Flag[i].playingMedalTransition = false;
+		CSDCommon::PlayAnimation(*TitleWorldMap::Flag[i].flag, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		TitleWorldMap::Flag[i].flag->GetNode("img")->SetPatternIndex(i);
 
 		float shadeAmount = fmax(0.0f, -(CVector(-79.8565f, 0, 4.78983f).dot((flagPositions.at(i) - CVector(0, 0, -2.34f)).normalized()))) * 100;
 		float visibility = fmax(0.0f, -(CVector(0, 0, -20).dot((flagPositions.at(i) - CVector(0, 0, -2.34f)).normalized()))) * 100;
 		bool isDark = shadeAmount > 50;
 
 		isInShade[i] = isDark;
-		CSDCommon::PlayAnimation(*flag[i].sun_moon, "Switch_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, isDark ? 0 : 100); //Set image to either sun or moon
-		CSDCommon::PlayAnimation(*flag[i].sun_moon, "Fade_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, visibility, visibility);
+		CSDCommon::PlayAnimation(*TitleWorldMap::Flag[i].sun_moon, "Switch_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, isDark ? 0 : 100); //Set image to either sun or moon
+		CSDCommon::PlayAnimation(*TitleWorldMap::Flag[i].sun_moon, "Fade_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, visibility, visibility);
 	}
 	TitleWorldMap::CreateScreen(This);
-	for (auto e : flag)	e.flag->SetHideFlag(true);
+	for (auto e : TitleWorldMap::Flag)	e.flag->SetHideFlag(true);
 	
 	TitleWorldMap::SetHideEverything(true);
 	cts_guide_4_misson->SetHideFlag(true);
@@ -789,6 +858,11 @@ HOOK(int, __fastcall, TitleWorldMap_CTitleMain, 0x0056FBE0, Sonic::CGameObject* 
 	cts_guide_4_misson->SetPosition(sceneFixPosX, 0);
 	cts_guide_5_medal->SetPosition(sceneFixPosX, 0);
 	
+
+	m_spSkyGemSingleton = boost::make_shared<CTitleGameObject>(CVector(-79.8565f, 0, 4.78983f), "title_parts_space");
+	earth = boost::make_shared<CTitleGameObject>(CVector(-79.8565f, 0, 4.78983f), "title_parts");
+	Sonic::CGameDocument::GetInstance()->AddGameObject(m_spSkyGemSingleton);
+
 	return originalTitleWorldMap_CTitleMain(This, Edx, a2, a3, a4);
 }
 
@@ -801,34 +875,37 @@ void Flags_Update()
 
 		float shadeAmount = fmax(0.0f, -(light->m_GlobalLightDirection.dot((flagPositions.at(i) - CVector(0, 0, -2.34f)).normalized()))) * 100;
 		bool isDark = shadeAmount > 50;
-		if (flag[i].playingMedalTransition && flag[i].sun_moon->m_MotionFrame == 0 || flag[i].sun_moon->m_MotionFrame == flag[i].sun_moon->m_MotionEndFrame) flag[i].playingMedalTransition = false;
+		if (TitleWorldMap::Flag[i].playingMedalTransition 
+			&& TitleWorldMap::Flag[i].sun_moon->m_MotionFrame == 0 
+			|| TitleWorldMap::Flag[i].sun_moon->m_MotionFrame == TitleWorldMap::Flag[i].sun_moon->m_MotionEndFrame)
+			TitleWorldMap::Flag[i].playingMedalTransition = false;
 
 		if (introPlayed)
-			CSDCommon::PlayAnimation(*flag[i].flag, "Fade_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, visibility, visibility);
+			CSDCommon::PlayAnimation(*TitleWorldMap::Flag[i].flag, "Fade_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, visibility, visibility);
 
-		if (!flag[i].playingMedalTransition)
-			CSDCommon::PlayAnimation(*flag[i].sun_moon, "Fade_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, visibility, visibility);
+		if (!TitleWorldMap::Flag[i].playingMedalTransition)
+			CSDCommon::PlayAnimation(*TitleWorldMap::Flag[i].sun_moon, "Fade_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, visibility, visibility);
 
-		flag[i].flag->SetPosition(uiPos.x(), uiPos.y());
-		flag[i].sun_moon->SetPosition(uiPos.x() + 36, uiPos.y() - 23);
-		flag[i].night = !isDark;
+		TitleWorldMap::Flag[i].flag->SetPosition(uiPos.x(), uiPos.y());
+		TitleWorldMap::Flag[i].sun_moon->SetPosition(uiPos.x() + 36, uiPos.y() - 23);
+		TitleWorldMap::Flag[i].night = !isDark;
 
 		if (isDark && !isInShade[i])
 		{
-			flag[i].playingMedalTransition = true;
-			CSDCommon::PlayAnimation(*flag[i].sun_moon, "Switch_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, 0, 0, true, true);
+			TitleWorldMap::Flag[i].playingMedalTransition = true;
+			CSDCommon::PlayAnimation(*TitleWorldMap::Flag[i].sun_moon, "Switch_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, 0, 0, true, true);
 		}
 		else if (!isDark && isInShade[i])
 		{
-			flag[i].playingMedalTransition = true;
-			CSDCommon::PlayAnimation(*flag[i].sun_moon, "Switch_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, 0);
+			TitleWorldMap::Flag[i].playingMedalTransition = true;
+			CSDCommon::PlayAnimation(*TitleWorldMap::Flag[i].sun_moon, "Switch_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, 0);
 		}
 
 		bool inrange = IsInsideCursorRange(uiPos, visibility, i);
 		currentFlagSelected = inrange ? i : -1;
 		if (currentFlagSelected != -1)
 		{
-			lastValidFlagSelected = currentFlagSelected;
+			TitleWorldMap::LastValidFlagSelected = currentFlagSelected;
 			if (isDark && !isInShade[i])
 				MiniAudioHelper::playSound(cursorSelectHandle, 15, "Sunset");
 			else if (!isDark && isInShade[i])
@@ -866,9 +943,9 @@ void CapitalWindow_Update()
 		if (selectedCapital == 0)
 		{
 			MiniAudioHelper::playSound(stageSelectHandle, 3, "Boot");
-			isWhiteWorldEnabled = Configuration::worldData.data[lastValidFlagSelected].data[Configuration::getCapital(lastValidFlagSelected)].isWhiteWorld;
+			LevelLoadingManager::WhiteWorldEnabled = Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].data[Configuration::getCapital(TitleWorldMap::LastValidFlagSelected)].isWhiteWorld;
 
-			/*if (isWhiteWorldEnabled)
+			/*if (LevelLoadingManager::WhiteWorldEnabled)
 			{
 				WRITE_STRING(0x015B499C, GetStageToLoad());
 				WRITE_STRING(0x015C789C, GetStageToLoad());
@@ -884,7 +961,7 @@ void CapitalWindow_Update()
 			SetVisibilityStageWindow(true);
 			SetVisibilityCapitalWindow(false);
 			//ShowTextAct(true);
-			capitalWindowOpen = false;
+			TitleWorldMap::CapitalWindowOpen = false;
 			timeStageSelectDelay = 0;
 
 		}
@@ -903,7 +980,7 @@ void SetStageSelectionScreenshot()
 		sprintf(nameCast, "ss_%02dd", i + 1);
 		cts_stage_ss->GetNode(nameCast)->SetHideFlag(true);
 	}
-	sprintf(nameCast, "ss_%02dd", lastValidFlagSelected+1);
+	sprintf(nameCast, "ss_%02dd", TitleWorldMap::LastValidFlagSelected+1);
 
 	cts_stage_ss->GetNode(nameCast)->SetHideFlag(false);
 }
@@ -919,43 +996,53 @@ void StageWindow_Update(Sonic::CGameObject* This)
 	if (inputPtr->IsTapped(Sonic::eKeyState_A) && timeStageSelectDelay >= 5)
 	{
 		MiniAudioHelper::playSound(stageSelectHandle, 3, "Boot");
-		isWhiteWorldEnabled = Configuration::worldData.data[lastValidFlagSelected].data[stageSelectedWindow].isWhiteWorld;
+		LevelLoadingManager::WhiteWorldEnabled = Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].data[TitleWorldMap::StageSelectedWindow].isWhiteWorld;
 		Title::canLoad = 1;
 	}
 	//Selection increase
-	if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickDown) && stageSelectedWindow != stageSelectedWindowMax)
+	if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickDown) && TitleWorldMap::StageSelectedWindow != stageSelectedWindowMax)
 	{
-		stageSelectedWindow += 1;
+		TitleWorldMap::StageSelectedWindow += 1;
 		MiniAudioHelper::playSound(stageSelectHandle, 0, "Cursor", false);
-		if (stageSelectedWindow > 0) //technically not needed
-			CSDCommon::PlayAnimation(*cts_stage_select, "Select_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, (stageSelectedWindow - 1) * 10, stageSelectedWindow * 10);
+		if (TitleWorldMap::StageSelectedWindow > 0) //technically not needed
+			CSDCommon::PlayAnimation(*cts_stage_select, "Select_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, (TitleWorldMap::StageSelectedWindow - 1) * 10, TitleWorldMap::StageSelectedWindow * 10);
 	}
 	//Selection decrease
 	if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickUp))
 	{
-		stageSelectedWindow -= 1;
+		TitleWorldMap::StageSelectedWindow -= 1;
 		MiniAudioHelper::playSound(stageSelectHandle, 0, "Cursor", false);
-		if (stageSelectedWindow < 5)
-			CSDCommon::PlayAnimation(*cts_stage_select, "Select_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 130 - ((stageSelectedWindow + 1) * 10), 130 - (stageSelectedWindow) * 10);
+		if (TitleWorldMap::StageSelectedWindow < 5)
+			CSDCommon::PlayAnimation(*cts_stage_select, "Select_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 130 - ((TitleWorldMap::StageSelectedWindow + 1) * 10), 130 - (TitleWorldMap::StageSelectedWindow) * 10);
 	}
 	SetStageSelectionScreenshot();
-	Common::ClampInt(stageSelectedWindow, 0, stageSelectedWindowMax);
-	PopulateStageWindowInfo(Configuration::worldData.data[lastValidFlagSelected].data[stageSelectedWindow].levelID);
+	Common::ClampInt(TitleWorldMap::StageSelectedWindow, 0, stageSelectedWindowMax);
+	PopulateStageWindowInfo(Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].data[TitleWorldMap::StageSelectedWindow].levelID);
 }
+
+void LoadTest(Hedgehog::base::CSharedString a1, Sonic::CGameObject* a2)
+{
+	uint32_t func = 0x010DA3E0;
+	__asm
+	{
+		lea     eax, a1
+		mov     ecx, a2
+		call func
+	};
+};
 HOOK(void*, __fastcall, TitleWorldMap_UpdateApplication, 0xE7BED0, Sonic::CGameObject* This, void* Edx, float elapsedTime, uint8_t a3)
 {
 	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
 
 	//There's definitely a better way to do this
-	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-	char** h = (char**)stageTerrainAddress;
-	const char* terr = *h; 
-	
+	if (inputPtr->IsTapped(Sonic::eKeyState_DpadUp))
+	{
+		LoadTest("Genesis", earth.get());
+	}
 	if (TitleWorldMap::Active)
 	{
-		lastStageID = terr;
 		//Pretty much just "if titleworldmap exists"
-		if (flag[0].flag && cts_guide_4_misson && cts_guide_5_medal)
+		if (TitleWorldMap::Flag[0].flag && cts_guide_4_misson && cts_guide_5_medal)
 		{
 			if (infoimg2->m_MotionDisableFlag) CSDCommon::PlayAnimation(*infoimg2, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 0, 0);
 			if (infoimg3->m_MotionDisableFlag)CSDCommon::PlayAnimation(*infoimg3, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 0, 0);
@@ -969,7 +1056,7 @@ HOOK(void*, __fastcall, TitleWorldMap_UpdateApplication, 0xE7BED0, Sonic::CGameO
 			flagSelectionAmount = 0;
 			if (TitleWorldMap::Camera)
 			{
-				if (flag[0].flag->m_MotionDisableFlag && !introPlayed)				
+				if (TitleWorldMap::Flag[0].flag->m_MotionDisableFlag && !introPlayed)
 					introPlayed = true;
 				
 
@@ -995,8 +1082,8 @@ HOOK(void*, __fastcall, TitleWorldMap_UpdateApplication, 0xE7BED0, Sonic::CGameO
 
 						MiniAudioHelper::playSound(cursorSelectHandle, 800004, "CursorSelect", false);
 
-						PopulateCountryPreviewInfo(lastValidFlagSelected);
-						SetLevelTextCast(Configuration::worldData.data[lastValidFlagSelected].description.c_str());
+						PopulateCountryPreviewInfo(TitleWorldMap::LastValidFlagSelected);
+						SetLevelTextCast(Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].description.c_str());
 					}
 					else
 					{
@@ -1019,17 +1106,17 @@ HOOK(void*, __fastcall, TitleWorldMap_UpdateApplication, 0xE7BED0, Sonic::CGameO
 					if (inputPtr->IsTapped(Sonic::eKeyState_A) && !isStageWindowOpen)
 					{
 						isStageWindowOpen = true;
-						stageSelectedWindow = 0;
-						PopulateStageSelect(lastValidFlagSelected);
+						TitleWorldMap::StageSelectedWindow = 0;
+						PopulateStageSelect(TitleWorldMap::LastValidFlagSelected);
 						SetVisibilityPlayerInfo(false);
 
 						MiniAudioHelper::playSound(stageSelectHandle, 2, "OpenWindow", false);
-						cts_name_2->GetNode("img_1")->SetPatternIndex(lastValidFlagSelected);
-						stageSelectFlag->GetNode("img")->SetPatternIndex(lastValidFlagSelected);
+						cts_name_2->GetNode("img_1")->SetPatternIndex(TitleWorldMap::LastValidFlagSelected);
+						stageSelectFlag->GetNode("img")->SetPatternIndex(TitleWorldMap::LastValidFlagSelected);
 
-						if (Configuration::getCapital(lastValidFlagSelected) != -1)
+						if (Configuration::getCapital(TitleWorldMap::LastValidFlagSelected) != -1)
 						{
-							capitalWindowOpen = true;
+							TitleWorldMap::CapitalWindowOpen = true;
 							ShowTextAct(false);
 							SetVisibilityCapitalWindow(true);
 						}
@@ -1047,18 +1134,18 @@ HOOK(void*, __fastcall, TitleWorldMap_UpdateApplication, 0xE7BED0, Sonic::CGameO
 						timeStageSelectDelay = 0;
 						MiniAudioHelper::playSound(stageSelectHandle, 4, "Cancel", false);
 
-						if (capitalWindowOpen)
+						if (TitleWorldMap::CapitalWindowOpen)
 							SetVisibilityCapitalWindow(false);
 						else
 							SetVisibilityStageWindow(false);
 						ShowTextAct(false);
-						capitalWindowOpen = false;
+						TitleWorldMap::CapitalWindowOpen = false;
 					}
-					if (isStageWindowOpen && !capitalWindowOpen)
+					if (isStageWindowOpen && !TitleWorldMap::CapitalWindowOpen)
 					{
 						StageWindow_Update(This);
 					}
-					if (capitalWindowOpen)
+					if (TitleWorldMap::CapitalWindowOpen)
 					{
 						CapitalWindow_Update();
 					}
@@ -1189,6 +1276,7 @@ void MagnetizeToFlag(const CVector& flagPosition, float deltaTime)
 	rotationYaw = lerpUnclampedf(rotationYaw, rYaw, deltaTime * lerpRate);
 }
 float s_RotationAngle;
+float s_RotationAngleSpace;
 HOOK(void, __fastcall, TitleWorldMap_CameraUpdate, 0x0058CDA0, TransitionTitleCamera* This, void* Edx, const Hedgehog::Universe::SUpdateInfo& updateInfo)
 {
 	using namespace hh::math;
@@ -1203,9 +1291,9 @@ HOOK(void, __fastcall, TitleWorldMap_CameraUpdate, 0x0058CDA0, TransitionTitleCa
 
 	// HACK: Doing camera position stuff here instead of on a "Start" function, or the constructor, lol
 	
-	if (!camInitialized)
+	if (!TitleWorldMap::CamInitialized)
 	{
-		camInitialized = true;
+		TitleWorldMap::CamInitialized = true;
 		camera->m_Position = CVector(0, 0, cameraDistance);
 		camera->m_TargetPosition = CVector(0, 0, 0);
 		light = Sonic::CGameDocument::GetInstance()->m_pMember->m_spLightManager;
@@ -1284,23 +1372,26 @@ HOOK(void, __fastcall, TitleWorldMap_CameraUpdate, 0x0058CDA0, TransitionTitleCa
 
 	constexpr float rotationhRateLight = 0.1f;
 
-		
-
 	const CVector lightPosition = CVector(-79.8565f, 0, 4.78983f);
 	//Set up light stuff
 	const float rotationForce = rotationhRateLight * multiplierRotationLight * updateInfo.DeltaTime;
 	s_RotationAngle += rotationForce;
 	// Wrap this around 360 degrees if you feel so inclined
 	s_RotationAngle = WrapAroundFloat(s_RotationAngle, 360.0 * DEG2RAD);
+	
 	const CQuaternion lightRotation = TitleWorldMap::QuaternionFromAngleAxis(-s_RotationAngle, CVector(0, 1, 0));
 	light->m_GlobalLightDirection = lightRotation * (lightPosition - TitleWorldMap::emblemPosition) + TitleWorldMap::emblemPosition;
-
 	//Set light properties
 	light->m_GlobalLightDiffuse = CVector(0.02f, 0.02f, 0.02f);
 	//light->m_GlobalLightDirection = CVector(-79.8565f, 0, 4.78983f);
 	light->m_GlobalLightSpecular = CVector(1, 1, 1);
 
 
+	if (m_spSkyGemSingleton)
+	{		
+		m_spSkyGemSingleton->m_spMatrixNodeTransform->m_Transform.SetRotation(lightRotation);
+
+	}
 	ApplyCameraStuff(This, camera);
 	camera->UpdateParallel(updateInfo);
 
@@ -1329,98 +1420,17 @@ void GetCServiceGameplay(void* arg1, void* serviceRetrn, DWORD* a3)
 	};
 };
 #pragma endregion
-void SetCorrectStageFromFlag()
-{
-	camInitialized = false;
-	if (!TitleWorldMap::LoadingReplacementEnabled)
-	{
-		if (Title::inInstall)
-		{
-			uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-			char** h = (char**)stageTerrainAddress;
-			const char* terr = *h;
-			
-			if (terr != lastStageID && lastStageID[0] != '\0')
-				strcpy(*(char**)stageTerrainAddress, lastStageID);
-		}
-		return;
-	}
-	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-	char** h = (char**)stageTerrainAddress;
-	const char* stageToLoad = "ghz200";
-	if (Configuration::worldData.data.size() < lastValidFlagSelected)
-	{
-		//if only cpp had the same ${} system as c#
-		std::string message = "This country has an invalid configuration. Loading " + std::string(stageToLoad) + " instead.";
-		MessageBoxA(NULL, message.c_str(), "Unleashed Title Screen", 0);
-		printf("\n[WorldMap] Missing config for FlagID %d", lastValidFlagSelected);
-	}
-	else
-	{
-		stageToLoad = GetStageToLoad();
-	}
-	
-	DebugDrawText::log((std::string("Stage Loading: ") + std::string(stageToLoad)).c_str());
-	strcpy(*(char**)stageTerrainAddress, stageToLoad);
-}
 
-void __declspec(naked) SetCorrectTerrainForMission_ASM()
-{
-	static uint32_t sub_662010 = 0x662010;
-	static uint32_t returnAddress = 0xD56CCF;
-	__asm
-	{
-		call[sub_662010]
-		push    esi
-		call    SetCorrectStageFromFlag
-		pop     esi
-		jmp[returnAddress]
-	}
-}
 
-void __declspec(naked) InterceptGameplayFlowLoading()
-{
-	static uint32_t normal = 0x00D0E166;
-	static uint32_t loc_D0E170 = 0xD0E170;
-	__asm
-	{ 
-		/*cmp TitleWorldMap::LoadingReplacementEnabled, 1
-		jne FunctionFinish*/
-		//Original function
-		mov     esi, eax
-		xor eax, eax
-		cmp TitleWorldMap::ForceLoadToFlowTitle, 1
-		je ChangeToTitle
-
-		cmp ecx, 5
-		//Change module only if its white world
-		je ChangeToAct
-		jmp[loc_D0E170]
-
-		ChangeToAct :
-		cmp isWhiteWorldEnabled, 1
-		je FunctionFinish
-		mov ecx, 6
-		jmp[loc_D0E170]
-
-		ChangeToTitle :
-		mov ecx, 3
-		jmp[loc_D0E170]
-
-		FunctionFinish:
-		jmp[loc_D0E170]
-	}
-}
 
 HOOK(int, __fastcall, UVAnimStart, 0x007597E0, Sonic::CGameObject* This, void* Edx, int a2, Hedgehog::Base::CSharedString* modelName, int flag)
 {
 	printf("\nLoaded UV-Anim: %s", modelName->c_str());
 	return originalUVAnimStart(This, Edx, a2,modelName, flag );
 }
-FUNCTION_PTR(int, __thiscall, PlayUVAnimMaybe, 0x00752F00, Hedgehog::Mirage::CRenderable* This, float a2);
 
 HOOK(Hedgehog::Mirage::CRenderable*, __fastcall, AddRenderableTitle, 0x58E650, DWORD* This, int a2, int a3, int a4, void* Edx)
-{
+{	
 	return originalAddRenderableTitle(This, a2, a3, a4, Edx);
 }
 HOOK(int, __cdecl, sub_7C931F, 0x7C931F, int a1, const char* a2)
@@ -1437,17 +1447,48 @@ HOOK(char, __stdcall, SaveRead, 0x00E7A220, int a1, void* file)
 {
 	return originalSaveRead(a1,file);
 }
-void TitleWorldMap::applyPatches()
+
+HOOK(int, __fastcall, CHudGateMenuMainIntroInfo, 0x1080110, hh::fnd::CStateMachineBase::CStateBase* This, void* Edx)
 {
-	WRITE_JUMP(0xD56CCA, SetCorrectTerrainForMission_ASM);
-	WRITE_JUMP(0x00D0E164, InterceptGameplayFlowLoading);
-	
+	////Run function first, otherwise scenes won't be gettable
+	auto returne = originalCHudGateMenuMainIntroInfo(This, Edx);
+	int* contextBase = (int*)This->GetContextBase();
+	auto stageID = (*(uint8_t*)((int)contextBase + 336));
+	int index = stageID == 0 ? stageID : stageID + 1;
+	const char* idArchive = (const char*)((int*)0x015BBA34)[stageID];
+
+	Common::ClampUInt(stageID, 0, Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].data.size()-1);
+	LevelLoadingManager::NextLevelLoad = Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].data[stageID].levelID.c_str();
+	return returne;
+}
+
+HOOK(void, __fastcall, sub_107D790, 0x107D790, void* This)
+{
+}
+HOOK(char, *_stdcall, StageGate_MoveToOtherStage, 0x107FBC0, int a1)
+{
+	char* returned = originalStageGate_MoveToOtherStage(a1);
+	uint8_t stageID = (*(uint8_t*)(a1 + 336));
+	LevelLoadingManager::NextLevelLoad = Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].data[stageID].levelID.c_str();
+	return returned;
+
+}
+HOOK(int, __fastcall, CHudGateMenuMainOutro, 0x107B770, hh::fnd::CStateMachineBase::CStateBase* This)
+{
+	LevelLoadingManager::ActiveReplacement = true;
+	return originalCHudGateMenuMainOutro(This);
+}
+
+void TitleWorldMap::applyPatches()
+{	
 	//WRITE_JUMP(0x00D9565B, SetCorrectPlayer2);
 	//WRITE_JUMP(0x00D961E2, 0x00D961E6);
 	//WRITE_JUMP(0x00D76A45, SetCorrectPlayer2);
 	//WRITE_JUMP(0x00D0E164, StageLoader);
 	//WRITE_JUMP(0x010A0B46, SetCorrectPause);
 	INSTALL_HOOK(sub_7C931F);
+	INSTALL_HOOK(CHudGateMenuMainOutro);
+	INSTALL_HOOK(CHudGateMenuMainIntroInfo);
 	INSTALL_HOOK(sub_7E27B0);
 	INSTALL_HOOK(AddRenderableTitle);
 	WRITE_JUMP(0x00584CEE, (void*)0x00588820);

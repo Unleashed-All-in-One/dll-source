@@ -199,9 +199,9 @@ void TitleWorldMapPause::applyPatches()
 	INSTALL_HOOK(TitleWorldMapPause_UpdateApplication);
 	WRITE_MEMORY(0x016E11F4, void*, CTitleWorldmapPauseRemoveCallback);
 
-	//From Brianuu's 06 Title, makes saving not crash
-	WRITE_JUMP(0xD22A83, (void*)0xD22B84);
-	WRITE_MEMORY(0xD22CE8, uint8_t, 0);
+	////From Brianuu's 06 Title, makes saving not crash
+	//WRITE_JUMP(0xD22A83, (void*)0xD22B84);
+	//WRITE_MEMORY(0xD22CE8, uint8_t, 0);
 
 	//WRITE_JUMP(0x00A51B66, 0x00A51BCE);
 }

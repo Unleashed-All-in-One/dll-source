@@ -45,6 +45,7 @@
 
 #include "Gameplay/QSSRestore.h"
 
+#include "System/LevelLoadingManager.h"
 #include "System/DiscordStatus.h"
 #include "System/ArchiveTreePatcher.h"
 #include "System/EnemyTrigger.h"
@@ -57,3 +58,5 @@
 #include "UI/TitleWorldMap.h"
 #include "UI/TitleOption.h"
 #include "UI/TitleWorldMapPause.h"
+
+#include "Testing/TestingCode.h"

@@ -2141,6 +2141,10 @@ namespace Common
 	{
 		if (number < min) number = min;
 		if (number > max) number = max;
+	}inline void ClampUInt(uint8_t& number, int min, int max)
+	{
+		if (number < min) number = min;
+		if (number > max) number = max;
 	}
 
 	static char* IntToString(int num, const char* format)
