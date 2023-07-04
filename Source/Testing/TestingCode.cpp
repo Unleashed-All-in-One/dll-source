@@ -1,3 +1,29 @@
+class CBasicSphere : public Sonic::CGameObject3D
+{
+public:
+	boost::shared_ptr<hh::mr::CSingleElement> m_spRenderable;
+	boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
+
+	virtual void AddCallback(const hh::base::THolder<Sonic::CWorld>& worldHolder,
+		Sonic::CGameDocument* pGameDocument, const boost::shared_ptr<hh::db::CDatabase>& spDatabase) override
+	{
+		Sonic::CApplicationDocument::GetInstance()->AddMessageActor("GameObject", this);
+		pGameDocument->AddUpdateUnit("0", this); // Worth looking into which updateuints do what, by the way.
+
+		hh::mr::CMirageDatabaseWrapper wrapper(spDatabase.get());
+		// This is a debug asset that has a broken material, so it will be pure red--but that's ok, cuz we can see it.
+		const char* assetName = "BasicSphere";
+		boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
+
+		m_spRenderable = boost::make_shared<hh::mr::CSingleElement>(spModelData);
+		// Safeguard from crashing (last I checked this works, could crash if it doesn't exist anyway.)
+		if (!spModelData)
+			return;
+
+		AddRenderable("Object", m_spRenderable, true);
+	}
+};
+
 DWORD* GetServiceScriptMan(Hedgehog::Base::TSynchronizedPtr<Sonic::CApplicationDocument> doc)
 {
 	uint32_t func = 0x0041E6F0;
@@ -26,13 +52,55 @@ DWORD* serviceScriptman;
 DWORD* serviceGameplay;
 DWORD* storySequence;
 __int64 mystery;
+//
+struct MsgRequestChangeModule : public hh::fnd::MessageTypeSet
+{
+public:
+	HH_FND_MSG_MAKE_TYPE(0x0168120C);
 
+	size_t m_PlayerType;
+
+	MsgRequestChangeModule(size_t playerType) : m_PlayerType(playerType) {}
+};
+struct MsgRequestStartLoading : public hh::fnd::MessageTypeSet
+{
+public:
+	HH_FND_MSG_MAKE_TYPE(0x016813F0);
+
+	size_t m_PlayerType;
+
+	MsgRequestStartLoading(size_t playerType) : m_PlayerType(playerType) {}
+};
 DWORD LODWORD(__int64 x) 
 {
 	return x & 0xFFFFFFFF;
 }
+DWORD* storyseq;
 int sonic;
 bool were = false;
+void OpenStage(DWORD stageID)
+{
+	FUNCTION_PTR(void, __thiscall, Hedgehog_Base_CHolderBase___ct, 0x0065FBE0, Hedgehog::Base::CHolderBase * This, void* synchronizedObject, char forceSync);
+	//void __thiscall (void *this)
+	FUNCTION_PTR(void, __thiscall, Hedgehog_Base_CHolderBase___dt, 0x0065FC40, void* This);
+	//int  sub_552130( a1)
+	FUNCTION_PTR(int, __fastcall, sub_552130, 0x552130, __int16 a1);
+	Hedgehog::base::CHolderBase v6 = Hedgehog::base::CHolderBase();
+	Hedgehog_Base_CHolderBase___ct(&v6, (void*)0x01E66B34, 0);
+	int v4 = *((DWORD*)v6.get() + 1) + 436;
+	Hedgehog_Base_CHolderBase___dt(&v6);
+	unsigned int result = (unsigned __int8)stageID;
+	if ((unsigned __int8)stageID <= 0x1Au)
+	{
+		result = sub_552130(stageID);
+		if (result < 0x8E)
+		{
+			result = *(DWORD*)(*(DWORD*)v4 + 124) + 288 * result + 28;
+			if (result)
+				*(DWORD*)(result + 284) |= 1u;
+		}
+	}
+}
 HOOK(void*, __fastcall, TestingCode_UpdateApplication, 0xE7BED0, Sonic::CGameObject* This, void* Edx, float elapsedTime, uint8_t a3)
 {
 	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
@@ -49,8 +117,23 @@ HOOK(void*, __fastcall, TestingCode_UpdateApplication, 0xE7BED0, Sonic::CGameObj
 
 	if (inputPtr->IsTapped(Sonic::eKeyState_DpadDown) && !were)
 	{
+		auto g = boost::make_shared<CBasicSphere>();
+		g->SendMessage("Player", boost::make_shared<MsgRequestChangeModule>(5));
+		g->SendMessage("Player", boost::make_shared<MsgRequestStartLoading>(5));
 		serviceScriptman = GetServiceScriptMan(Sonic::CApplicationDocument::GetInstance());
 		serviceGameplay = GetServiceGameplay(Sonic::CApplicationDocument::GetInstance());
+		//(void, __fastcall, sub_D71A90, 0x00D71A90, BYTE* This, void*Edx,int a2, Hedgehog::Base::CSharedString* stage)
+
+		/*auto p = Hedgehog::Base::CSharedString("pam000");
+		Hedgehog::Base::CSharedString* pam = &p;
+		FUNCTION_PTR(void, __thiscall, SetupStage, 0x00D71A90, DWORD* storysequence, int dummy, const Hedgehog::base::CSharedString & stage);
+		SetupStage(storyseq, 0, "pam000");*/
+		//unsigned int, __stdcall, sub_D71950, 0xD71950, int a1, DWORD* a2)
+		/*FUNCTION_PTR(unsigned int, __stdcall, sub_D71950, 0xD71950, int a1, DWORD * a2);
+		sub_D71950(0, storyseq);*/
+
+		OpenStage(0);
+
 
 		/*sonic->m_pPlayer->m_spCharacterModel = nullptr;
 		sonic->m_pPlayer->m_spCharacterModel =
@@ -78,6 +161,31 @@ HOOK(void*, __fastcall, TestingCode_UpdateApplication, 0xE7BED0, Sonic::CGameObj
 	}
 	return originalTestingCode_UpdateApplication(This, Edx, elapsedTime, a3);
 }
+
+//__thiscall sub_D77020()
+HOOK(int*, __fastcall, sub_D77020, 0xD77020, void* This,void* Edx, const char* a2, const char* a3)
+{
+	return originalsub_D77020(This, Edx, a2, a3);
+}
+//Sonic::Sequence::CStoryImpl *__stdcall Sonic::Sequence::CStoryImpl(Sonic::Sequence::CStoryImpl *a1
+HOOK(DWORD*, __stdcall, StoryImpl, 0x00D74560, DWORD* storySeq)
+{
+	auto retur = originalStoryImpl(storySeq);
+
+	storyseq = storySeq;
+	return retur;
+}
+HOOK(void, __fastcall, sub_D71A90, 0x00D71A90, BYTE* This, void*Edx,int a2, const Hedgehog::base::CSharedString& stage)
+{
+	originalsub_D71A90(This, Edx, a2, stage);
+}
+// __stdcall 
+HOOK(unsigned int, __stdcall, sub_D71950, 0xD71950, int a1, DWORD* a2)
+{
+	auto v2 = (DWORD*)a2[1];
+	auto v3 = v2[1];
+	return originalsub_D71950(a1,a2);
+}
 HOOK(void*, __cdecl, LoadLuanneData, 0x6D93E0, const char*& name, const uint8_t* data, const size_t length, void* a4)
 {
 	
@@ -87,4 +195,8 @@ HOOK(void*, __cdecl, LoadLuanneData, 0x6D93E0, const char*& name, const uint8_t*
 void TestingCode::applyPatches()
 {	
 	INSTALL_HOOK(TestingCode_UpdateApplication);
+	INSTALL_HOOK(sub_D77020);
+	INSTALL_HOOK(sub_D71950);
+	INSTALL_HOOK(sub_D71A90);
+	INSTALL_HOOK(StoryImpl);
 }
