@@ -432,7 +432,7 @@ HOOK(DWORD, *__cdecl, Title_CMain_CState_SelectMenu, 0x11D1210, hh::fnd::CStateM
 
 	return originalTitle_CMain_CState_SelectMenu(This);
 }
-HOOK(int, __fastcall, Title_CMain_CState_WaitStart, 0x11D1410, hh::fnd::CStateMachineBase::CStateBase* a1)
+HOOK(int, __cdecl, Title_CMain_CState_WaitStart, 0x11D1410, hh::fnd::CStateMachineBase::CStateBase* a1)
 {
 	//if(!titleMusicHandle)
 	//Common::playSoundStatic(titleMusicHandle, 800030);
