@@ -18,7 +18,8 @@ public:
 	static void introAnim(Chao::CSD::RCPtr<Chao::CSD::CScene> scene);
 	static void ShowWindow(const char* text);
 	static void HideWindow();
-	static bool canLoad;
+	static void update();
+	static void showTransition();
 	static bool inWorldMap;
 	static bool inInstall;
 

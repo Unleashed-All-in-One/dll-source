@@ -16,6 +16,16 @@ struct WorldData
 {
 	std::vector<FlagData> data;
 };
+struct QueueData
+{
+	int type;
+	std::string dataName;
+	const char* comment;
+};
+struct SequenceData
+{
+	std::vector<QueueData> data;
+};
 
 class Configuration
 {
@@ -27,11 +37,12 @@ public:
 
 	//---------------UI---------------
 	static void getStageList();
+	static void getLevelQueue();
 	enum TitleType {
 		Retail,
 		Preview,
 		E3
-	};	
+	};
 
 	static std::vector<std::string> getAllLevelIDs(bool onlyCustom);
 	static std::vector<std::string> getAllWhiteWorld();
@@ -41,6 +52,7 @@ public:
 	static bool ignoreWarnings;
 	static bool compatibilityMode;
 	static WorldData worldData;
+	static SequenceData queueData;
 	static TitleType menuType;
 };
 

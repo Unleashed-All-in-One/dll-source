@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="packages\SoLoud-wav.2020.2.7.1\build\native\SoLoud-wav.props" Condition="Exists('packages\SoLoud-wav.2020.2.7.1\build\native\SoLoud-wav.props')" />
+  <Import Project="packages\SoLoud-wav.2020.2.7.2\build\native\SoLoud-wav.props" Condition="Exists('packages\SoLoud-wav.2020.2.7.2\build\native\SoLoud-wav.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -15,7 +15,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{672c0b8a-7030-4793-8cf9-f536c84f321b}</ProjectGuid>
     <RootNamespace>UnleashedAllInOne</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
     <ProjectName>UnleashedConversion</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -64,7 +64,7 @@
       <PrecompiledHeaderFile>Pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\Dependencies;..\Dependencies\Detours\include;..\Dependencies\Loaders;..\Include\BlueBlur;..\Include\BlueBlurCustom;..\Dependencies\Discord;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Pch.h</ForcedIncludeFiles>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -94,9 +94,9 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
       <PrecompiledHeaderFile>Pch.h</PrecompiledHeaderFile>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <AdditionalIncludeDirectories>..\Dependencies;..\Dependencies\Detours\include;..\Dependencies\Loaders;..\Include\BlueBlur;..\Include\BlueBlurCustom;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Dependencies;..\Dependencies\Detours\include;..\Dependencies\Loaders;..\Include\BlueBlur;..\Include\BlueBlurCustom;..\Dependencies\Discord;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Pch.h</ForcedIncludeFiles>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,8 +146,10 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="System\LetterboxHelper.cpp" />
     <ClCompile Include="System\LevelLoadingManager.cpp" />
     <ClCompile Include="System\MiniAudioHelper.cpp" />
+    <ClCompile Include="System\SequenceHelpers.cpp" />
     <ClCompile Include="System\UpdateDirector.cpp" />
     <ClCompile Include="Testing\TestingCode.cpp" />
+    <ClCompile Include="UI\EventViewer.cpp" />
     <ClCompile Include="UI\Title.cpp" />
     <ClCompile Include="UI\TitleOption.cpp" />
     <ClCompile Include="UI\TitleWorldMap.cpp" />
@@ -181,6 +183,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="System\LetterboxHelper.h" />
     <ClInclude Include="System\LevelLoadingManager.h" />
     <ClInclude Include="System\MiniAudioHelper.h" />
+    <ClInclude Include="System\SequenceHelpers.h" />
     <ClInclude Include="System\UpdateDirector.h" />
     <ClInclude Include="Testing\TestingCode.h" />
     <ClInclude Include="UI\Title.h" />
@@ -201,6 +204,6 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets'))" />
-    <Error Condition="!Exists('packages\SoLoud-wav.2020.2.7.1\build\native\SoLoud-wav.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\SoLoud-wav.2020.2.7.1\build\native\SoLoud-wav.props'))" />
+    <Error Condition="!Exists('packages\SoLoud-wav.2020.2.7.2\build\native\SoLoud-wav.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\SoLoud-wav.2020.2.7.2\build\native\SoLoud-wav.props'))" />
   </Target>
 </Project>

@@ -8,7 +8,7 @@ Hedgehog::Math::CVector2* scale = new Hedgehog::Math::CVector2(1, 1);
 bool enteredStart, isInSubmenu, moved, hasSavefile, playingStartAnim, reversedAnim, isStartAnimComplete, startButtonAnimComplete, startBgAnimComplete, parsedSave, showedWindow = false;
 bool Title::inWorldMap = false;
 bool inTitle, scrollHorizontally = true;
-bool Title::canLoad = 0;
+int canLoad = 0;
 bool Title::inInstall = 0;
 int maxTitleIndex = 3;
 int holdTimer = 0;
@@ -90,12 +90,12 @@ void ShowInstallScreen()
 	Sonic::CGameDocument::GetInstance()->AddGameObject(spDebugMenu);
 	TitleWorldMap::LoadingReplacementEnabled = false;
 }
-void ShowTransition()
+void Title::showTransition()
 {
 	bg_transition->SetHideFlag(false);
 	CSDCommon::PlayAnimation(*bg_transition, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-
 	PlayTitleBGM(TitleStateContextBase, "");
+	canLoad = 1;
 }
 void __declspec(naked) TitleUI_SetCustomExecFunction()
 {
@@ -111,7 +111,6 @@ void __declspec(naked) TitleUI_SetCustomExecFunction()
 		{
 			cmp     currentTitleIndex, 0
 			jne	Options
-			call ShowTransition
 			jmp[adNewGame]
 			jmp	FunctionFinish
 
@@ -145,6 +144,10 @@ void __declspec(naked) TitleUI_SetCustomExecFunction()
 		}
 	}
 }
+void OnNewGame()
+{
+	LevelLoadingManager::InStory = true;
+}
 void __declspec(naked) TitleUI_SetCustomExecFunctionAdvance()
 {
 	//https://godbolt.org/
@@ -159,15 +162,18 @@ void __declspec(naked) TitleUI_SetCustomExecFunctionAdvance()
 		jne	Continue
 		mov isInSubmenu, 1
 		call ExitingTitle
-		jmp[adNewGame]
+		jmp NewGame
 		jmp	FunctionFinish
 
-		Continue :
-		cmp     currentTitleIndex, 1
+		NewGame :
+		call OnNewGame
+			jmp[adNewGame]
+			Continue :
+			cmp     currentTitleIndex, 1
 			jne	Options
 			call ExitingTitle
 			call ContinueToWM
-			cmp Title::canLoad, 1
+			cmp canLoad, 2
 			je LoadingForContinue
 			jmp	FunctionFinish
 
@@ -187,8 +193,6 @@ void __declspec(naked) TitleUI_SetCustomExecFunctionAdvance()
 			jmp[pAddr]
 
 			LoadingForContinue :
-			call ShowTransition
-
 			jmp[adContinue]
 	}
 }
@@ -242,7 +246,7 @@ void __fastcall CTitleRemoveCallback(Sonic::CGameObject* This, void*, Sonic::CGa
 	inTitle, parsedSave = false;
 	currentTitleIndex = Title::TitleIndexState::New_Game;
 	holdTimer = 0;
-	Title::canLoad = 0;
+	canLoad = 0;
 	Title::inWorldMap = 0;
 }
 void Title::setHideEverything(bool visible, bool logoVisible)
@@ -337,7 +341,7 @@ HOOK(int, __fastcall, Title_CMain, 0x0056FBE0, Sonic::CGameObject* This, void* E
 	char buffer[8];
 	sprintf(buffer, "title_%d", Configuration::logoType + 1);
 	rcTitleLogo_1 = rcTitleScreen->CreateScene(buffer);
-	
+
 	switch (Configuration::menuType)
 	{
 	case 0:
@@ -464,7 +468,17 @@ bool IsRightDown() {
 HOOK(void*, __fastcall, Title_UpdateApplication, 0xE7BED0, Sonic::CGameObject* This, void* Edx, float elapsedTime, uint8_t a3)
 {
 	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
-
+	if (canLoad == 1)
+	{
+		if (bg_transition)
+		{
+			if (bg_transition->m_MotionDisableFlag)
+			{
+				SequenceHelpers::loadStage(LevelLoadingManager::getStageToLoad());
+				canLoad = 0;
+			}
+		}
+	}
 
 	if (inTitle && !Title::inWorldMap)
 	{
@@ -545,7 +559,7 @@ HOOK(void*, __fastcall, Title_UpdateApplication, 0xE7BED0, Sonic::CGameObject* T
 					holdTimer = 0;
 				}
 			}
-				
+
 		}
 #pragma endregion
 	}
@@ -666,11 +680,12 @@ HOOK(void, __cdecl, DebugDrawTextDraw, 0x750820, void*, float x, float y, void*,
 void Title::applyPatches()
 {
 	//Set up title screen so that it resembles Unleashed function-wise
-	WRITE_JUMP(0x00571FCA, TitleUI_SetCutsceneTimer); //Set title AFK wait amount - it varies depending on framerate
+	// //571A25 - cause of crash with direct9ex 11
+	//WRITE_JUMP(0x00571FCA, TitleUI_SetCutsceneTimer); //Set title AFK wait amount - it varies depending on framerate
 	WRITE_JUMP(0x00572D23, TitleUI_SetCustomExecFunction); //Override Button Function
 	WRITE_JUMP(0x005732C3, TitleUI_SetCustomExecFunctionAdvance); //Override button after-function
 	WRITE_JUMP(0x00572B2E, (void*)0x00572B45); //Disable scroll sound	
-
+	
 	//UI
 	INSTALL_HOOK(Title_UpdateApplication);
 	WRITE_MEMORY(0x016E11F4, void*, CTitleRemoveCallback);

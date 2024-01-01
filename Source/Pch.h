@@ -22,6 +22,7 @@
 #include <iomanip>
 #include <math.h>
 #include <filesystem>
+//#include <queue>
 
 // LostCodeLoader
 #include <LostCodeLoader.h>
@@ -41,6 +42,7 @@
 #define DEBUG_DRAW_TEXT_DLL_IMPORT
 #include <DebugDrawText.h>
 #include <Common.h>
+#include "System/SequenceHelpers.h"
 #include "Configuration.h"
 
 #include "Gameplay/QSSRestore.h"
@@ -58,5 +60,6 @@
 #include "UI/TitleWorldMap.h"
 #include "UI/TitleOption.h"
 #include "UI/TitleWorldMapPause.h"
+#include "UI/EventViewer.h"
 
 #include "Testing/TestingCode.h"

@@ -2,6 +2,7 @@
 
 #define INI_FILE "UnleashedConversion.ini"
 #define STAGE_LIST_FILE "stage_list.json"
+#define QUEUE_LIST_FILE "sequence.json"
 
 //---------------Gameplay---------------
 bool Configuration::m_bQSS = true;
@@ -13,6 +14,7 @@ bool Configuration::compatibilityMode = false;
 int Configuration::logoType = 0;
 Configuration::TitleType Configuration::menuType = (TitleType)0;
 WorldData Configuration::worldData;
+SequenceData Configuration::queueData;
 
 void Configuration::load()
 {
@@ -35,6 +37,43 @@ void Configuration::load()
 	compatibilityMode = reader.Get("Main", "IncludeDir1", "disk_sounds") == "";
 	gensStages = { "ghz100","ghz200","cpz100","cpz200","ssz100","ssz200","sph100","sph200","cte100", "cte200","ssh100","ssh200","csc100","csc200","euc100","euc200","pla100","pla200" };
 	getStageList();
+	getLevelQueue();
+}
+void Configuration::getLevelQueue()
+{
+	std::ifstream jsonFile(QUEUE_LIST_FILE);
+
+	queueData = SequenceData();
+
+	std::vector<std::string> modList;
+	Common::GetModIniList(modList);
+	modList.insert(modList.end(), ""); //Unleashed title's own stage_list
+
+	//Parse stage_list
+	for (size_t a = 0; a < modList.size(); a++)
+	{
+		size_t pos = modList.at(a).find_last_of("\\/");
+		if (pos != std::string::npos)
+		{
+			modList.at(a).erase(pos + 1);
+		}
+		std::ifstream jsonFile(modList.at(a) + QUEUE_LIST_FILE);
+
+		if (!jsonFile)
+			continue;
+
+		Json::Value root;
+		jsonFile >> root;
+		auto wd = root["CustomStorySequence"];
+		Json::Value arrayFlag = wd["SequenceData"];
+		for (int i = 0; i < arrayFlag.size(); i++)
+		{
+			queueData.data.push_back(QueueData());
+			queueData.data[i].type = arrayFlag[i]["type"].asInt();
+			queueData.data[i].dataName = std::string(arrayFlag[i]["dataName"].asCString());
+		}
+		break;
+	}
 }
 void Configuration::getStageList()
 {

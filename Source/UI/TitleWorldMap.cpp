@@ -953,7 +953,7 @@ void CapitalWindow_Update()
 				WRITE_STRING(0x0169A304, GetStageToLoad());
 
 			}*/
-			Title::canLoad = 1;
+			Title::showTransition();
 		}
 		else
 		{
@@ -997,7 +997,8 @@ void StageWindow_Update(Sonic::CGameObject* This)
 	{
 		MiniAudioHelper::playSound(stageSelectHandle, 3, "Boot");
 		LevelLoadingManager::WhiteWorldEnabled = Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].data[TitleWorldMap::StageSelectedWindow].isWhiteWorld;
-		Title::canLoad = 1;
+
+		Title::showTransition();
 	}
 	//Selection increase
 	if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickDown) && TitleWorldMap::StageSelectedWindow != stageSelectedWindowMax)
