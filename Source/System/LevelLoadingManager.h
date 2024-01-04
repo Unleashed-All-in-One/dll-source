@@ -14,4 +14,5 @@ public:
 	static void update();
 	static void initialize();
 	static const char* getStageToLoad();
+	static void setCorrectStage();
 };

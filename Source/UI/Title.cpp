@@ -148,54 +148,56 @@ void OnNewGame()
 {
 	LevelLoadingManager::InStory = true;
 }
-void __declspec(naked) TitleUI_SetCustomExecFunctionAdvance()
-{
-	//https://godbolt.org/
-	static uint32_t pAddr = 0x0057372E;
-	static uint32_t adNewGame = 0x0057339E;
-	static uint32_t adContinue = 0x0057342B;
-	static uint32_t adOptions = 0x00573557;
-	static uint32_t adQuit = 0x0057364F;
-	__asm // NEW: 0| CONTINUE:1 | OPTIONS: 3 | QUIT:  4
-	{
-		cmp     currentTitleIndex, 0
-		jne	Continue
-		mov isInSubmenu, 1
-		call ExitingTitle
-		jmp NewGame
-		jmp	FunctionFinish
+//void __declspec(naked) TitleUI_SetCustomExecFunctionAdvance()
+//{
+//	//https://godbolt.org/
+//	static uint32_t pAddr = 0x0057372E;
+//	static uint32_t adNewGame = 0x0057339E;
+//	static uint32_t adContinue = 0x0057342B;
+//	static uint32_t adOptions = 0x00573557;
+//	static uint32_t adQuit = 0x0057364F;
+//	__asm // NEW: 0| CONTINUE:1 | OPTIONS: 3 | QUIT:  4
+//	{
+//		cmp     currentTitleIndex, 0
+//		jne	Continue
+//		mov isInSubmenu, 1
+//		call ExitingTitle
+//		jmp NewGame
+//		jmp	FunctionFinish
+//
+//		NewGame :
+//		call OnNewGame
+//			jmp[adNewGame]
+//			Continue :
+//			cmp     currentTitleIndex, 1
+//			jne	Options
+//			call ExitingTitle
+//			call ContinueToWM
+//			cmp canLoad, 2
+//			je LoadingForContinue
+//			jmp	FunctionFinish
+//
+//			Options :
+//		cmp     currentTitleIndex, 2
+//			jne Quit
+//			jmp[adOptions]
+//			jmp	FunctionFinish
+//
+//			Quit :
+//		cmp     currentTitleIndex, 3
+//			jne	FunctionFinish
+//			jmp[adQuit]
+//
+//
+//			FunctionFinish :
+//			jmp[pAddr]
+//
+//			LoadingForContinue :
+//			jmp[adContinue]
+//	}
+//}
 
-		NewGame :
-		call OnNewGame
-			jmp[adNewGame]
-			Continue :
-			cmp     currentTitleIndex, 1
-			jne	Options
-			call ExitingTitle
-			call ContinueToWM
-			cmp canLoad, 2
-			je LoadingForContinue
-			jmp	FunctionFinish
 
-			Options :
-		cmp     currentTitleIndex, 2
-			jne Quit
-			jmp[adOptions]
-			jmp	FunctionFinish
-
-			Quit :
-		cmp     currentTitleIndex, 3
-			jne	FunctionFinish
-			jmp[adQuit]
-			mov isInSubmenu, 1
-
-			FunctionFinish :
-			jmp[pAddr]
-
-			LoadingForContinue :
-			jmp[adContinue]
-	}
-}
 //old but dont remove
 
 //void __declspec(naked) TitleUI_MoveUp()
@@ -677,16 +679,56 @@ HOOK(void, __cdecl, DebugDrawTextDraw, 0x750820, void*, float x, float y, void*,
 	size_t aspect = (resx / resy) * scale->x();
 	DebugDrawText::draw(formattedMultiByte, { (size_t)(x / *(size_t*)0x180C6B0 * resx) % resx, (size_t)(y / *(size_t*)0x1B24560 * resy) % resy }, aspect);
 }
+
+HOOK(void, __fastcall, TitleUI_SetCustomExecFunctionAdvance, 0x005732A0, DWORD* This)
+{
+	DWORD* v2 = (DWORD*)This[2];
+	//This calls Title_GetSelectionIndex
+	int i = (*(int (__thiscall **)(DWORD *))(*v2 + 56))(v2);
+	switch (currentTitleIndex)
+	{
+		case 0:
+		{
+			OnNewGame();
+
+			originalTitleUI_SetCustomExecFunctionAdvance(This); 
+			break;
+		}
+		case 1:
+		{
+			if (canLoad)
+			{
+				originalTitleUI_SetCustomExecFunctionAdvance(This);
+				break;
+			}
+			ExitingTitle();
+			ContinueToWM();
+			break;
+		}
+		default:
+			originalTitleUI_SetCustomExecFunctionAdvance(This);
+
+	}
+}
+
+HOOK(int, __fastcall, Title_GetSelectionIndex, 0x0056FBB0, DWORD* This)
+{
+	isInSubmenu = true;
+	return currentTitleIndex;
+}
 void Title::applyPatches()
 {
 	//Set up title screen so that it resembles Unleashed function-wise
 	// //571A25 - cause of crash with direct9ex 11
-	//WRITE_JUMP(0x00571FCA, TitleUI_SetCutsceneTimer); //Set title AFK wait amount - it varies depending on framerate
+	WRITE_JUMP(0x00571FCA, TitleUI_SetCutsceneTimer); //Set title AFK wait amount - it varies depending on framerate
 	WRITE_JUMP(0x00572D23, TitleUI_SetCustomExecFunction); //Override Button Function
-	WRITE_JUMP(0x005732C3, TitleUI_SetCustomExecFunctionAdvance); //Override button after-function
+	//WRITE_JUMP(0x005732C3, TitleUI_SetCustomExecFunctionAdvance); //Override button after-function
 	WRITE_JUMP(0x00572B2E, (void*)0x00572B45); //Disable scroll sound	
-	
+	//Try forcing out loading the world map if the save is invalid
+	WRITE_JUMP(0x0057342B, 0x0057346B);
 	//UI
+	INSTALL_HOOK(TitleUI_SetCustomExecFunctionAdvance);
+	INSTALL_HOOK(Title_GetSelectionIndex);
 	INSTALL_HOOK(Title_UpdateApplication);
 	WRITE_MEMORY(0x016E11F4, void*, CTitleRemoveCallback);
 	WRITE_JUMP(0x572D3A, (void*)0x57326B); // Don't create delete save dialog

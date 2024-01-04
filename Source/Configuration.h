@@ -20,6 +20,8 @@ struct QueueData
 {
 	int type;
 	std::string dataName;
+	bool immediate;
+	int playerTypeOverride;
 	const char* comment;
 };
 struct SequenceData
@@ -46,6 +48,7 @@ public:
 
 	static std::vector<std::string> getAllLevelIDs(bool onlyCustom);
 	static std::vector<std::string> getAllWhiteWorld();
+	static int getFlagFromStage(const char* stage);
 	static std::vector<std::string> gensStages;
 	static int getCapital(int flagID);
 	static int logoType;

@@ -1,7 +1,9 @@
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcNewUi;
 Chao::CSD::RCPtr<Chao::CSD::CScene> basicSceneTemplate;
 boost::shared_ptr<Sonic::CGameObjectCSD> spNewUi;
-
+DWORD* objecttt;
+bool isGoingToSkip;
+bool isInEventViewer;
 void CreateScreen(Sonic::CGameObject* pParentGameObject)
 {
 	if (rcNewUi && !spNewUi)
@@ -30,24 +32,53 @@ void __fastcall CHudSonicStageRemoveCallback2(Sonic::CGameObject* This, void*, S
 
 	rcNewUi = nullptr;
 }
-HOOK(volatile signed int*, __stdcall, CreateBTNSKip, 0x00B21A30, Sonic::CGameObject* This)
+HOOK(volatile signed int*, __stdcall, CreateBTNSKip, 0x00B21A30, DWORD* This)
 {
-	std::srand(static_cast<unsigned int>(std::time(nullptr)));
-	auto returnee = originalCreateBTNSKip(This);
-	CHudSonicStageRemoveCallback2(This, nullptr, nullptr);
-	Sonic::CCsdDatabaseWrapper wrapper(Sonic::CGameDocument::GetInstance()->m_pMember->m_spDatabase.get());
 
-	auto spCsdProject = wrapper.GetCsdProject("ui_btn_guide");
-	rcNewUi = spCsdProject->m_rcProject;
-	basicSceneTemplate = rcNewUi->CreateScene("btn_guide_skip");
-	CreateScreen(This);
+	auto returnee = originalCreateBTNSKip(This);
+	objecttt = This;
+	isGoingToSkip = true;
+	UnleashedHUD_API::StartFadeout();	
 	return returnee;
 }
+
+void EventViewer::update()
+{
+	DebugDrawText::log(std::to_string(LevelLoadingManager::LastSavedQueueIndex).c_str(), 0);
+	if (isInEventViewer)
+	{
+		if (isGoingToSkip)
+		{
+			if (UnleashedHUD_API::IsLoadingFadeoutCompleted())
+			{
+				LevelLoadingManager::setCorrectStage();
+				isGoingToSkip = false;
+				objecttt[77] = 2;
+			}
+		}
+	}
+}
+//Hedgehog::Base::CSharedString *__thiscall sub_10FE500(DWORD *this, Hedgehog::Base::CSharedString *a2)
+HOOK(Hedgehog::Base::CSharedString*, __fastcall, sub_10fe500, 0x10FE500, DWORD* EventQueue, void* Edx, Hedgehog::Base::CSharedString* a2)
+{
+	return originalsub_10fe500(EventQueue, Edx, a2);
+}
+//_DWORD *__thiscall sub_645C40(_DWORD *this, char a2)
+HOOK(char, __fastcall, sub_10FE9E0, 0x10FE9E0, void* This, void* Edx, DWORD* a1, int a2)
+{
+	isInEventViewer = true;
+	return originalsub_10FE9E0(This, Edx, a1,a2);
+}
+//char __thiscall sub_10FE9E0(void *this, DWORD *a1, int a2)
 void EventViewer::applyPatches()
 {
 	INSTALL_HOOK(CreateBTNSKip);
+	INSTALL_HOOK(sub_10fe500);
+	INSTALL_HOOK(sub_10FE9E0);
+	//WRITE_JUMP(0x00B21AD0, InterceptProject);
+	//WRITE_JUMP(0x00B21A33, InterceptGameObject);
 
-
+	WRITE_JUMP(0x00B21D38, 0x00B21CF3);
 	//IMPORTANT!!!!!!!!!
 	WRITE_MEMORY(0x16A467C, void*, CHudSonicStageRemoveCallback2);
 

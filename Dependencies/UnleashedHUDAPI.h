@@ -10,6 +10,8 @@ private:
 	LIB_FUNCTION(void, "UnleashedHUD.dll", API_AddSpeedScore, int score);
 	LIB_FUNCTION(void, "UnleashedHUD.dll", API_AddEnemyScore, int score);
 	LIB_FUNCTION(void, "UnleashedHUD.dll", API_AddTrickScore, int score);
+	LIB_FUNCTION(bool, "UnleashedHUD.dll", API_IsLoadingFadeoutCompleted);
+	LIB_FUNCTION(void, "UnleashedHUD.dll", API_StartFadeOut);
 
 public:
     static UnleashedHUD_API* GetInstance()
@@ -21,6 +23,14 @@ public:
     static void AddRingScore(int score)
 	{
 		VOID_EXPORT(API_AddRingScore, score);
+	}
+	static bool IsLoadingFadeoutCompleted()
+	{
+		BOOL_EXPORT(API_IsLoadingFadeoutCompleted);
+	}
+	static void StartFadeout()
+	{
+		VOID_EXPORT(API_StartFadeOut);
 	}
 
     static void AddSpeedScore(int score)

@@ -57,4 +57,6 @@ extern "C" void __declspec(dllexport) OnFrame()
 	CSDCommon::update();
 	DiscordStatus::update();
 	LevelLoadingManager::update();
+	EventViewer::update();
+	SequenceHelpers::update();
 }

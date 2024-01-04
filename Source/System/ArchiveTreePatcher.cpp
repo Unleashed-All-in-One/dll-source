@@ -101,6 +101,8 @@ void ArchiveTreePatcher::applyPatches()
     {
         m_archiveDependencies.push_back(ArchiveDependency("etfdoor", { whiteworld[i] }));
         m_archiveDependencies.push_back(ArchiveDependency("SonicPam", { whiteworld[i] }));      
+        m_archiveDependencies.push_back(ArchiveDependency("pam000", { whiteworld[i] }));      
+        m_archiveDependencies.push_back(ArchiveDependency("StageGate", { whiteworld[i] }));      
     }
     m_archiveDependencies.push_back(ArchiveDependency("myk_cmn", { "ghz_cmn" }));
     m_archiveDependencies.push_back(ArchiveDependency("JumpSelector", { "cmn200" }));

@@ -1,7 +1,17 @@
 Sonic::Sequence::Story* storySequenceInstance;
 int nextPlayerType = 0;
 const char* nextStage = nullptr;
+bool test = false;
 
+class MsgGetEventQueueState : public Hedgehog::Universe::MessageTypeGet
+{
+public:
+	HH_FND_MSG_MAKE_TYPE(0x01681C80);
+
+	int m_pPosition;
+
+	MsgGetEventQueueState(int in_pPosition) : m_pPosition(in_pPosition) {}
+};
 char* allocateStr(const char* value)
 {
 	char* allocatedStr = (char*)__HH_ALLOC(strlen(value) + 1);
@@ -17,6 +27,21 @@ void SequenceHelpers::changeModule(ModuleFlow in_Flow)
 {
 	FUNCTION_PTR(void, __stdcall, ChangeModuleTest, 0x01107D50, Hedgehog::Universe::CMessageActor * Th, int a2);
 	ChangeModuleTest(Sonic::Sequence::Main::GetInstance(), (int)in_Flow);
+}
+void SequenceHelpers::queueEvent(const char* in_EventName)
+{
+	test = true;
+	auto message = Sonic::Message::MsgEventRequest(in_EventName, 0);
+	Sonic::Event::EventQueue::ProcessMessage(&message);
+}
+void getEventState()
+{
+	if (!test)
+		return;
+	auto msgno = MsgGetEventQueueState(0);
+	MsgGetEventQueueState* message = &msgno;
+	Sonic::Event::EventQueue::ProcessMessage(message);
+	DebugDrawText::log(std::to_string(message->m_pPosition).c_str(), 0);
 }
 /// <summary>
 /// Sends a message to CEventQueue to queue an event.
@@ -39,7 +64,6 @@ void SequenceHelpers::loadStage(const char* in_StageName)
 	nextStage = allocateStr(in_StageName);
 	auto message = Sonic::Message::MsgSequenceEvent(2, 0);
 	Sonic::Sequence::Main::ProcessMessage(&message);
-
 }
 /// <summary>
 /// Uses the SetupPlayer and SetupPlayerForce functions from CStorySequence to change player classes
@@ -61,18 +85,27 @@ HOOK(char, __fastcall, CStoryLua_SetupPlayerForce, 0xD72270, Sonic::Sequence::St
 {
 	if (nextPlayerType != -1)
 	{
+		if (nextPlayerType == 0)
+			DebugDrawText::log(std::format("[SH] Set player type to Modern").c_str(), 5);
+		else if (nextPlayerType == 1)
+			DebugDrawText::log(std::format("[SH] Set player type to Classic").c_str(), 5);
 		a3->entry->content = nextPlayerType;
 		nextPlayerType = -1;
 	}
-	return originalCStoryLua_SetupPlayerForce(StorySequence, Edx, a2, a3);
+	return originalCStoryLua_SetupPlayerForce(storySequenceInstance, Edx, a2, a3);
 }
 HOOK(void, __fastcall, CStoryLua_SetupPlayer, 0xD72360, Sonic::Sequence::Story* StorySequence, void* Edx, int a2, LuaIntegerEntryContainer* a3)
 {
 	if (nextPlayerType != -1)
 	{
+		if (nextPlayerType == 0)
+			DebugDrawText::log(std::format("[SH] Set player type to Modern").c_str(), 5);
+		else if(nextPlayerType == 1)
+			DebugDrawText::log(std::format("[SH] Set player type to Classic").c_str(), 5);
 		a3->entry->content = nextPlayerType;
 		nextPlayerType = -1;
 	}
+	
 	return originalCStoryLua_SetupPlayer(StorySequence, Edx, a2, a3);
 }
 HOOK(void, __fastcall, CStoryLua_SetupStage, 0x00D71A90, Sonic::Sequence::Story* StorySequence, void* Edx, DWORD* a2, LuaStringEntryContainer* stage)
@@ -86,6 +119,9 @@ HOOK(Sonic::Sequence::Story*, __fastcall, ConstructStorySequence, 0xD76930)
 {
 	storySequenceInstance = originalConstructStorySequence();
 	return storySequenceInstance;
+}
+void SequenceHelpers::update()
+{
 }
 void SequenceHelpers::applyPatches()
 {

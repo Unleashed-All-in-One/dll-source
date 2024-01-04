@@ -70,10 +70,39 @@ void Configuration::getLevelQueue()
 		{
 			queueData.data.push_back(QueueData());
 			queueData.data[i].type = arrayFlag[i]["type"].asInt();
+			queueData.data[i].immediate = arrayFlag[i]["immediate"].asInt();
+			if (arrayFlag[i]["playerTypeOverride"])
+				queueData.data[i].playerTypeOverride = arrayFlag[i]["playerTypeOverride"].asInt();
+			else
+				queueData.data[i].playerTypeOverride = -1;
 			queueData.data[i].dataName = std::string(arrayFlag[i]["dataName"].asCString());
 		}
 		break;
 	}
+}
+int Configuration::getFlagFromStage(const char* stage)
+{
+	std::string stageString = stage;
+	//if only c++ had linq
+	for (size_t i = 0; i < worldData.data.size(); i++)
+	{
+		for (size_t a = 0; a < worldData.data[i].data.size(); a++)
+		{
+			if (worldData.data[i].data[a].levelID == stageString)
+			{
+				return i;
+			}
+		}
+		for (size_t a = 0; a < worldData.data[i].dataNight.size(); a++)
+		{
+			if (worldData.data[i].dataNight[a].levelID == stageString)
+			{
+				return i;
+			}
+		}
+		
+	}
+	return -1;
 }
 void Configuration::getStageList()
 {

@@ -186,6 +186,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="System\SequenceHelpers.h" />
     <ClInclude Include="System\UpdateDirector.h" />
     <ClInclude Include="Testing\TestingCode.h" />
+    <ClInclude Include="UI\EventViewer.h" />
     <ClInclude Include="UI\Title.h" />
     <ClInclude Include="UI\TitleOption.h" />
     <ClInclude Include="UI\TitleWorldMap.h" />
