@@ -102,10 +102,19 @@ void ArchiveTreePatcher::applyPatches()
         m_archiveDependencies.push_back(ArchiveDependency("etfdoor", { whiteworld[i] }));
         m_archiveDependencies.push_back(ArchiveDependency("SonicPam", { whiteworld[i] }));      
         m_archiveDependencies.push_back(ArchiveDependency("pam000", { whiteworld[i] }));      
-        m_archiveDependencies.push_back(ArchiveDependency("StageGate", { whiteworld[i] }));      
+        m_archiveDependencies.push_back(ArchiveDependency("StageGate", { whiteworld[i] }));           
     }
     m_archiveDependencies.push_back(ArchiveDependency("myk_cmn", { "ghz_cmn" }));
     m_archiveDependencies.push_back(ArchiveDependency("JumpSelector", { "cmn200" }));
+    m_archiveDependencies.push_back(ArchiveDependency("ObjectPhysicsUnleashed", { "cmn200" }));
+    m_archiveDependencies.push_back(ArchiveDependency("CmnAfrica", { "ObjectPhysicsUnleashed" }));
+    m_archiveDependencies.push_back(ArchiveDependency("CmnBeach", { "ObjectPhysicsUnleashed" }));
+    m_archiveDependencies.push_back(ArchiveDependency("CmnChina", { "ObjectPhysicsUnleashed" }));
+    m_archiveDependencies.push_back(ArchiveDependency("CmnEU", { "ObjectPhysicsUnleashed" }));
+    m_archiveDependencies.push_back(ArchiveDependency("CmnMykonos", { "ObjectPhysicsUnleashed" }));
+    m_archiveDependencies.push_back(ArchiveDependency("CmnNY", { "ObjectPhysicsUnleashed" }));
+    m_archiveDependencies.push_back(ArchiveDependency("CmnPetra", { "ObjectPhysicsUnleashed" }));
+    m_archiveDependencies.push_back(ArchiveDependency("CmnSnow", { "ObjectPhysicsUnleashed" }));
     if (!m_archiveDependencies.empty())
     {
         INSTALL_HOOK(ArchiveTreePatcher_ParseArchiveTree);
