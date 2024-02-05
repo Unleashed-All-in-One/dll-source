@@ -56,6 +56,14 @@
 #include "System/CSDCommon.h"
 #include "System/UpdateDirector.h"
 
+
+#include "Functionality/PauseBgm.h"
+
+
+#include "CustomSetObjects/DebugObject.h"
+
+
+#include "Testing/SubtitleUI.h"
 #include "UI/Title.h"
 #include "UI/TitleWorldMap.h"
 #include "UI/TitleOption.h"

@@ -67,7 +67,16 @@ bool TitleWorldMap::Active = false;
 float multiplierRotationLight = 0.1f;
 
 hh::math::CQuaternion rotationEarth;
+void CreateParticleController(boost::shared_ptr<Sonic::CGameObject>& a1)
+{
+	uint32_t func = 0xE8FE50;
+	__asm
+	{
+		mov eax, a1
+		call func
 
+	};
+};
 class CTitleGameObject : public Sonic::CGameObject3D
 {
 	INSERT_PADDING(0x4);
@@ -125,12 +134,12 @@ public:
 
 		Sonic::CApplicationDocument::GetInstance()->AddMessageActor("GameObject", this);
 		pGameDocument->AddUpdateUnit("0", this);
-
+		
 		m_spModel = boost::make_shared<hh::mr::CSingleElement>(hh::mr::CMirageDatabaseWrapper(spDatabase.get()).GetModelData(name));
 		
 
 		AddRenderable("Object", m_spModel, false);
-		Common::ObjectCGlitterPlayerOneShot(this, "worldmap_sun");
+
 
 	}
 
@@ -139,6 +148,8 @@ public:
 		const Hedgehog::Universe::SUpdateInfo& updateInfo
 	) override
 	{
+
+		Common::ObjectCGlitterPlayerOneShot(this, "worldmap_sun");
 		m_spMatrixNodeTransform->m_Transform.SetRotation(rotationEarth);
 	}
 
@@ -1035,11 +1046,6 @@ HOOK(void*, __fastcall, TitleWorldMap_UpdateApplication, 0xE7BED0, Sonic::CGameO
 {
 	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
 
-	//There's definitely a better way to do this
-	if (inputPtr->IsTapped(Sonic::eKeyState_DpadUp))
-	{
-		LoadTest("Genesis", earth.get());
-	}
 	if (TitleWorldMap::Active)
 	{
 		//Pretty much just "if titleworldmap exists"

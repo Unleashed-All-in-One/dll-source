@@ -18,8 +18,15 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	//---------------Gameplay---------------
 	QSSRestore::applyPatches();
 
+	//-----------Functionality (accuracy)-----------
+	PauseBgm::applyPatches();
+
+	//-----------Register Set Objects-----------
+	WerehogPole::Install();
+
 	//---------------UI---------------
 	Title::applyPatches();
+	SubtitleUI::applyPatches();
 	TitleWorldMap::applyPatches();
 	TitleWorldMapPause::applyPatches();
 	EventViewer::applyPatches();

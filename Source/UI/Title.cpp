@@ -1,6 +1,9 @@
 ﻿Chao::CSD::RCPtr<Chao::CSD::CProject> rcTitleScreen;
+Chao::CSD::RCPtr<Chao::CSD::CProject> rcTitleScreenLogos;
 Chao::CSD::RCPtr<Chao::CSD::CScene> rcTitleLogo_1, rcTitlebg, rcTitleMenu, rcTitleMenuScroll, rcTitleMenuTXT, black_bg, bg_window, fg_window, txt_window, footer_window, bg_transition;
+Chao::CSD::RCPtr<Chao::CSD::CScene> rcConversionLogo;
 boost::shared_ptr<Sonic::CGameObjectCSD> spTitleScreen;
+boost::shared_ptr<Sonic::CGameObjectCSD> spTitleScreenLogos;
 boost::shared_ptr<Sonic::StageSelectMenu::CDebugStageSelectMenuXml> spDebugMenu;
 
 Title::TitleIndexState currentTitleIndex = Title::TitleIndexState::New_Game;
@@ -232,7 +235,9 @@ void __fastcall CTitleRemoveCallback(Sonic::CGameObject* This, void*, Sonic::CGa
 {
 	//rcTitleLogo_1, rcTitlebg, rcTitleMenu, rcTitleMenuScroll, rcTitleMenuTXT, black_bg, bg_window, fg_window, txt_window, footer_window, bg_transition
 	Title::killScreen();
-	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), rcTitleLogo_1);
+	Chao::CSD::CProject::DestroyScene(rcTitleScreenLogos.Get(), rcTitleLogo_1);
+	if(rcConversionLogo)
+	Chao::CSD::CProject::DestroyScene(rcTitleScreenLogos.Get(), rcConversionLogo);
 	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), rcTitlebg);
 	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), rcTitleMenu);
 	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), rcTitleMenuScroll);
@@ -244,6 +249,7 @@ void __fastcall CTitleRemoveCallback(Sonic::CGameObject* This, void*, Sonic::CGa
 	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), footer_window);
 	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), bg_transition);
 	rcTitleScreen = nullptr;
+	rcTitleScreenLogos = nullptr;
 	enteredStart, isInSubmenu, moved, hasSavefile, playingStartAnim, reversedAnim, isStartAnimComplete, startButtonAnimComplete, startBgAnimComplete, showedWindow = false;
 	inTitle, parsedSave = false;
 	currentTitleIndex = Title::TitleIndexState::New_Game;
@@ -270,13 +276,19 @@ void Title::setHideEverything(bool visible, bool logoVisible)
 		rcTitleMenuScroll->SetHideFlag(visible);
 	if (rcTitleMenuTXT)
 		rcTitleMenuTXT->SetHideFlag(visible);
+	if (rcConversionLogo)
+		rcConversionLogo->SetHideFlag(visible);
 }
 void Title::createScreen(Sonic::CGameObject* pParentGameObject)
 {
+	if (rcTitleScreenLogos && !spTitleScreenLogos)
+	{
+		pParentGameObject->m_pMember->m_pGameDocument->AddGameObject(spTitleScreenLogos = boost::make_shared<Sonic::CGameObjectCSD>(rcTitleScreenLogos, 0.5f, "HUD", false), "main", pParentGameObject);
+	}
 	if (rcTitleScreen && !spTitleScreen)
 	{
 		pParentGameObject->m_pMember->m_pGameDocument->AddGameObject(spTitleScreen = boost::make_shared<Sonic::CGameObjectCSD>(rcTitleScreen, 0.5f, "HUD", false), "main", pParentGameObject);
-	}
+	}	
 }
 void Title::killScreen()
 {
@@ -284,6 +296,11 @@ void Title::killScreen()
 	{
 		spTitleScreen->SendMessage(spTitleScreen->m_ActorID, boost::make_shared<Sonic::Message::MsgKill>());
 		spTitleScreen = nullptr;
+	}
+	if (spTitleScreenLogos)
+	{
+		spTitleScreenLogos->SendMessage(spTitleScreenLogos->m_ActorID, boost::make_shared<Sonic::Message::MsgKill>());
+		spTitleScreenLogos = nullptr;
 	}
 }
 void Title::toggleScreen(const bool visible, Sonic::CGameObject* pParentGameObject)
@@ -338,12 +355,25 @@ HOOK(int, __fastcall, Title_CMain, 0x0056FBE0, Sonic::CGameObject* This, void* E
 	Title::setScrollDirection(true);
 	Sonic::CCsdDatabaseWrapper wrapper(This->m_pMember->m_pGameDocument->m_pMember->m_spDatabase.get());
 	auto spCsdProject = wrapper.GetCsdProject("ui_title_unleashed");
+	auto spCsdProjectLogos = wrapper.GetCsdProject("ui_title_logos");
 	rcTitleScreen = spCsdProject->m_rcProject;
+	rcTitleScreenLogos = spCsdProjectLogos->m_rcProject;
 	Title::inInstall = false;
 	char buffer[8];
-	sprintf(buffer, "title_%d", Configuration::logoType + 1);
-	rcTitleLogo_1 = rcTitleScreen->CreateScene(buffer);
+	sprintf(buffer, "title_%d", Configuration::logoType == 0 ? 1 : Configuration::logoType + 1);
+	rcTitleLogo_1 = rcTitleScreenLogos->CreateScene(buffer);
 
+	
+
+	if (Configuration::logoType == 0)
+	{
+		rcConversionLogo = rcTitleScreenLogos->CreateScene("conversionlogo");
+		rcTitleLogo_1->SetPosition(68, 3);
+		rcTitleLogo_1->SetScale(0.9f, 0.9f);
+		rcConversionLogo->SetPosition(68, 3);
+		rcConversionLogo->SetScale(0.9f, 0.9f);
+		CSDCommon::PlayAnimation(*rcConversionLogo, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+	}
 	switch (Configuration::menuType)
 	{
 	case 0:

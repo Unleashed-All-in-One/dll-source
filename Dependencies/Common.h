@@ -59,12 +59,6 @@ struct MsgGetHudPosition
 	uint32_t m_type;
 };
 
-struct MsgSetPosition
-{
-	INSERT_PADDING(0x10);
-	Eigen::Vector3f m_position;
-	INSERT_PADDING(0x4);
-};
 
 struct MsgSetRotation
 {
@@ -1568,16 +1562,6 @@ namespace Common
 		rotation = *(Eigen::Quaternionf*)rotAddress;
 	}
 
-	inline void SetPlayerPosition(Eigen::Vector3f const& position)
-	{
-		if (!*PLAYER_CONTEXT) return;
-
-		alignas(16) MsgSetPosition message;
-		message.m_position = position;
-
-		FUNCTION_PTR(void*, __thiscall, playerProcessMsgSetPosition, 0xE772D0, void* This, void* message);
-		playerProcessMsgSetPosition(Common::GetPlayer(), &message);
-	}
 
 	inline bool GetPlayerVelocity(Eigen::Vector3f& velocity)
 	{
@@ -1852,13 +1836,13 @@ namespace Common
 		processPlayerMsgAddImpulse(player, &msgApplyImpulse);
 	}
 
-	inline void ApplyObjectPhysicsPosition(void* pObject, Eigen::Vector3f const& pos)
+	/*inline void ApplyObjectPhysicsPosition(void* pObject, Eigen::Vector3f const& pos)
 	{
 		FUNCTION_PTR(void*, __thiscall, processObjectMsgSetPosition, 0xEA2130, void* This, void* message);
 		alignas(16) MsgSetPosition msgSetPosition {};
 		msgSetPosition.m_position = pos;
 		processObjectMsgSetPosition(pObject, &msgSetPosition);
-	}
+	}*/
 
 	inline void ApplyObjectPhysicsRotation(void* pObject, Eigen::Quaternionf const& rot)
 	{

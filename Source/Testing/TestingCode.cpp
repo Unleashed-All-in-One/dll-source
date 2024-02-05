@@ -232,9 +232,17 @@ HOOK(void, __fastcall, sub_6A1D40, 0x6A1D40, void* obj)
 	}
 	printf("Done PFD");
 }
+//int __thiscall sub_E8F330(void *this, int a2, int a3, int a4)
+
+HOOK(int, __fastcall, sub_E8F330, 0xE8F330, void* This, void* Edx, int a2, int a3, int a4)
+{
+	return originalsub_E8F330(This, Edx, a2, a3, a4);
+}
 void TestingCode::applyPatches()
 {	
-
+	//Get rid of mission icons and pamsettings permanently (in theory)
+	WRITE_JUMP(0x0107EAF8, 0x0107EB8F);
+	INSTALL_HOOK(sub_E8F330);
 	INSTALL_HOOK(A51CD0);
 	//INSTALL_HOOK(OpenStage);
 	//INSTALL_HOOK(sub_64B930);
