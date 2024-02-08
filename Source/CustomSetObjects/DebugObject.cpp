@@ -90,6 +90,7 @@ HOOK(void*, __fastcall, _InitializePlayer, 0x00D96110, void* This)
 // Whatever your entrypoint is, you'll need this:
 void WerehogPole::Install()
 {
+    WRITE_JUMP(0x00EA54E0, 0x00EA5506);
 	INSTALL_HOOK(_InitializePlayer);
     BB_INSTALL_SET_OBJECT_MAKE_HOOK(WerehogPole)
 }

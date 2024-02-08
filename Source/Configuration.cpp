@@ -15,8 +15,9 @@ int Configuration::logoType = 0;
 Configuration::TitleType Configuration::menuType = (TitleType)0;
 WorldData Configuration::worldData;
 SequenceData Configuration::queueData;
+std::string Configuration::modPath;
 
-void Configuration::load()
+void Configuration::load(const char* path)
 {
 	INIReader reader(INI_FILE);
 	if (reader.ParseError() != 0)
@@ -25,6 +26,8 @@ void Configuration::load()
 		exit(-1);
 		return;
 	}
+	std::filesystem::path modP = path;
+	Configuration::modPath = modP.parent_path().string();
 
 	//---------------Gameplay---------------
 	m_bQSS = reader.GetBoolean("Gameplay", "bQSS", m_bQSS);

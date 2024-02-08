@@ -46,12 +46,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\Build\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\Build\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -118,6 +118,8 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
   <ItemGroup>
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="CustomSetObjects\DebugObject.cpp" />
+    <ClCompile Include="CustomSetObjects\ETFTimeSwitch.cpp" />
+    <ClCompile Include="CustomSetObjects\Hintring.cpp" />
     <ClCompile Include="Functionality\PauseBgm.cpp" />
     <ClCompile Include="Mod.cpp" />
     <ClCompile Include="Pch.cpp">
@@ -161,6 +163,8 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
   <ItemGroup>
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="CustomSetObjects\DebugObject.h" />
+    <ClInclude Include="CustomSetObjects\ETFTimeSwitch.h" />
+    <ClInclude Include="CustomSetObjects\Hintring.h" />
     <ClInclude Include="Functionality\PauseBgm.h" />
     <ClInclude Include="Pch.h" />
     <ClInclude Include="Gameplay\QSSRestore.h" />

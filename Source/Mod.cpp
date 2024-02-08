@@ -2,7 +2,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 {
 	MessageBoxA(NULL, "", "", 0);
 	// Load configuration
-	Configuration::load();
+	Configuration::load(modInfo->CurrentMod->Path);
 
 	// Set random seed
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -23,6 +23,8 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 
 	//-----------Register Set Objects-----------
 	WerehogPole::Install();
+	ETFTimeSwitch::Install();
+	Hintring::Install();
 
 	//---------------UI---------------
 	Title::applyPatches();

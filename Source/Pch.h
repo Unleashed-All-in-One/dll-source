@@ -61,6 +61,7 @@
 
 
 #include "CustomSetObjects/DebugObject.h"
+#include "CustomSetObjects/ETFTimeSwitch.h"
 
 
 #include "Testing/SubtitleUI.h"
@@ -70,4 +71,5 @@
 #include "UI/TitleWorldMapPause.h"
 #include "UI/EventViewer.h"
 
+#include "CustomSetObjects/Hintring.h"
 #include "Testing/TestingCode.h"

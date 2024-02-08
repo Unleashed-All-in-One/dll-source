@@ -1,3 +1,5 @@
+
+Chao::CSD::CScene* sceneB;
 bool IsAnimDone(Chao::CSD::CScene* scene)
 {
 	if (scene->m_MotionSpeed < 0.0f)
@@ -13,10 +15,9 @@ bool IsAnimDone(Chao::CSD::CScene* scene)
 	}
 	return false;
 }
-
+//this may cause a very very slow memory leak.
 void CSDCommon::CheckSceneAnimation(int i, Chao::CSD::CScene* scene)
 {
-	Chao::CSD::CScene* sceneB;
 	if (i != -1)
 		sceneB = CSDCommon::scenesPlayingBack[i];
 	else
@@ -60,7 +61,7 @@ void CSDCommon::update()
 	}
 }
 
-void CSDCommon::SplitTextToSeparateCasts(Chao::CSD::CScene* scene, const char* formatCastName, const char* text, int maxCharacterPerLine, int maxLines)
+void CSDCommon::SplitTextToSeparateCasts(Chao::CSD::CScene* scene, const char* formatCastName, const char* text, int maxCharacterPerLine, int maxLines, bool blankOutEmpty)
 {
 	const string input = string(text);
 	std::stringstream ss(input);
@@ -81,6 +82,13 @@ void CSDCommon::SplitTextToSeparateCasts(Chao::CSD::CScene* scene, const char* f
 		if (i <= lines.size() - 1)
 		{
 			scene->GetNode(buff)->SetText(lines.at(i).c_str());
+		}
+		else
+		{
+			if (blankOutEmpty)
+			{
+				scene->GetNode(buff)->SetText("");
+			}
 		}
 	}
 }

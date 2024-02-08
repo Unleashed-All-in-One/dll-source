@@ -32,7 +32,7 @@ struct SequenceData
 class Configuration
 {
 public:
-	static void load();
+	static void load(const char* path);
 
 	//---------------Gameplay---------------
 	static bool m_bQSS;
@@ -45,7 +45,7 @@ public:
 		Preview,
 		E3
 	};
-
+	static std::string modPath;
 	static std::vector<std::string> getAllLevelIDs(bool onlyCustom);
 	static std::vector<std::string> getAllWhiteWorld();
 	static int getFlagFromStage(const char* stage);

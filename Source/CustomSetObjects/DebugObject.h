@@ -1,10 +1,13 @@
 #pragma once
 using namespace hh::math;
 static const int* pColID_Common = reinterpret_cast<int*>(0x01E0AF30);
-class ConversionUtility
+static const int* pColID_PlayerEvent = reinterpret_cast<int*>(0x01E0AFD8);
+class TransformUtilities
 {
 public:
-    static Hedgehog::Math::CVector MoveAroundPivot(Hedgehog::Math::CVector& player, const Hedgehog::Math::CVector& pivot, const Hedgehog::Math::CVector& rotationAngles) {
+
+    static Hedgehog::Math::CVector MoveAroundPivot(Hedgehog::Math::CVector& player, const Hedgehog::Math::CVector& pivot, const Hedgehog::Math::CVector& rotationAngles) 
+    {
 
         if (rotationAngles.x() == 0)
             return player;
@@ -50,9 +53,9 @@ public:
 
         return rotation = rotationQuaternion * rotation;
     }
-   
+
+
 };
-static const int* pColID_PlayerEvent = reinterpret_cast<int*>(0x01E0AFD8);
 class WerehogPole :public Sonic::CObjectBase, public Sonic::CSetObjectListener
 {
 public:
@@ -64,7 +67,14 @@ public:
 
     boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
 
-    boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;    bool inCollision;
+    boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;   
+    bool m_playerInsideCollider;
+    bool m_playerOnPole;
+    float m_playerVerticalProgress;
+    float add2;
+    float m_playerPoleRotation;
+    float cooldownTimer;
+    float side = 0;
     /* Renderable methods */
     bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
     {
@@ -88,7 +98,7 @@ public:
                 const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
                 if (in_rMsg.m_SenderActorID == playerContext->m_pPlayer->m_ActorID)
                 {
-                    inCollision = true;
+                    m_playerInsideCollider = true;
                 }
                 return true;
             }
@@ -97,7 +107,7 @@ public:
                 const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
                 if (in_rMsg.m_SenderActorID == playerContext->m_pPlayer->m_ActorID)
                 {
-                    inCollision = false;
+                    m_playerInsideCollider = false;
                 }
                 return true;
             }
@@ -112,28 +122,17 @@ public:
     };
     bool SetAddColliders(const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
     {
-
         m_spNodeEventCollision = boost::make_shared<Sonic::CMatrixNodeTransform>();
         m_spNodeEventCollision->m_Transform.SetPosition(Hedgehog::Math::CVector(0,0,0));
         m_spNodeEventCollision->NotifyChanged();
         m_spNodeEventCollision->SetParent(m_spMatrixNodeTransform.get());
         //void __thiscall sub_10C0E00(_DWORD *this, int a2)
         hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(1, 6, 1);
-
         AddEventCollision("Object", shapeEventTrigger1, *pColID_PlayerEvent, true, m_spNodeEventCollision);
         // You don't need to override this if you're not using it, but this would be for setting up event colliders & rigidbodies.
         // note you can do this in "SetAddRenderables" but sonic team *tends to* do collision stuff here.
         return true;
-    }
-
-    // You'll do update logic here for the most part.
-    // Again don't add this if you don't need to, but you usually will for interactables.
-    bool inPole;
-    float add;
-    float add2;
-    float add3;
-    float cooldownTimer;
-    float side = 0;
+    }        
     void AddImpulse(Hedgehog::Math::CVector impulse, bool relative)
     {
         auto context = Sonic::Player::CPlayerSpeedContext::GetInstance();
@@ -171,62 +170,45 @@ public:
     {
         auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
         const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-        if (inCollision && inputPtr->IsTapped(Sonic::eKeyState_B))
-            inPole = true;
-        if (inPole)
+        if (m_playerInsideCollider && inputPtr->IsTapped(Sonic::eKeyState_B))
+            m_playerOnPole = true;
+        if (m_playerOnPole)
         {
             if (inputPtr->IsTapped(Sonic::eKeyState_A))
             {
                 playerContext->m_Velocity = CVector(0, 0, 0);
                 AddImpulse(playerContext->m_spMatrixNode->m_Transform.m_Rotation * Hedgehog::Math::CVector(0, 5, -130), true);
                 playerContext->ChangeState(Sonic::Player::StateAction::Jump);
-                playerContext->SetStateFlag(Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput, 1);
+                playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = false;
 
                 playerContext->m_pPlayer->m_PostureStateMachine.ChangeState("Standard");
-                inPole = false;
+                m_playerOnPole = false;
+                return;
             }
-            add += inputPtr->LeftStickVertical / 30;
-            add2 += inputPtr->RightStickVertical;
-
-            m_spMatrixNodeTransform->m_Transform.m_Rotation = ConversionUtility::QuaternionFromAngleAxisUtil(add2, CVector(0, 1, 0));
-            add3 += inputPtr->RightStickHorizontal / 10;
+            m_playerVerticalProgress += inputPtr->LeftStickVertical / 30;
             if (inputPtr->IsTapped(Sonic::eKeyState_DpadRight))
             {
                 side++;
-                add3 += 1.5f;
+                m_playerPoleRotation += 1.5f;
             }
-            if (add3 > 4.5f)
-                add3 = 0;
-            if (add3 < 0)
-                add3 = 4.5f;
+            if (m_playerPoleRotation > 4.5f)
+                m_playerPoleRotation = 0;
+
+            if (m_playerPoleRotation < 0)
+                m_playerPoleRotation = 4.5f;
             playerContext->ChangeAnimation("Evilsonic_pillar_idle");
-            playerContext->SetStateFlag(Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput, 1 );
+            playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = true;
             auto playerPos = playerContext->m_spMatrixNode->m_Transform.m_Position;
             auto targetPos = m_spMatrixNodeTransform->m_Transform.m_Position;
+            targetPos.y() = playerPos.y();
 
-           targetPos.y() = playerPos.y();
-            CVector veca = targetPos - playerPos;
-            CVector vecb = CVector(1, 0, 1); // this is always the direction the particle is initially created in.
-            veca.normalize();
-            CVector axis = veca.cross(vecb);
-            axis.normalize();
-            DebugDrawText::log(std::format("Add3: {0} | Side: {1}", add3, side).c_str(), 0);
-            playerContext->m_spMatrixNode->m_Transform.m_Rotation = ConversionUtility::QuaternionFaceTowards(targetPos, playerPos, playerContext->m_spMatrixNode->m_Transform.m_Rotation);
-            //rotateQuaternionTowardsVector(playerContext->m_spMatrixNode->m_Transform.m_Rotation, m_spMatrixNodeTransform->m_Transform.m_Position);
-            playerContext->m_spMatrixNode->m_Transform.m_Position = Hedgehog::Math::CVector(m_spMatrixNodeTransform->m_Transform.m_Position.x() + 1, m_spMatrixNodeTransform->m_Transform.m_Position.y() + add, m_spMatrixNodeTransform->m_Transform.m_Position.z());
-            playerContext->m_spMatrixNode->m_Transform.m_Position = ConversionUtility::MoveAroundPivot(playerContext->m_spMatrixNode->m_Transform.m_Position, m_spMatrixNodeTransform->m_Transform.m_Position, Hedgehog::math::CVector(add3, 0, add3));
+            playerContext->m_spMatrixNode->m_Transform.m_Rotation = TransformUtilities::QuaternionFaceTowards(targetPos, playerPos, playerContext->m_spMatrixNode->m_Transform.m_Rotation);
+            playerContext->m_spMatrixNode->m_Transform.m_Position = Hedgehog::Math::CVector(m_spMatrixNodeTransform->m_Transform.m_Position.x() + 1, m_spMatrixNodeTransform->m_Transform.m_Position.y() + m_playerVerticalProgress, m_spMatrixNodeTransform->m_Transform.m_Position.z());
+            playerContext->m_spMatrixNode->m_Transform.m_Position = TransformUtilities::MoveAroundPivot(playerContext->m_spMatrixNode->m_Transform.m_Position, m_spMatrixNodeTransform->m_Transform.m_Position, Hedgehog::math::CVector(m_playerPoleRotation, 0, m_playerPoleRotation));
 
             
         }
     }
 
-    void InitializeEditParam(Sonic::CEditParam& in_rEditParam) override // argument name/type might be wrong
-    {
-        auto test = in_rEditParam.m_ParamList[0];
-        test->m_Name;
-        // Use methods with in_pEditParam to initialize your fields, arg names should be self explanatory
-    }
-
     static void Install();
-    /* */
 };

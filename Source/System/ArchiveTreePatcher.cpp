@@ -104,6 +104,14 @@ void ArchiveTreePatcher::applyPatches()
         m_archiveDependencies.push_back(ArchiveDependency("pam000", { whiteworld[i] }));
         m_archiveDependencies.push_back(ArchiveDependency("StageGate", { whiteworld[i] }));           
     }
+    m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyChibiFighter", { "cmn200" }));
+    m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyChibiFighter", { "cmn100" }));
+    m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyNightmareR", { "cmn200" }));
+    m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyNightmareR", { "cmn100" }));
+    m_archiveDependencies.push_back(ArchiveDependency("HintRing", { "cmn200" }));
+    m_archiveDependencies.push_back(ArchiveDependency("HintRing", { "cmn100" }));
+    m_archiveDependencies.push_back(ArchiveDependency("etfswitch", { "cmn200" }));
+    m_archiveDependencies.push_back(ArchiveDependency("etfswitch", { "cmn100" }));
     m_archiveDependencies.push_back(ArchiveDependency("JumpSelector", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("WhiteWorldCommon", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("ObjectPhysicsUnleashed", { "cmn200" }));

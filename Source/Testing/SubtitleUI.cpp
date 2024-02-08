@@ -278,107 +278,91 @@ void __cdecl SubtitleUI::addCaptionImpl(uint32_t* owner, uint32_t* caption, floa
     m_captionData.m_bypassLoading = Common::IsAtLoadingScreen();
 }
 
-Chao::CSD::RCPtr<Chao::CSD::CProject> rcSubtitleScreen;
-boost::shared_ptr<Sonic::CGameObjectCSD> spSubtitleScreen;
-Chao::CSD::RCPtr<Chao::CSD::CScene> rcWindow;
-Chao::CSD::RCPtr<Chao::CSD::CScene> rcWindowArea;
-Chao::CSD::RCPtr<Chao::CSD::CScene> rcHelpChara1;
-Chao::CSD::RCPtr<Chao::CSD::CScene> rcHelpNametag;
-void createScreen(Sonic::CGameObject* pParentGameObject)
-{
-    if (rcSubtitleScreen && !spSubtitleScreen)
-    {
-        pParentGameObject->m_pMember->m_pGameDocument->AddGameObject(spSubtitleScreen = boost::make_shared<Sonic::CGameObjectCSD>(rcSubtitleScreen, 0.5f, "HUD", false), "main", pParentGameObject);
-    }
-}
-void killScreen()
-{
-    if (spSubtitleScreen)
-    {
-        spSubtitleScreen->SendMessage(spSubtitleScreen->m_ActorID, boost::make_shared<Sonic::Message::MsgKill>());
-        spSubtitleScreen = nullptr;
-    }
-}
-void __fastcall CSubtitleRemoveCallback(Sonic::CGameObject* This, void*, Sonic::CGameDocument* pGameDocument)
-{
-    //rcTitleLogo_1, rcTitlebg, rcTitleMenu, rcTitleMenuScroll, rcTitleMenuTXT, black_bg, bg_window, fg_window, txt_window, footer_window, bg_transition
-    killScreen();
-    Chao::CSD::CProject::DestroyScene(rcSubtitleScreen.Get(), rcWindow);
-    Chao::CSD::CProject::DestroyScene(rcSubtitleScreen.Get(), rcHelpChara1);
-    Chao::CSD::CProject::DestroyScene(rcSubtitleScreen.Get(), rcWindowArea);
-    rcSubtitleScreen = nullptr;
-   
-}
+
+//void __fastcall CSubtitleRemoveCallback(Sonic::CGameObject* This, void*, Sonic::CGameDocument* pGameDocument)
+//{
+//    //rcTitleLogo_1, rcTitlebg, rcTitleMenu, rcTitleMenuScroll, rcTitleMenuTXT, black_bg, bg_window, fg_window, txt_window, footer_window, bg_transition
+//    killScreen();
+//    Chao::CSD::CProject::DestroyScene(rcSubtitleScreen.Get(), rcWindow);
+//    Chao::CSD::CProject::DestroyScene(rcSubtitleScreen.Get(), rcHelpChara1);
+//    Chao::CSD::CProject::DestroyScene(rcSubtitleScreen.Get(), rcWindowArea);
+//    rcSubtitleScreen = nullptr;
+//   
+//}
+
+//SubtitleData SubtitleUI::GenerateSubtitle(Sonic::CGameObject* Parent)
+//{
+//    SubtitleData dataOut = SubtitleData();
+//    Sonic::CCsdDatabaseWrapper wrapper(Parent->m_pMember->m_pGameDocument->m_pMember->m_spDatabase.get());
+//    auto spCsdProject = wrapper.GetCsdProject("ui_help");
+//    dataOut.rcSubtitleScreen = spCsdProject->m_rcProject;
+//    dataOut.rcWindow = dataOut.rcSubtitleScreen->CreateScene("help_window");
+//    dataOut.rcWindowArea = dataOut.rcSubtitleScreen->CreateScene("help_text_area");
+//    dataOut.rcHelpChara1 = dataOut.rcSubtitleScreen->CreateScene("help_chara_1");
+//    dataOut.rcHelpNametag = dataOut.rcSubtitleScreen->CreateScene("help_nametag");
+//
+//    CSDCommon::PlayAnimation(*dataOut.rcWindow, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+//    CSDCommon::PlayAnimation(*dataOut.rcHelpNametag, "Intro_chip_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+//    CSDCommon::PlayAnimation(*dataOut.rcHelpChara1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+//    Parent->m_pMember->m_pGameDocument->AddGameObject(dataOut.spSubtitleScreen = boost::make_shared<Sonic::CGameObjectCSD>(dataOut.rcSubtitleScreen, 0.5f, "HUD", false), "main", Parent);
+//    return dataOut;
+//}
 //int __thiscall sub_11F8990(int parentGameObject, int worldHolder, int gameDocument, void **a4)
 HOOK(int, __fastcall, sub_11F8990, 0x11F8990, Sonic::CGameObject* Parent, void* Edx, int worldHolder, Sonic::CGameDocument* gameDoc, void** a4)
 {
-    CSubtitleRemoveCallback(Parent, nullptr, nullptr);
-    Sonic::CCsdDatabaseWrapper wrapper(Parent->m_pMember->m_pGameDocument->m_pMember->m_spDatabase.get());
-    auto spCsdProject = wrapper.GetCsdProject("ui_help");
-    rcSubtitleScreen = spCsdProject->m_rcProject;
-    rcWindow = rcSubtitleScreen->CreateScene("help_window");
-    rcWindowArea = rcSubtitleScreen->CreateScene("help_text_area");
-    rcHelpChara1 = rcSubtitleScreen->CreateScene("help_chara_1");
-    rcHelpNametag = rcSubtitleScreen->CreateScene("help_nametag");
-
-    CSDCommon::PlayAnimation(*rcWindow, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-    CSDCommon::PlayAnimation(*rcHelpNametag, "Intro_chip_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-    CSDCommon::PlayAnimation(*rcHelpChara1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-    createScreen(Parent);
     return originalsub_11F8990(Parent, Edx, worldHolder, gameDoc, a4);
 }
-bool wait = false;
-bool skipped = false;
-//sub_11F86B0(int this, const struct Hedgehog::Universe::SUpdateInfo *a2)
-HOOK(void, __fastcall, sub_11F86B0, 0x11F86B0, void* This, void* Edx, const struct Hedgehog::Universe::SUpdateInfo* a2)
-{   
-    if (*((byte*)This + 253))
-    {
-        if (*((byte*)This + 288))
-        {
-           
-
-            if (rcWindow && rcWindow->m_MotionDisableFlag)
-            {
-                rcWindowArea->SetHideFlag(true);
-                CSDCommon::PlayAnimation(*rcHelpNametag, "Intro_chip_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);
-                CSDCommon::PlayAnimation(*rcHelpChara1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);
-                CSDCommon::PlayAnimation(*rcWindow, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);
-            }
-        }
-    }
-    if (!wait)
-        originalsub_11F86B0(This, Edx, a2);
-}
-//int __thiscall sub_4609E0(CTempState *this)
-HOOK(int, __fastcall, sub_4609E0, 0x4609E0, void* This)
-{
-    return 0;
-}
-HOOK(int, __fastcall, sub_4606A0, 0x4606A0, void* This)
-{
-    return 0;
-}
+//bool wait = false;
+//bool skipped = false;
+////sub_11F86B0(int this, const struct Hedgehog::Universe::SUpdateInfo *a2)
+//HOOK(void, __fastcall, sub_11F86B0, 0x11F86B0, void* This, void* Edx, const struct Hedgehog::Universe::SUpdateInfo* a2)
+//{   
+//    if (*((byte*)This + 253))
+//    {
+//        if (*((byte*)This + 288))
+//        {           
+//
+//            if (rcWindow && rcWindow->m_MotionDisableFlag)
+//            {
+//                rcWindowArea->SetHideFlag(true);
+//                CSDCommon::PlayAnimation(*rcHelpNametag, "Intro_chip_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);
+//                CSDCommon::PlayAnimation(*rcHelpChara1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);
+//                CSDCommon::PlayAnimation(*rcWindow, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);
+//            }
+//        }
+//    }
+//    if (!wait)
+//        originalsub_11F86B0(This, Edx, a2);
+//}
+////int __thiscall sub_4609E0(CTempState *this)
+//HOOK(int, __fastcall, sub_4609E0, 0x4609E0, void* This)
+//{
+//    return 0;
+//}
+//HOOK(int, __fastcall, sub_4606A0, 0x4606A0, void* This)
+//{
+//    return 0;
+//}
 void SubtitleUI::applyPatches()
 {
-	//// Omochao subtitle
-	//WRITE_JUMP(0x461402, addCaption_COmochaoFollow);
-	//WRITE_JUMP(0x1155E81, addCaption_MsgOmochao_PlayVoice);
-	//WRITE_JUMP(0x11F8813, (void*)0x11F8979);
-    WRITE_JUMP(0x011F8AC9, 0x011F8AE3);
-    WRITE_JUMP(0x004606CF, 0x00460967);
-    WRITE_MEMORY(0x016E11F4, void*, CSubtitleRemoveCallback);
-	// Cutscene subtitle
-	//WRITE_MEMORY(0xB16D7A, uint8_t, 0); // disable original textbox
-	WRITE_JUMP(0xB16E6C, addCaption_GetCutsceneDuration);
-	WRITE_JUMP(0x6AE09D, addCaption_Cutscene);
-	INSTALL_HOOK(sub_11F8990);
-	INSTALL_HOOK(sub_4609E0);
-	//INSTALL_HOOK(sub_4606A0);
-	INSTALL_HOOK(sub_11F86B0);
-	INSTALL_HOOK(SubtitleUI_CEventSceneStart);
-	INSTALL_HOOK(SubtitleUI_CEventSceneAdvance);
-	INSTALL_HOOK(SubtitleUI_CLastBossCaptionKill);
+	////// Omochao subtitle
+	////WRITE_JUMP(0x461402, addCaption_COmochaoFollow);
+	////WRITE_JUMP(0x1155E81, addCaption_MsgOmochao_PlayVoice);
+	////WRITE_JUMP(0x11F8813, (void*)0x11F8979);
+ //   WRITE_JUMP(0x011F8AC9, 0x011F8AE3);
+ //   WRITE_JUMP(0x004606CF, 0x00460967);
+ //   WRITE_MEMORY(0x016E11F4, void*, CSubtitleRemoveCallback);
+	//// Cutscene subtitle
+	////WRITE_MEMORY(0xB16D7A, uint8_t, 0); // disable original textbox
+	//WRITE_JUMP(0xB16E6C, addCaption_GetCutsceneDuration);
+	//WRITE_JUMP(0x6AE09D, addCaption_Cutscene);
+	//INSTALL_HOOK(sub_11F8990);
+	//INSTALL_HOOK(sub_4609E0);
+	////INSTALL_HOOK(sub_4606A0);
+	//INSTALL_HOOK(sub_11F86B0);
+	//INSTALL_HOOK(SubtitleUI_CEventSceneStart);
+	//INSTALL_HOOK(SubtitleUI_CEventSceneAdvance);
+	//INSTALL_HOOK(SubtitleUI_CLastBossCaptionKill);
 
 }
 
