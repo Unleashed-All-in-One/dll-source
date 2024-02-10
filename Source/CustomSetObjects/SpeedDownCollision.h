@@ -80,11 +80,9 @@ public:
     {
         auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
         const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-        if (m_playerInsideCollider)
-        {
-            playerContext->m_Velocity = TransformUtilities::ClampMagnitudeMax(playerContext->m_Velocity, 0, m_Speed);
-        }
         
+        if (playerContext->m_Velocity.norm() > m_Speed && m_playerInsideCollider)
+            playerContext->m_Velocity *= 1.0f - in_rUpdateInfo.DeltaTime * 0.85f;
     }
     void InitializeEditParam(Sonic::CEditParam& in_rEditParam) override
     {
