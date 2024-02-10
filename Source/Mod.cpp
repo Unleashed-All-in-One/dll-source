@@ -25,10 +25,11 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	WerehogPole::Install();
 	ETFTimeSwitch::Install();
 	Hintring::Install();
+	Paraloop::Install();
+	SpeedDownCollision::Install();
 
 	//---------------UI---------------
 	Title::applyPatches();
-	SubtitleUI::applyPatches();
 	TitleWorldMap::applyPatches();
 	TitleWorldMapPause::applyPatches();
 	EventViewer::applyPatches();
@@ -64,7 +65,7 @@ extern "C" void __declspec(dllexport) OnFrame()
 {
 	//---------------System---------------
 	CSDCommon::update();
-	DiscordStatus::update();
+	//DiscordStatus::update();
 	LevelLoadingManager::update();
 	EventViewer::update();
 	SequenceHelpers::update();

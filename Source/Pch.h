@@ -44,9 +44,12 @@
 #include <Common.h>
 #include "System/SequenceHelpers.h"
 #include "Configuration.h"
+#include "Temporary.h"
 
+//Gameplay
 #include "Gameplay/QSSRestore.h"
 
+//System
 #include "System/LevelLoadingManager.h"
 #include "System/DiscordStatus.h"
 #include "System/ArchiveTreePatcher.h"
@@ -56,20 +59,24 @@
 #include "System/CSDCommon.h"
 #include "System/UpdateDirector.h"
 
-
+//Functionality
 #include "Functionality/PauseBgm.h"
 
-
-#include "CustomSetObjects/DebugObject.h"
-#include "CustomSetObjects/ETFTimeSwitch.h"
-
-
-#include "Testing/SubtitleUI.h"
+//UI
 #include "UI/Title.h"
 #include "UI/TitleWorldMap.h"
 #include "UI/TitleOption.h"
 #include "UI/TitleWorldMapPause.h"
 #include "UI/EventViewer.h"
+#include "UI/SubtitleUI.h"
+#include "UI/ItemboxUI.h"
 
+//Set objects
 #include "CustomSetObjects/Hintring.h"
+#include "CustomSetObjects/DebugObject.h"
+#include "CustomSetObjects/ETFTimeSwitch.h"
+#include "CustomSetObjects/Paraloop.h"
+#include "CustomSetObjects/SpeedDownCollision.h"
+
+//Rest
 #include "Testing/TestingCode.h"

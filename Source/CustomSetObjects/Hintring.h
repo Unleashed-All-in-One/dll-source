@@ -52,6 +52,8 @@ public:
                         const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
                         if(playerContext->m_pPlayer->m_PostureStateMachine.GetCurrentState()->m_Name == "Standard")
                         playerContext->m_pPlayer->m_PostureStateMachine.ChangeState("Stop");
+
+                        playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_OutOfControl] = true;
                     }
                     m_IsExiting = false;
                     m_HintUI->Reset();
@@ -69,6 +71,12 @@ public:
                 {
                     m_playerInsideCollider = false;
                 }
+            }
+            if (std::strstr(in_rMsg.GetType(), "MsgGetHomingAttackPosition") != nullptr)
+            {
+
+                DWORD* msg = (DWORD*)&in_rMsg;
+                *(Hedgehog::Math::CVector**)(msg + 16) = &m_spMatrixNodeTransform->m_Transform.m_Position;
             }
         }
         return Sonic::CObjectBase::ProcessMessage(in_rMsg, in_Flag);
@@ -105,6 +113,7 @@ public:
 
                         if (playerContext->m_pPlayer->m_PostureStateMachine.GetCurrentState()->m_Name == "Stop")
                         playerContext->m_pPlayer->m_PostureStateMachine.ChangeState("Standard");
+                        playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_OutOfControl] = false;
                     }
                 }
             }

@@ -78,7 +78,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E
+      <Command>xcopy "$(SolutionDir)..\Build\bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E
 xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -111,7 +111,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E
+      <Command>xcopy "$(SolutionDir)..\Build\bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E
 xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -120,6 +120,8 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="CustomSetObjects\DebugObject.cpp" />
     <ClCompile Include="CustomSetObjects\ETFTimeSwitch.cpp" />
     <ClCompile Include="CustomSetObjects\Hintring.cpp" />
+    <ClCompile Include="CustomSetObjects\Paraloop.cpp" />
+    <ClCompile Include="CustomSetObjects\SpeedDownCollision.cpp" />
     <ClCompile Include="Functionality\PauseBgm.cpp" />
     <ClCompile Include="Mod.cpp" />
     <ClCompile Include="Pch.cpp">
@@ -152,7 +154,6 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="System\MiniAudioHelper.cpp" />
     <ClCompile Include="System\SequenceHelpers.cpp" />
     <ClCompile Include="System\UpdateDirector.cpp" />
-    <ClCompile Include="Testing\SubtitleUI.cpp" />
     <ClCompile Include="Testing\TestingCode.cpp" />
     <ClCompile Include="UI\EventViewer.cpp" />
     <ClCompile Include="UI\Title.cpp" />
@@ -165,6 +166,8 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="CustomSetObjects\DebugObject.h" />
     <ClInclude Include="CustomSetObjects\ETFTimeSwitch.h" />
     <ClInclude Include="CustomSetObjects\Hintring.h" />
+    <ClInclude Include="CustomSetObjects\Paraloop.h" />
+    <ClInclude Include="CustomSetObjects\SpeedDownCollision.h" />
     <ClInclude Include="Functionality\PauseBgm.h" />
     <ClInclude Include="Pch.h" />
     <ClInclude Include="Gameplay\QSSRestore.h" />
@@ -194,7 +197,9 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="System\MiniAudioHelper.h" />
     <ClInclude Include="System\SequenceHelpers.h" />
     <ClInclude Include="System\UpdateDirector.h" />
-    <ClInclude Include="Testing\SubtitleUI.h" />
+    <ClInclude Include="Temporary.h" />
+    <ClInclude Include="UI\ItemboxUI.h" />
+    <ClInclude Include="UI\SubtitleUI.h" />
     <ClInclude Include="Testing\TestingCode.h" />
     <ClInclude Include="UI\EventViewer.h" />
     <ClInclude Include="UI\Title.h" />

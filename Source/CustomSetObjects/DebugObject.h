@@ -1,7 +1,6 @@
 #pragma once
 using namespace hh::math;
-static const int* pColID_Common = reinterpret_cast<int*>(0x01E0AF30);
-static const int* pColID_PlayerEvent = reinterpret_cast<int*>(0x01E0AFD8);
+
 class TransformUtilities
 {
 public:
@@ -43,7 +42,24 @@ public:
         q.w() = cosf(angle / 2);
         return q;
     }
+    static float Distance(const Eigen::Vector3f& v1, const Eigen::Vector3f& v2) 
+    {
+        Eigen::Vector3f diff = v1 - v2;
+        double distanceSquared = diff.dot(diff);
+        return std::sqrt(distanceSquared);
+    }
+    static Eigen::Vector3f ClampMagnitudeMax(const Eigen::Vector3f& vec, float minMagnitude, float maxMagnitude) {
+        float magnitude = vec.norm();
+        Eigen::Vector3f clampedVec = vec;
 
+        
+        if (magnitude > maxMagnitude) 
+        {
+            clampedVec *= maxMagnitude / magnitude;
+        }
+
+        return clampedVec;
+    }
     static CQuaternion QuaternionFaceTowards(const Eigen::Vector3f& targetPoint, const Eigen::Vector3f& position, CQuaternion rotation) {
         Eigen::Vector3f currentForward = rotation * Eigen::Vector3f::UnitZ();
         Eigen::Vector3f targetDirection = (targetPoint - position).normalized();
