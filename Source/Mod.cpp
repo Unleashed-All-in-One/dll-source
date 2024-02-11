@@ -38,7 +38,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	//---------------UI---------------
 	Title::applyPatches();
 	TitleWorldMap::applyPatches();
-	TitleWorldMapPause::applyPatches();
+	//TitleWorldMapPause::applyPatches();
 	EventViewer::applyPatches();
 	// NOTE: Because we're essentially remaking the title experience to be the exact same, we might want to make the options change in the
 	// same way unleashed does it (via an small options sub-tab-thing and remove TitleOption entirely.

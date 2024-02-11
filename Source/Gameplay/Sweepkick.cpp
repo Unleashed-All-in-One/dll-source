@@ -2,6 +2,7 @@ int m_IsBButtonPressed = 0;
 float m_InputResetTimer = -1;
 float m_SweepkickCollisionTime = 0.0f;
 SharedPtrTypeless m_SquatKickParticleHandle;
+SharedPtrTypeless m_SquatKickSoundHandle;
 Hedgehog::Math::CQuaternion m_SquatKickRotation;
 bool m_IsSweepkickActive = false;
 
@@ -19,7 +20,7 @@ HOOK(void, __fastcall, CSonicStateSquatKickBegin, 0x12526D0, void* This)
 	boost::shared_ptr<Hedgehog::Mirage::CMatrixNodeSingleElementNode> RefNode = context->m_pPlayer->m_spCharacterModel->GetNode("Reference");
 	Common::fCGlitterCreate(context, m_SquatKickParticleHandle, &RefNode, (Common::IsPlayerSuper() ? "ef_ch_sps_lms_sliding_kick" : "ef_ch_sng_lms_sliding_kick"), 0);
 	
-	context->PlaySound(2002497, true);
+	Common::PlaySoundStatic(m_SquatKickSoundHandle, 2002497);
 
 	if (Sweepkick::useLight) {
 		m_SweepLight.Color = Common::IsPlayerSuper() ? Sweepkick::colorSuper : Sweepkick::color;

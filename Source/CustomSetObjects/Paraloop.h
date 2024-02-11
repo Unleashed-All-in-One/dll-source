@@ -8,8 +8,8 @@ public:
     boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
     boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;   
     bool m_playerInsideCollider;
-    SharedPtrTypeless particle;
-    SharedPtrTypeless sound;
+    SharedPtrTypeless particle = nullptr;
+    SharedPtrTypeless sound = nullptr;
     float m_CollisionWidth = 1;
     float m_CollisionHeight = 1;
     float m_CollisionLength = 1;
@@ -28,11 +28,12 @@ public:
 
                 if (in_rMsg.m_SenderActorID == playerContext->m_pPlayer->m_ActorID)
                 {
-                    auto bone = playerContext->m_pPlayer->m_spCharacterModel->GetNode("Reference");
-                    if(!particle)
-                    Common::fCGlitterCreate(playerContext, particle, &bone, *pSuperSonicContext ? "ef_ch_sps_lms_paraloop02" : "ef_ch_sng_lms_paraloop02", 0);
+                    if (particle == nullptr) {
+                        void* matrixNode = (void*)((uint32_t)*PLAYER_CONTEXT + 0x30);
+                        Common::fCGlitterCreate(playerContext, particle, matrixNode, *pSuperSonicContext ? "ef_ch_sps_lms_paraloop02" : "ef_ch_sng_lms_paraloop02", 0);
+                        Common::PlaySoundStatic(sound, 2002501);
+                    }         
                     m_playerInsideCollider = true;
-                    Common::PlaySoundStatic(sound,2002501);
                 }
                 return true;
             }

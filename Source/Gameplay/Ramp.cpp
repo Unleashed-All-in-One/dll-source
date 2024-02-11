@@ -5,7 +5,7 @@ void CreateRampParticle() {
 		return;
 
 	void* middlematrixNode = (void*)((uint32_t)*PLAYER_CONTEXT + 0x30);
-	Common::fCGlitterCreate(*pModernSonicContext, rampParticleHandle, middlematrixNode, "ef_ch_sng_lms_jump_delux", 1);
+	Common::fCGlitterCreate(*PLAYER_CONTEXT, rampParticleHandle, middlematrixNode, "ef_ch_sng_lms_jump_delux", 1);
 }
 
 void PlayRampAnimation() {

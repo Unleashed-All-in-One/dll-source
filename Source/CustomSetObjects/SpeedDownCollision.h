@@ -16,6 +16,7 @@ public:
     float m_CollisionHeight = 1;
     float m_CollisionLength = 1;
     float m_Speed = 45;
+    float m_Range = 10000;
     bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
     {        
         return true;
