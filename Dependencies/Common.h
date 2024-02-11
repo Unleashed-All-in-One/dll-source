@@ -1710,6 +1710,22 @@ namespace Common
 		CSonicSpeedProcMsgGetAnimationInfo(player, &message);
 	}
 
+	inline const char* SonicContextGetAnimationName()
+	{
+		alignas(16) MsgGetAnimationInfo message {};
+		SonicContextGetAnimationInfo(message);
+
+		return message.m_name;
+	}
+
+	inline bool SonicContextIsAnimation(const char* anim)
+	{
+		alignas(16) MsgGetAnimationInfo message {};
+		SonicContextGetAnimationInfo(message);
+
+		return message.IsAnimation(anim);
+	}
+
 	inline void SonicContextGetItemType(uint32_t type)
 	{
 		void* pSonicContext = *PLAYER_CONTEXT;
