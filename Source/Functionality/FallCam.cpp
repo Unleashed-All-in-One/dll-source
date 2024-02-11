@@ -128,7 +128,7 @@ void CameraFollow(Sonic::Player::CPlayerSpeedContext* context, Sonic::CCamera::C
 }
 
 HOOK(void, __fastcall, FallCam_CCameraUpdateParallel, 0x10FB770, Sonic::CCamera* This, void* Edx, const hh::fnd::SUpdateInfo& in_rUpdateInfo) {
-	if (!*pModernSonicContext) {
+	if (!*pModernSonicContext && !*pClassicSonicContext) {
 		originalFallCam_CCameraUpdateParallel(This, Edx, in_rUpdateInfo);
 		return;
 	}
@@ -185,7 +185,7 @@ HOOK(int, __fastcall, FallCam_MsgRestartStage, 0xE76810, uint32_t* This, void* E
 {
 	int result = originalFallCam_MsgRestartStage(This, Edx, message);
 
-	if (!*pModernSonicContext)
+	if (!*pModernSonicContext && !*pClassicSonicContext)
 		return result;
 
 	StopFade();
