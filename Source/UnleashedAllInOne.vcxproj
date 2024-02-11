@@ -124,7 +124,10 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClCompile Include="CustomSetObjects\SpeedDownCollision.cpp" />
     <ClCompile Include="Functionality\FallCam.cpp" />
     <ClCompile Include="Functionality\PauseBgm.cpp" />
+    <ClCompile Include="Functionality\RingEnergy.cpp" />
+    <ClCompile Include="Gameplay\Drift.cpp" />
     <ClCompile Include="Gameplay\Ramp.cpp" />
+    <ClCompile Include="Gameplay\ShortJump.cpp" />
     <ClCompile Include="Gameplay\Sweepkick.cpp" />
     <ClCompile Include="Mod.cpp" />
     <ClCompile Include="Pch.cpp">
@@ -173,7 +176,10 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClInclude Include="CustomSetObjects\SpeedDownCollision.h" />
     <ClInclude Include="Functionality\FallCam.h" />
     <ClInclude Include="Functionality\PauseBgm.h" />
+    <ClInclude Include="Functionality\RingEnergy.h" />
+    <ClInclude Include="Gameplay\Drift.h" />
     <ClInclude Include="Gameplay\Ramp.h" />
+    <ClInclude Include="Gameplay\ShortJump.h" />
     <ClInclude Include="Gameplay\Sweepkick.h" />
     <ClInclude Include="Pch.h" />
     <ClInclude Include="Gameplay\QSSRestore.h" />

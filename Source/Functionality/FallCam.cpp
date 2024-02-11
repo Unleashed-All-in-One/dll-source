@@ -155,13 +155,13 @@ HOOK(void, __fastcall, FallCam_CCameraUpdateParallel, 0x10FB770, Sonic::CCamera*
 	if (playIntroTimer) {
 		introTimer += in_rUpdateInfo.DeltaTime;
 		
-		if (introTimer >= 1.0f && !fadePlayed) {
+		if (introTimer >= 2.0f && !fadePlayed) {
 			PlayFade();
 			fadePlayed = true;
 		}
 	}
 
-	if (isDeadFall && !playIntroTimer) {
+	if ((isDeadFall || Common::IsPlayerDead()) && !playIntroTimer) {
 		playIntroTimer = true;
 		introTimer = 0.0f;
 	}

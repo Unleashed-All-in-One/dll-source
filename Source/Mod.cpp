@@ -19,10 +19,13 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	QSSRestore::applyPatches();
 	Sweepkick::Install();
 	Ramp::Install();
+	ShortJump::Install();
+	Drift::Install();
 
 	//-----------Functionality (accuracy)-----------
 	PauseBgm::applyPatches();
 	FallCam::Install();
+	RingEnergy::Install();
 
 	//-----------Register Set Objects-----------
 	WerehogPole::Install();

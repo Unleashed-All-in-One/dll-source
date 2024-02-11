@@ -1,23 +1,18 @@
 SharedPtrTypeless rampParticleHandle;
 
 void CreateRampParticle() {
-	Sonic::Player::CPlayerSpeedContext* sonic = Sonic::Player::CPlayerSpeedContext::GetInstance();
-
-	if (!sonic)
+	if (!*pModernSonicContext)
 		return;
 
-	void* middlematrixNode = (void*)((uint32_t)sonic + 0x30);
-	
-	Common::fCGlitterCreate(sonic, rampParticleHandle, middlematrixNode, "ef_ch_sng_lms_jump_delux", 1);
+	void* middlematrixNode = (void*)((uint32_t)*PLAYER_CONTEXT + 0x30);
+	Common::fCGlitterCreate(*pModernSonicContext, rampParticleHandle, middlematrixNode, "ef_ch_sng_lms_jump_delux", 1);
 }
 
 void PlayRampAnimation() {
-	Sonic::Player::CPlayerSpeedContext* sonic = Sonic::Player::CPlayerSpeedContext::GetInstance();
-
-	if (!sonic)
+	if (!*pModernSonicContext)
 		return;
 
-	sonic->ChangeAnimation("JumpBoardLoop");
+	Common::SonicContextChangeAnimation("JumpBoardLoop");
 }
 
 //https://github.com/brianuuu/DllMods/blob/master/Source/ColorsVoice/Mod.cpp
@@ -29,15 +24,10 @@ HOOK(void, __fastcall, RampApplyImpulse, 0xE6CFA0, void* This, void* Edx, MsgApp
 	if (!*pModernSonicContext)
 		return;
 
-	switch (message->m_impulseType) // i would just pass in context here but it crashes.
-	{
-	case ImpulseType::JumpBoardSpecial:
+	if (message->m_impulseType == ImpulseType::JumpBoardSpecial)
 		CreateRampParticle();
-		break;
-	case ImpulseType::JumpBoard:
+	else if (message->m_impulseType == ImpulseType::JumpBoard)
 		PlayRampAnimation();
-		break;
-	}
 }
 
 void Ramp::Install() {

@@ -52,6 +52,8 @@
 #include "Gameplay/QSSRestore.h"
 #include "Gameplay/Sweepkick.h"
 #include "Gameplay/Ramp.h"
+#include "Gameplay/ShortJump.h"
+#include "Gameplay/Drift.h"
 
 //System
 #include "System/LevelLoadingManager.h"
@@ -67,6 +69,7 @@
 //Functionality
 #include "Functionality/PauseBgm.h"
 #include "Functionality/FallCam.h"
+#include "Functionality/RingEnergy.h"
 
 //UI
 #include "UI/Title.h"
