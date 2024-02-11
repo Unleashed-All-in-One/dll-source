@@ -171,9 +171,7 @@ void PauseCase(int pos)
 	case 4:
 	{
 		SequenceHelpers::loadStage("pla201");
-
-		uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-		strcpy(*(char**)stageTerrainAddress, "pla201");
+		LevelLoadingManager::ActiveReplacement = false;
 		break;
 	}
 	}
