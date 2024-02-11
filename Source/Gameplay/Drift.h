@@ -2,12 +2,9 @@
 class Drift
 {
 public:
-    /// <summary>
-    /// Installs the mid-ASM hooks.
-    /// </summary>
-    static void Install();
+    static void applyPatches();
 
-    static bool CheckForBDrift() {
+    static bool checkForBDrift() {
         Sonic::Player::CPlayerSpeedContext* sonic = Sonic::Player::CPlayerSpeedContext::GetInstance();
         
         if (!sonic)

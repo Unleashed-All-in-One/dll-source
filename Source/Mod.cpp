@@ -1,6 +1,6 @@
 extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 {
-	MessageBoxA(NULL, "", "", 0);
+	MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
 	// Load configuration
 	Configuration::load(modInfo->CurrentMod->Path);
 
@@ -13,26 +13,26 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	EnemyTrigger::applyPatches();
 	LetterboxHelper::initialize(1280, 720);
 	MiniAudioHelper::initialize(modInfo->CurrentMod->Path);
-	DiscordStatus::Initialize();
+	DiscordStatus::initialize();
 	SequenceHelpers::applyPatches();
 	//---------------Gameplay---------------
 	QSSRestore::applyPatches();
-	Sweepkick::Install();
-	Ramp::Install();
-	ShortJump::Install();
-	Drift::Install();
+	Sweepkick::applyPatches();
+	Ramp::applyPatches();
+	ShortJump::applyPatches();
+	Drift::applyPatches();
 
 	//-----------Functionality (accuracy)-----------
 	PauseBgm::applyPatches();
-	FallCam::Install();
-	RingEnergy::Install();
+	FallCam::applyPatches();
+	RingEnergy::applyPatches();
 
 	//-----------Register Set Objects-----------
-	WerehogPole::Install();
-	ETFTimeSwitch::Install();
-	Hintring::Install();
-	Paraloop::Install();
-	SpeedDownCollision::Install();
+	WerehogPole::registerObject();
+	ETFTimeSwitch::registerObject();
+	Hintring::registerObject();
+	Paraloop::registerObject();
+	SpeedDownCollision::registerObject();
 
 	//---------------UI---------------
 	Title::applyPatches();

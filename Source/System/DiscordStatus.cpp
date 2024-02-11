@@ -17,7 +17,7 @@ HOOK(void, __fastcall, HudLoading_CHudLoadingCStateIntroBegin, 0x10938F0, hh::fn
 	originalHudLoading_CHudLoadingCStateIntroBegin(This);
 }
 
-void DiscordStatus::Initialize()
+void DiscordStatus::initialize()
 {
 	INSTALL_HOOK(HudLoading_CHudLoadingCStateIntroBegin);
 	//i hate discord's game sdk -Nextin

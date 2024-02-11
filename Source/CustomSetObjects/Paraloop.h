@@ -85,5 +85,5 @@ public:
         in_rEditParam.SetFloat(&m_CollisionLength, "Collision_Length");
         in_rEditParam.SetFloat(&m_CollisionWidth, "Collision_Width");
     }
-    static void Install();
+    static void registerObject();
 };

@@ -1,11 +1,11 @@
-int BPressed = 0;
-float BResetTimer = -1;
-float sweepkickColTime = 0.0f;
-SharedPtrTypeless squatKickParticleHandle;
-Hedgehog::Math::CQuaternion squatKickRotation;
-bool sweepKickActive = false;
+int m_IsBButtonPressed = 0;
+float m_InputResetTimer = -1;
+float m_SweepkickCollisionTime = 0.0f;
+SharedPtrTypeless m_SquatKickParticleHandle;
+Hedgehog::Math::CQuaternion m_SquatKickRotation;
+bool m_IsSweepkickActive = false;
 
-SpawnableLight sweepLight;
+SpawnableLight m_SweepLight;
 
 HOOK(void, __fastcall, CSonicStateSquatKickBegin, 0x12526D0, void* This)
 {
@@ -17,16 +17,16 @@ HOOK(void, __fastcall, CSonicStateSquatKickBegin, 0x12526D0, void* This)
 		return;
 
 	boost::shared_ptr<Hedgehog::Mirage::CMatrixNodeSingleElementNode> RefNode = context->m_pPlayer->m_spCharacterModel->GetNode("Reference");
-	Common::fCGlitterCreate(context, squatKickParticleHandle, &RefNode, (Common::IsPlayerSuper() ? "ef_ch_sps_lms_sliding_kick" : "ef_ch_sng_lms_sliding_kick"), 0);
+	Common::fCGlitterCreate(context, m_SquatKickParticleHandle, &RefNode, (Common::IsPlayerSuper() ? "ef_ch_sps_lms_sliding_kick" : "ef_ch_sng_lms_sliding_kick"), 0);
 	
 	context->PlaySound(2002497, true);
 
 	if (Sweepkick::useLight) {
-		sweepLight.Color = Common::IsPlayerSuper() ? Sweepkick::ColorSuper : Sweepkick::Color;
-		sweepLight.Play();
+		m_SweepLight.Color = Common::IsPlayerSuper() ? Sweepkick::colorSuper : Sweepkick::color;
+		m_SweepLight.Play();
 	}
 
-	sweepkickColTime = Sweepkick::supportShockwaveDelay;
+	m_SweepkickCollisionTime = Sweepkick::supportShockwaveDelay;
 }
 
 HOOK(void, __fastcall, CSonicStateSquatKickAdvance, 0x1252810, void* This) {
@@ -35,7 +35,7 @@ HOOK(void, __fastcall, CSonicStateSquatKickAdvance, 0x1252810, void* This) {
 	if (!context)
 		return;
 
-	if (sweepkickColTime <= 0 && Sweepkick::useSupportShockwave) 
+	if (m_SweepkickCollisionTime <= 0 && Sweepkick::useSupportShockwave) 
 		Common::CreatePlayerSupportShockWave(context->m_spMatrixNode->m_Transform.m_Position, 0.15f, 3.0f, 0.1f);
 
 	originalCSonicStateSquatKickAdvance(This);
@@ -80,27 +80,27 @@ void __declspec(naked) CSonicStateSquatKickAdvanceTransitionOut()
 	}
 }
 
-void OnBPressed(Sonic::Player::CPlayerSpeedContext* sonic, Hedgehog::Base::CSharedString state) {
+void Onm_IsBButtonPressed(Sonic::Player::CPlayerSpeedContext* sonic, Hedgehog::Base::CSharedString state) {
 	if (!sonic)
 		return;
 
-	if (BResetTimer < 0.0f)
-		BResetTimer = Sweepkick::sweepInputTime;
+	if (m_InputResetTimer < 0.0f)
+		m_InputResetTimer = Sweepkick::sweepInputTime;
 
-	BPressed++;
+	m_IsBButtonPressed++;
 
-	bool canSquatKick = BPressed == 2 
-		&& BResetTimer > 0.0f 
+	bool canSquatKick = m_IsBButtonPressed == 2 
+		&& m_InputResetTimer > 0.0f 
 		&& (state == "Squat" || state == "Sliding" || state == "Walk" || state == "SlidingEnd" || state == "StompingLand" || state == "SquatCharge") 
 		&& !Common::IsPlayerControlLocked();
 
 	if (!canSquatKick)
 		return;
 	
-	BPressed = 0;
-	squatKickRotation = sonic->m_spMatrixNode->m_Transform.m_Rotation;
+	m_IsBButtonPressed = 0;
+	m_SquatKickRotation = sonic->m_spMatrixNode->m_Transform.m_Rotation;
 	sonic->ChangeState("SquatKick");
-	sweepKickActive = true;
+	m_IsSweepkickActive = true;
 }
 
 HOOK(void, __fastcall, SweepkickOnUpdate, 0xE6BF20, void* This, void* Edx, float* dt) {
@@ -116,47 +116,47 @@ HOOK(void, __fastcall, SweepkickOnUpdate, 0xE6BF20, void* This, void* Edx, float
 	if (!sonic)
 		return;
 
-	if (sweepkickColTime > 0)
-		sweepkickColTime -= *dt;
+	if (m_SweepkickCollisionTime > 0)
+		m_SweepkickCollisionTime -= *dt;
 
 	if (input.IsTapped(Sonic::eKeyState_B))
-		OnBPressed(sonic, state);
+		Onm_IsBButtonPressed(sonic, state);
 
-	if ((state == "SquatKick" || sweepKickActive) && sonic->m_Velocity.norm() == 0.0f)
-		sonic->m_spMatrixNode->m_Transform.SetRotation(squatKickRotation);
+	if ((state == "SquatKick" || m_IsSweepkickActive) && sonic->m_Velocity.norm() == 0.0f)
+		sonic->m_spMatrixNode->m_Transform.SetRotation(m_SquatKickRotation);
 
-	if (sweepKickActive && (state != "Squat" && state != "Sliding" && state != "Stand" && state != "Walk" && state != "SlidingEnd" && state != "StompingLand" && state != "SquatCharge" && state != "SquatKick")) {
-		Common::fCGlitterEnd(sonic, squatKickParticleHandle, true);
-		sweepLight.Stop(true);
-		sweepKickActive = false;
+	if (m_IsSweepkickActive && (state != "Squat" && state != "Sliding" && state != "Stand" && state != "Walk" && state != "SlidingEnd" && state != "StompingLand" && state != "SquatCharge" && state != "SquatKick")) {
+		Common::fCGlitterEnd(sonic, m_SquatKickParticleHandle, true);
+		m_SweepLight.Stop(true);
+		m_IsSweepkickActive = false;
 	}
 
-	if (sweepKickActive && Sweepkick::useLight) {
-		sweepLight.Position = sweepLight.playerLocalPos(Sweepkick::Offset);
-		sweepLight.Update(*dt);
+	if (m_IsSweepkickActive && Sweepkick::useLight) {
+		m_SweepLight.Position = m_SweepLight.playerLocalPos(Sweepkick::offset);
+		m_SweepLight.Update(*dt);
 	}
 
-	if (BResetTimer >= 0.0f)
-		BResetTimer -= *dt;
+	if (m_InputResetTimer >= 0.0f)
+		m_InputResetTimer -= *dt;
 	else
-		BPressed = 0;
+		m_IsBButtonPressed = 0;
 }
 
 HOOK(int, __fastcall, ProcMsgRestartStageSweepkick, 0xE76810, uint32_t* This, void* Edx, void* message)
 {
 	if (*pModernSonicContext && Sweepkick::useLight)
-		sweepLight.Stop(true);
+		m_SweepLight.Stop(true);
 	
 	return originalProcMsgRestartStageSweepkick(This, Edx, message);
 }
 
-void Sweepkick::Install() {
-	sweepLight.FadeInSpeed = Sweepkick::lerpSpeedIn;
-	sweepLight.FadeOutSpeed = Sweepkick::lerpSpeedOut;
-	sweepLight.LifeTime = Sweepkick::lightLifeTime;
-	sweepLight.Range = Sweepkick::lightRange;
-	sweepLight.StartDelay = Sweepkick::lightInDelay;
-	sweepLight.Color = Sweepkick::Color;
+void Sweepkick::applyPatches() {
+	m_SweepLight.FadeInSpeed = Sweepkick::lerpSpeedIn;
+	m_SweepLight.FadeOutSpeed = Sweepkick::lerpSpeedOut;
+	m_SweepLight.LifeTime = Sweepkick::lightLifeTime;
+	m_SweepLight.Range = Sweepkick::lightRange;
+	m_SweepLight.StartDelay = Sweepkick::lightInDelay;
+	m_SweepLight.Color = Sweepkick::color;
 
 	// Enable sweep kick attack collision immediately
 	static double const c_sweepKickActivateTime = 0.0;

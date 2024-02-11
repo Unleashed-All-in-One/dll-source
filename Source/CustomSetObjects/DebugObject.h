@@ -226,5 +226,5 @@ public:
         }
     }
 
-    static void Install();
+    static void registerObject();
 };

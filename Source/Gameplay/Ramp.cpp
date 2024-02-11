@@ -30,6 +30,6 @@ HOOK(void, __fastcall, RampApplyImpulse, 0xE6CFA0, void* This, void* Edx, MsgApp
 		PlayRampAnimation();
 }
 
-void Ramp::Install() {
+void Ramp::applyPatches() {
 	INSTALL_HOOK(RampApplyImpulse);
 }

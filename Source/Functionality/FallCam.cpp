@@ -1,17 +1,17 @@
-float factor = 0.0f;
-bool pause = false;
-
-bool fadePlayed = false;
 
 const float FADE_INTRO = 3.0f;
 const float DEAD_TO_RESTART = 0.15f;
 
-float introTimer = 0.0f;
-bool playIntroTimer = false;
+float m_Factor = 0.0f;
+float m_IntroTimer = 0.0f;
+bool m_Pause = false;
+bool m_IsFadeComplete = false;
+bool m_PlayIntroTimer = false;
 
 boost::shared_ptr<Sonic::CGameObject> fadeSingleton;
 
-class FadeObject : public Sonic::CGameObject {
+class FadeObject : public Sonic::CGameObject 
+{
 	boost::shared_ptr<Sonic::CGameObjectCSD> spFade;
 	Chao::CSD::RCPtr<Chao::CSD::CProject> rcFade;
 	Chao::CSD::RCPtr<Chao::CSD::CScene> rect;
@@ -74,13 +74,13 @@ public:
 
 HOOK(bool, __fastcall, FallCam_MsgStartPause, 0x010BC130, void* This, void* Edx, void* a2)
 {
-	pause = true;
+	m_Pause = true;
 	return originalFallCam_MsgStartPause(This, Edx, a2);
 }
 
 HOOK(int, __fastcall, FallCam_MsgFinishPause, 0x010BC110, void* This, void* Edx, void* a2)
 {
-	pause = false;
+	m_Pause = false;
 	return originalFallCam_MsgFinishPause(This, Edx, a2);
 }
 
@@ -101,7 +101,7 @@ void PlayFade() {
 }
 
 void StopFade() {
-	fadePlayed = false;
+	m_IsFadeComplete = false;
 	if (fadeSingleton)
 		((FadeObject*)fadeSingleton.get())->Kill();
 }
@@ -111,9 +111,9 @@ void CameraFollow(Sonic::Player::CPlayerSpeedContext* context, Sonic::CCamera::C
 	Hedgehog::Math::CVector playerUp = context->m_spMatrixNode->m_Transform.m_Rotation * Hedgehog::Math::CVector::UnitY();
 	Hedgehog::Math::CVector playerForward = context->m_spMatrixNode->m_Transform.m_Rotation * Hedgehog::Math::CVector::UnitZ();
 
-	factor += delta * 0.05f;
+	m_Factor += delta * 0.05f;
 	
-	Common::ClampFloat(factor, 0.0f, 1.0f);
+	Common::ClampFloat(m_Factor, 0.0f, 1.0f);
 	
 	camera.m_Direction = context->m_HorizontalRotation * Eigen::Vector3f::UnitZ();
 
@@ -121,7 +121,7 @@ void CameraFollow(Sonic::Player::CPlayerSpeedContext* context, Sonic::CCamera::C
 	Eigen::AngleAxisf rotYaw(180.0f * DEG_TO_RAD, playerUp);
 	Eigen::AngleAxisf rotRoll(0.0f * DEG_TO_RAD, playerForward);
 
-	Hedgehog::Math::CQuaternion rotationSlerp = Hedgehog::Math::CQuaternion(camera.m_View.rotation().inverse()).slerp(factor, rotPitch * rotYaw * rotRoll * context->m_spMatrixNode->m_Transform.m_Rotation);
+	Hedgehog::Math::CQuaternion rotationSlerp = Hedgehog::Math::CQuaternion(camera.m_View.rotation().inverse()).slerp(m_Factor, rotPitch * rotYaw * rotRoll * context->m_spMatrixNode->m_Transform.m_Rotation);
 
 	camera.m_View = (Eigen::Translation3f(camera.m_Position) * rotationSlerp).inverse().matrix();
 	camera.m_InputView = camera.m_View;
@@ -152,18 +152,18 @@ HOOK(void, __fastcall, FallCam_CCameraUpdateParallel, 0x10FB770, Sonic::CCamera*
 	context->m_spParameter->m_scpNode->m_ValueMap[Sonic::Player::ePlayerSpeedParameter_DeadBgmWaitTime] = time - 0.15f;
 	context->m_spParameter->m_scpNode->m_ValueMap[Sonic::Player::ePlayerSpeedParameter_DeadBgmFadeTime] = 0.15f;
 
-	if (playIntroTimer) {
-		introTimer += in_rUpdateInfo.DeltaTime;
+	if (m_PlayIntroTimer) {
+		m_IntroTimer += in_rUpdateInfo.DeltaTime;
 		
-		if (introTimer >= 2.0f && !fadePlayed) {
+		if (m_IntroTimer >= 2.0f && !m_IsFadeComplete) {
 			PlayFade();
-			fadePlayed = true;
+			m_IsFadeComplete = true;
 		}
 	}
 
-	if ((isDeadFall || Common::IsPlayerDead()) && !playIntroTimer) {
-		playIntroTimer = true;
-		introTimer = 0.0f;
+	if ((isDeadFall || Common::IsPlayerDead()) && !m_PlayIntroTimer) {
+		m_PlayIntroTimer = true;
+		m_IntroTimer = 0.0f;
 	}
 
 	if (!isDeadFall) {
@@ -171,7 +171,7 @@ HOOK(void, __fastcall, FallCam_CCameraUpdateParallel, 0x10FB770, Sonic::CCamera*
 		return;
 	}
 
-	if (pause) {
+	if (m_Pause) {
 		camera.m_View = (Eigen::Translation3f(camera.m_Position) * Hedgehog::Math::CQuaternion(camera.m_View.rotation().inverse())).inverse().matrix();
 		camera.m_InputView = camera.m_View;
 		originalFallCam_CCameraUpdateParallel(This, Edx, in_rUpdateInfo);
@@ -190,14 +190,15 @@ HOOK(int, __fastcall, FallCam_MsgRestartStage, 0xE76810, uint32_t* This, void* E
 
 	StopFade();
 
-	factor = 0.0f;
+	m_Factor = 0.0f;
 
-	playIntroTimer = false;
+	m_PlayIntroTimer = false;
 
 	return result;
 }
 
-void FallCam::Install() {
+void FallCam::applyPatches()
+{
 	INSTALL_HOOK(FallCam_MsgStartPause);
 	INSTALL_HOOK(FallCam_MsgFinishPause);
 	INSTALL_HOOK(FallCam_CCameraUpdateParallel);

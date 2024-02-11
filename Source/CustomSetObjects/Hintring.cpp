@@ -16,7 +16,7 @@ HOOK(void*, __fastcall, InitializePlayer, 0x00D96110, void* This)
 	}
 	HintDataList* data = new HintDataList();
 
-	if (!jsonFile)
+	if (!jsonFile)	
 		return originalInitializePlayer(This);
 
 	Json::Value root;
@@ -66,7 +66,7 @@ HOOK(void*, __fastcall, InitializePlayer, 0x00D96110, void* This)
 	return originalInitializePlayer(This);
 }
 BB_SET_OBJECT_MAKE_HOOK(Hintring);
-void Hintring::Install()
+void Hintring::registerObject()
 {
 	INSTALL_HOOK(InitializePlayer);
     BB_INSTALL_SET_OBJECT_MAKE_HOOK(Hintring)

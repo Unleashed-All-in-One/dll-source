@@ -80,14 +80,19 @@ public:
 			lines.push_back(line);
 		}
 		rcText->GetNode("text_0")->SetText(lines.at(0).c_str());
-		if(lines.size() >= 2)
-		rcText1->GetNode("text_0")->SetText(lines.at(1).c_str());
+		if (lines.size() >= 2)
+			rcText1->GetNode("text_0")->SetText(lines.at(1).c_str());
 		if (lines.size() >= 3)
-		rcText2->GetNode("text_0")->SetText(lines.at(2).c_str());
+			rcText2->GetNode("text_0")->SetText(lines.at(2).c_str());
 	}
 	void SetText(int index)
 	{
-		SetUIText(strings->hintScreens[index]->text);
+		if (strings == nullptr)
+			SetUIText("HINTDATA DOES NOT EXIST");
+		else if (strings->hintScreens.size() <= index)
+			SetUIText("HINTSCREENS DOES NOT EXIST");
+		else
+			SetUIText(strings->hintScreens[index]->text);
 		if (strings->hintScreens[index]->imageIndex == -1)
 		{
 			rcWindowArea->GetNode("imgbox")->SetHideFlag(true);
@@ -130,8 +135,8 @@ public:
 		rcWindowArea->SetHideFlag(true);
 
 		rcText->GetNode("text_0")->SetHideFlag(true);
-			rcText1->GetNode("text_0")->SetHideFlag(true);
-			rcText2->GetNode("text_0")->SetHideFlag(true);
+		rcText1->GetNode("text_0")->SetHideFlag(true);
+		rcText2->GetNode("text_0")->SetHideFlag(true);
 		CSDCommon::PlayAnimation(*rcHelpNametag, "Intro_chip_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);
 		CSDCommon::PlayAnimation(*rcHelpChara1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);
 		CSDCommon::PlayAnimation(*rcWindow, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);

@@ -11,8 +11,7 @@ void __declspec(naked) GetCServiceGameplayMidAsmHook()
         retn
     }
 }
-
-void ETFTimeSwitch::Initialize()
+void ETFTimeSwitch::initialize()
 {
 	WRITE_MEMORY(0xD00E6F, uint8_t, 0xEB);
 	WRITE_NOP(0xD94BAF, 6);
@@ -26,12 +25,7 @@ void ETFTimeSwitch::Initialize()
 
 
 }
-
-
-
-
-
-void ETFTimeSwitch::Install()
+void ETFTimeSwitch::registerObject()
 {
     BB_INSTALL_SET_OBJECT_MAKE_HOOK(ETFTimeSwitch)
 }

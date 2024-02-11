@@ -91,5 +91,5 @@ public:
         in_rEditParam.SetFloat(&m_CollisionWidth, "Collision_Width");
         in_rEditParam.SetFloat(&m_Speed, "Speed");
     }
-    static void Install();
+    static void registerObject();
 };

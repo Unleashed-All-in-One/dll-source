@@ -31,7 +31,7 @@ void NOP(int floatInstrAddr, int paramStrAddr)
 	WRITE_MEMORY(paramStrAddr, ::byte, 0x00);
 }
 
-void RingEnergy::Install() {
+void RingEnergy::applyPatches() {
 	NOP(0x120628B, 0x15FA690); /* ChaosEnergyRecoverRateByRing */
 	NOP(0x1206335, 0x15FA6DC); /* ChaosEnergyRecoverRateByRingBonus */
 	NOP(0x12063DF, 0x15FA72C); /* ChaosEnergyRecoverRateByRingPenalty */

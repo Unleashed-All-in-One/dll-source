@@ -47,7 +47,7 @@ public:
         m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
         AddRenderable("Object", m_spExampleElement, true);
         static bool init = false;
-        Initialize();
+        initialize();
         
         return true;
     }
@@ -55,7 +55,7 @@ public:
     void ChangeSonic()
     {
         classic = !classic;
-        Initialize();
+        initialize();
         Sonic::Player::CPlayerSpeedContext::GetInstance()->m_pPlayer->SendMessage("Player", boost::make_shared<MsgChangePlayer>(0));
         Sonic::Player::CPlayerSpeedContext::GetInstance()->m_pPlayer->SendMessage("Player", boost::make_shared<MsgChangeHudMode>(3));
     }
@@ -123,6 +123,6 @@ public:
     }
 
     
-    static void Initialize();
-    static void Install();
+    static void initialize();
+    static void registerObject();
 };

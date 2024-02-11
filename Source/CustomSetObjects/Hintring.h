@@ -126,5 +126,5 @@ public:
         in_rEditParam.SetBool(&m_PlayerStop, "PlayerStop");
         in_rEditParam.SetInt(&m_HintDataIndex, "HintDataIndex");
     }
-    static void Install();
+    static void registerObject();
 };

@@ -77,7 +77,7 @@ static std::vector<DiscordPresenceData> presenceData = {
 
 class DiscordStatus {
 public:
-	static void Initialize();
+	static void initialize();
 	static void ChangeInformationFromStageInfo(bool timestamp) {
 		uint8_t stageID = Common::GetCurrentStageID() & 0xFF;
 		static char* stageName = *(char**)(4 * stageID + 0x1E66B48);

@@ -4,7 +4,7 @@ HOOK(void, __fastcall, BDriftUpdate, 0xE6BF20, void* This, void* Edx, float* dt)
 	if (!*pModernSonicContext)
 		return;
 	
-	if (!Drift::CheckForBDrift())
+	if (!Drift::checkForBDrift())
 		return;
 	
 	Sonic::Player::CPlayerSpeedContext* sonic = Sonic::Player::CPlayerSpeedContext::GetInstance();
@@ -17,6 +17,6 @@ HOOK(void, __fastcall, BDriftUpdate, 0xE6BF20, void* This, void* Edx, float* dt)
 		sonic->ChangeState("Walk");
 }
 
-void Drift::Install() {
+void Drift::applyPatches() {
 	INSTALL_HOOK(BDriftUpdate);
 }
