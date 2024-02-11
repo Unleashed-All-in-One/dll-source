@@ -311,7 +311,8 @@ void SetCursorPos(const CVector2& pos)
 }
 bool IsInsideCursorRange(const CVector2& input, float visibility, int flagID)
 {
-	if (!cursorL || TitleWorldMap::DisabledStick)
+	if (!cursorL || TitleWorldMap::DisabledStick ||
+		TitleWorldMapPause::isPaused)
 		return false;
 	bool result = false;
 	float range = 100;
@@ -1057,7 +1058,7 @@ HOOK(void*, __fastcall, TitleWorldMap_UpdateApplication, 0xE7BED0, Sonic::CGameO
 
 			multiplierRotationLight = inputPtr->IsDown(Sonic::eKeyState_X) ? 10 : 0.005;
 
-			if (!isStageWindowOpen)
+			if (!isStageWindowOpen && !TitleWorldMapPause::isPaused)
 				SetCursorPos(CVector2(inputPtr->LeftStickHorizontal * cursorMultiplier, -inputPtr->LeftStickVertical * cursorMultiplier));
 
 			flagSelectionAmount = 0;
@@ -1321,7 +1322,7 @@ HOOK(void, __fastcall, TitleWorldMap_CameraUpdate, 0x0058CDA0, TransitionTitleCa
 
 	const bool hasInput = pan.squaredNorm() > deadzone * deadzone;
 
-	if (!TitleWorldMap::DisabledStick && hasInput && !isStageWindowOpen)
+	if (!TitleWorldMap::DisabledStick && !TitleWorldMapPause::isPaused && hasInput && !isStageWindowOpen)
 	{
 		rotationPitch -= input.LeftStickVertical * rotationPitchRate * updateInfo.DeltaTime;
 		rotationYaw += input.LeftStickHorizontal * rotationYawRate * updateInfo.DeltaTime;

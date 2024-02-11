@@ -1,11 +1,13 @@
 using namespace hh::math;
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcWMPause;
 boost::shared_ptr<Sonic::CGameObjectCSD> spWMPause;
-Chao::CSD::RCPtr<Chao::CSD::CScene> pauseBG, pauseHeader, pauseWindow, pauseSelect;
-uint32_t m_cursorPos = 0;
+Chao::CSD::RCPtr<Chao::CSD::CScene> pauseBG, pauseHeader, pauseWindow, pauseSelect, pauseText;
+int m_cursorPos = 0;
 uint32_t m_prevCursorPos = 0;
 bool active;
-
+SharedPtrTypeless m_SoundHandleEnter, m_SoundHandleExit, m_SoundHandleCursor, m_SoundHandleAccept;
+float originalVolume;
+bool TitleWorldMapPause::isPaused;
 void TitleWorldMapPause::Start()
 {
 
@@ -19,6 +21,7 @@ void __fastcall CTitleWorldmapPauseRemoveCallback(Sonic::CGameObject* This, void
 	Chao::CSD::CProject::DestroyScene(rcWMPause.Get(), pauseHeader);
 	Chao::CSD::CProject::DestroyScene(rcWMPause.Get(), pauseWindow);
 	Chao::CSD::CProject::DestroyScene(rcWMPause.Get(), pauseSelect);
+	Chao::CSD::CProject::DestroyScene(rcWMPause.Get(), pauseText);
 
 	rcWMPause = nullptr;
 }
@@ -61,6 +64,8 @@ HOOK(int, __fastcall, TitleWorldMapPause_CTitleMain, 0x0056FBE0, Sonic::CGameObj
 	pauseWindow->SetHideFlag(true);
 	pauseSelect = rcWMPause->CreateScene("bg_1_select");
 	pauseSelect->SetHideFlag(true);
+	pauseWindow->SetPosition(0, 20);
+	pauseText = rcWMPause->CreateScene("pause_text");
 	TitleWorldMapPause::CreateScreen(This);
 	return originalTitleWorldMapPause_CTitleMain(This, Edx, a2, a3, a4);
 }
@@ -69,8 +74,8 @@ void HudPause_OpenPauseWindow(bool isPam)
 	m_cursorPos = 0;
 
 	if (!rcWMPause) return;
-	pauseWindow->GetNode("center")->SetScale(62.0f, isPam ? 0.5f : 0.9f);
-	pauseWindow->GetNode("text_area")->SetScale(62.0f, isPam ? 0.5f : 0.9f);
+	pauseWindow->GetNode("center")->SetScale(62.0f, 1.25f);
+	pauseWindow->GetNode("text_area")->SetScale(62.0f, 0.9f);
 	CSDCommon::PlayAnimation(*pauseWindow, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 }
 void HudPause_OpenPauseScreen(bool isPam)
@@ -95,8 +100,10 @@ void HudPause_OpenPauseScreen(bool isPam)
 void HudPause_ClosePauseScreen()
 {
 	if (!rcWMPause) return;
+	pauseText->SetHideFlag(true);
+	Common::PlaySoundStatic(m_SoundHandleExit, 1000001);
 	active = false;
-	TitleWorldMap::DisabledStick = false;
+	TitleWorldMapPause::isPaused = false;
 	pauseBG->SetHideFlag(true);
 	pauseHeader->SetHideFlag(true);
 	pauseWindow->SetHideFlag(true);
@@ -104,26 +111,34 @@ void HudPause_ClosePauseScreen()
 }
 void ChangeSelection()
 {
+	if(m_prevCursorPos != m_cursorPos)
+	Common::PlaySoundStatic(m_SoundHandleCursor, 1000004);
+	Common::ClampInt(m_cursorPos, 0, 5);
+	CSDCommon::PlayAnimation(*pauseText, "Intro_Anim", Chao::CSD::eMotionRepeatType_Loop, 1, 0);
+	CSDCommon::PlayAnimation(*pauseText, std::format("Select_{0}", m_cursorPos + 1).c_str(), Chao::CSD::eMotionRepeatType_Loop, 1, 0);
 	CSDCommon::PlayAnimation(*pauseSelect, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 1, 0);
 	CSDCommon::FreezeMotion(*pauseSelect, 0);
-	if (m_prevCursorPos == m_cursorPos + 1)
-	{
-		// Scroll down
-		CSDCommon::PlayAnimation(*pauseSelect, "Scroll_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, m_cursorPos * 10.0f, m_prevCursorPos * 10.0f);
-	}
-	else if (m_prevCursorPos == m_cursorPos - 1)
-	{
-		// Scroll up
-		CSDCommon::PlayAnimation(*pauseSelect, "Scroll_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 120.0f - m_cursorPos * 10.0f, 120.0f - m_prevCursorPos * 10.0f, false, true);
-	}
-	else
-	{
+	//if (m_prevCursorPos == m_cursorPos + 1)
+	//{
+	//	// Scroll up
+	//	CSDCommon::PlayAnimation(*pauseSelect, "Scroll_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 120.0f - m_cursorPos * 10.0f, 120.0f - m_prevCursorPos * 10.0f, false, true);
+	//}
+	//else if (m_prevCursorPos == m_cursorPos - 1)
+	//{
+
+	//	CSDCommon::PlayAnimation(*pauseSelect, "Scroll_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, m_prevCursorPos * 10.0f, m_cursorPos * 10.0f);
+	//	// Scroll down
+	//}
+	//else
+	//{
 		CSDCommon::PlayAnimation(*pauseSelect, "Scroll_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1,0);
-		CSDCommon::FreezeMotion(*pauseSelect, m_prevCursorPos * 10.0f);
-	}
+		CSDCommon::FreezeMotion(*pauseSelect, m_cursorPos * 10.0f);
+	//}
 }
 void PauseCase(int pos)
 {
+	Common::PlaySoundStatic(m_SoundHandleAccept, 1000005);
+
 	switch (pos)
 	{
 	case 0:
@@ -163,8 +178,10 @@ HOOK(void*, __fastcall, TitleWorldMapPause_UpdateApplication, 0xE7BED0, Sonic::C
 	if (inputPtr->IsTapped(Sonic::eKeyState_Start) && TitleWorldMap::Active && !active)
 	{
 		HudPause_OpenPauseScreen(false);
-		TitleWorldMap::DisabledStick = true;
+		Common::PlaySoundStatic(m_SoundHandleEnter, 1000000);
 		active = true;
+		TitleWorldMapPause::isPaused = true;
+		pauseText->SetHideFlag(false);
 	}
 	
 	if (active)

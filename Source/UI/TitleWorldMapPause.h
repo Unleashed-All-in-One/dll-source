@@ -5,7 +5,7 @@ class TitleWorldMapPause
 
 public:
 
-	
+	static bool isPaused;
 	static void applyPatches();
 	static void Start();
 	static void CreateScreen(Sonic::CGameObject* pParentGameObject);

@@ -58,6 +58,7 @@
 #include "System/LetterboxHelper.h"
 #include "System/CSDCommon.h"
 #include "System/UpdateDirector.h"
+#include "System/SoundController.h"
 
 //Functionality
 #include "Functionality/PauseBgm.h"
