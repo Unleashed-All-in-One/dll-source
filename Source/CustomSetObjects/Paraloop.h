@@ -30,7 +30,7 @@ public:
                 {
                     auto bone = playerContext->m_pPlayer->m_spCharacterModel->GetNode("Reference");
                     if(!particle)
-                    Common::fCGlitterCreate(playerContext, particle, &bone, "ef_ch_sng_lms_paraloop02", 0);
+                    Common::fCGlitterCreate(playerContext, particle, &bone, *pSuperSonicContext ? "ef_ch_sps_lms_paraloop02" : "ef_ch_sng_lms_paraloop02", 0);
                     m_playerInsideCollider = true;
                     Common::PlaySoundStatic(sound,2002501);
                 }

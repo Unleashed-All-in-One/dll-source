@@ -21,6 +21,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	Ramp::applyPatches();
 	ShortJump::applyPatches();
 	Drift::applyPatches();
+	Pole::applyPatches();
 
 	//-----------Functionality (accuracy)-----------
 	PauseBgm::applyPatches();

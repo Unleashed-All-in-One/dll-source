@@ -54,6 +54,7 @@
 #include "Gameplay/Ramp.h"
 #include "Gameplay/ShortJump.h"
 #include "Gameplay/Drift.h"
+#include "Gameplay/Pole.h"
 
 //System
 #include "System/LevelLoadingManager.h"
