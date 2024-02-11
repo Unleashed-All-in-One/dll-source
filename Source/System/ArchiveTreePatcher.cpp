@@ -96,7 +96,6 @@ void ArchiveTreePatcher::applyPatches()
     m_archiveDependencies.push_back(ArchiveDependency("WorldMap", { "Title" }));
     m_archiveDependencies.push_back(ArchiveDependency("TitleModel", { "Title" }));
     m_archiveDependencies.push_back(ArchiveDependency("GenericWindow", { "Title" }));
-    m_archiveDependencies.push_back(ArchiveDependency("UIFade", { "SystemCommon" }));
     std::vector<std::string> whiteworld = Configuration::getAllWhiteWorld();
     for (size_t i = 0; i < whiteworld.size(); i++)
     {
@@ -105,13 +104,16 @@ void ArchiveTreePatcher::applyPatches()
         m_archiveDependencies.push_back(ArchiveDependency("pam000", { whiteworld[i] }));
         m_archiveDependencies.push_back(ArchiveDependency("StageGate", { whiteworld[i] }));           
     }
+    //For restorations
+    m_archiveDependencies.push_back(ArchiveDependency("Ramp", { "cmn200" }));
+    m_archiveDependencies.push_back(ArchiveDependency("Sweepkick", { "cmn200" }));
+    m_archiveDependencies.push_back(ArchiveDependency("UIFade", { "SystemCommon" }));
+
     m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighterMykonos", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighterMykonos", { "cmn100" }));
     m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyChibiFighter", { "cmn100" }));
     m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyNightmareR", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyNightmareR", { "cmn100" }));
-    m_archiveDependencies.push_back(ArchiveDependency("Ramp", { "cmn200" }));
-    m_archiveDependencies.push_back(ArchiveDependency("Sweepkick", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("HintRing", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("HintRing", { "cmn100" }));
     m_archiveDependencies.push_back(ArchiveDependency("etfswitch", { "cmn200" }));
