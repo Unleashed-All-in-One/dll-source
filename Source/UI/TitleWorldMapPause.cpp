@@ -66,6 +66,7 @@ HOOK(int, __fastcall, TitleWorldMapPause_CTitleMain, 0x0056FBE0, Sonic::CGameObj
 	pauseSelect->SetHideFlag(true);
 	pauseWindow->SetPosition(0, 20);
 	pauseText = rcWMPause->CreateScene("pause_text");
+	pauseText->SetHideFlag(true);
 	TitleWorldMapPause::CreateScreen(This);
 	return originalTitleWorldMapPause_CTitleMain(This, Edx, a2, a3, a4);
 }
@@ -165,6 +166,14 @@ void PauseCase(int pos)
 		TitleWorldMap::Active = false;
 		Title::setSubmenu(false);
 		Title::setHideEverything(false);
+		break;
+	}
+	case 4:
+	{
+		SequenceHelpers::loadStage("pla201");
+
+		uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
+		strcpy(*(char**)stageTerrainAddress, "pla201");
 		break;
 	}
 	}
