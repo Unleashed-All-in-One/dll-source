@@ -96,6 +96,7 @@ void ArchiveTreePatcher::applyPatches()
     m_archiveDependencies.push_back(ArchiveDependency("WorldMap", { "Title" }));
     m_archiveDependencies.push_back(ArchiveDependency("TitleModel", { "Title" }));
     m_archiveDependencies.push_back(ArchiveDependency("GenericWindow", { "Title" }));
+    m_archiveDependencies.push_back(ArchiveDependency("UIFade", { "SystemCommon" }));
     std::vector<std::string> whiteworld = Configuration::getAllWhiteWorld();
     for (size_t i = 0; i < whiteworld.size(); i++)
     {
@@ -109,6 +110,8 @@ void ArchiveTreePatcher::applyPatches()
     m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyChibiFighter", { "cmn100" }));
     m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyNightmareR", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyNightmareR", { "cmn100" }));
+    m_archiveDependencies.push_back(ArchiveDependency("Ramp", { "cmn200" }));
+    m_archiveDependencies.push_back(ArchiveDependency("Sweepkick", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("HintRing", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("HintRing", { "cmn100" }));
     m_archiveDependencies.push_back(ArchiveDependency("etfswitch", { "cmn200" }));
@@ -126,6 +129,7 @@ void ArchiveTreePatcher::applyPatches()
     m_archiveDependencies.push_back(ArchiveDependency("CmnNY", { "ObjectPhysicsUnleashed" }));
     m_archiveDependencies.push_back(ArchiveDependency("CmnPetra", { "ObjectPhysicsUnleashed" }));
     m_archiveDependencies.push_back(ArchiveDependency("CmnSnow", { "ObjectPhysicsUnleashed" }));
+
     if (!m_archiveDependencies.empty())
     {
         INSTALL_HOOK(ArchiveTreePatcher_ParseArchiveTree);

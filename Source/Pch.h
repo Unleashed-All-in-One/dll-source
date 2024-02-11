@@ -31,6 +31,7 @@
 #include <INIReader.h>
 #include <json/json.h>
 #include <Helpers.h>
+#include <Light.h>
 #include "System/DiscordGameSDK/discord.h"
 #include "UnleashedHUDAPI.h"
 
@@ -42,12 +43,15 @@
 #define DEBUG_DRAW_TEXT_DLL_IMPORT
 #include <DebugDrawText.h>
 #include <Common.h>
+#include <StateManager.h>
 #include "System/SequenceHelpers.h"
 #include "Configuration.h"
 #include "Temporary.h"
 
 //Gameplay
 #include "Gameplay/QSSRestore.h"
+#include "Gameplay/Sweepkick.h"
+#include "Gameplay/Ramp.h"
 
 //System
 #include "System/LevelLoadingManager.h"
@@ -62,6 +66,7 @@
 
 //Functionality
 #include "Functionality/PauseBgm.h"
+#include "Functionality/FallCam.h"
 
 //UI
 #include "UI/Title.h"

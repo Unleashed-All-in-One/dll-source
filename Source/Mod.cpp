@@ -17,9 +17,12 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	SequenceHelpers::applyPatches();
 	//---------------Gameplay---------------
 	QSSRestore::applyPatches();
+	Sweepkick::Install();
+	Ramp::Install();
 
 	//-----------Functionality (accuracy)-----------
 	PauseBgm::applyPatches();
+	FallCam::Install();
 
 	//-----------Register Set Objects-----------
 	WerehogPole::Install();
