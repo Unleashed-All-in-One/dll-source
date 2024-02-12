@@ -110,9 +110,9 @@ void ArchiveTreePatcher::applyPatches()
     m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyChibiFighter", { "cmn100" }));
     m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyNightmareR", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyNightmareR", { "cmn100" }));
-    m_archiveDependencies.push_back(ArchiveDependency("Ramp", { "SonicActionCommon" }));
-    m_archiveDependencies.push_back(ArchiveDependency("Sweepkick", { "SonicActionCommon" }));
-    m_archiveDependencies.push_back(ArchiveDependency("Paraloop", { "SonicActionCommon" }));
+    m_archiveDependencies.push_back(ArchiveDependency("Ramp", { "Sonic" }));
+    m_archiveDependencies.push_back(ArchiveDependency("Sweepkick", { "Sonic" }));
+    m_archiveDependencies.push_back(ArchiveDependency("Paraloop", { "Sonic" }));
     m_archiveDependencies.push_back(ArchiveDependency("Pole", { "SonicActionCommon" }));
     m_archiveDependencies.push_back(ArchiveDependency("HintRing", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("HintRing", { "cmn100" }));

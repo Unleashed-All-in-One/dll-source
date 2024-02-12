@@ -138,6 +138,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Gameplay\QSSRestore.cpp" />
+    <ClCompile Include="System\AnimationSetPatcher.cpp" />
     <ClCompile Include="System\ArchiveTreePatcher.cpp" />
     <ClCompile Include="System\CSDCommon.cpp" />
     <ClCompile Include="System\DiscordStatus.cpp" />
@@ -185,6 +186,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClInclude Include="Gameplay\Sweepkick.h" />
     <ClInclude Include="Pch.h" />
     <ClInclude Include="Gameplay\QSSRestore.h" />
+    <ClInclude Include="System\AnimationSetPatcher.h" />
     <ClInclude Include="System\ArchiveTreePatcher.h" />
     <ClInclude Include="System\CSDCommon.h" />
     <ClInclude Include="System\DiscordStatus.h" />

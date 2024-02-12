@@ -60,6 +60,7 @@
 #include "System/LevelLoadingManager.h"
 #include "System/DiscordStatus.h"
 #include "System/ArchiveTreePatcher.h"
+#include "System/AnimationSetPatcher.h"
 #include "System/EnemyTrigger.h"
 #include "System/MiniAudioHelper.h"
 #include "System/LetterboxHelper.h"

@@ -10,6 +10,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	//---------------System---------------
 	LevelLoadingManager::initialize();
 	ArchiveTreePatcher::applyPatches();
+	AnimationSetPatcher::applyPatches();
 	EnemyTrigger::applyPatches();
 	LetterboxHelper::initialize(1280, 720);
 	MiniAudioHelper::initialize(modInfo->CurrentMod->Path);
