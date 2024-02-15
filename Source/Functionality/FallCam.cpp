@@ -85,7 +85,7 @@ HOOK(int, __fastcall, FallCam_MsgFinishPause, 0x010BC110, void* This, void* Edx,
 }
 
 void PlayFade() {
-	auto* context = Sonic::Player::CPlayerSpeedContext::GetInstance();
+	Sonic::Player::CPlayerSpeedContext* context = Sonic::Player::CPlayerSpeedContext::GetInstance();
 
 	if (!context)
 		return;
