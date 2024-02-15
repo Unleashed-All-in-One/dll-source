@@ -170,8 +170,11 @@ void PauseCase(int pos)
 	}
 	case 4:
 	{
-		SequenceHelpers::loadStage("pla201");
 		LevelLoadingManager::ActiveReplacement = false;
+		Title::inInstall = true;
+		LevelLoadingManager::NextLevelLoad = "pla201";
+		TitleWorldMap::LoadingReplacementEnabled = true;
+		SequenceHelpers::loadStage("pla201");
 		break;
 	}
 	}

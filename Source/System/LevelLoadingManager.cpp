@@ -151,8 +151,10 @@ void SetCorrectStageFromFlag()
 	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 	char** h = (char**)stageTerrainAddress;
 	TitleWorldMap::CamInitialized = false;
+		
 	if (!LevelLoadingManager::InStory)
-	{
+	{		
+		const char* stageToLoad = "ghz200";
 		if (!TitleWorldMap::LoadingReplacementEnabled)
 		{
 			if (Title::inInstall)
@@ -166,12 +168,6 @@ void SetCorrectStageFromFlag()
 			}
 			return;
 		}
-	}
-	
-	if (!LevelLoadingManager::InStory)
-	{
-		
-		const char* stageToLoad = "ghz200";
 		if (Configuration::worldData.data.size() < TitleWorldMap::LastValidFlagSelected)
 		{
 			//if only cpp had the same ${} system as c#

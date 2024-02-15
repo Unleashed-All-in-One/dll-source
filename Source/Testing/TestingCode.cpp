@@ -23,7 +23,9 @@ public:
 		AddRenderable("Object", m_spRenderable, true);
 	}
 };
+class TestClass1 : public Hedgehog::Universe::TStateMachine<TestClass1>, public Hedgehog::Universe::CStateMachineBase, public Hedgehog::Universe::IStateMachineMessageReceiver, public  Hedgehog::Base::CObject, public Hedgehog::Universe::CMessageActor, public Hedgehog::Universe::IMessageProcess, public Hedgehog::Universe::IParallelJob {
 
+};
 DWORD* GetServiceScriptMan(Hedgehog::Base::TSynchronizedPtr<Sonic::CApplicationDocument> doc)
 {
 	uint32_t func = 0x0041E6F0;
@@ -60,6 +62,12 @@ public:
 	size_t m_PlayerType;
 
 	MsgRequestChangeModule(size_t playerType) : m_PlayerType(playerType) {}
+};
+struct MsgRequestEndModule : public hh::fnd::MessageTypeSet
+{
+public:
+	HH_FND_MSG_MAKE_TYPE(0x01681224);
+
 };
 struct MsgRequestStartLoading : public hh::fnd::MessageTypeSet
 {
@@ -238,12 +246,35 @@ HOOK(int, __fastcall, sub_E8F330, 0xE8F330, void* This, void* Edx, int a2, int a
 {
 	return originalsub_E8F330(This, Edx, a2, a3, a4);
 }
+//int __thiscall sub_42A710(void *this)
+//0042ABA0
+HOOK(void, __fastcall, sub_42A710, 0x0042ABA0, void* This, void* Edx)
+{
+
+	//int *__thiscall Sonic::Sequence::CSequenceMainImpl::LuanneFunctions::StartModule(DWORD *this, int a2, Luanne_IntegerMessageContainer *a3)
+	/*FUNCTION_PTR(int*, __thiscall, StartModule, 0x00D77020, Hedgehog::Universe::CMessageActor* This, int a2, LuaStringEntryContainer * a3);
+	StartModule(Sonic::Sequence::Main::GetInstance(), 0, new LuaStringEntryContainer("Title"));*/
+	//SequenceHelpers::changeModule(ModuleFlow::Title);
+	DWORD* test = (DWORD*)Sonic::CApplicationDocument::GetInstance()->m_pMember;
+	//DWORD *__thiscall ProcMsgRequestChangeModule(Hedgehog::Universe::MessageTypeSet *this, DWORD *a2)
+	FUNCTION_PTR(DWORD*, __thiscall, ProcMsg, 0x00D0B2E0, DWORD* T5his, boost::shared_ptr<MsgRequestChangeModule> a2);
+
+	DWORD* test2 = (DWORD*)test[13];
+	//ProcMsg(test2, boost::make_shared<MsgRequestChangeModule>(1));
+	//void __thiscall sub_D0AE90(Sonic::CAnimationStateMachine *this, int a2
+	FUNCTION_PTR(DWORD*, __thiscall, ProcMsg2, 0xD0AE90, DWORD * T5his, MsgRequestEndModule * a2);
+	//ProcMsg2(test2, new MsgRequestEndModule());
+	SequenceHelpers::changeModule(ModuleFlow::Genesis);
+	originalsub_42A710(This, Edx);
+}
 void TestingCode::applyPatches()
 {	
 	//Get rid of mission icons and pamsettings permanently (in theory)
 	WRITE_JUMP(0x0107EAF8, 0x0107EB8F);
 	INSTALL_HOOK(sub_E8F330);
 	INSTALL_HOOK(A51CD0);
+	//
+	//INSTALL_HOOK(sub_42A710);
 	//INSTALL_HOOK(OpenStage);
 	//INSTALL_HOOK(sub_64B930);
 	////INSTALL_HOOK(sub_D51A10);

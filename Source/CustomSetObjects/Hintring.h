@@ -76,7 +76,8 @@ public:
             {
 
                 DWORD* msg = (DWORD*)&in_rMsg;
-                *(Hedgehog::Math::CVector**)(msg + 16) = &m_spMatrixNodeTransform->m_Transform.m_Position;
+                *(Hedgehog::Math::CVector*)(msg + 16) = m_spMatrixNodeTransform->m_Transform.m_Position;
+                SendMessageImm(in_rMsg.m_SenderActorID, (Hedgehog::Universe::MessageTypeSet*)msg);
             }
         }
         return Sonic::CObjectBase::ProcessMessage(in_rMsg, in_Flag);

@@ -27,7 +27,10 @@ void SequenceHelpers::changeModule(ModuleFlow in_Flow)
 {
 	FUNCTION_PTR(void, __stdcall, ChangeModuleTest, 0x01107D50, Hedgehog::Universe::CMessageActor * Th, int a2);
 	ChangeModuleTest(Sonic::Sequence::Main::GetInstance(), (int)in_Flow);
+	/*Sonic::Message::MsgRequestChangeModule* message = new Sonic::Message::MsgRequestChangeModule(in_Flow);
+	Sonic::Sequence::Main::ProcessMessage(message)*/;
 }
+
 void SequenceHelpers::queueEvent(const char* in_EventName)
 {
 	test = true;
