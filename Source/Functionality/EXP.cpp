@@ -6,7 +6,7 @@ void ChaosEnergyLogic() {
 	if (!context)
 		return;
 
-	boost::shared_ptr<Sonic::CGameObject> newEXP = boost::make_shared<EXPCollect>();
+	boost::shared_ptr<Sonic::CGameObject> newEXP = boost::make_shared<EXPCollect>(context->m_spMatrixNode->m_Transform.m_Position);
 
 	expCache.push_back(newEXP);
 

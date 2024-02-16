@@ -1868,6 +1868,10 @@ namespace Common
 		processObjectMsgSetRotation(pObject, &msgSetRotation);
 	}
 
+	inline hh::math::CVector LerpVector(hh::math::CVector a, hh::math::CVector b, float t) {
+		return hh::math::CVector(a.x() + t * (b.x() - a.x()), a.y() + t * (b.y() - a.y()), a.z() + t * (b.z() - a.z()));
+	}
+
 	inline void CreatePlayerSupportShockWave(hh::math::CVector const& pos, float height, float radius, float duration)
 	{
 		struct ShockWaveParam
