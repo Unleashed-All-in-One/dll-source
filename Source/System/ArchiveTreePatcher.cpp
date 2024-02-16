@@ -1,7 +1,6 @@
-#include "ArchiveTreePatcher.h"
 
-vector<ArchiveDependency> ArchiveTreePatcher::m_archiveDependencies = {};
-vector<string> ArchiveTreePatcher::m_languageArchives = {};
+std::vector<ArchiveDependency> ArchiveTreePatcher::m_archiveDependencies = {};
+std::vector<std::string> ArchiveTreePatcher::m_languageArchives = {};
 
 HOOK(bool, __stdcall, ArchiveTreePatcher_ParseArchiveTree, 0xD4C8E0, void* A1, char* pData, const size_t size, void* pDatabase)
 {
@@ -17,7 +16,7 @@ HOOK(bool, __stdcall, ArchiveTreePatcher_ParseArchiveTree, 0xD4C8E0, void* A1, c
             stream << "    <Order>" << 0 << "</Order>\n";
             stream << "    <DefAppend>" << node.m_archive << "</DefAppend>\n";
 
-            for (string const& dependency : node.m_dependencies)
+            for (std::string const& dependency : node.m_dependencies)
             {
                 stream << "    <Node>\n";
                 stream << "      <Name>" << dependency << "</Name>\n";
@@ -64,7 +63,7 @@ boost::shared_ptr<hh::db::CRawData>* __fastcall ArchiveTreePatcher_GetRawDataImp
     std::string str;
     {
         std::stringstream stream;
-        for (string const& archive : ArchiveTreePatcher::m_languageArchives)
+        for (std::string const& archive : ArchiveTreePatcher::m_languageArchives)
         {
             stream << "<Archive>" << archive << "</Archive>\n";
         }

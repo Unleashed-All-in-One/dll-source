@@ -1,12 +1,11 @@
 #pragma once
-
 struct ArchiveDependency
 {
-    string m_archive;
-    vector<string> m_dependencies;
+    std::string m_archive;
+    std::vector<std::string> m_dependencies;
 
     ArchiveDependency() {};
-    ArchiveDependency(string _archive, vector<string> _dependencies)
+    ArchiveDependency(std::string _archive, std::vector<std::string> _dependencies)
         : m_archive(_archive)
         , m_dependencies(_dependencies)
     {}
@@ -15,7 +14,7 @@ struct ArchiveDependency
 class ArchiveTreePatcher
 {
 public:
-    static vector<ArchiveDependency> m_archiveDependencies;
-    static vector<string> m_languageArchives;
+    static std::vector<ArchiveDependency> m_archiveDependencies;
+    static std::vector<std::string> m_languageArchives;
     static void applyPatches();
 };

@@ -25,8 +25,8 @@
 //#include <queue>
 
 // HE1ML
-#include <ModLoader.h>
 
+#include <ModLoader.h>
 // Other
 #include <INIReader.h>
 #include <json/json.h>

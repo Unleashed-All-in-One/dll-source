@@ -9,7 +9,7 @@ HOOK(bool, __fastcall, CAnimationControlSingle_Debug, 0x6D84F0, uint32_t** This,
     if (name.find("sn_") != std::string::npos)
     {
         printf("%s\n", name.c_str());
-        DebugDrawText::log(format("Anim File : %s", name.c_str()));
+        DebugDrawText::log(std::format("Anim File : %s", name.c_str()).c_str(), 0);
     }
     return originalCAnimationControlSingle_Debug(This, Edx, a2, a3);
 }

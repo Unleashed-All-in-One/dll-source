@@ -340,10 +340,10 @@ bool IsInsideCursorRange(const CVector2& input, float visibility, int flagID)
 }
 void SetLevelTextCast(const char* text)
 {
-	string input = string(text);
+	std::string input = std::string(text);
 	std::stringstream ss(input);
-	string line;
-	vector<string> lines;
+	std::string line;
+	std::vector<std::string> lines;
 	while (getline(ss, line, '\n')) {
 		lines.push_back(line);
 	}
@@ -395,7 +395,7 @@ void PopulateStageSelect(int id)
 }
 TitleWorldMap::SaveStageInfo GetInfoForStage(std::string id)
 {
-	vector<string>::iterator it = std::find(Configuration::gensStages.begin(), Configuration::gensStages.end(), id);
+	std::vector<std::string>::iterator it = std::find(Configuration::gensStages.begin(), Configuration::gensStages.end(), id);
 	TitleWorldMap::SaveStageInfo returnI = TitleWorldMap::SaveStageInfo();
 	returnI.stageID_string = id;
 	//Return an empty Info struct if the stage isnt a native gens stage. This should be expanded to have custom stage slot save files in the future.

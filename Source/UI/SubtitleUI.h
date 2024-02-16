@@ -71,10 +71,10 @@ public:
 		rcText->GetNode("text_0")->SetText("");
 		rcText1->GetNode("text_0")->SetText(" ");
 		rcText2->GetNode("text_0")->SetText(" ");
-		const string input = string(in);
+		const std::string input = std::string(in);
 		std::stringstream ss(input);
-		string line;
-		vector<string> lines;
+		std::string line;
+		std::vector<std::string> lines;
 		for (std::string line; std::getline(ss, line);)
 		{
 			lines.push_back(line);

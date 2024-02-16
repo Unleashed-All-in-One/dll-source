@@ -63,10 +63,10 @@ void CSDCommon::update()
 
 void CSDCommon::SplitTextToSeparateCasts(Chao::CSD::CScene* scene, const char* formatCastName, const char* text, int maxCharacterPerLine, int maxLines, bool blankOutEmpty)
 {
-	const string input = string(text);
+	const std::string input = std::string(text);
 	std::stringstream ss(input);
-	string line;
-	vector<string> lines;
+	std::string line;
+	std::vector<std::string> lines;
 	for (std::string line; std::getline(ss, line);)
 	{
 		lines.push_back(line);
