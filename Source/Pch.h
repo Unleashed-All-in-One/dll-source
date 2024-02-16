@@ -24,8 +24,8 @@
 #include <filesystem>
 //#include <queue>
 
-// LostCodeLoader
-#include <LostCodeLoader.h>
+// HE1ML
+#include <ModLoader.h>
 
 // Other
 #include <INIReader.h>
@@ -44,6 +44,7 @@
 #include <DebugDrawText.h>
 #include <Common.h>
 #include <StateManager.h>
+#include "System/ArchiveTreePatcher.h"
 #include "System/SequenceHelpers.h"
 #include "Configuration.h"
 #include "Temporary.h"
@@ -59,7 +60,6 @@
 //System
 #include "System/LevelLoadingManager.h"
 #include "System/DiscordStatus.h"
-#include "System/ArchiveTreePatcher.h"
 #include "System/AnimationSetPatcher.h"
 #include "System/EnemyTrigger.h"
 #include "System/MiniAudioHelper.h"

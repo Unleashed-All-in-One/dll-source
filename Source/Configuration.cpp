@@ -2,6 +2,7 @@
 
 #define INI_FILE "UnleashedConversion.ini"
 #define STAGE_LIST_FILE "stage_list.json"
+#define ARCHIVE_LIST_FILE "archivelist.json"
 #define QUEUE_LIST_FILE "sequence.json"
 
 //---------------Gameplay---------------
@@ -14,6 +15,7 @@ bool Configuration::compatibilityMode = false;
 int Configuration::logoType = 0;
 Configuration::TitleType Configuration::menuType = (TitleType)0;
 WorldData Configuration::worldData;
+ArchiveTreeDefinitions Configuration::archiveTree;
 SequenceData Configuration::queueData;
 std::string Configuration::modPath;
 
@@ -41,6 +43,7 @@ void Configuration::load(const char* path)
 	gensStages = { "ghz100","ghz200","cpz100","cpz200","ssz100","ssz200","sph100","sph200","cte100", "cte200","ssh100","ssh200","csc100","csc200","euc100","euc200","pla100","pla200" };
 	getStageList();
 	getLevelQueue();
+	getTempCustomArchiveTree();
 }
 void Configuration::getLevelQueue()
 {
@@ -79,6 +82,11 @@ void Configuration::getLevelQueue()
 			else
 				queueData.data[i].playerTypeOverride = -1;
 			queueData.data[i].dataName = std::string(arrayFlag[i]["dataName"].asCString());
+
+			if (arrayFlag[i]["eventStageName"])
+			{
+				queueData.data[i].stageEventName = std::string(arrayFlag[i]["eventStageName"].asCString());
+			}
 		}
 		break;
 	}
@@ -106,6 +114,35 @@ int Configuration::getFlagFromStage(const char* stage)
 		
 	}
 	return -1;
+}
+void Configuration::getTempCustomArchiveTree()
+{
+	std::ifstream jsonFile(ARCHIVE_LIST_FILE);
+
+	archiveTree = ArchiveTreeDefinitions();
+
+	if (!jsonFile)
+	{
+		MessageBox(NULL, L"Failed to parse ArchiveTree", NULL, MB_ICONERROR);
+		exit(-1);
+		return;
+	}
+
+	Json::Value root;
+	jsonFile >> root;
+	Json::Value arrayFlag = root["ArchiveTreeDefinitions"];
+	for (int i = 0; i < arrayFlag.size(); i++)
+	{
+		ArchiveDependency dependency;
+		dependency.m_archive = arrayFlag[i]["archiveName"].asCString();
+		Json::Value flagDep = arrayFlag[i]["dependencies"];
+		for (size_t d = 0; d < flagDep.size(); d++)
+		{
+			dependency.m_dependencies.push_back(flagDep[d]["archiveName"].asCString());
+		}
+		archiveTree.data.push_back(dependency);
+	}
+
 }
 void Configuration::getStageList()
 {

@@ -122,6 +122,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClCompile Include="CustomSetObjects\Hintring.cpp" />
     <ClCompile Include="CustomSetObjects\Paraloop.cpp" />
     <ClCompile Include="CustomSetObjects\SpeedDownCollision.cpp" />
+    <ClCompile Include="Functionality\EXP.cpp" />
     <ClCompile Include="Functionality\FallCam.cpp" />
     <ClCompile Include="Functionality\PauseBgm.cpp" />
     <ClCompile Include="Functionality\RingEnergy.cpp" />
@@ -176,6 +177,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClInclude Include="CustomSetObjects\Hintring.h" />
     <ClInclude Include="CustomSetObjects\Paraloop.h" />
     <ClInclude Include="CustomSetObjects\SpeedDownCollision.h" />
+    <ClInclude Include="Functionality\EXP.h" />
     <ClInclude Include="Functionality\FallCam.h" />
     <ClInclude Include="Functionality\PauseBgm.h" />
     <ClInclude Include="Functionality\RingEnergy.h" />

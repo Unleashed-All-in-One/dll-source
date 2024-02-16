@@ -6,6 +6,10 @@ namespace Sonic::Sequence
 {
     class Story : public Hedgehog::Universe::CMessageActor
     {
-
+    public:
+        static Hedgehog::Universe::CMessageActor* GetInstance()
+        {
+            return *((Hedgehog::Universe::CMessageActor**)Sonic::CApplicationDocument::GetInstance()->m_pMember + 45);
+        };
     };
 }

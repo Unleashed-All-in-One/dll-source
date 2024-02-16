@@ -20,6 +20,7 @@ struct QueueData
 {
 	int type;
 	std::string dataName;
+	std::string stageEventName;
 	bool immediate;
 	int playerTypeOverride;
 	const char* comment;
@@ -27,6 +28,10 @@ struct QueueData
 struct SequenceData
 {
 	std::vector<QueueData> data;
+};
+struct ArchiveTreeDefinitions
+{
+	std::vector<ArchiveDependency> data;
 };
 
 class Configuration
@@ -40,6 +45,7 @@ public:
 	//---------------UI---------------
 	static void getStageList();
 	static void getLevelQueue();
+	static void getTempCustomArchiveTree();
 	enum TitleType {
 		Retail,
 		Preview,
@@ -55,6 +61,7 @@ public:
 	static bool ignoreWarnings;
 	static bool compatibilityMode;
 	static WorldData worldData;
+	static ArchiveTreeDefinitions archiveTree;
 	static SequenceData queueData;
 	static TitleType menuType;
 };

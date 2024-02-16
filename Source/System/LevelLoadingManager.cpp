@@ -101,7 +101,15 @@ void TriggerSequenceEvents(QueueData data)
 	case 5:
 	{
 		//Play event (realtime)
-		SequenceHelpers::playEvent(data.dataName.c_str(), ModuleFlow::StageEvent);
+		LevelLoadingManager::NextLevelLoad = data.stageEventName.c_str();
+		//SequenceHelpers::queueEvent(data.dataName.c_str());
+		//00D72520
+		//void __thiscall Sonic::Sequence::CStoryImpl::LuanneFunctions::PlayEvent(Hedgehog::Universe::CMessageActor *this, int a2, Luanne_StringMessageContainer *a3)
+		auto test = LuaStringIntegerEntryContainer(data.dataName.c_str(), 0);
+		FUNCTION_PTR(void, __thiscall, PlayEventLuanne, 0x00D72520, DWORD * StorySeq, int a2, LuaStringIntegerEntryContainer * a3);
+		PlayEventLuanne(storySequence, 0, &test);
+		/*auto message = Sonic::Message::MsgSequenceEvent(1, 0);
+		Sonic::Sequence::Main::ProcessMessage(&message);*/
 		break;
 	}
 	}

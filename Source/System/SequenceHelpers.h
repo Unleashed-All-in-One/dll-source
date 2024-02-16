@@ -77,6 +77,36 @@ public:
 		entry = &newEntry;
 	}
 };
+class LuaStringIntegerEntry {
+	BYTE gap0[4];
+public:
+	Hedgehog::Base::CSharedString content;
+	LuaIntegerEntry* content2;
+	//thanks skyth
+	/*char* allocateStr(const char* value)
+	{
+		char* allocatedStr = (char*)__HH_ALLOC(strlen(value) + 1);
+		strcpy(allocatedStr, value);
+		return allocatedStr;
+	}*/
+	LuaStringIntegerEntry(Hedgehog::Base::CSharedString const& integer, int integer2)
+	{
+		content = integer;
+		content2 = new LuaIntegerEntry(integer2);
+	}
+};
+class LuaStringIntegerEntryContainer
+{
+public:
+	BYTE gap0[4];
+	LuaStringIntegerEntry* entry;
+
+	LuaStringIntegerEntryContainer(const char* stringContent, int integerContent)
+	{
+		LuaStringIntegerEntry newEntry1 = LuaStringIntegerEntry(stringContent, integerContent);
+		entry = &newEntry1;
+	}
+};
 class SequenceHelpers
 {
 public:

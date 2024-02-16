@@ -93,6 +93,10 @@ boost::shared_ptr<hh::db::CRawData>* __fastcall ArchiveTreePatcher_GetRawDataImp
 
 void ArchiveTreePatcher::applyPatches()
 {
+    for (size_t i = 0; i < Configuration::archiveTree.data.size(); i++)
+    {
+        m_archiveDependencies.push_back(Configuration::archiveTree.data[i]);
+    }
     m_archiveDependencies.push_back(ArchiveDependency("WorldMap", { "Title" }));
     m_archiveDependencies.push_back(ArchiveDependency("TitleModel", { "Title" }));
     m_archiveDependencies.push_back(ArchiveDependency("GenericWindow", { "Title" }));
@@ -110,6 +114,12 @@ void ArchiveTreePatcher::applyPatches()
     m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyChibiFighter", { "cmn100" }));
     m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyNightmareR", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyNightmareR", { "cmn100" }));
+    m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighter", { "cmn100" }));
+    m_archiveDependencies.push_back(ArchiveDependency("EnemyNal", { "cmn100" }));
+    m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighter", { "cmn200" }));
+    m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighterSword", { "cmn200" }));
+    m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighterSword", { "cmn100" }));
+    m_archiveDependencies.push_back(ArchiveDependency("EnemyNal", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("Ramp", { "Sonic" }));
     m_archiveDependencies.push_back(ArchiveDependency("Sweepkick", { "Sonic" }));
     m_archiveDependencies.push_back(ArchiveDependency("Paraloop", { "Sonic" }));

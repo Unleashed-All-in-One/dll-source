@@ -1,4 +1,10 @@
-extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
+extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
+{
+	//Make Gens support 4gb+
+	modInfo->API->SendMessageToLoader(ML_MSG_REQ_LARGE_ADDRESS_AWARE, nullptr);
+}
+
+extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 {
 	MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
 	// Load configuration
@@ -16,6 +22,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	MiniAudioHelper::initialize(modInfo->CurrentMod->Path);
 	DiscordStatus::initialize();
 	SequenceHelpers::applyPatches();
+
 	//---------------Gameplay---------------
 	QSSRestore::applyPatches();
 	Sweepkick::applyPatches();
@@ -40,7 +47,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	//---------------UI---------------
 	Title::applyPatches();
 	TitleWorldMap::applyPatches();
-	//TitleWorldMapPause::applyPatches();
+	TitleWorldMapPause::applyPatches();
 	EventViewer::applyPatches();
 	// NOTE: Because we're essentially remaking the title experience to be the exact same, we might want to make the options change in the
 	// same way unleashed does it (via an small options sub-tab-thing and remove TitleOption entirely.
