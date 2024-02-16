@@ -72,6 +72,7 @@
 #include "Functionality/PauseBgm.h"
 #include "Functionality/FallCam.h"
 #include "Functionality/RingEnergy.h"
+#include "Functionality/EXP.h"
 
 //UI
 #include "UI/Title.h"

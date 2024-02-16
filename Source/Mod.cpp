@@ -28,6 +28,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo * modInfo)
 	PauseBgm::applyPatches();
 	FallCam::applyPatches();
 	RingEnergy::applyPatches();
+	EXPCollect::applyPatches();
 
 	//-----------Register Set Objects-----------
 	WerehogPole::registerObject();
