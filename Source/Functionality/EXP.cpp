@@ -1,22 +1,24 @@
-std::vector<boost::shared_ptr<Sonic::CGameObject>> expCache;
+std::vector<Sonic::CGameObject*> expCache;
 
-void ChaosEnergyLogic() {
+void ChaosEnergyLogic(uint32_t amount) {
 	Sonic::Player::CPlayerSpeedContext* context = Sonic::Player::CPlayerSpeedContext::GetInstance();
 
 	if (!context)
 		return;
 
-	boost::shared_ptr<Sonic::CGameObject> newEXP = boost::make_shared<EXPCollect>(context->m_spMatrixNode->m_Transform.m_Position);
-
-	expCache.push_back(newEXP);
-
-	context->m_pPlayer->m_pMember->m_pGameDocument->AddGameObject(newEXP);
+	for (uint32_t i = 0; i < amount; i++)
+	{
+		boost::shared_ptr<EXPCollect> newEXP = boost::make_shared<EXPCollect>(context->m_spMatrixNode->m_Transform.m_Position);
+		expCache.push_back(newEXP.get());
+		// modification example : ((EXPCollect*)expCache.at(i))->test = true;
+		context->m_pPlayer->m_pMember->m_pGameDocument->AddGameObject(newEXP);
+	}
 }
 
 uint32_t __fastcall getEnemyChaosEnergyTypeImpl(uint32_t* pEnemy, uint32_t amount)
 {
-	ChaosEnergyLogic();
-	return amount;
+	ChaosEnergyLogic(amount);
+	return 0;
 }
 
 void __declspec(naked) getEnemyChaosEnergyType()
@@ -37,5 +39,10 @@ void __declspec(naked) getEnemyChaosEnergyType()
 }
 
 void EXPCollect::applyPatches() {
+	WRITE_STRING(0x1613B98, ""); // disable stinky hud particles EW!
 	WRITE_JUMP(0xBE05EF, getEnemyChaosEnergyType);
+}
+
+void EXPCollect::removeEXPCollect(Sonic::CGameObject* exp) {
+	expCache.erase(std::find(expCache.begin(), expCache.end(), exp));
 }

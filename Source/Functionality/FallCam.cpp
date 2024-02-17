@@ -8,6 +8,8 @@ bool m_Pause = false;
 bool m_IsFadeComplete = false;
 bool m_PlayIntroTimer = false;
 
+bool isDeadFall = false;
+
 boost::shared_ptr<Sonic::CGameObject> fadeSingleton;
 
 class FadeObject : public Sonic::CGameObject 
@@ -144,7 +146,8 @@ HOOK(void, __fastcall, FallCam_CCameraUpdateParallel, 0x10FB770, Sonic::CCamera*
 
 	Hedgehog::Base::CSharedString anim = context->GetCurrentAnimationName();
 	
-	bool isDeadFall = Common::IsPlayerDead() && (anim == "Fall" || anim == "FallLarge");
+	if (!m_PlayIntroTimer)
+		isDeadFall = Common::IsPlayerDead() && (anim == "Fall" || anim == "FallLarge");
 
 	float time = DEAD_TO_RESTART + FADE_INTRO;
 

@@ -114,6 +114,7 @@ void ArchiveTreePatcher::applyPatches()
     m_archiveDependencies.push_back(ArchiveDependency("Sweepkick", { "Sonic" }));
     m_archiveDependencies.push_back(ArchiveDependency("Paraloop", { "Sonic" }));
     m_archiveDependencies.push_back(ArchiveDependency("Pole", { "SonicActionCommon" }));
+    m_archiveDependencies.push_back(ArchiveDependency("SonicEXP", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("HintRing", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("HintRing", { "cmn100" }));
     m_archiveDependencies.push_back(ArchiveDependency("etfswitch", { "cmn200" }));

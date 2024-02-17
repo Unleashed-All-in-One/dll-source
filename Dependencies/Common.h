@@ -991,6 +991,14 @@ namespace Common
 		if (number > max) number = max;
 	}
 
+	inline float RandomFloat(float min, float max) {
+		return min + rand() / (RAND_MAX / (max - min + 1) + 1);
+	}
+
+	inline float Lerp(float a, float b, float t) {
+		return a + t * (b - a);
+	}
+
 	inline bool IsStringEndsWith(std::string const& value, std::string const& ending)
 	{
 		if (ending.size() > value.size()) return false;
@@ -1868,8 +1876,89 @@ namespace Common
 		processObjectMsgSetRotation(pObject, &msgSetRotation);
 	}
 
-	inline hh::math::CVector LerpVector(hh::math::CVector a, hh::math::CVector b, float t) {
+	inline hh::math::CVector Lerp(hh::math::CVector a, hh::math::CVector b, float t) {
 		return hh::math::CVector(a.x() + t * (b.x() - a.x()), a.y() + t * (b.y() - a.y()), a.z() + t * (b.z() - a.z()));
+	}
+
+	inline hh::math::CVector SmoothDamp(hh::math::CVector current, hh::math::CVector target, hh::math::CVector currentVelocity, float smoothTime, float maxSpeed, float deltaTime)
+	{
+		float output_x = 0.0f;
+		float output_y = 0.0f;
+		float output_z = 0.0f;
+
+		// Based on Game Programming Gems 4 Chapter 1.10
+		smoothTime = max(0.0001F, smoothTime);
+		float omega = 2.0F / smoothTime;
+
+		float x = omega * deltaTime;
+		float exp = 1.0F / (1.0F + x + 0.48F * x * x + 0.235F * x * x * x);
+
+		float change_x = current.x() - target.x();
+		float change_y = current.y() - target.y();
+		float change_z = current.z() - target.z();
+		hh::math::CVector originalTo = target;
+
+		// Clamp maximum speed
+		float maxChange = maxSpeed * smoothTime;
+
+		float maxChangeSq = maxChange * maxChange;
+		float sqrmag = change_x * change_x + change_y * change_y + change_z * change_z;
+		if (sqrmag > maxChangeSq)
+		{
+			float mag = (float)sqrt(sqrmag);
+			change_x = change_x / mag * maxChange;
+			change_y = change_y / mag * maxChange;
+			change_z = change_z / mag * maxChange;
+		}
+
+		target.x() = current.x() - change_x;
+		target.y() = current.y() - change_y;
+		target.z() = current.z() - change_z;
+
+		float temp_x = (currentVelocity.x() + omega * change_x) * deltaTime;
+		float temp_y = (currentVelocity.y() + omega * change_y) * deltaTime;
+		float temp_z = (currentVelocity.z() + omega * change_z) * deltaTime;
+
+		currentVelocity.x() = (currentVelocity.x() - omega * temp_x) * exp;
+		currentVelocity.y() = (currentVelocity.y() - omega * temp_y) * exp;
+		currentVelocity.z() = (currentVelocity.z() - omega * temp_z) * exp;
+
+		output_x = target.x() + (change_x + temp_x) * exp;
+		output_y = target.y() + (change_y + temp_y) * exp;
+		output_z = target.z() + (change_z + temp_z) * exp;
+
+		// Prevent overshooting
+		float origMinusCurrent_x = originalTo.x() - current.x();
+		float origMinusCurrent_y = originalTo.y() - current.y();
+		float origMinusCurrent_z = originalTo.z() - current.z();
+		float outMinusOrig_x = output_x - originalTo.x();
+		float outMinusOrig_y = output_y - originalTo.y();
+		float outMinusOrig_z = output_z - originalTo.z();
+
+		if (origMinusCurrent_x * outMinusOrig_x + origMinusCurrent_y * outMinusOrig_y + origMinusCurrent_z * outMinusOrig_z > 0)
+		{
+			output_x = originalTo.x();
+			output_y = originalTo.y();
+			output_z = originalTo.z();
+
+			currentVelocity.x() = (output_x - originalTo.x()) / deltaTime;
+			currentVelocity.y() = (output_y - originalTo.y()) / deltaTime;
+			currentVelocity.z() = (output_z - originalTo.z()) / deltaTime;
+		}
+
+		return hh::math::CVector(output_x, output_y, output_z);
+	}
+
+
+	inline hh::math::CVector MoveTowards(hh::math::CVector current, hh::math::CVector target, float maxDistanceDelta)
+	{
+		hh::math::CVector a = target - current;
+		float magnitude = abs(a.norm());
+
+		if (magnitude <= maxDistanceDelta || magnitude == 0.0f)
+			return target;
+		
+		return current + a / magnitude * maxDistanceDelta;
 	}
 
 	inline void CreatePlayerSupportShockWave(hh::math::CVector const& pos, float height, float radius, float duration)
