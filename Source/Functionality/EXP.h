@@ -9,6 +9,7 @@ public:
 
     Hedgehog::Math::CVector m_StartPosition;
     Hedgehog::Math::CVector m_Position;
+    Hedgehog::Math::CVector m_PositionAdd;
 
     Hedgehog::Math::CVector m_Scale;
 
@@ -128,12 +129,14 @@ public:
 
         float distance = abs((m_Position - context->m_spMatrixNode->m_Transform.m_Position).norm());
         
-        if (m_LifeTime >= 0.25f)
-            m_TargetPosition = Common::Lerp(m_TargetPosition, context->m_spMatrixNode->m_Transform.m_Position + (Eigen::Vector3f::UnitY() * 0.5f), updateInfo.DeltaTime * 8.0f);
-        else
-            m_TargetPosition = Common::Lerp(m_TargetPosition, m_StartPosition, updateInfo.DeltaTime * 8.0f);
-        
-        m_Position = Common::SmoothDamp(m_Position, m_TargetPosition, m_Velocity, 0.08f, INFINITY, updateInfo.DeltaTime);
+        if (m_LifeTime >= 0.25f) {
+            m_TargetPosition = Common::Lerp(m_TargetPosition, context->m_spMatrixNode->m_Transform.m_Position + (Eigen::Vector3f::UnitY() * 0.5f), updateInfo.DeltaTime * 4.0f);
+        }
+        else {
+            m_PositionAdd += Eigen::Vector3f::UnitY() * updateInfo.DeltaTime * 0.5f;
+            m_TargetPosition = Common::Lerp(m_TargetPosition, m_StartPosition + m_PositionAdd, updateInfo.DeltaTime * 4.0f);
+        }
+        m_Position = Common::MoveTowards(m_Position, m_TargetPosition, updateInfo.DeltaTime * 8.0f);
 
         if (m_playerInsideCollider && m_LifeTime >= 0.5f)
             Collect();
