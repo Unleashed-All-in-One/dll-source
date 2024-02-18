@@ -1,4 +1,3 @@
-
 void OnRing(hh::fnd::Message& msg, bool superRing = false) {
 	if (!*pModernSonicContext)
 		return;
@@ -8,7 +7,7 @@ void OnRing(hh::fnd::Message& msg, bool superRing = false) {
 		return;
 
 	if (*Common::GetPlayerBoost() < 100.0f)
-		*Common::GetPlayerBoost() = std::clamp(*Common::GetPlayerBoost() + (superRing ? 4.0f : 2.0f), 0.0f, 100.0f);
+		*Common::GetPlayerBoost() = std::clamp(*Common::GetPlayerBoost() + (superRing ? RingEnergy::m_SuperRingAdd : RingEnergy::m_RingAdd), 0.0f, 100.0f);
 }
 
 HOOK(void, __fastcall, CObjRingProcMsgHitEventCollision, 0x10534B0, Sonic::CGameObject3D* This, void* Edx, hh::fnd::Message& in_rMsg)
@@ -23,26 +22,18 @@ HOOK(void, __fastcall, CObjSuperRingProcMsgHitEventCollision, 0x11F2F10, Sonic::
 	originalCObjSuperRingProcMsgHitEventCollision(This, Edx, in_rMsg);
 }
 
-//Patch "Never Receive Boost From Rings" in "Gameplay" by "Hyper"
-void NOP(int floatInstrAddr, int paramStrAddr)
-{
-	WRITE_MEMORY(floatInstrAddr, ::byte, 0xD9, 0xEE); /* fldz */
-	WRITE_NOP(floatInstrAddr + 2, 6);
-	WRITE_MEMORY(paramStrAddr, ::byte, 0x00);
+HOOK(void, __fastcall, RingEnergyUpdate, 0xE6BF20, void* This, void* Edx, float* dt) {
+	originalRingEnergyUpdate(This, Edx, dt);
+
+	if (!*pModernSonicContext)
+		return;
+	
+	if (Common::GetSonicStateFlags()->Drifting && *Common::GetPlayerBoost() < 100.0f)
+		*Common::GetPlayerBoost() = std::clamp(*Common::GetPlayerBoost() + (Common::GetSonicStateFlags()->Boost ? RingEnergy::m_DriftAdd * 0.4f : RingEnergy::m_DriftAdd) * *dt, 0.0f, 100.0f);
 }
 
 void RingEnergy::applyPatches() {
-	NOP(0x120628B, 0x15FA690); /* ChaosEnergyRecoverRateByRing */
-	NOP(0x1206335, 0x15FA6DC); /* ChaosEnergyRecoverRateByRingBonus */
-	NOP(0x12063DF, 0x15FA72C); /* ChaosEnergyRecoverRateByRingPenalty */
-	
+	INSTALL_HOOK(RingEnergyUpdate);
 	INSTALL_HOOK(CObjRingProcMsgHitEventCollision);
 	INSTALL_HOOK(CObjSuperRingProcMsgHitEventCollision);
-
-	static float const ChaosEnergyRecoveryRate1 = 0.02f; // Enemy (0.03 default)
-	WRITE_MEMORY(0xD96724, float*, &ChaosEnergyRecoveryRate1);
-
-	static float const ChaosEnergyRecoveryRate3 = 0.0f; // EnemyBonus (0.02 default)
-	WRITE_MEMORY(0xD96736, float*, &ChaosEnergyRecoveryRate3);
-	WRITE_MEMORY(0xE60C94, float*, &ChaosEnergyRecoveryRate3);
 }

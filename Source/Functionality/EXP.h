@@ -91,7 +91,7 @@ public:
         Common::fCGlitterCreate(context, particle, matrixNode, "ef_ch_sng_lms_expcol", 0);
         Common::PlaySoundStatic(sound, 4002073);
 
-        context->m_ChaosEnergy += Common::RandomFloat(0.5f, 1.5f);
+        context->m_ChaosEnergy += Common::RandomFloat(0.25f, 0.75f);
         Common::ClampFloat(context->m_ChaosEnergy, 0.0f, 100.0f);
 
         Kill();
@@ -128,7 +128,7 @@ public:
 
         float distance = abs((m_Position - context->m_spMatrixNode->m_Transform.m_Position).norm());
         
-        if (m_LifeTime >= 0.5f)
+        if (m_LifeTime >= 0.25f)
             m_TargetPosition = Common::Lerp(m_TargetPosition, context->m_spMatrixNode->m_Transform.m_Position + (Eigen::Vector3f::UnitY() * 0.5f), updateInfo.DeltaTime * 8.0f);
         else
             m_TargetPosition = Common::Lerp(m_TargetPosition, m_StartPosition, updateInfo.DeltaTime * 8.0f);

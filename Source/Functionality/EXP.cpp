@@ -17,7 +17,28 @@ void ChaosEnergyLogic(uint32_t amount) {
 
 uint32_t __fastcall getEnemyChaosEnergyTypeImpl(uint32_t* pEnemy, uint32_t amount)
 {
-	ChaosEnergyLogic(amount);
+	switch (pEnemy[0])
+	{
+		case 0x016F593C: 
+			ChaosEnergyLogic(1); // EFighter
+			break;
+		case 0x016F70BC:
+			ChaosEnergyLogic(3); // Spinner
+			break;
+		case 0x016FB1FC: 
+			ChaosEnergyLogic(1); // EFighterMissile
+			break;
+		case 0x016FB62C: 
+			ChaosEnergyLogic(4); // AirCannon
+			break;
+		case 0x016F912C: 
+			ChaosEnergyLogic(2); // Mole
+			break;
+		default:
+			ChaosEnergyLogic(3);
+			break;
+	}
+
 	return 0;
 }
 
