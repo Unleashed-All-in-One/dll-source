@@ -1877,8 +1877,6 @@ namespace Common
 		const float max = fmax(start, end);
 		return fmin(min, fmax(max, lerpUnclampedf(start, end, time)));
 	}
-	inline hh::math::CVector LerpVector(hh::math::CVector a, hh::math::CVector b, float t)
-	{
 	inline void ApplyObjectPhysicsRotation(void* pObject, Eigen::Quaternionf const& rot)
 	{
 		FUNCTION_PTR(void*, __thiscall, processObjectMsgSetRotation, 0xEA20D0, void* This, void* message);
