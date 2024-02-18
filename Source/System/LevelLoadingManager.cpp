@@ -84,6 +84,8 @@ void TriggerSequenceEvents(QueueData data)
 	{
 		//Play stage (day)
 		SequenceHelpers::loadStage(data.dataName.c_str());
+
+		SequenceHelpers::changeModule(ModuleFlow::StageAct);
 		SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
 		LevelLoadingManager::WhiteWorldEnabled = 0;
 		DebugDrawText::log(std::format("[LLM] Loading Stage (Day) \"{}\" as {}",data.dataName, (int)PlayerType::GENERIC_SONIC).c_str(), 5);
@@ -152,7 +154,7 @@ void TriggerSequenceEvents(QueueData data)
 		nextEVSIDCutscene = data.dataName.c_str();
 		nextStageIDCutscene = data.stageEventName.c_str();
 		isMovieCutscene = true;
-
+		SequenceHelpers::setPlayerType(data.playerTypeOverride);
 		auto message1 = Sonic::Message::MsgSequenceEvent(0, 7);
 		Sonic::Sequence::Main::ProcessMessage(&message1);
 		//Hedgehog::Base::CSharedString string = ("evs031");
@@ -181,12 +183,7 @@ void TriggerSequenceEvents(QueueData data)
 		sub_00D40070(v12, test555, new Hedgehog::Base::CSharedString("ev041"));*/
 
 
-		if (data.immediate)
-
-		{
-			
-			SequenceHelpers::changeModule(ModuleFlow::StageEvent);
-		}
+		
 		/*DWORD* worldcontainer = ((DWORD*)Sonic::CApplicationDocument::GetInstance()->m_pMember + 109);
 		Hedgehog::Base::CSharedString* eventName = (Hedgehog::Base::CSharedString*)(worldcontainer[32] + 44);
 		eventName = new Hedgehog::Base::CSharedString("ev041");
