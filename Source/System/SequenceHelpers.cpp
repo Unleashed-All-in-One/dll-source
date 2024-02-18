@@ -62,10 +62,10 @@ void SequenceHelpers::playEvent(const char* in_EventName, ModuleFlow in_EventMod
 /// Sends a message to CMainSequence to trigger a stage load.
 /// </summary>
 /// <param name="in_EventName">Stage archive name</param>
-void SequenceHelpers::loadStage(const char* in_StageName) 
+void SequenceHelpers::loadStage(const char* in_StageName, int sequenceEventExtra) 
 {
 	nextStage = allocateStr(in_StageName);
-	auto message = Sonic::Message::MsgSequenceEvent(2, 0);
+	auto message = Sonic::Message::MsgSequenceEvent(2, sequenceEventExtra);
 	Sonic::Sequence::Main::ProcessMessage(&message);
 }
 /// <summary>
@@ -115,6 +115,8 @@ HOOK(void, __fastcall, CStoryLua_SetupStage, 0x00D71A90, Sonic::Sequence::Story*
 {
 	if (nextStage != nullptr)
 		stage->entry->content = nextStage;
+
+	DebugDrawText::log(std::format("[LUA_STORYSEQUENCE] SetupStage received \"{}\"", stage->entry->content).c_str(), 100);
 	nextStage = nullptr;
 	originalCStoryLua_SetupStage(StorySequence, Edx, a2, stage);
 }

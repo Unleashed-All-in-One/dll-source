@@ -89,8 +89,11 @@ public:
     float m_playerVerticalProgress;
     float add2;
     float m_playerPoleRotation;
+    float m_playerPoleRotationTarget;
+    float m_playerPoleRotationPrevTarget;
     float cooldownTimer;
     float side = 0;
+    float progress;
     /* Renderable methods */
     bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
     {
@@ -201,18 +204,24 @@ public:
                 m_playerOnPole = false;
                 return;
             }
+            if(progress < 1)
+            progress += in_rUpdateInfo.DeltaTime * 0.8f;
             m_playerVerticalProgress += inputPtr->LeftStickVertical / 30;
             if (inputPtr->IsTapped(Sonic::eKeyState_DpadRight))
             {
                 side++;
-                m_playerPoleRotation += 1.5f;
+                m_playerPoleRotationPrevTarget = m_playerPoleRotationTarget;
+                m_playerPoleRotationTarget += 1.5f;
+                progress = 0;
             }
-            if (m_playerPoleRotation > 4.5f)
-                m_playerPoleRotation = 0;
+            if (m_playerPoleRotationTarget > 4.5f)
+                m_playerPoleRotationTarget = 0;
 
-            if (m_playerPoleRotation < 0)
-                m_playerPoleRotation = 4.5f;
-            playerContext->ChangeAnimation("Evilsonic_pillar_idle");
+            if (m_playerPoleRotationTarget < 0)
+                m_playerPoleRotationTarget = 4.5f;
+            m_playerPoleRotation = Common::lerpUnclampedf(m_playerPoleRotationPrevTarget, m_playerPoleRotationTarget, progress);
+            
+            //playerContext->ChangeAnimation("Evilsonic_pillar_idle");
             playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = true;
             auto playerPos = playerContext->m_spMatrixNode->m_Transform.m_Position;
             auto targetPos = m_spMatrixNodeTransform->m_Transform.m_Position;

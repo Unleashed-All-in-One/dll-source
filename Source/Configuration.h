@@ -59,6 +59,7 @@ public:
 	static int getCapital(int flagID);
 	static int logoType;
 	static bool ignoreWarnings;
+	static bool use4gbMode;
 	static bool compatibilityMode;
 	static WorldData worldData;
 	static ArchiveTreeDefinitions archiveTree;

@@ -23,3 +23,19 @@ namespace Sonic::Message
         {}
     };
 }
+namespace Sonic::Message
+{
+    class MsgChangeStageMode : public Hedgehog::Universe::MessageTypeSet
+    {
+    public:
+        HH_FND_MSG_MAKE_TYPE(0x016819E8);
+
+        uint32_t m_EventType;
+
+        // the same order as sub_4F9E90
+        MsgChangeStageMode(uint32_t in_EventType)
+        {
+            m_EventType = in_EventType;
+        }
+    };
+}

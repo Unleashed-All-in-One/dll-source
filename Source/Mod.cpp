@@ -1,14 +1,15 @@
 extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 {
+	// Load configuration
+	Configuration::load(modInfo->CurrentMod->Path);
 	//Make Gens support 4gb+
+	if(Configuration::use4gbMode)
 	modInfo->API->SendMessageToLoader(ML_MSG_REQ_LARGE_ADDRESS_AWARE, nullptr);
 }
 
 extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 {
 	MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
-	// Load configuration
-	Configuration::load(modInfo->CurrentMod->Path);
 
 	// Set random seed
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));

@@ -113,7 +113,7 @@ public:
 	static void changeModule(ModuleFlow in_Flow);
 	static void playEvent(const char* in_EventName, ModuleFlow in_EventModule);
 	static void queueEvent(const char* in_EventName);
-	static void loadStage(const char* in_StageName);
+	static void loadStage(const char* in_StageName, int sequenceEventExtra = 0);
 	static void setPlayerType(int in_PlayerType);
 	static void applyPatches();
 	static void update();

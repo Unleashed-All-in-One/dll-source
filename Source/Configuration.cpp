@@ -11,6 +11,7 @@ bool Configuration::m_bQSS = true;
 //---------------UI---------------
 std::vector<std::string> Configuration::gensStages;
 bool Configuration::ignoreWarnings = false;
+bool Configuration::use4gbMode = false;
 bool Configuration::compatibilityMode = false;
 int Configuration::logoType = 0;
 Configuration::TitleType Configuration::menuType = (TitleType)0;
@@ -38,7 +39,7 @@ void Configuration::load(const char* path)
 	//---------------UI---------------
 	logoType = reader.GetInteger("Appearance", "LogoType", logoType);
 	menuType = (TitleType)reader.GetInteger("Appearance", "MenuType", menuType);
-	ignoreWarnings = reader.GetBoolean("Main", "IgnoreWarnings", ignoreWarnings);
+	use4gbMode = reader.GetBoolean("Main", "Use4GB", use4gbMode);
 	compatibilityMode = reader.Get("Main", "IncludeDir1", "disk_sounds") == "";
 	gensStages = { "ghz100","ghz200","cpz100","cpz200","ssz100","ssz200","sph100","sph200","cte100", "cte200","ssh100","ssh200","csc100","csc200","euc100","euc200","pla100","pla200" };
 	getStageList();
