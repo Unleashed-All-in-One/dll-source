@@ -1,7 +1,6 @@
 #pragma once
 
 #define WIN32_LEAN_AND_MEAN
-
 #include <BlueBlur.h>
 #include <BlueBlurCustom.h>
 
@@ -26,6 +25,17 @@
 
 // HE1ML
 #include <ModLoader.h>
+
+//IMGUI
+#include <d3d11.h>
+#include <d3d9.h>
+#include "System/DebugMenu/imgui.h"
+#include "System/DebugMenu/imgui_impl_dx11.h"
+#include "System/DebugMenu/imgui_impl_dx9.h"
+#include "System/DebugMenu/imgui_impl_win32.h"
+#include "System/DebugMenu/DDSTextureLoader9.h"
+#include "System/DebugMenu/DDSTextureLoader11.h"
+#include "System/DebugMenu/CsdImGui.h"
 
 // Other
 #include <tweeny-3.2.0.h>
@@ -68,6 +78,14 @@
 #include "System/CSDCommon.h"
 #include "System/UpdateDirector.h"
 #include "System/SoundController.h"
+#include "System/ImguiInitializer.h"
+
+//Debug Menu
+#include "System/DebugMenu/Context.h"
+#include "System/DebugMenu/ImguiManager.h"
+#include "System/DebugMenu/ImGuiTheme.h"
+#include "System/DebugMenu/SynchronizedObject.h"
+#include "System/DebugMenu/Types.h"
 
 //Functionality
 #include "Functionality/PauseBgm.h"

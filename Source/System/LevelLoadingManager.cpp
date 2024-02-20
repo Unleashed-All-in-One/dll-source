@@ -7,8 +7,10 @@ const char* lastStageIDGate = "";
 bool LevelLoadingManager::WhiteWorldEnabled = false;
 int LevelLoadingManager::LastSavedQueueIndex = -1;
 uint32_t nextPlayerType = 0;
-const char* nextStageIDCutscene = "ev011";
-const char* nextEVSIDCutscene = "ghz100";
+std::string nextStageIDCutscene = "ev011";
+std::string nextEVSIDCutscene = "ghz100";
+const char* temp_nextStageIDCutscene = "ev011";
+const char* temp_nextEVSIDCutscene = "ghz100";
 bool isMovieCutscene;
 bool LevelLoadingManager::InStory;
 bool inStoryBefore;
@@ -24,21 +26,21 @@ bool eventTransitionFinished;
 struct IntStuffPlayEvent
 {
 	BYTE gap0[4];
-	int dword4;
+	int value;
 };
 
-struct __declspec(align(4)) Test2
+struct __declspec(align(4)) LuaParamPlayEventEntry
 {
 	BYTE gap0[4];
-	const char* string;
-	IntStuffPlayEvent string2;
+	const char* eventName;
+	IntStuffPlayEvent eventStageType;
 };
 
-struct Test1
+struct LuaParamPlayEvent
 {
 	BYTE gap0[4];
-	Test2* entry;
-	Test2* entry1;
+	LuaParamPlayEventEntry* entry;
+	LuaParamPlayEventEntry* entry1;
 };
 void __declspec(naked) sub_00D40070(int skipped, DWORD* a2, Hedgehog::Base::CSharedString* eventName)
 {
@@ -51,6 +53,10 @@ void __declspec(naked) sub_00D40070(int skipped, DWORD* a2, Hedgehog::Base::CSha
 		call [func]
 		retn
 	}
+}
+bool IsCutsceneMeantForStage(std::string in_String)
+{
+	return in_String != "evs041" && in_String != "evs121";
 }
 const char* LevelLoadingManager::getStageToLoad()
 {
@@ -76,6 +82,28 @@ const char* LevelLoadingManager::getStageToLoad()
 	}
 	return stageToLoad;
 }
+void LevelLoadingManager::forcePlayCutscene(std::string in_EventName, std::string in_StageName, bool flag, int playerType)
+{
+	auto playEventRequest = new LuaParamPlayEvent();
+	playEventRequest->entry = new LuaParamPlayEventEntry();
+	playEventRequest->entry->eventName = in_EventName.c_str();
+	playEventRequest->entry->eventStageType = IntStuffPlayEvent();
+	playEventRequest->entry->eventStageType.value = flag ? 1 : 0;
+	FUNCTION_PTR(void, __thiscall, PlayEventLuanne, 0x00D72520, DWORD * StorySeq, int a2, LuaParamPlayEvent * a3);
+	PlayEventLuanne(storySequence, 0, playEventRequest);
+
+	nextEVSIDCutscene = in_EventName.c_str();
+	nextStageIDCutscene = in_StageName.c_str();
+	isMovieCutscene = true;
+	SequenceHelpers::setPlayerType(playerType);
+	auto message1 = Sonic::Message::MsgSequenceEvent(0, 7);
+	Sonic::Sequence::Main::ProcessMessage(&message1);
+
+	//uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
+	//char** h = (char**)stageTerrainAddress;
+	//const char* stageToLoad = in_StageName.c_str();
+	//strcpy(*(char**)stageTerrainAddress, stageToLoad);
+}
 void TriggerSequenceEvents(QueueData data)
 {
 	switch (data.type)
@@ -85,7 +113,6 @@ void TriggerSequenceEvents(QueueData data)
 		//Play stage (day)
 		SequenceHelpers::loadStage(data.dataName.c_str());
 
-		SequenceHelpers::changeModule(ModuleFlow::StageAct);
 		SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
 		LevelLoadingManager::WhiteWorldEnabled = 0;
 		DebugDrawText::log(std::format("[LLM] Loading Stage (Day) \"{}\" as {}",data.dataName, (int)PlayerType::GENERIC_SONIC).c_str(), 5);
@@ -127,6 +154,7 @@ void TriggerSequenceEvents(QueueData data)
 		else
 			SequenceHelpers::queueEvent(data.dataName.c_str());
 
+		SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
 		auto message = Sonic::Message::MsgSequenceEvent(5, 0);
 		Sonic::Sequence::Main::ProcessMessage(&message);
 		isMovieCutscene = false;
@@ -137,68 +165,26 @@ void TriggerSequenceEvents(QueueData data)
 	case 5:
 	{
 		//Play event (realtime)
-		LevelLoadingManager::NextLevelLoad = "ghz100";
-		//SequenceHelpers::queueEvent(data.dataName.c_str());
-		//00D72520
-		// 
-		//SequenceHelpers::loadStage("ghz100");
-		//void __thiscall Sonic::Sequence::CStoryImpl::LuanneFunctions::PlayEvent(Hedgehog::Universe::CMessageActor *this, int a2, Luanne_StringMessageContainer *a3)
-		auto test = new Test1();
-		test->entry = new Test2();
-		test->entry->string = data.dataName.c_str();
-		test->entry->string2 = IntStuffPlayEvent();
-		test->entry->string2.dword4 = data.immediate ? 1 : 0;
-		FUNCTION_PTR(void, __thiscall, PlayEventLuanne, 0x00D72520, DWORD * StorySeq, int a2, Test1* a3);
-		PlayEventLuanne(storySequence, 0, test); //this works
+		
+		auto playEventRequest = new LuaParamPlayEvent();
+		playEventRequest->entry = new LuaParamPlayEventEntry();
+		playEventRequest->entry->eventName = data.dataName.c_str();
+		playEventRequest->entry->eventStageType = IntStuffPlayEvent();
+		playEventRequest->entry->eventStageType.value = data.immediate ? 1 : 0;
+		FUNCTION_PTR(void, __thiscall, PlayEventLuanne, 0x00D72520, DWORD * StorySeq, int a2, LuaParamPlayEvent* a3);
+		PlayEventLuanne(storySequence, 0, playEventRequest);
 
 		nextEVSIDCutscene = data.dataName.c_str();
-		nextStageIDCutscene = data.stageEventName.c_str();
+		nextStageIDCutscene = data.stageEventName.c_str();		
 		isMovieCutscene = true;
 		SequenceHelpers::setPlayerType(data.playerTypeOverride);
 		auto message1 = Sonic::Message::MsgSequenceEvent(0, 7);
 		Sonic::Sequence::Main::ProcessMessage(&message1);
-		//Hedgehog::Base::CSharedString string = ("evs031");
-		////SequenceHelpers::queueEvent("ev031");
-		//uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-		//char** h = (char**)stageTerrainAddress;
-		//const char* stageToLoad = "ghz100";
-		//LevelLoadingManager::ActiveReplacement = true;
-
-		//auto actor = (Hedgehog::Universe::CMessageActor*)(*((DWORD*)Sonic::CApplicationDocument::GetInstance()->m_pMember + 13) + 96);
-
-		auto message2 = Sonic::Message::MsgChangeStageMode(13);
-		//actor->ProcessMessage(message2, 0);
-	/*	auto v10 = ((int*)0x01684858);
-		auto v11 = 0;
-		while (*v10 != 5)
-		{
-			v11 += 8;
-			v10 += 2;
-			if (v11 >= 0x80)
-				break;
-		}
-		auto v12 = v10[1];
-		DWORD* test555 = new DWORD();
-		*(test555 + 10) = Sonic::Sequence::Main::GetInstance()->m_ActorID;
-		sub_00D40070(v12, test555, new Hedgehog::Base::CSharedString("ev041"));*/
-
-
 		
-		/*DWORD* worldcontainer = ((DWORD*)Sonic::CApplicationDocument::GetInstance()->m_pMember + 109);
-		Hedgehog::Base::CSharedString* eventName = (Hedgehog::Base::CSharedString*)(worldcontainer[32] + 44);
-		eventName = new Hedgehog::Base::CSharedString("ev041");
-		Hedgehog::Base::CSharedString* stageName = (Hedgehog::Base::CSharedString*)(worldcontainer[32] + 48);
-		stageName = new Hedgehog::Base::CSharedString("cpz200");*/
-
-		
-		//SetupStage_F(storySequence, 0, new LuaStringEntryContainer("ghz100"));
-		//uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-		//char** h = (char**)stageTerrainAddress;
-		//const char* stageToLoad = "ghz100";
-		//strcpy(*(char**)stageTerrainAddress, stageToLoad);
-		//LevelLoadingManager::NextLevelLoad = "ghz100";
-		/*auto message = Sonic::Message::MsgSequenceEvent(1, 0);
-		Sonic::Sequence::Main::ProcessMessage(&message);*/
+		uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
+		char** h = (char**)stageTerrainAddress;
+		const char* stageToLoad = data.stageEventName.c_str();
+		strcpy(*(char**)stageTerrainAddress, stageToLoad);
 		break;
 	}
 	}
@@ -315,7 +301,10 @@ void __declspec(naked) SetCorrectTerrainForMission_ASM()
 		jmp[returnAddress]
 	}
 }
-
+void __declspec(naked) Test(int in)
+{
+	printf("in");
+}
 void __declspec(naked) InterceptGameplayFlowLoading()
 {
 	static uint32_t normal = 0x00D0E166;
@@ -331,7 +320,7 @@ void __declspec(naked) InterceptGameplayFlowLoading()
 
 		cmp TitleWorldMap::ForceLoadToFlowTitle, 1
 		je ChangeToTitle
-
+			
 		cmp ecx, 6
 		je ChangeToWhiteWorld
 		cmp ecx, 5
@@ -506,13 +495,13 @@ void SetStuffTest()
 
 	std::string stageIdCopy = std::string(nextStageIDCutscene);
 	std::string evsNameCopy = std::string(nextEVSIDCutscene);
-	if (stageIdCopy.empty() || evsNameCopy.empty())
-	{
-		int index = LevelLoadingManager::LastSavedQueueIndex;
+		/*int index = LevelLoadingManager::LastSavedQueueIndex;
 		QueueData data = Configuration::queueData.data[index];
 		stageIdCopy = std::string(data.stageEventName);
-		evsNameCopy = std::string(data.dataName);
-	}
+		evsNameCopy = std::string(data.dataName);*/
+	
+
+	DebugDrawText::log(std::format("[LLM] Loading Event ID \"{}\" as {}", evsNameCopy, stageIdCopy).c_str(), 5);
 	auto v4 = *((DWORD*)appdocMember + 109);
 	auto e = (Hedgehog::Base::CSharedString*)(*((DWORD*)v4 + 32) + 44);
 	auto e2 = (Hedgehog::Base::CSharedString*)(*((DWORD*)v4 + 32) + 48);
@@ -545,6 +534,10 @@ void __declspec(naked) SetCorrectStageForCutscene()
 		retn
 	}
 }
+HOOK(void, __fastcall, CEventScene_OnEnd, 0xB1EA80, int* This, void* Edx, int a2)
+{
+	LevelLoadingManager::setCorrectStage();
+}
 void LevelLoadingManager::initialize()
 {
 	WRITE_JUMP(0xD56CCA, SetCorrectTerrainForMission_ASM);
@@ -561,6 +554,7 @@ void LevelLoadingManager::initialize()
 	////dont spawn button ui
 	//WRITE_JUMP(0x00B21CF5, 0x00B21CF3);
 	//INSTALL_HOOK(GetEventIndex);
+	INSTALL_HOOK(CEventScene_OnEnd);
 	INSTALL_HOOK(HudLoading_CHudLoadingCStateOutroBegin);
 	INSTALL_HOOK(CHudGateMenuMainCStateOutroBegin);
 	INSTALL_HOOK(HudResult_CHudResultAdvance);

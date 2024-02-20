@@ -62,7 +62,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\Dependencies;..\Dependencies\Detours\include;..\Dependencies\Loaders;..\Include\BlueBlur;..\Include\BlueBlurCustom;..\Dependencies\Discord;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Dependencies;..\Dependencies\Detours\include;..\Dependencies\Loaders;..\Include\BlueBlur;..\Include\BlueBlurCustom;..\Dependencies\Discord;..\Dependencies\imgui;..\Dependencies\DDSTextureLoader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Pch.h</ForcedIncludeFiles>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -94,7 +94,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
       <PrecompiledHeaderFile>Pch.h</PrecompiledHeaderFile>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <AdditionalIncludeDirectories>..\Dependencies;..\Dependencies\Detours\include;..\Dependencies\Loaders;..\Include\BlueBlur;..\Include\BlueBlurCustom;..\Dependencies\Discord;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Dependencies;..\Dependencies\Detours\include;..\Dependencies\Loaders;..\Include\BlueBlur;..\Include\BlueBlurCustom;..\Dependencies\Discord;..\Dependencies\imgui;..\Dependencies\DDSTextureLoader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Pch.h</ForcedIncludeFiles>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -142,6 +142,22 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClCompile Include="System\AnimationSetPatcher.cpp" />
     <ClCompile Include="System\ArchiveTreePatcher.cpp" />
     <ClCompile Include="System\CSDCommon.cpp" />
+    <ClCompile Include="System\DebugMenu\Context.cpp" />
+    <ClCompile Include="System\DebugMenu\CsdImGui.cpp" />
+    <ClCompile Include="System\DebugMenu\DDSTextureLoader11.cpp" />
+    <ClCompile Include="System\DebugMenu\DDSTextureLoader9.cpp" />
+    <ClCompile Include="System\DebugMenu\imgui.cpp" />
+    <ClCompile Include="System\DebugMenu\ImguiManager.cpp" />
+    <ClCompile Include="System\DebugMenu\ImGuiTheme.cpp" />
+    <ClCompile Include="System\DebugMenu\imgui_demo.cpp" />
+    <ClCompile Include="System\DebugMenu\imgui_draw.cpp" />
+    <ClCompile Include="System\DebugMenu\imgui_impl_dx11.cpp" />
+    <ClCompile Include="System\DebugMenu\imgui_impl_dx9.cpp" />
+    <ClCompile Include="System\DebugMenu\imgui_impl_win32.cpp" />
+    <ClCompile Include="System\DebugMenu\imgui_tables.cpp" />
+    <ClCompile Include="System\DebugMenu\imgui_widgets.cpp" />
+    <ClCompile Include="System\DebugMenu\SynchronizedObject.cpp" />
+    <ClCompile Include="System\DebugMenu\Types.cpp" />
     <ClCompile Include="System\DiscordStatus.cpp" />
     <ClCompile Include="System\DiscordGameSDK\achievement_manager.cpp" />
     <ClCompile Include="System\DiscordGameSDK\activity_manager.cpp" />
@@ -158,6 +174,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClCompile Include="System\DiscordGameSDK\user_manager.cpp" />
     <ClCompile Include="System\DiscordGameSDK\voice_manager.cpp" />
     <ClCompile Include="System\EnemyTrigger.cpp" />
+    <ClCompile Include="System\ImguiInitializer.cpp" />
     <ClCompile Include="System\LetterboxHelper.cpp" />
     <ClCompile Include="System\LevelLoadingManager.cpp" />
     <ClCompile Include="System\MiniAudioHelper.cpp" />
@@ -191,6 +208,23 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClInclude Include="System\AnimationSetPatcher.h" />
     <ClInclude Include="System\ArchiveTreePatcher.h" />
     <ClInclude Include="System\CSDCommon.h" />
+    <ClInclude Include="System\DebugMenu\Context.h" />
+    <ClInclude Include="System\DebugMenu\CsdImGui.h" />
+    <ClInclude Include="System\DebugMenu\DDSTextureLoader11.h" />
+    <ClInclude Include="System\DebugMenu\DDSTextureLoader9.h" />
+    <ClInclude Include="System\DebugMenu\imconfig.h" />
+    <ClInclude Include="System\DebugMenu\imgui.h" />
+    <ClInclude Include="System\DebugMenu\ImguiManager.h" />
+    <ClInclude Include="System\DebugMenu\ImGuiTheme.h" />
+    <ClInclude Include="System\DebugMenu\imgui_impl_dx11.h" />
+    <ClInclude Include="System\DebugMenu\imgui_impl_dx9.h" />
+    <ClInclude Include="System\DebugMenu\imgui_impl_win32.h" />
+    <ClInclude Include="System\DebugMenu\imgui_internal.h" />
+    <ClInclude Include="System\DebugMenu\imstb_rectpack.h" />
+    <ClInclude Include="System\DebugMenu\imstb_textedit.h" />
+    <ClInclude Include="System\DebugMenu\imstb_truetype.h" />
+    <ClInclude Include="System\DebugMenu\SynchronizedObject.h" />
+    <ClInclude Include="System\DebugMenu\Types.h" />
     <ClInclude Include="System\DiscordStatus.h" />
     <ClInclude Include="System\DiscordGameSDK\achievement_manager.h" />
     <ClInclude Include="System\DiscordGameSDK\activity_manager.h" />
@@ -210,6 +244,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClInclude Include="System\DiscordGameSDK\user_manager.h" />
     <ClInclude Include="System\DiscordGameSDK\voice_manager.h" />
     <ClInclude Include="System\EnemyTrigger.h" />
+    <ClInclude Include="System\ImguiInitializer.h" />
     <ClInclude Include="System\LetterboxHelper.h" />
     <ClInclude Include="System\LevelLoadingManager.h" />
     <ClInclude Include="System\Light.h" />

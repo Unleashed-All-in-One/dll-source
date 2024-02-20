@@ -1,3 +1,5 @@
+
+
 extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 {
 	// Load configuration
@@ -7,6 +9,11 @@ extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 	modInfo->API->SendMessageToLoader(ML_MSG_REQ_LARGE_ADDRESS_AWARE, nullptr);
 }
 
+std::string getDirectoryPath(const std::string& path)
+{
+	const size_t pos = path.find_last_of("\\/");
+	return path.substr(0, pos != std::string::npos ? pos : 0);
+}
 extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 {
 	MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
@@ -23,7 +30,8 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	MiniAudioHelper::initialize(modInfo->CurrentMod->Path);
 	DiscordStatus::initialize();
 	SequenceHelpers::applyPatches();
-
+	ImguiInitializer::initialize();
+	Context::setModDirectoryPath(getDirectoryPath(modInfo->CurrentMod->Path));
 	//---------------Gameplay---------------
 	QSSRestore::applyPatches();
 	Sweepkick::applyPatches();
@@ -81,6 +89,7 @@ extern "C" __declspec(dllexport) void PostInit()
 extern "C" void __declspec(dllexport) OnFrame()
 {
 	//---------------System---------------
+	ImguiInitializer::update();
 	CSDCommon::update();
 	//DiscordStatus::update();
 	LevelLoadingManager::update();

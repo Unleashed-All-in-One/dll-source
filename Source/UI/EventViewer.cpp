@@ -51,7 +51,7 @@ void EventViewer::update()
 		{
 			if (UnleashedHUD_API::IsLoadingFadeoutCompleted())
 			{
-				LevelLoadingManager::setCorrectStage();
+				//LevelLoadingManager::setCorrectStage();
 				isGoingToSkip = false;
 				objecttt[77] = 2;
 			}
