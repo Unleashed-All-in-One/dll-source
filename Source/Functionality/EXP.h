@@ -9,15 +9,19 @@ public:
 
     Hedgehog::Math::CVector m_StartPosition;
     Hedgehog::Math::CVector m_Position;
+    Hedgehog::Math::CVector m_PositionAtStartHoming;
     Hedgehog::Math::CVector m_PositionAdd;
 
     Hedgehog::Math::CVector m_Scale;
 
     float m_Radius = 1.0f;
     float m_LifeTime = 0.0f;
+    float m_TimerLerp = 0.0f;
 
     static inline SharedPtrTypeless particle;
     static inline SharedPtrTypeless sound;
+    bool m_IsGoingTowardsPlayer;
+    
 
     bool m_playerInsideCollider = false;
     Hedgehog::Math::CVector m_Velocity;
@@ -129,18 +133,27 @@ public:
 
         float distance = abs((m_Position - context->m_spMatrixNode->m_Transform.m_Position).norm());
         
-        if (m_LifeTime >= 0.25f) {
-            m_TargetPosition = Common::Lerp(m_TargetPosition, context->m_spMatrixNode->m_Transform.m_Position + (Eigen::Vector3f::UnitY() * 0.5f), updateInfo.DeltaTime * 4.0f);
+        if (m_LifeTime >= 0.25f) 
+        {
+            if (!m_IsGoingTowardsPlayer)
+            {
+                m_IsGoingTowardsPlayer = true;
+                m_PositionAtStartHoming = m_TargetPosition;
+            }
+            m_TimerLerp += updateInfo.DeltaTime / 1.2f;
+            m_Position = Common::Lerp(m_PositionAtStartHoming, context->m_spMatrixNode->m_Transform.m_Position + (Eigen::Vector3f::UnitY() * 0.5f), m_TimerLerp);
+            
         }
-        else {
+        else 
+        {
             m_PositionAdd += Eigen::Vector3f::UnitY() * updateInfo.DeltaTime * 0.5f;
             m_TargetPosition = Common::Lerp(m_TargetPosition, m_StartPosition + m_PositionAdd, updateInfo.DeltaTime * 4.0f);
+            m_Position = Common::MoveTowards(m_Position, m_TargetPosition, updateInfo.DeltaTime * 8.0f);
         }
-        m_Position = Common::MoveTowards(m_Position, m_TargetPosition, updateInfo.DeltaTime * 8.0f);
+        //
 
-        if (m_playerInsideCollider && m_LifeTime >= 0.5f)
+        if ((m_playerInsideCollider && m_LifeTime >= 0.5f) || m_LifeTime > 5) 
             Collect();
-
         SetPosition(m_Position);
     }
 

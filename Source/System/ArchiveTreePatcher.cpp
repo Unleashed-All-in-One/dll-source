@@ -109,6 +109,7 @@ void ArchiveTreePatcher::applyPatches()
         m_archiveDependencies.push_back(ArchiveDependency("StageGate", { whiteworld[i] }));           
     }
     m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighterMykonos", { "cmn200" }));
+    m_archiveDependencies.push_back(ArchiveDependency("SonicEVRoot", { "ev041" }));
     m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighterMykonos", { "cmn100" }));
     m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyChibiFighter", { "cmn100" }));
     m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyNightmareR", { "cmn200" }));

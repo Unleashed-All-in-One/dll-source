@@ -21,6 +21,9 @@ static uint32_t cameraInitRan = 0;
 static AudioHandle stageSelectHandle;
 void* TitleStateContextBase;
 
+
+boost::shared_ptr<SaveLoadTestStruct> m_spSaveT;
+FUNCTION_PTR(void, __thiscall, TitleUI_CTitleOptionCStateOutroSaving, 0xD22A70, boost::shared_ptr<SaveLoadTestStruct>& spSave, void* a2);
 void Title::setSubmenu(bool enabled)
 {
 	isInSubmenu = enabled;
@@ -497,9 +500,20 @@ bool IsRightDown() {
 	auto inputPtr = &inputState->m_PadStates[inputState->m_CurrentPadStateIndex];
 	return inputPtr->IsDown(Sonic::eKeyState_LeftStickRight) || inputPtr->IsDown(Sonic::eKeyState_DpadRight);
 }
+int saveOffset;
 HOOK(void*, __fastcall, Title_UpdateApplication, 0xE7BED0, Sonic::CGameObject* This, void* Edx, float elapsedTime, uint8_t a3)
 {
 	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
+	if (m_spSaveT)
+	{
+		if (inputPtr->IsTapped(Sonic::eKeyState_DpadLeft))
+			saveOffset--;
+		if (inputPtr->IsTapped(Sonic::eKeyState_DpadRight))
+			saveOffset++;
+		uint32_t* point = (uint32_t*)m_spSaveT.get();
+		uint32_t val = *(point + saveOffset);
+		DebugDrawText::log(std::format("SaveFile at {0}: {1}", saveOffset, val).c_str(), 0);
+	}
 	if (canLoad == 1)
 	{
 		if (bg_transition)
@@ -746,8 +760,18 @@ HOOK(int, __fastcall, Title_GetSelectionIndex, 0x0056FBB0, DWORD* This)
 	isInSubmenu = true;
 	return currentTitleIndex;
 }
+
+
+HOOK(void, __fastcall, TitleUI_CGameplayFlowStage_CStateGoalBegin, 0xCFD550, void* This)
+{
+	// Force saving at result screen
+	TitleUI_CTitleOptionCStateOutroSaving(m_spSaveT, nullptr);
+
+	originalTitleUI_CGameplayFlowStage_CStateGoalBegin(This);
+}
 void Title::applyPatches()
 {
+	INSTALL_HOOK(TitleUI_CGameplayFlowStage_CStateGoalBegin);
 	//Set up title screen so that it resembles Unleashed function-wise
 	// //571A25 - cause of crash with direct9ex 11
 	WRITE_JUMP(0x00571FCA, TitleUI_SetCutsceneTimer); //Set title AFK wait amount - it varies depending on framerate
@@ -755,7 +779,7 @@ void Title::applyPatches()
 	//WRITE_JUMP(0x005732C3, TitleUI_SetCustomExecFunctionAdvance); //Override button after-function
 	WRITE_JUMP(0x00572B2E, (void*)0x00572B45); //Disable scroll sound	
 	//Try forcing out loading the world map if the save is invalid
-	WRITE_JUMP(0x0057342B, 0x0057346B);
+	//WRITE_JUMP(0x0057342B, 0x0057346B);
 	//UI
 	INSTALL_HOOK(TitleUI_SetCustomExecFunctionAdvance);
 	INSTALL_HOOK(Title_GetSelectionIndex);
