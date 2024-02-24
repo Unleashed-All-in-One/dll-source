@@ -45,6 +45,7 @@
 #include <Light.h>
 #include "System/DiscordGameSDK/discord.h"
 #include "UnleashedHUDAPI.h"
+#include "ScoreGenerationsAPI/ScoreGenerationsAPI.h"
 
 // Alternative Audio Backend
 #define WITH_MINIAUDIO
@@ -79,6 +80,7 @@
 #include "System/UpdateDirector.h"
 #include "System/SoundController.h"
 #include "System/ImguiInitializer.h"
+#include "System/SaveManager.h"
 
 //Debug Menu
 #include "System/DebugMenu/Context.h"
@@ -101,6 +103,7 @@
 #include "UI/EventViewer.h"
 #include "UI/SubtitleUI.h"
 #include "UI/ItemboxUI.h"
+#include "UI/ETFStageGateUI.h"
 
 //Set objects
 #include "CustomSetObjects/Hintring.h"
@@ -108,6 +111,7 @@
 #include "CustomSetObjects/ETFTimeSwitch.h"
 #include "CustomSetObjects/Paraloop.h"
 #include "CustomSetObjects/SpeedDownCollision.h"
+#include "CustomSetObjects/ETFStageGate.h"
 
 //Rest
 #include "Testing/TestingCode.h"

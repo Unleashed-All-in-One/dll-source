@@ -82,6 +82,7 @@ public:
         boost::shared_ptr<hh::mr::CSingleElement> m_spExampleElement;
 
     boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
+    boost::shared_ptr<Sonic::CAnimationStateMachine> animator;
 
     boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;   
     bool m_playerInsideCollider;

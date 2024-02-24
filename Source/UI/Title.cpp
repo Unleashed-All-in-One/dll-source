@@ -22,8 +22,6 @@ static AudioHandle stageSelectHandle;
 void* TitleStateContextBase;
 
 
-boost::shared_ptr<SaveLoadTestStruct> m_spSaveT;
-FUNCTION_PTR(void, __thiscall, TitleUI_CTitleOptionCStateOutroSaving, 0xD22A70, boost::shared_ptr<SaveLoadTestStruct>& spSave, void* a2);
 void Title::setSubmenu(bool enabled)
 {
 	isInSubmenu = enabled;
@@ -153,6 +151,10 @@ void __declspec(naked) TitleUI_SetCustomExecFunction()
 void OnNewGame()
 {
 	LevelLoadingManager::InStory = true;
+	SaveManager::deleteSave();
+	auto save = SaveManager::getCurrentSave();
+	save->lives = 5;
+	//SaveManager::saveToDisk();
 }
 //void __declspec(naked) TitleUI_SetCustomExecFunctionAdvance()
 //{
@@ -344,8 +346,8 @@ HOOK(void, __fastcall, Title_CMain_CState_SelectMenuBegin, 0x572750, hh::fnd::CS
 	isInSubmenu = false;
 	if (!parsedSave)
 	{
-		uint32_t owner = (uint32_t)(This->GetContextBase());
-		hasSavefile = *(bool*)(owner + 0x1AC);
+		auto saveObject = SaveManager::getCurrentSave(false);
+		hasSavefile = saveObject != nullptr;
 		currentTitleIndex = hasSavefile ? Title::TitleIndexState::Continue : Title::TitleIndexState::New_Game;
 		UpdateTitleText();
 		parsedSave = true;
@@ -504,16 +506,7 @@ int saveOffset;
 HOOK(void*, __fastcall, Title_UpdateApplication, 0xE7BED0, Sonic::CGameObject* This, void* Edx, float elapsedTime, uint8_t a3)
 {
 	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
-	if (m_spSaveT)
-	{
-		if (inputPtr->IsTapped(Sonic::eKeyState_DpadLeft))
-			saveOffset--;
-		if (inputPtr->IsTapped(Sonic::eKeyState_DpadRight))
-			saveOffset++;
-		uint32_t* point = (uint32_t*)m_spSaveT.get();
-		uint32_t val = *(point + saveOffset);
-		DebugDrawText::log(std::format("SaveFile at {0}: {1}", saveOffset, val).c_str(), 0);
-	}
+	
 	if (canLoad == 1)
 	{
 		if (bg_transition)
@@ -762,16 +755,10 @@ HOOK(int, __fastcall, Title_GetSelectionIndex, 0x0056FBB0, DWORD* This)
 }
 
 
-HOOK(void, __fastcall, TitleUI_CGameplayFlowStage_CStateGoalBegin, 0xCFD550, void* This)
-{
-	// Force saving at result screen
-	TitleUI_CTitleOptionCStateOutroSaving(m_spSaveT, nullptr);
-
-	originalTitleUI_CGameplayFlowStage_CStateGoalBegin(This);
-}
 void Title::applyPatches()
 {
-	INSTALL_HOOK(TitleUI_CGameplayFlowStage_CStateGoalBegin);
+	//Disable loading save at the start
+	WRITE_JUMP(0x005724FA, 0x00572501);
 	//Set up title screen so that it resembles Unleashed function-wise
 	// //571A25 - cause of crash with direct9ex 11
 	WRITE_JUMP(0x00571FCA, TitleUI_SetCutsceneTimer); //Set title AFK wait amount - it varies depending on framerate

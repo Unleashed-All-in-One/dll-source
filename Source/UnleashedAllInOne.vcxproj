@@ -120,6 +120,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
   <ItemGroup>
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="CustomSetObjects\DebugObject.cpp" />
+    <ClCompile Include="CustomSetObjects\ETFStageGate.cpp" />
     <ClCompile Include="CustomSetObjects\ETFTimeSwitch.cpp" />
     <ClCompile Include="CustomSetObjects\Hintring.cpp" />
     <ClCompile Include="CustomSetObjects\Paraloop.cpp" />
@@ -180,9 +181,11 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClCompile Include="System\LetterboxHelper.cpp" />
     <ClCompile Include="System\LevelLoadingManager.cpp" />
     <ClCompile Include="System\MiniAudioHelper.cpp" />
+    <ClCompile Include="System\SaveManager.cpp" />
     <ClCompile Include="System\SequenceHelpers.cpp" />
     <ClCompile Include="System\UpdateDirector.cpp" />
     <ClCompile Include="Testing\TestingCode.cpp" />
+    <ClCompile Include="UI\ETFStageGateUI.cpp" />
     <ClCompile Include="UI\EventViewer.cpp" />
     <ClCompile Include="UI\Title.cpp" />
     <ClCompile Include="UI\TitleOption.cpp" />
@@ -192,6 +195,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
   <ItemGroup>
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="CustomSetObjects\DebugObject.h" />
+    <ClInclude Include="CustomSetObjects\ETFStageGate.h" />
     <ClInclude Include="CustomSetObjects\ETFTimeSwitch.h" />
     <ClInclude Include="CustomSetObjects\Hintring.h" />
     <ClInclude Include="CustomSetObjects\Paraloop.h" />
@@ -251,10 +255,12 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClInclude Include="System\LevelLoadingManager.h" />
     <ClInclude Include="System\Light.h" />
     <ClInclude Include="System\MiniAudioHelper.h" />
+    <ClInclude Include="System\SaveManager.h" />
     <ClInclude Include="System\SequenceHelpers.h" />
     <ClInclude Include="System\SoundController.h" />
     <ClInclude Include="System\UpdateDirector.h" />
     <ClInclude Include="Temporary.h" />
+    <ClInclude Include="UI\ETFStageGateUI.h" />
     <ClInclude Include="UI\ItemboxUI.h" />
     <ClInclude Include="UI\SubtitleUI.h" />
     <ClInclude Include="Testing\TestingCode.h" />

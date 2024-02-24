@@ -110,11 +110,15 @@ public:
 class SequenceHelpers
 {
 public:
+
+	static Sonic::Sequence::Story* storySequenceInstance;
+	static void resetStorySequence();
 	static void changeModule(ModuleFlow in_Flow);
 	static void playEvent(const char* in_EventName, ModuleFlow in_EventModule);
 	static void queueEvent(const char* in_EventName);
-	static void loadStage(const char* in_StageName, int sequenceEventExtra = 0);
+	static void loadStage(const char* in_StageName, int sequenceEventExtra = 0, bool resetStorySequence = true);
 	static void setPlayerType(int in_PlayerType);
 	static void applyPatches();
+	static std::string getCurrentStageName(bool withoutNumber);
 	static void update();
 };

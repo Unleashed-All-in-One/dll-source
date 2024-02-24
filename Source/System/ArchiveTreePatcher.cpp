@@ -103,11 +103,12 @@ void ArchiveTreePatcher::applyPatches()
     std::vector<std::string> whiteworld = Configuration::getAllWhiteWorld();
     for (size_t i = 0; i < whiteworld.size(); i++)
     {
-        m_archiveDependencies.push_back(ArchiveDependency("etfdoor", { whiteworld[i] }));
         m_archiveDependencies.push_back(ArchiveDependency("SonicPam", { whiteworld[i] }));      
         m_archiveDependencies.push_back(ArchiveDependency("pam000", { whiteworld[i] }));
         m_archiveDependencies.push_back(ArchiveDependency("StageGate", { whiteworld[i] }));           
     }
+    m_archiveDependencies.push_back(ArchiveDependency("etfdoor", { "cmn100", "cmn200"}));
+    m_archiveDependencies.push_back(ArchiveDependency("StageGateSUC", { "cmn100", "cmn200"}));
     m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighterMykonos", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("SonicEVRoot", { "ev041" }));
     m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighterMykonos", { "cmn100" }));

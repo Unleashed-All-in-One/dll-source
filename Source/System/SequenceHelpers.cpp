@@ -1,4 +1,4 @@
-Sonic::Sequence::Story* storySequenceInstance;
+Sonic::Sequence::Story* SequenceHelpers::storySequenceInstance;
 int nextPlayerType = 0;
 const char* nextStage = nullptr;
 bool test = false;
@@ -58,14 +58,45 @@ void SequenceHelpers::playEvent(const char* in_EventName, ModuleFlow in_EventMod
 	Sonic::Event::EventQueue::ProcessMessage(&message);
 	SequenceHelpers::changeModule(in_EventModule);
 }
+
+std::string SequenceHelpers::getCurrentStageName(bool withoutNumber = false)
+{
+	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
+	char** h = (char**)stageTerrainAddress;
+	std::string returnVal = *h;
+	if (withoutNumber)
+	{
+		returnVal.erase(returnVal.length() - 3);
+	}
+	return returnVal;
+}
+void SequenceHelpers::resetStorySequence()
+{
+	//you have to run this twice. dont ask me why, what works works.
+	FUNCTION_PTR(void, __thiscall, StorySeqProcessStorySequenceEvent, 0x00D76980, Sonic::Sequence::Story * StorySeq, Sonic::Message::MsgStorySequenceEvent * a2);
+
+	auto message2 = Sonic::Message::MsgStorySequenceEvent(0, 0);
+	StorySeqProcessStorySequenceEvent(storySequenceInstance, &message2);
+	StorySeqProcessStorySequenceEvent(storySequenceInstance, &message2);
+}
 /// <summary>
 /// Sends a message to CMainSequence to trigger a stage load.
 /// </summary>
 /// <param name="in_EventName">Stage archive name</param>
-void SequenceHelpers::loadStage(const char* in_StageName, int sequenceEventExtra) 
+void SequenceHelpers::loadStage(const char* in_StageName, int sequenceEventExtra, bool resetStorySequence) 
 {
 	nextStage = allocateStr(in_StageName);
+	//int __thiscall Sonic::Sequence::CStoryImpl::LuanneFunctions::BeginStory(int this, int a2, int a3)
+	//void __thiscall Sonic::Sequence::CStoryImpl::LuanneFunctions::StoryLabel(int this, int a2, int stringComparison)
 	auto message = Sonic::Message::MsgSequenceEvent(2, sequenceEventExtra);
+	auto message2 = Sonic::Message::MsgStorySequenceEvent(0, 0);
+	auto test = Sonic::Sequence::Main::GetInstance();
+	//void __thiscall StorySeqProcessStorySequenceEvent(int storySequence, CMsgStorySequenceEvent *storySequenceEvent)
+
+	if (resetStorySequence)
+	{
+		SequenceHelpers::resetStorySequence();
+	}
 	Sonic::Sequence::Main::ProcessMessage(&message);
 }
 /// <summary>
@@ -95,7 +126,7 @@ HOOK(char, __fastcall, CStoryLua_SetupPlayerForce, 0xD72270, Sonic::Sequence::St
 		a3->entry->content = nextPlayerType;
 		nextPlayerType = -1;
 	}
-	return originalCStoryLua_SetupPlayerForce(storySequenceInstance, Edx, a2, a3);
+	return originalCStoryLua_SetupPlayerForce(SequenceHelpers::storySequenceInstance, Edx, a2, a3);
 }
 HOOK(void, __fastcall, CStoryLua_SetupPlayer, 0xD72360, Sonic::Sequence::Story* StorySequence, void* Edx, int a2, LuaIntegerEntryContainer* a3)
 {
@@ -122,8 +153,8 @@ HOOK(void, __fastcall, CStoryLua_SetupStage, 0x00D71A90, Sonic::Sequence::Story*
 }
 HOOK(Sonic::Sequence::Story*, __fastcall, ConstructStorySequence, 0xD76930)
 {
-	storySequenceInstance = originalConstructStorySequence();
-	return storySequenceInstance;
+	SequenceHelpers::storySequenceInstance = originalConstructStorySequence();
+	return SequenceHelpers::storySequenceInstance;
 }
 void SequenceHelpers::update()
 {

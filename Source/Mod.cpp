@@ -32,6 +32,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	SequenceHelpers::applyPatches();
 	ImguiInitializer::initialize();
 	Context::setModDirectoryPath(getDirectoryPath(modInfo->CurrentMod->Path));
+	SaveManager::applyPatches();
 	//---------------Gameplay---------------
 	QSSRestore::applyPatches();
 	Sweepkick::applyPatches();
@@ -52,6 +53,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	Hintring::registerObject();
 	Paraloop::registerObject();
 	SpeedDownCollision::registerObject();
+	ETFStageGate::registerObject();
 
 	//---------------UI---------------
 	Title::applyPatches();
