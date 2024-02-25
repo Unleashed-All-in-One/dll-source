@@ -14,9 +14,10 @@ static int loadModule(lua_State* L) // Lua callable functions must be this forma
     SequenceHelpers::changeModule((ModuleFlow)num);
     return 0; // how many params we're passing to Lua
 }
-static int setStageToLoad(lua_State* L) // Lua callable functions must be this format
+static int triggerStageLoad(lua_State* L)
 {
-    const char* num = lua_tostring(L, 1); // get first param from stack
+    const char* num = lua_tostring(L, 1);
+    int num = (int)lua_tonumber(L, 2);
     LevelLoadingManager::ActiveReplacement = true;
     LevelLoadingManager::NextLevelLoad = num;
     return 0; // how many params we're passing to Lua
@@ -31,7 +32,7 @@ void LuaManager::initialize()
     luaState = luaL_newstate(); // create a new lua instance
     luaL_openlibs(luaState); // give lua access to basic libraries
     lua_register(luaState, "loadModule", loadModule); // register our C++ function with Lua
-    lua_register(luaState, "setStageToLoad", setStageToLoad); // register our C++ function with Lua
+    lua_register(luaState, "triggerStageLoad", triggerStageLoad); // register our C++ function with Lua
     luaL_dofile(luaState, "main.lua"); // loads the Lua script
     
     // *** call Lua function from C++ ***
