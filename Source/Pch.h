@@ -81,6 +81,7 @@
 #include "System/SoundController.h"
 #include "System/ImguiInitializer.h"
 #include "System/SaveManager.h"
+#include "System/LuaManager.h"
 
 //Debug Menu
 #include "System/DebugMenu/Context.h"
@@ -112,6 +113,7 @@
 #include "CustomSetObjects/Paraloop.h"
 #include "CustomSetObjects/SpeedDownCollision.h"
 #include "CustomSetObjects/ETFStageGate.h"
+#include "CustomSetObjects/MoonMedal.h"
 
 //Rest
 #include "Testing/TestingCode.h"

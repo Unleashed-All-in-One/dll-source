@@ -33,6 +33,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	ImguiInitializer::initialize();
 	Context::setModDirectoryPath(getDirectoryPath(modInfo->CurrentMod->Path));
 	SaveManager::applyPatches();
+	LuaManager::initialize();
 	//---------------Gameplay---------------
 	QSSRestore::applyPatches();
 	Sweepkick::applyPatches();
@@ -54,6 +55,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	Paraloop::registerObject();
 	SpeedDownCollision::registerObject();
 	ETFStageGate::registerObject();
+	MoonMedal::registerObject();
 
 	//---------------UI---------------
 	Title::applyPatches();

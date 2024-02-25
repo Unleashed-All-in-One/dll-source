@@ -58,8 +58,27 @@ public:
         m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
         const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
         auto node = m_spExampleElement->GetNode("ETFdoor_Mark_00");
+        const char* particleName = "stage1";
+        switch (stageType)
+        {
+        case 0:
+        {
+            particleName = "stage1";
+            break;
+        }
+        case 1:
+        {
+            particleName = "stage_night";
+            break;
+        }
+        case 2:
+        {
+            particleName = "stage1";
+            break;
+        }
+        }
         //fpAddParticle2(Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager.get(), handle1, &node, "ef_ch_sng_yh1_spinattack", 1);
-        //Common::fCGlitterCreate(playerContext, handle1, &node, "stage1", 0);
+        Common::fCGlitterCreate(playerContext, handle1, &node, particleName, 0);
         AddRenderable("Object", m_spExampleElement, true);
         DebugDrawText::log("I EXIST!!", 10);
         return true;
@@ -116,7 +135,14 @@ public:
         AddEventCollision("Object", shapeEventTrigger1, *pColID_PlayerEvent, true, m_spNodeEventCollision);
         return true;
     }  
-
+    CQuaternion EulerToQuaternion(CVector euler)
+    {
+        CQuaternion q;
+        q = Eigen::AngleAxisf(euler.x(), Eigen::Vector3f::UnitX())
+            * Eigen::AngleAxisf(euler.y(), Eigen::Vector3f::UnitY())
+            * Eigen::AngleAxisf(euler.z(), Eigen::Vector3f::UnitZ());
+        return q;
+    }
     void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
     {
         auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
@@ -135,6 +161,9 @@ public:
                     containerUI = ETFStageGateUIContainer::Generate(playerContext->m_pPlayer, false, false);
                 containerUI->UpdateState(SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID), actIndex, worldIndex);
                 containerUI->Show();
+                playerContext->m_pPlayer->m_PostureStateMachine.ChangeState("Stop");
+                playerContext->m_spMatrixNode->m_Transform.m_Position = m_spMatrixNodeTransform->m_Transform.m_Position;
+                playerContext->m_spMatrixNode->m_Transform.SetRotation(EulerToQuaternion(Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera()->m_MyCamera.m_Direction));
             }
             else
             {
@@ -146,6 +175,7 @@ public:
                     char** h = (char**)stageTerrainAddress;
                     const char* stageToLoad = stageToLoadS.c_str();
 
+                    LevelLoadingManager::setETFInfo(SequenceHelpers::getCurrentStageName(false));
                     TitleWorldMap::LoadingReplacementEnabled = true;
                     LevelLoadingManager::WhiteWorldEnabled = false;
                     SequenceHelpers::loadStage((SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID)).c_str(), 0);

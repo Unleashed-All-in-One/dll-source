@@ -123,6 +123,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClCompile Include="CustomSetObjects\ETFStageGate.cpp" />
     <ClCompile Include="CustomSetObjects\ETFTimeSwitch.cpp" />
     <ClCompile Include="CustomSetObjects\Hintring.cpp" />
+    <ClCompile Include="CustomSetObjects\MoonMedal.cpp" />
     <ClCompile Include="CustomSetObjects\Paraloop.cpp" />
     <ClCompile Include="CustomSetObjects\SpeedDownCollision.cpp" />
     <ClCompile Include="Functionality\EXP.cpp" />
@@ -180,6 +181,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClCompile Include="System\ImguiInitializer.cpp" />
     <ClCompile Include="System\LetterboxHelper.cpp" />
     <ClCompile Include="System\LevelLoadingManager.cpp" />
+    <ClCompile Include="System\LuaManager.cpp" />
     <ClCompile Include="System\MiniAudioHelper.cpp" />
     <ClCompile Include="System\SaveManager.cpp" />
     <ClCompile Include="System\SequenceHelpers.cpp" />
@@ -198,6 +200,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClInclude Include="CustomSetObjects\ETFStageGate.h" />
     <ClInclude Include="CustomSetObjects\ETFTimeSwitch.h" />
     <ClInclude Include="CustomSetObjects\Hintring.h" />
+    <ClInclude Include="CustomSetObjects\MoonMedal.h" />
     <ClInclude Include="CustomSetObjects\Paraloop.h" />
     <ClInclude Include="CustomSetObjects\SpeedDownCollision.h" />
     <ClInclude Include="Functionality\EXP.h" />
@@ -254,6 +257,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClInclude Include="System\LetterboxHelper.h" />
     <ClInclude Include="System\LevelLoadingManager.h" />
     <ClInclude Include="System\Light.h" />
+    <ClInclude Include="System\LuaManager.h" />
     <ClInclude Include="System\MiniAudioHelper.h" />
     <ClInclude Include="System\SaveManager.h" />
     <ClInclude Include="System\SequenceHelpers.h" />
@@ -277,6 +281,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets" Condition="Exists('packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" />
+    <Import Project="packages\lua.5.4.6\build\native\Lua.targets" Condition="Exists('packages\lua.5.4.6\build\native\Lua.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -284,5 +289,6 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     </PropertyGroup>
     <Error Condition="!Exists('packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets'))" />
     <Error Condition="!Exists('packages\SoLoud-wav.2020.2.7.2\build\native\SoLoud-wav.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\SoLoud-wav.2020.2.7.2\build\native\SoLoud-wav.props'))" />
+    <Error Condition="!Exists('packages\lua.5.4.6\build\native\Lua.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\lua.5.4.6\build\native\Lua.targets'))" />
   </Target>
 </Project>

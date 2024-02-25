@@ -9,6 +9,7 @@ public:
     boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
     boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
 
+    boost::shared_ptr<Hedgehog::Animation::CAnimationPose> animatorTest;
     static HintDataList* hintData;
     bool m_playerInsideCollider;    
     static SubtitleUIContainer* m_HintUI;
@@ -18,15 +19,42 @@ public:
     uint32_t m_HintDataIndex = 0;
     bool m_PlayerStop = true;
     bool m_NeedInput = true;
-    
+    std::vector<NewAnimationData> animations;
+    boost::shared_ptr<Sonic::CAnimationStateMachine> animationStateMachine;
     bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
     {
-        const char* assetName = "cmn_hintring_suc";
+        const char* assetName = "cmn_obj_sk2_hintring";
         hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
         boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
         m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
 
+        animatorTest = boost::make_shared<Hedgehog::Animation::CAnimationPose>(in_spDatabase, assetName);
+
+        animations = std::vector<NewAnimationData>();
+        animations.push_back(NewAnimationData("Appear", "cmn_obj_sk2_hintring_appear", 1, true, nullptr));
+
+        CAnimationStateInfo* pEntries = new CAnimationStateInfo[animations.size()];
+
+        pEntries[0].m_Name = animations[0].m_stateName;
+        pEntries[0].m_FileName = animations[0].m_fileName;
+        pEntries[0].m_Speed = animations[0].m_speed;
+        pEntries[0].m_PlaybackType = !animations[0].m_isLoop;
+        pEntries[0].field10 = 0;
+        pEntries[0].field14 = -1.0f;
+        pEntries[0].field18 = -1.0f;
+        pEntries[0].field1C = 0;
+        pEntries[0].field20 = -1;
+        pEntries[0].field24 = -1;
+        pEntries[0].field28 = -1;
+        pEntries[0].field2C = -1;
+
+        animatorTest->AddAnimationList(pEntries, animations.size());
+        //animationStateMachine = boost::make_shared< Sonic::CAnimationStateMachine>();
+        //auto test = animationStateMachine->GetContext();
+        
         m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
+        //m_spExampleElement->BindAnimationPose(animatorTest);
+        //ChangeState("Appear");
         AddRenderable("Object", m_spExampleElement, true);
         DebugDrawText::log("I EXIST!!", 10);
         return true;

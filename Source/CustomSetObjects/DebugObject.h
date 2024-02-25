@@ -222,7 +222,7 @@ public:
                 m_playerPoleRotationTarget = 4.5f;
             m_playerPoleRotation = Common::lerpUnclampedf(m_playerPoleRotationPrevTarget, m_playerPoleRotationTarget, progress);
             
-            //playerContext->ChangeAnimation("Evilsonic_pillar_idle");
+            playerContext->ChangeAnimation("Evilsonic_pillar_idle");
             playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = true;
             auto playerPos = playerContext->m_spMatrixNode->m_Transform.m_Position;
             auto targetPos = m_spMatrixNodeTransform->m_Transform.m_Position;

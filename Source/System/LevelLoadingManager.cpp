@@ -12,6 +12,8 @@ std::string nextEVSIDCutscene = "ghz100";
 const char* temp_nextStageIDCutscene = "ev011";
 const char* temp_nextEVSIDCutscene = "ghz100";
 bool isMovieCutscene;
+bool enteredStageFromETF;
+std::string etfHubName = "ghz205";
 bool LevelLoadingManager::InStory;
 bool inStoryBefore;
 bool stageEnded;
@@ -55,9 +57,19 @@ void __declspec(naked) sub_00D40070(int skipped, DWORD* a2, Hedgehog::Base::CSha
 		retn
 	}
 }
-bool IsCutsceneMeantForStage(std::string in_String)
+void LevelLoadingManager::setETFInfo(std::string etfHubStageName)
 {
-	return in_String != "evs041" && in_String != "evs121";
+	enteredStageFromETF = true;
+	etfHubName = etfHubStageName;
+}
+void loadCapitalDay(std::string stageName)
+{
+	SequenceHelpers::loadStage(stageName.c_str(), 0, false);
+	TitleWorldMap::LoadingReplacementEnabled = true;
+	LevelLoadingManager::WhiteWorldEnabled = true;
+	//SequenceHelpers::changeModule(ModuleFlow::PlayableMenu);
+	SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
+	DebugDrawText::log(std::format("[LLM] Loading Capital (Day) \"{}\" as {}", stageName, (int)PlayerType::GENERIC_SONIC).c_str(), 5);
 }
 const char* LevelLoadingManager::getStageToLoad()
 {
@@ -131,10 +143,7 @@ void TriggerSequenceEvents(QueueData data)
 	case 2:
 	{
 		//Go to capital (day)
-		SequenceHelpers::loadStage(data.dataName.c_str(), 0, false);
-		TitleWorldMap::LoadingReplacementEnabled = true;
-		LevelLoadingManager::WhiteWorldEnabled = true;
-		//SequenceHelpers::changeModule(ModuleFlow::PlayableMenu);
+		loadCapitalDay(data.dataName);
 		SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
 		DebugDrawText::log(std::format("[LLM] Loading Capital (Day) \"{}\" as {}", data.dataName, (int)PlayerType::GENERIC_SONIC).c_str(), 5);
 		break;
@@ -237,7 +246,9 @@ void SetCorrectStageFromFlag()
 	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 	char** h = (char**)stageTerrainAddress;
 	TitleWorldMap::CamInitialized = false;
-		
+	//LuaManager::onStageLoad();
+
+	strcpy(*(char**)stageTerrainAddress, LevelLoadingManager::NextLevelLoad);
 	if (!LevelLoadingManager::InStory)
 	{		
 		const char* stageToLoad = "ghz200";
@@ -427,8 +438,16 @@ HOOK(void, __fastcall, HudResult_CHudResultAdvance, 0x10B96D0, Sonic::CGameObjec
 	{
 		if (!stageEnded)
 		{
-			SetCorrectStageFromFlag();
-			skipCurrentQueueEvent = true;
+			if (enteredStageFromETF)
+			{
+				loadCapitalDay(etfHubName);
+				enteredStageFromETF = false;
+			}
+			else
+			{
+				SetCorrectStageFromFlag();
+				skipCurrentQueueEvent = true;
+			}
 			//SequenceHelpers::resetStorySequence();
 		}
 		stageEnded = true;

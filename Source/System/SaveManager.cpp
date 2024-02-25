@@ -32,38 +32,45 @@ HOOK(void*, __fastcall, SaveManager_InitializePlayer, 0x00D96110, void* This)
 }
 HOOK(void, __fastcall, SaveManager_CGameplayFlowStage_CStateGoalBegin, 0xCFD550, void* This)
 {
-	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-	char** pointerTerrainID = (char**)stageTerrainAddress;
-	std::string stageID = std::string(*pointerTerrainID);
-	auto saveObj = SaveManager::getCurrentSave();
-	DebugDrawText::log("Saving data for stage...", 10);
-	const size_t liveCountAddr = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x7C, 0x9FDC });
-	saveObj->lives = *(int*)liveCountAddr;
-	int stageDataIndex = saveObj->getStageDataIndexFromID(stageID);
-	if (stageDataIndex == -1)
+	try
 	{
-		saveObj->stageData.push_back(new StageSaveData());
-		stageDataIndex = saveObj->stageData.size() - 1;
-		saveObj->stageData[stageDataIndex]->stageID = stageID;
+		uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
+		char** pointerTerrainID = (char**)stageTerrainAddress;
+		std::string stageID = std::string(*pointerTerrainID);
+		auto saveObj = SaveManager::getCurrentSave();
+		DebugDrawText::log("Saving data for stage...", 10);
+		const size_t liveCountAddr = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x7C, 0x9FDC });
+		saveObj->lives = *(int*)liveCountAddr;
+		int stageDataIndex = saveObj->getStageDataIndexFromID(stageID);
+		if (stageDataIndex == -1)
+		{
+			saveObj->stageData.push_back(new StageSaveData());
+			stageDataIndex = saveObj->stageData.size() - 1;
+			saveObj->stageData[stageDataIndex]->stageID = stageID;
+		}
+		float score = 0;
+		if (GetModuleHandle(TEXT("UnleashedHUD.dll")))
+		{
+			auto stageDataUHUD = UnleashedHUD_API::GetInstance()->GetStageResultData();
+			saveObj->stageData[stageDataIndex]->rank = (StageRank)(int)stageDataUHUD.m_rank;
+			score = stageDataUHUD.m_score;
+		}
+		else if (GetModuleHandle(TEXT("ScoreGenerations.dll")))
+		{
+			score = ScoreGenerationsAPI::GetScore();
+			saveObj->stageData[stageDataIndex]->rank = (StageRank)ScoreGenerationsAPI::GetRank();
+		}
+		if (ScoreGenerationsAPI::IsAttached())
+			saveObj->stageData[stageDataIndex]->timeInSeconds = ScoreGenerationsAPI::GetStatistics().seconds;
+		saveObj->stageData[stageDataIndex]->score = score;
+		SaveManager::saveToDisk();
+		// Force saving at result screen
+		SaveManager_CTitleOptionCStateOutroSaving(m_spSaveT, nullptr);
 	}
-	float score = 0;
-	if (GetModuleHandle(TEXT("UnleashedHUD.dll")))
+	catch (std::exception& e)
 	{
-		auto stageDataUHUD = UnleashedHUD_API::GetInstance()->GetStageResultData();
-		saveObj->stageData[stageDataIndex]->rank = (StageRank)(int)stageDataUHUD.m_rank;
-		score = stageDataUHUD.m_score;
+
 	}
-	else if (GetModuleHandle(TEXT("ScoreGenerations.dll")))
-	{
-		score = ScoreGenerationsAPI::GetScore();
-		saveObj->stageData[stageDataIndex]->rank = (StageRank)ScoreGenerationsAPI::GetRank();
-	}
-	if(ScoreGenerationsAPI::IsAttached())
-		saveObj->stageData[stageDataIndex]->timeInSeconds = ScoreGenerationsAPI::GetStatistics().seconds;
-	saveObj->stageData[stageDataIndex]->score = score;
-	SaveManager::saveToDisk();
-	// Force saving at result screen
-	SaveManager_CTitleOptionCStateOutroSaving(m_spSaveT, nullptr);
 
 	originalSaveManager_CGameplayFlowStage_CStateGoalBegin(This);
 }
