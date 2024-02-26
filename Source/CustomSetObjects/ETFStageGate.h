@@ -176,6 +176,7 @@ public:
                     const char* stageToLoad = stageToLoadS.c_str();
 
                     LevelLoadingManager::setETFInfo(SequenceHelpers::getCurrentStageName(false));
+                    LevelLoadingManager::setGameParameters(SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID), "");
                     TitleWorldMap::LoadingReplacementEnabled = true;
                     LevelLoadingManager::WhiteWorldEnabled = false;
                     SequenceHelpers::loadStage((SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID)).c_str(), 0);

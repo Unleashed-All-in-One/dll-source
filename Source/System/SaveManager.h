@@ -22,6 +22,12 @@ public:
 	float timeInSeconds;
 	StageRank rank;
 };
+class KeyBool
+{
+public:
+	std::string keyName;
+	bool keyValue;
+};
 class SaveObject
 {
 public:
@@ -31,6 +37,7 @@ public:
 	int moonMedalAcquired;
 	int sunMedalAcquired;
 	std::vector<StageSaveData*> stageData;
+	std::vector<KeyBool*> keysBool;
 	int getStageDataIndexFromID(std::string stageID)
 	{
 		//oh linq... i miss you...
@@ -39,6 +46,29 @@ public:
 			if (stageID == stageData.at(i)->stageID)
 			{
 				return i;
+			}
+		}
+		return -1;
+	}
+	bool hasStageBeenPlayedBeforeFromID(std::string stageID)
+	{
+		//oh linq... i miss you...
+		for (size_t i = 0; i < stageData.size(); i++)
+		{
+			if (stageID == stageData.at(i)->stageID)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	bool getSaveBoolKeyValue(std::string keyName)
+	{
+		for (size_t i = 0; i < keysBool.size(); i++)
+		{
+			if (keyName == keysBool.at(i)->keyName)
+			{
+				return keysBool.at(i)->keyValue;
 			}
 		}
 		return -1;
@@ -112,7 +142,17 @@ public:
 
 			stageData.append(stageObj);
 		}
+
+		Json::Value keysData(Json::arrayValue);
+		for (const auto& keys : save->keysBool)
+		{
+			Json::Value keysObj;
+			keysObj["keyName"] = keys->keyName;
+			keysObj["keyValue"] = keys->keyValue;
+			keysData.append(keysObj);
+		}
 		root["stageData"] = stageData;
+		root["keyDataBool"] = keysData;
 
 		std::ofstream outputFile(SAVE_FILE_NAME);
 		if (outputFile.is_open())
@@ -153,6 +193,7 @@ public:
 		for (const auto& stage : stageData) {
 			StageSaveData stageSaveData;
 			stageSaveData.score = stage["score"].asInt();
+			stageSaveData.stageID = stage["stageID"].asCString();
 			stageSaveData.moonMedalMax = stage["moonMedalMax"].asInt();
 			stageSaveData.sunMedalMax = stage["sunMedalMax"].asInt();
 			stageSaveData.sunMedalCount = stage["sunMedalCount"].asInt();
@@ -191,6 +232,13 @@ public:
 			}
 
 			save->stageData.push_back(&stageSaveData);
+		}
+		Json::Value keysData = root["keyDataBool"];
+		for (const auto& keyData : keysData) {
+
+			KeyBool keyBoolNew;
+			keyBoolNew.keyName = keyData["keyName"].asString();
+			keyBoolNew.keyValue = keyData["keyValue"].asBool();
 		}
 
 		inputFile.close();

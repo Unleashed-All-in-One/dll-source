@@ -92,7 +92,10 @@ void SequenceHelpers::loadStage(const char* in_StageName, int sequenceEventExtra
 	auto message2 = Sonic::Message::MsgStorySequenceEvent(0, 0);
 	auto test = Sonic::Sequence::Main::GetInstance();
 	//void __thiscall StorySeqProcessStorySequenceEvent(int storySequence, CMsgStorySequenceEvent *storySequenceEvent)
-
+	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
+	char** h = (char**)stageTerrainAddress;
+	const char* terr = *h;
+	strcpy(*(char**)stageTerrainAddress, in_StageName);
 	if (resetStorySequence)
 	{
 		SequenceHelpers::resetStorySequence();
