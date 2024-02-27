@@ -28,9 +28,9 @@ static int triggerMovieLoad(lua_State* L)
 {
     const char* evsID = lua_tostring(L, 1);
     const char* stageID = lua_tostring(L, 2);
-    int stageType = (int)lua_tonumber(L, 3);
+    int playerType = (int)lua_tonumber(L, 3);
+    int stageType = (int)lua_tonumber(L, 4);
     LevelLoadingManager::setGameParameters(stageID, evsID);
-    SequenceHelpers::setPlayerType(0);
     LevelLoadingManager::triggerSequenceEvents(4 + stageType);
     return 0; // how many params we're passing to Lua
 }
@@ -80,6 +80,11 @@ void LuaManager::onStageLoad()
 {
     lua_getglobal(luaState, "OnStageLoad"); // find the Lua function
     lua_pcall(luaState, 0, 0, 0); 
+}
+void LuaManager::onStageEnd()
+{
+    lua_getglobal(luaState, "OnStageEnd"); // find the Lua function
+    lua_pcall(luaState, 0, 0, 0); // call the function passing 2 params
 }
 
 void LuaManager::initialize()

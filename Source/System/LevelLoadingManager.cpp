@@ -48,6 +48,7 @@ void LevelLoadingManager::setGameParameters(std::string stageID, std::string evs
 void LevelLoadingManager::setETFInfo(std::string etfHubStageName)
 {
 	LevelLoadingManager::enteredStageFromETF = true;
+	skipCurrentQueueEvent = false;
 	etfHubName = etfHubStageName;
 }
 void loadCapital(std::string stageName, bool isWerehog)
@@ -262,13 +263,20 @@ void SetCorrectStageFromFlag()
 		strcpy(*(char**)stageTerrainAddress, stageToLoad);
 	}
 	else
-	{		
-		if(!skipCurrentQueueEvent)
-		LuaManager::onStageLoad();
+	{
 		if (LevelLoadingManager::enteredStageFromETF)
 		{
 			strcpy(*(char**)stageTerrainAddress, LevelLoadingManager::nextStageID.c_str());
+			//LevelLoadingManager::enteredStageFromETF = false;
+		}
+		if (!skipCurrentQueueEvent)
+		{
+			LuaManager::onStageLoad();
+		}
+		else
+		{
 			LevelLoadingManager::enteredStageFromETF = false;
+			skipCurrentQueueEvent = false;
 		}
 		//if (LevelLoadingManager::LastSavedQueueIndex == -1)
 		//{
@@ -423,7 +431,18 @@ HOOK(void, __fastcall, HudResult_CHudResultAdvance, 0x10B96D0, Sonic::CGameObjec
 		{
 			if (LevelLoadingManager::enteredStageFromETF)
 			{
-				loadCapital(etfHubName, 0);
+				std::string stageBef = LevelLoadingManager::nextStageID.c_str();
+				std::string evsBef = LevelLoadingManager::nextEvsID.c_str();
+				LuaManager::onStageEnd();
+				if (LevelLoadingManager::nextStageID == stageBef && LevelLoadingManager::nextEvsID == evsBef)
+				{
+					loadCapital(etfHubName, 0);
+					skipCurrentQueueEvent = false;
+				}
+				else
+				{
+					LevelLoadingManager::enteredStageFromETF = false;
+				}
 			}
 			else
 			{

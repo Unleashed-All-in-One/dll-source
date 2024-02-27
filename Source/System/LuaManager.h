@@ -10,4 +10,5 @@ public:
 	static lua_State* luaState;
 	static void initialize();
 	static void onStageLoad();
+	static void onStageEnd();
 };
