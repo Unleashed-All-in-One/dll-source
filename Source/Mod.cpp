@@ -20,14 +20,18 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 
 	// Set random seed
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
-
+	std::string path =  std::string(modInfo->CurrentMod->Path);
+	path = path.substr(0, path.find_last_of("/\\"));
+	WRITE_JUMP(0x00E13ECF, 0x00E13EDF);
+	//Patch out a weird check for the results music
+	WRITE_JUMP(0x00CFD472, 0x00CFD492);
 	//---------------System---------------
 	LevelLoadingManager::initialize();
 	ArchiveTreePatcher::applyPatches();
 	AnimationSetPatcher::applyPatches();
 	EnemyTrigger::applyPatches();
 	LetterboxHelper::initialize(1280, 720);
-	MiniAudioHelper::initialize(modInfo->CurrentMod->Path);
+	MiniAudioHelper::initialize(path.c_str());
 	DiscordStatus::initialize();
 	SequenceHelpers::applyPatches();
 	ImguiInitializer::initialize();

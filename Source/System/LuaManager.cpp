@@ -20,8 +20,8 @@ static int triggerStageLoad(lua_State* L)
     int playerID = (int)lua_tonumber(L, 2);
     int stageType = (int)lua_tonumber(L, 3);
     LevelLoadingManager::setGameParameters(stageID, "");
-    SequenceHelpers::setPlayerType(playerID);
-    LevelLoadingManager::triggerSequenceEvents(stageType);
+    LevelLoadingManager::triggerSequenceEvents(stageType, true);
+    SequenceHelpers::setPlayerType(playerID, true);
     return 0; // how many params we're passing to Lua
 }
 static int triggerMovieLoad(lua_State* L)
@@ -31,7 +31,8 @@ static int triggerMovieLoad(lua_State* L)
     int playerType = (int)lua_tonumber(L, 3);
     int stageType = (int)lua_tonumber(L, 4);
     LevelLoadingManager::setGameParameters(stageID, evsID);
-    LevelLoadingManager::triggerSequenceEvents(4 + stageType);
+    LevelLoadingManager::triggerSequenceEvents(4 + stageType, true);
+    SequenceHelpers::setPlayerType(playerType, true);
     return 0; // how many params we're passing to Lua
 }
 static int setDefaultStage(lua_State* L)

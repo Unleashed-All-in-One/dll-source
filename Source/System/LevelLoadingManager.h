@@ -22,8 +22,8 @@ class LevelLoadingManager
 {
 
 public:
-	static void triggerSequenceEvents(int type);
-	static std::string nextStageID ;
+	static void triggerSequenceEvents(int type, bool dontSetPlayerType);
+	static std::string nextStageID;
 	static std::string nextEvsID;
 	static void setGameParameters(std::string stageID, std::string evsID);
 	static const char* NextLevelLoad;

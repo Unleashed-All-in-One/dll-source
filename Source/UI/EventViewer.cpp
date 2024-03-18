@@ -1,3 +1,97 @@
+#include <rapidxml/rapidxml_utils.hpp>
+
+using namespace rapidxml;
+
+class Resource {
+public:
+	int id;
+	std::string type;
+	std::string fileName;
+	std::string cueName;
+
+	Resource(int id, const std::string& type, const std::string& fileName, const std::string& cueName)
+		: id(id), type(type), fileName(fileName), cueName(cueName) {}
+};
+
+class Trigger {
+public:
+	float resourceID;
+	float startFrame;
+	float endFrame;
+
+	Trigger(float resourceID, float startFrame, float endFrame)
+		: resourceID(resourceID), startFrame(startFrame), endFrame(endFrame) {}
+};
+
+class InspireResource {
+public:
+	std::string fileVersion;
+	int startFrame;
+	int endFrame;
+	bool isFixFrame;
+	std::string matrix;
+	std::vector<Resource> resources;
+	std::vector<Trigger> triggers;
+
+	InspireResource(const char* filePath) {
+		// Load the XML file
+		file<> xmlFile(filePath);
+		xml_document<> doc;
+		doc.parse<0>(xmlFile.data());
+
+		// Access the root node
+		xml_node<>* root = doc.first_node("InspireResource");
+
+		// Parse VersionInfo
+		xml_node<>* versionInfoNode = root->first_node("VersionInfo");
+		fileVersion = versionInfoNode->first_node("FileVersion")->value();
+
+		// Parse ProjectInfo
+		xml_node<>* projectInfoNode = root->first_node("ProjectInfo");
+		startFrame = std::stoi(projectInfoNode->first_node("StartFrame")->value());
+		endFrame = std::stoi(projectInfoNode->first_node("EndFrame")->value());
+		isFixFrame = std::string(projectInfoNode->first_node("IsFixFrame")->value()) == "True";
+
+		// Parse TerrainInfo
+		xml_node<>* terrainInfoNode = root->first_node("TerrainInfo");
+		matrix = terrainInfoNode->first_node("Matrix")->value();
+
+		// Parse ResourceInfo
+		xml_node<>* resourceInfoNode = root->first_node("ResourceInfo");
+		for (xml_node<>* resourceNode = resourceInfoNode->first_node("Resource"); resourceNode; resourceNode = resourceNode->next_sibling()) {
+			int id = std::stoi(resourceNode->first_node("ID")->value());
+			std::string type = resourceNode->first_node("Type")->value();
+			std::string fileName = resourceNode->first_node("Param")->first_node("FileName")->value();
+			std::string cueName = resourceNode->first_node("Param")->first_node("CueName")->value();
+			resources.emplace_back(id, type, fileName, cueName);
+		}
+
+		// Parse TriggerInfo
+		xml_node<>* triggerInfoNode = root->first_node("TriggerInfo");
+		for (xml_node<>* triggerNode = triggerInfoNode->first_node("Trigger"); triggerNode; triggerNode = triggerNode->next_sibling()) {
+			float resourceID = std::stof(triggerNode->first_node("ResourceID")->value());
+			float start = std::stof(triggerNode->first_node("Frame")->first_node("Start")->value());
+			float end = std::stof(triggerNode->first_node("Frame")->first_node("End")->value());
+			triggers.emplace_back(resourceID, start, end);
+		}
+	}
+	Trigger findTriggersForResource(int resourceID) 
+	{
+		for (const auto& trigger : triggers) {
+			if (trigger.resourceID == resourceID) {
+				return trigger;
+			}
+		}
+		return Trigger(-1, -1, -1);
+	}
+};
+
+
+
+
+
+
+
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcNewUi;
 Chao::CSD::RCPtr<Chao::CSD::CScene> basicSceneTemplate;
 boost::shared_ptr<Sonic::CGameObjectCSD> spNewUi;
@@ -49,12 +143,12 @@ void EventViewer::update()
 	{
 		if (isGoingToSkip)
 		{
-			if (UnleashedHUD_API::IsLoadingFadeoutCompleted())
-			{
+			//if (UnleashedHUD_API::IsLoadingFadeoutCompleted())
+			//{
 				//LevelLoadingManager::setCorrectStage();
 				isGoingToSkip = false;
 				objecttt[77] = 2;
-			}
+			//}
 		}
 	}
 }
@@ -69,10 +163,53 @@ HOOK(char, __fastcall, sub_10FE9E0, 0x10FE9E0, void* This, void* Edx, DWORD* a1,
 	isInEventViewer = true;
 	return originalsub_10FE9E0(This, Edx, a1,a2);
 }
+float frame = 0;
+bool doCount = true;
+InspireResource* resource;
+Trigger* nextTrigger;
+AudioHandle soundhandle;
+int currentEventIndex = 0;
+HOOK(void, __fastcall, EventUpdate, 0x00B24A40, Sonic::CGameObject* This, void* Edx, const hh::fnd::SUpdateInfo& in_rUpdateInfo)
+{
+	doCount = !doCount;
+	if (doCount)
+		frame += 1;
+	if (resource == nullptr)
+	{
+		return originalEventUpdate(This, Edx, in_rUpdateInfo);
+	}
+	for (size_t i = currentEventIndex; i < resource->triggers.size(); i++)
+	{
+		if (frame >= resource->triggers[i].startFrame)
+		{
+
+			MiniAudioHelper::playSound(soundhandle, 0, resource->resources[currentEventIndex].cueName, false, true);
+			DebugDrawText::log(std::format("PLAYSOUND: {0}", resource->resources[currentEventIndex].cueName).c_str(), 5);
+			const char* in_Name = resource->resources[currentEventIndex].cueName.c_str();
+			
+			currentEventIndex++;
+		}
+	}
+	
+	DebugDrawText::log(std::format("EVENT_FRAME CUSTOM: {0}", frame).c_str(), 0);
+	return originalEventUpdate(This, Edx, in_rUpdateInfo);
+}
+HOOK(long, __fastcall, sub_B1ECF0, 0xB1ECF0, int This, void* Edx, int a2, int a3, int _38)
+{
+	frame = 0;
+	doCount = true;
+	resource = new InspireResource("G:\\Steam\\steamapps\\common\\Sonic Generations\\mods\\UnleashedTitlescreenGens\\evrt_m1_01_voice_English.inspire_resource.xml");
+
+	return originalsub_B1ECF0(This, Edx, a2, a3, _38);
+}
+//
+//Sonic::CEventScene::UpdateSerial(_DWORD *this, float *a2)
 //char __thiscall sub_10FE9E0(void *this, DWORD *a1, int a2)
 void EventViewer::applyPatches()
 {
 	INSTALL_HOOK(CreateBTNSKip);
+	INSTALL_HOOK(EventUpdate);
+	INSTALL_HOOK(sub_B1ECF0);
 	INSTALL_HOOK(sub_10fe500);
 	INSTALL_HOOK(sub_10FE9E0);
 	//WRITE_JUMP(0x00B21AD0, InterceptProject);

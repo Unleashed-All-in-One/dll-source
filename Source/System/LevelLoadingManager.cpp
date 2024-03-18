@@ -106,7 +106,7 @@ void LevelLoadingManager::forcePlayCutscene(std::string in_EventName, std::strin
 	//const char* stageToLoad = in_StageName.c_str();
 	//strcpy(*(char**)stageTerrainAddress, stageToLoad);
 }
-void LevelLoadingManager::triggerSequenceEvents(int type)
+void LevelLoadingManager::triggerSequenceEvents(int type, bool dontSetPlayerType)
 {
 	switch (type)
 	{
@@ -114,7 +114,8 @@ void LevelLoadingManager::triggerSequenceEvents(int type)
 	{
 		//Play stage (day)
 		SequenceHelpers::loadStage(LevelLoadingManager::nextStageID.c_str(), 0, false);
-		SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
+		if(!dontSetPlayerType)
+			SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
 		LevelLoadingManager::WhiteWorldEnabled = 0;
 		DebugDrawText::log(std::format("[LLM] Loading Stage (Day) \"{}\" as {}",LevelLoadingManager::nextStageID, (int)PlayerType::GENERIC_SONIC).c_str(), 5);
 		break;
@@ -123,6 +124,7 @@ void LevelLoadingManager::triggerSequenceEvents(int type)
 	{
 		//Play stage (night)
 		SequenceHelpers::loadStage(LevelLoadingManager::nextStageID.c_str(), 0, false);
+		if (!dontSetPlayerType)
 		SequenceHelpers::setPlayerType(PlayerType::CLASSIC_SONIC);
 		LevelLoadingManager::WhiteWorldEnabled = 0;
 		DebugDrawText::log(std::format("[LLM] Loading Stage (Night) \"{}\" as {}", LevelLoadingManager::nextStageID, (int)PlayerType::CLASSIC_SONIC).c_str(), 5);
@@ -132,6 +134,7 @@ void LevelLoadingManager::triggerSequenceEvents(int type)
 	{
 		//Go to capital (day)
 		loadCapital(LevelLoadingManager::nextStageID, 0);
+		if (!dontSetPlayerType)
 		SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
 		break;
 	}
@@ -139,13 +142,14 @@ void LevelLoadingManager::triggerSequenceEvents(int type)
 	{
 		//Go to capital (day)
 		loadCapital(LevelLoadingManager::nextStageID, 1);
+		if (!dontSetPlayerType)
 		SequenceHelpers::setPlayerType(PlayerType::CLASSIC_SONIC);
 		break;
 	}
 	case 4:
 	{
 		SequenceHelpers::playEvent(LevelLoadingManager::nextEvsID.c_str(), ModuleFlow::Event);
-
+		if (!dontSetPlayerType)
 		SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
 		auto message = Sonic::Message::MsgSequenceEvent(5, 0);
 		Sonic::Sequence::Main::ProcessMessage(&message);
@@ -166,11 +170,11 @@ void LevelLoadingManager::triggerSequenceEvents(int type)
 		PlayEventLuanne(SequenceHelpers::storySequenceInstance, 0, playEventRequest);
 
 		isMovieCutscene = true;
-		SequenceHelpers::setPlayerType(0);
 		//SequenceHelpers::resetStorySequence();
 		auto message1 = Sonic::Message::MsgSequenceEvent(0, 7);
 		SequenceHelpers::changeModule(ModuleFlow::Event);
 		Sonic::Sequence::Main::ProcessMessage(&message1);
+		//SequenceHelpers::setPlayerType(0);
 		uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 		char** h = (char**)stageTerrainAddress;
 		const char* stageToLoad = LevelLoadingManager::nextStageID.c_str();
@@ -423,32 +427,38 @@ void LevelLoadingManager::setCorrectStage()
 {
 	SetCorrectStageFromFlag();
 }
+//int __thiscall CalledOnResultEnd(CTempState *this)
+HOOK(int, __fastcall, CalledOnResultEnd, 0x00CFB300, void* This, void* Edx)
+{
+	if (LevelLoadingManager::enteredStageFromETF)
+	{
+		std::string stageBef = LevelLoadingManager::nextStageID.c_str();
+		std::string evsBef = LevelLoadingManager::nextEvsID.c_str();
+		LuaManager::onStageEnd();
+		if (LevelLoadingManager::nextStageID == stageBef && LevelLoadingManager::nextEvsID == evsBef)
+		{
+			loadCapital(etfHubName, 0);
+			skipCurrentQueueEvent = false;
+		}
+		else
+		{
+			LevelLoadingManager::enteredStageFromETF = false;
+		}
+	}
+	else
+	{
+		SetCorrectStageFromFlag();
+		skipCurrentQueueEvent = true;
+	}
+	return 0;
+}
 HOOK(void, __fastcall, HudResult_CHudResultAdvance, 0x10B96D0, Sonic::CGameObject* This, void* Edx, const hh::fnd::SUpdateInfo& in_rUpdateInfo)
 {	
 	if (*(uint32_t*)0x10B96E6 != 0xFFD285E8)
 	{
 		if (!stageEnded)
 		{
-			if (LevelLoadingManager::enteredStageFromETF)
-			{
-				std::string stageBef = LevelLoadingManager::nextStageID.c_str();
-				std::string evsBef = LevelLoadingManager::nextEvsID.c_str();
-				LuaManager::onStageEnd();
-				if (LevelLoadingManager::nextStageID == stageBef && LevelLoadingManager::nextEvsID == evsBef)
-				{
-					loadCapital(etfHubName, 0);
-					skipCurrentQueueEvent = false;
-				}
-				else
-				{
-					LevelLoadingManager::enteredStageFromETF = false;
-				}
-			}
-			else
-			{
-				SetCorrectStageFromFlag();
-				skipCurrentQueueEvent = true;
-			}
+			
 			//SequenceHelpers::resetStorySequence();
 		}
 		stageEnded = true;
@@ -575,6 +585,28 @@ HOOK(void*, __fastcall, sub_B1ECF0, 0xB1ECF0, int* This, void* Edx, int a2, int 
 	skipCurrentQueueEvent = true;
 	return originalsub_B1ECF0(This, Edx, a2, a3, a4);
 }
+extern "C" __declspec(dllexport) int API_GetLoadingScreenMotionIndex()
+{
+	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
+	char** h = (char**)stageTerrainAddress;
+	std::string stageIDName = *h;
+	std::unordered_map<std::string, int> stageMap = {
+		{"ghz", 0}, {"cpz", 2}, {"ssz", 4}, {"sph", 6},
+		{"cte", 8}, {"ssh", 10}, {"csc", 12}, {"euc", 14},
+		{"pla", 16}
+	};
+
+	// if the stage id is not any of the stages, return the mono pic
+	if (stageMap.find(stageIDName.substr(0, 3)) == stageMap.end()) {
+		return 18;
+	}
+
+	std::string prefix = stageIDName.substr(0, 3);
+	int indexOffset = (stageIDName[3] == '2') ? 1 : 0; // add 1 if its werehog
+	std::string numberPart = stageIDName.substr(3 + indexOffset, 3);
+
+	return stageMap[prefix] + indexOffset;
+}
 void LevelLoadingManager::initialize()
 {
 	WRITE_JUMP(0xD56CCA, SetCorrectTerrainForMission_ASM);
@@ -590,11 +622,12 @@ void LevelLoadingManager::initialize()
 	////dont spawn button ui
 	//WRITE_JUMP(0x00B21CF5, 0x00B21CF3);
 	//INSTALL_HOOK(GetEventIndex);
+	INSTALL_HOOK(CalledOnResultEnd);
 	INSTALL_HOOK(sub_B1ECF0);
 	INSTALL_HOOK(CEventScene_OnEnd);
 	INSTALL_HOOK(HudLoading_CHudLoadingCStateOutroBegin);
 	INSTALL_HOOK(CHudGateMenuMainCStateOutroBegin);
-	INSTALL_HOOK(HudResult_CHudResultAdvance);
+	//INSTALL_HOOK(HudResult_CHudResultAdvance);
 	INSTALL_HOOK(LoadPamSettings);
 	INSTALL_HOOK(ConstructStorySequence);
 }

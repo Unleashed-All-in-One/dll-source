@@ -41,6 +41,7 @@
 #include <tweeny-3.2.0.h>
 #include <INIReader.h>
 #include <json/json.h>
+#include <rapidxml/rapidxml.hpp>
 #include <Helpers.h>
 #include <Light.h>
 #include "System/DiscordGameSDK/discord.h"
@@ -70,6 +71,7 @@
 #include "Gameplay/Pole.h"
 
 //System
+#include "System/PhysicsObject.h"
 #include "System/LevelLoadingManager.h"
 #include "System/DiscordStatus.h"
 #include "System/AnimationSetPatcher.h"

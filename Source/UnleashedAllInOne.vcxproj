@@ -259,6 +259,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClInclude Include="System\Light.h" />
     <ClInclude Include="System\LuaManager.h" />
     <ClInclude Include="System\MiniAudioHelper.h" />
+    <ClInclude Include="System\PhysicsObject.h" />
     <ClInclude Include="System\SaveManager.h" />
     <ClInclude Include="System\SequenceHelpers.h" />
     <ClInclude Include="System\SoundController.h" />
@@ -282,6 +283,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets" Condition="Exists('packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" />
     <Import Project="packages\lua.5.4.6\build\native\Lua.targets" Condition="Exists('packages\lua.5.4.6\build\native\Lua.targets')" />
+    <Import Project="packages\rapidxml.1.13\build\native\rapidxml.targets" Condition="Exists('packages\rapidxml.1.13\build\native\rapidxml.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -290,5 +292,6 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <Error Condition="!Exists('packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets'))" />
     <Error Condition="!Exists('packages\SoLoud-wav.2020.2.7.2\build\native\SoLoud-wav.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\SoLoud-wav.2020.2.7.2\build\native\SoLoud-wav.props'))" />
     <Error Condition="!Exists('packages\lua.5.4.6\build\native\Lua.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\lua.5.4.6\build\native\Lua.targets'))" />
+    <Error Condition="!Exists('packages\rapidxml.1.13\build\native\rapidxml.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\rapidxml.1.13\build\native\rapidxml.targets'))" />
   </Target>
 </Project>
