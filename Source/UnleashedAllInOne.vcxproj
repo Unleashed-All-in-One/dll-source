@@ -196,6 +196,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Configuration.h" />
+    <ClInclude Include="CustomSetObjects\DebugEnemy.h" />
     <ClInclude Include="CustomSetObjects\DebugObject.h" />
     <ClInclude Include="CustomSetObjects\ETFStageGate.h" />
     <ClInclude Include="CustomSetObjects\ETFTimeSwitch.h" />

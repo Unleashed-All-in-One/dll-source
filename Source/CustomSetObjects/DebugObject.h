@@ -131,10 +131,26 @@ public:
                 }
                 return true;
             }
+            if (std::strstr(in_rMsg.GetType(), "MsgGetHomingAttackPriority") != nullptr)
+            {
+                const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
+
+                Sonic::Message::MsgGetHomingAttackPriority& msg = (Sonic::Message::MsgGetHomingAttackPriority&)(in_rMsg);
+                *msg.m_pPriority = 0;
+                return true;
+            }
             if (std::strstr(in_rMsg.GetType(), "MsgSetPosition") != nullptr)
             {
                 Sonic::Message::MsgSetPosition& msg = (Sonic::Message::MsgSetPosition&)(in_rMsg);
                 m_spMatrixNodeTransform->m_Transform.m_Position = msg.m_Position;
+                return true;
+            }
+            if (std::strstr(in_rMsg.GetType(), "MsgGetHomingAttackPosition") != nullptr)
+            {
+                const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
+
+                Sonic::Message::MsgGetHomingAttackPosition& msg = (Sonic::Message::MsgGetHomingAttackPosition&)(in_rMsg);
+                *msg.m_pPosition = playerContext->m_spMatrixNode->m_Transform.m_Position;
                 return true;
             }
         }

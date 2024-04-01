@@ -45,6 +45,10 @@ void LevelLoadingManager::setGameParameters(std::string stageID, std::string evs
 	*evsIDLoc = evsID.c_str();
 	*stageIDLoc = stageID.c_str();
 }
+std::string LevelLoadingManager::getEventID()
+{
+	return nextEvsID;
+}
 void LevelLoadingManager::setETFInfo(std::string etfHubStageName)
 {
 	LevelLoadingManager::enteredStageFromETF = true;

@@ -38,6 +38,7 @@ public:
 	static void update();
 	static void setETFInfo(std::string etfHubStageName);
 	static void initialize();
+	static std::string getEventID();
 	static const char* getStageToLoad();
 	static void setCorrectStage();
 };

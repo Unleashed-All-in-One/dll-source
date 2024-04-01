@@ -196,10 +196,10 @@ HOOK(void, __fastcall, EventUpdate, 0x00B24A40, Sonic::CGameObject* This, void* 
 }
 HOOK(long, __fastcall, sub_B1ECF0, 0xB1ECF0, int This, void* Edx, int a2, int a3, int _38)
 {
-	frame = 0;
-	doCount = true;
-	resource = new InspireResource("G:\\Steam\\steamapps\\common\\Sonic Generations\\mods\\UnleashedTitlescreenGens\\evrt_m1_01_voice_English.inspire_resource.xml");
-
+	//frame = 0;
+	//doCount = true;
+	//resource = new InspireResource(std::format("G:\\Steam\\steamapps\\common\\Sonic Generations\\mods\\UnleashedTitlescreenGens\\{0}_voice_English.inspire_resource.xml", LevelLoadingManager::getEventID()).c_str());
+	//currentEventIndex = 0;
 	return originalsub_B1ECF0(This, Edx, a2, a3, _38);
 }
 //

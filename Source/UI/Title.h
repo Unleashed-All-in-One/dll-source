@@ -19,7 +19,7 @@ public:
 	static void ShowWindow(const char* text);
 	static void HideWindow();
 	static void update();
-	static void showTransition();
+	static void showTransition(bool enableLoad);
 	static bool inWorldMap;
 	static bool inInstall;
 

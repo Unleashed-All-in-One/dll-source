@@ -94,11 +94,12 @@ void ShowInstallScreen()
 	Sonic::CGameDocument::GetInstance()->AddGameObject(spDebugMenu);
 	TitleWorldMap::LoadingReplacementEnabled = false;
 }
-void Title::showTransition()
+void Title::showTransition(bool enableLoad)
 {
 	bg_transition->SetHideFlag(false);
 	CSDCommon::PlayAnimation(*bg_transition, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 	PlayTitleBGM(TitleStateContextBase, "");
+	if(enableLoad)
 	canLoad = 1;
 }
 void __declspec(naked) TitleUI_SetCustomExecFunction()
@@ -150,10 +151,12 @@ void __declspec(naked) TitleUI_SetCustomExecFunction()
 }
 void OnNewGame()
 {
+	Title::showTransition(false);
 	LevelLoadingManager::InStory = true;
 	SaveManager::deleteSave();
 	auto save = SaveManager::getCurrentSave();
 	save->lives = 5;
+	UnleashedHUD_API::StartFadeout();
 	//SaveManager::saveToDisk();
 }
 //void __declspec(naked) TitleUI_SetCustomExecFunctionAdvance()
@@ -365,7 +368,12 @@ HOOK(int, __fastcall, Title_CMain, 0x0056FBE0, Sonic::CGameObject* This, void* E
 	rcTitleScreenLogos = spCsdProjectLogos->m_rcProject;
 	Title::inInstall = false;
 	char buffer[8];
-	sprintf(buffer, "title_%d", Configuration::logoType == 0 ? 1 : Configuration::logoType + 1);
+	//LogoType
+	//0: Conversion
+	//1: USA
+	//2: JPN
+	//3: Generations Demo
+	sprintf(buffer, "title_%d", Configuration::logoType == 0 || Configuration::logoType == 1 ? 1 : Configuration::logoType);
 	rcTitleLogo_1 = rcTitleScreenLogos->CreateScene(buffer);
 
 	
@@ -721,6 +729,7 @@ HOOK(void, __fastcall, TitleUI_SetCustomExecFunctionAdvance, 0x005732A0, DWORD* 
 {
 	DWORD* v2 = (DWORD*)This[2];
 	//This calls Title_GetSelectionIndex
+	*((byte*)v2 + 429) = 1;
 	int i = (*(int (__thiscall **)(DWORD *))(*v2 + 56))(v2);
 	switch (currentTitleIndex)
 	{
@@ -759,6 +768,9 @@ void Title::applyPatches()
 {
 	//Disable loading save at the start
 	WRITE_JUMP(0x005724FA, 0x00572501);
+
+	//Should remove the hints options screen from New Game
+	//WRITE_JUMP(0x005733D5, 0x005733D7);
 	//Set up title screen so that it resembles Unleashed function-wise
 	// //571A25 - cause of crash with direct9ex 11
 	WRITE_JUMP(0x00571FCA, TitleUI_SetCutsceneTimer); //Set title AFK wait amount - it varies depending on framerate
