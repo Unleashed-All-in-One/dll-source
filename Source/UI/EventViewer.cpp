@@ -22,7 +22,13 @@ public:
 	Trigger(float resourceID, float startFrame, float endFrame)
 		: resourceID(resourceID), startFrame(startFrame), endFrame(endFrame) {}
 };
-
+struct InspireResourceTriggerSort
+{
+	inline bool operator() (const Trigger& struct1, const Trigger& struct2)
+	{
+		return (struct1.startFrame < struct2.startFrame);
+	}
+};
 class InspireResource {
 public:
 	std::string fileVersion;
@@ -33,7 +39,9 @@ public:
 	std::vector<Resource> resources;
 	std::vector<Trigger> triggers;
 
-	InspireResource(const char* filePath) {
+	InspireResource(const char* filePath) 
+	{
+		
 		// Load the XML file
 		file<> xmlFile(filePath);
 		xml_document<> doc;
@@ -74,6 +82,7 @@ public:
 			float end = std::stof(triggerNode->first_node("Frame")->first_node("End")->value());
 			triggers.emplace_back(resourceID, start, end);
 		}
+		std::sort(triggers.begin(), triggers.end(), InspireResourceTriggerSort());
 	}
 	Trigger findTriggersForResource(int resourceID) 
 	{
@@ -85,6 +94,9 @@ public:
 		return Trigger(-1, -1, -1);
 	}
 };
+
+
+
 
 
 
@@ -196,9 +208,17 @@ HOOK(void, __fastcall, EventUpdate, 0x00B24A40, Sonic::CGameObject* This, void* 
 }
 HOOK(long, __fastcall, sub_B1ECF0, 0xB1ECF0, int This, void* Edx, int a2, int a3, int _38)
 {
-	//frame = 0;
-	//doCount = true;
-	//resource = new InspireResource(std::format("G:\\Steam\\steamapps\\common\\Sonic Generations\\mods\\UnleashedTitlescreenGens\\{0}_voice_English.inspire_resource.xml", LevelLoadingManager::getEventID()).c_str());
+	frame = 0;
+	doCount = true;
+	auto string = std::format("{0}\\disk\\EventSceneResource\\{1}_voice_English.inspire_resource.xml", Configuration::modPath, LevelLoadingManager::getEventID());
+	if (!std::filesystem::exists(string))
+	{
+		printf("\n[SonicUnleashedConversion] Missing InspireResource file.");
+	}
+	else
+	{
+		resource = new InspireResource(string.c_str());
+	}
 	//currentEventIndex = 0;
 	return originalsub_B1ECF0(This, Edx, a2, a3, _38);
 }

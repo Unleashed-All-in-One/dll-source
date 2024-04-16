@@ -95,6 +95,64 @@ public:
     float cooldownTimer;
     float side = 0;
     float progress;
+    enum MotionType
+    {
+        /// 
+        MOTION_INVALID,
+
+        /// A fully-simulated, movable rigid body. At construction time the engine checks
+        /// the input inertia and selects MOTION_SPHERE_INERTIA or MOTION_BOX_INERTIA as
+        /// appropriate.
+        MOTION_DYNAMIC,
+
+        /// Simulation is performed using a sphere inertia tensor. (A multiple of the
+        /// Identity matrix). The highest value of the diagonal of the rigid body's
+        /// inertia tensor is used as the spherical inertia.
+        MOTION_SPHERE_INERTIA,
+
+        /// This is the same as MOTION_SPHERE_INERTIA, except that simulation of the rigid
+        /// body is "softened", which produces more stable results in large constrained
+        /// systems.
+        MOTION_STABILIZED_SPHERE_INERTIA,
+
+        /// Simulation is performed using a box inertia tensor. The non-diagonal elements
+        /// of the inertia tensor are set to zero. This is slower than the
+        /// MOTION_SPHERE_INERTIA motions, however it can produce more accurate results,
+        /// especially for long thin objects.
+        MOTION_BOX_INERTIA,
+
+        /// This is the same as MOTION_BOX_INERTIA, except that simulation of 	the rigid
+        /// body is "softened", which produces more stable results in large constrained
+        /// systems.
+
+        MOTION_STABILIZED_BOX_INERTIA,
+        /// Simulation is not performed as a normal rigid body. During a simulation step,
+        /// the velocity of the rigid body is used to calculate the new position of the
+        /// rigid body, however the velocity is NOT updated. The user can keyframe a rigid
+        /// body by setting the velocity of the rigid body to produce the desired keyframe
+        /// positions. The hkpKeyFrameUtility class can be used to simply apply keyframes
+        /// in this way. The velocity of a keyframed rigid body is NOT changed by the
+        /// application of impulses or forces. The keyframed rigid body has an infinite
+        /// mass when viewed by the rest of the system.
+        MOTION_KEYFRAMED,
+
+        /// This motion type is used for the static elements of a game scene, e.g. the
+        /// landscape. Fixed rigid bodies are treated in a special way by the system. They
+        /// have the same effect as a rigid body with a motion of type MOTION_KEYFRAMED
+        /// and velocity 0, however they are much faster to use, incurring no simulation
+        /// overhead, except in collision with moving bodies.
+        MOTION_FIXED,
+
+        /// A box inertia motion which is optimized for thin boxes and has less stability problems
+        MOTION_THIN_BOX_INERTIA,
+
+        /// A specialized motion used for character controllers
+        /// Not currently used
+        MOTION_CHARACTER,
+
+        /// 
+        MOTION_MAX_ID
+    };
     /* Renderable methods */
     bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
     {
@@ -103,7 +161,7 @@ public:
         hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
         boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
         m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
-
+       
         m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
         AddRenderable("Object", m_spExampleElement, true);
         DebugDrawText::log("I EXIST!!", 10);
@@ -164,7 +222,14 @@ public:
         m_spNodeEventCollision->SetParent(m_spMatrixNodeTransform.get());
         //void __thiscall sub_10C0E00(_DWORD *this, int a2)
         hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(1, 6, 1);
-        AddEventCollision("Object", shapeEventTrigger1, *pColID_PlayerEvent, true, m_spNodeEventCollision);
+        //AddEventCollision("Object", shapeEventTrigger1, *pColID_PlayerEvent, true, m_spNodeEventCollision);
+        AddRigidBody(m_spRigidBody, shapeEventTrigger1, *pColID_PlayerEvent, m_spNodeEventCollision);
+        m_spRigidBody->ApplyPropertyID(0, 0);
+        MotionType f = (MotionType)m_spRigidBody->m_pHkpRigidBody->m_Unk1;
+        m_spRigidBody->m_pHkpRigidBody->m_Unk1 = 1;
+        void* ffaf = *(void**)m_spRigidBody->m_pHkpRigidBody->m_Collideable.m_Motion;
+        // bool AddRigidBody(const boost::shared_ptr<CRigidBody>& rigidBody, hk2010_2_0::hkpShape* shape, int collisionID, const boost::shared_ptr<Hedgehog::Mirage::CMatrixNode>& matrixNode)
+        
         // You don't need to override this if you're not using it, but this would be for setting up event colliders & rigidbodies.
         // note you can do this in "SetAddRenderables" but sonic team *tends to* do collision stuff here.
         return true;

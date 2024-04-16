@@ -128,9 +128,11 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="CustomSetObjects\SpeedDownCollision.cpp" />
     <ClCompile Include="Functionality\EXP.cpp" />
     <ClCompile Include="Functionality\FallCam.cpp" />
+    <ClCompile Include="Functionality\Patches.cpp" />
     <ClCompile Include="Functionality\PauseBgm.cpp" />
     <ClCompile Include="Functionality\RingEnergy.cpp" />
     <ClCompile Include="Gameplay\Drift.cpp" />
+    <ClCompile Include="Gameplay\EnemyMotoraTemp.cpp" />
     <ClCompile Include="Gameplay\Pole.cpp" />
     <ClCompile Include="Gameplay\Ramp.cpp" />
     <ClCompile Include="Gameplay\ShortJump.cpp" />
@@ -206,9 +208,11 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="CustomSetObjects\SpeedDownCollision.h" />
     <ClInclude Include="Functionality\EXP.h" />
     <ClInclude Include="Functionality\FallCam.h" />
+    <ClInclude Include="Functionality\Patches.h" />
     <ClInclude Include="Functionality\PauseBgm.h" />
     <ClInclude Include="Functionality\RingEnergy.h" />
     <ClInclude Include="Gameplay\Drift.h" />
+    <ClInclude Include="Gameplay\EnemyMotoraTemp.h" />
     <ClInclude Include="Gameplay\Pole.h" />
     <ClInclude Include="Gameplay\Ramp.h" />
     <ClInclude Include="Gameplay\ShortJump.h" />

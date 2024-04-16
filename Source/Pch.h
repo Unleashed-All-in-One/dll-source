@@ -93,6 +93,7 @@
 #include "System/DebugMenu/Types.h"
 
 //Functionality
+#include "Functionality/Patches.h"
 #include "Functionality/PauseBgm.h"
 #include "Functionality/FallCam.h"
 #include "Functionality/RingEnergy.h"

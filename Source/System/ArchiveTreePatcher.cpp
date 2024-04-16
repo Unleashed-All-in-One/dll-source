@@ -96,9 +96,6 @@ void ArchiveTreePatcher::applyPatches()
     {
         m_archiveDependencies.push_back(Configuration::archiveTree.data[i]);
     }
-    m_archiveDependencies.push_back(ArchiveDependency("WorldMap", { "Title" }));
-    m_archiveDependencies.push_back(ArchiveDependency("TitleModel", { "Title" }));
-    m_archiveDependencies.push_back(ArchiveDependency("GenericWindow", { "Title" }));
     m_archiveDependencies.push_back(ArchiveDependency("UIFade", { "SystemCommon" }));
     std::vector<std::string> whiteworld = Configuration::getAllWhiteWorld();
     for (size_t i = 0; i < whiteworld.size(); i++)
@@ -107,35 +104,10 @@ void ArchiveTreePatcher::applyPatches()
         m_archiveDependencies.push_back(ArchiveDependency("pam000", { whiteworld[i] }));
         m_archiveDependencies.push_back(ArchiveDependency("StageGate", { whiteworld[i] }));           
     }
-    m_archiveDependencies.push_back(ArchiveDependency("etfdoor", { "cmn100", "cmn200"}));
-    m_archiveDependencies.push_back(ArchiveDependency("StageGateSUC", { "cmn100", "cmn200"}));
-    m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighterMykonos", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("SonicEVRoot", { "ev041" }));
-    m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighterMykonos", { "cmn100" }));
-    m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyChibiFighter", { "cmn100" }));
-    m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyNightmareR", { "cmn200" }));
-    m_archiveDependencies.push_back(ArchiveDependency("EvilEnemyNightmareR", { "cmn100" }));
-    m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighter", { "cmn100" }));
-    m_archiveDependencies.push_back(ArchiveDependency("EnemyNal", { "cmn100" }));
-    m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighter", { "cmn200" }));
-    m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighterSword", { "cmn200" }));
-    m_archiveDependencies.push_back(ArchiveDependency("EnemyEFighterSword", { "cmn100" }));
-    m_archiveDependencies.push_back(ArchiveDependency("EnemyNal", { "cmn200" }));
-    m_archiveDependencies.push_back(ArchiveDependency("Ramp", { "Sonic" }));
-    m_archiveDependencies.push_back(ArchiveDependency("Sweepkick", { "Sonic" }));
-    m_archiveDependencies.push_back(ArchiveDependency("Paraloop", { "Sonic" }));
-    m_archiveDependencies.push_back(ArchiveDependency("Pole", { "SonicActionCommon" }));
-    m_archiveDependencies.push_back(ArchiveDependency("SonicEXP", { "cmn200" }));
-    m_archiveDependencies.push_back(ArchiveDependency("HintRing", { "cmn200" }));
-    m_archiveDependencies.push_back(ArchiveDependency("HintRing", { "cmn100" }));
-    m_archiveDependencies.push_back(ArchiveDependency("etfswitch", { "cmn200" }));
-    m_archiveDependencies.push_back(ArchiveDependency("etfswitch", { "cmn100" }));
-    m_archiveDependencies.push_back(ArchiveDependency("JumpSelector", { "cmn200" }));
-    m_archiveDependencies.push_back(ArchiveDependency("WhiteWorldCommon", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("ObjectPhysicsUnleashed", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("ObjectPhysicsUnleashed", { "cmn100" }));
     m_archiveDependencies.push_back(ArchiveDependency("CmnAfrica", { "ObjectPhysicsUnleashed" }));
-    m_archiveDependencies.push_back(ArchiveDependency("myk_cmn", { "ObjectPhysicsUnleashed" }));
     m_archiveDependencies.push_back(ArchiveDependency("CmnBeach", { "ObjectPhysicsUnleashed" }));
     m_archiveDependencies.push_back(ArchiveDependency("CmnChina", { "ObjectPhysicsUnleashed" }));
     m_archiveDependencies.push_back(ArchiveDependency("CmnEU", { "ObjectPhysicsUnleashed" }));

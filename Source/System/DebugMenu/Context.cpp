@@ -42,7 +42,7 @@ void Context::initialize(HWND window, IUnknown* device)
     ImGuiTheme::ImGuiSetTheme(ImThemeColor(0, 0, 0), ImThemeColor(155, 155, 155), ImThemeColor(200, 200, 200), ImThemeColor(212, 212, 212), ImThemeColor(155, 155, 155));
     const float fontSize = max(16, *HEIGHT / 1080.0f * 16);
 
-    if ((font = io.Fonts->AddFontFromFileTTF((modDirectoryPath + "/Fonts/DroidSans.ttf").c_str(), fontSize, nullptr, io.Fonts->GetGlyphRangesDefault())) == nullptr)
+    if ((font = io.Fonts->AddFontFromFileTTF((modDirectoryPath + "/disk/Fonts/DroidSans.ttf").c_str(), fontSize, nullptr, io.Fonts->GetGlyphRangesDefault())) == nullptr)
     {
         DebugDrawText::log("Failed to load DroidSans.ttf", 1);
         font = io.Fonts->AddFontDefault();
@@ -51,7 +51,7 @@ void Context::initialize(HWND window, IUnknown* device)
     ImFontConfig fontConfig;
     fontConfig.MergeMode = true;
 
-    if (!io.Fonts->AddFontFromFileTTF((modDirectoryPath + "/Fonts/DroidSansJapanese.ttf").c_str(), fontSize * 1.25f, &fontConfig, io.Fonts->GetGlyphRangesJapanese()))
+    if (!io.Fonts->AddFontFromFileTTF((modDirectoryPath + "/disk/Fonts/DroidSansJapanese.ttf").c_str(), fontSize * 1.25f, &fontConfig, io.Fonts->GetGlyphRangesJapanese()))
         DebugDrawText::log("Failed to load DroidSansJapanese.ttf", 1);
 
     io.Fonts->Build();

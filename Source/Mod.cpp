@@ -14,6 +14,9 @@ std::string getDirectoryPath(const std::string& path)
 	const size_t pos = path.find_last_of("\\/");
 	return path.substr(0, pos != std::string::npos ? pos : 0);
 }
+//00E62450
+//int __thiscall Sonic::Player::CPlayerSpeedContext::UpdateFunc(CSonicContext *this, float *deltaTime)
+
 extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 {
 	MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
@@ -22,9 +25,9 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 	std::string path =  std::string(modInfo->CurrentMod->Path);
 	path = path.substr(0, path.find_last_of("/\\"));
-	WRITE_JUMP(0x00E13ECF, 0x00E13EDF);
-	//Patch out a weird check for the results music
-	WRITE_JUMP(0x00CFD472, 0x00CFD492);
+
+	// Functionality patches that don't necessarily need their own file
+	Patches::applyPatches();
 	//---------------System---------------
 	LevelLoadingManager::initialize();
 	ArchiveTreePatcher::applyPatches();

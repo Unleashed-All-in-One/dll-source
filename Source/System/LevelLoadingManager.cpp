@@ -589,6 +589,10 @@ HOOK(void*, __fastcall, sub_B1ECF0, 0xB1ECF0, int* This, void* Edx, int a2, int 
 	skipCurrentQueueEvent = true;
 	return originalsub_B1ECF0(This, Edx, a2, a3, a4);
 }
+extern "C" __declspec(dllexport) bool API_IsEvent()
+{
+	return false;
+}
 extern "C" __declspec(dllexport) int API_GetLoadingScreenMotionIndex()
 {
 	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
