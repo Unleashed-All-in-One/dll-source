@@ -92,11 +92,15 @@ public:
     float m_playerPoleRotation;
     float m_playerPoleRotationTarget;
     float m_playerPoleRotationPrevTarget;
+    float m_playerPolePositionPrevTarget;
     float cooldownTimer;
     float side = 0;
     float progress;
     uint32_t m_setColliderLength;
     bool m_setRotation90Snap;
+    bool m_movingUp;
+    float m_timer;
+    float m_target;
     /* Renderable methods */
     bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
     {
@@ -207,6 +211,18 @@ public:
 
         return rotation = rotationQuaternion * rotation;
     }
+    void MoveVertical(int increase)
+    {
+        m_target = m_spMatrixNodeTransform->m_Transform.m_Position.y() + m_playerVerticalProgress + increase;
+        m_timer = 0;
+        m_movingUp = true;
+    }
+    float easeInOutCirc(float x)
+    {
+        return x < 0.5
+            ? (1 - sqrt(1 - pow(2 * x, 2))) / 2
+            : (sqrt(1 - pow(-2 * x + 2, 2)) + 1) / 2;
+    }
     void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
     {
         auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
@@ -215,6 +231,22 @@ public:
             m_playerOnPole = true;
         if (m_playerOnPole)
         {
+            if (m_movingUp)
+            {
+                m_playerVerticalProgress = Common::lerpUnclampedf(m_playerPolePositionPrevTarget, m_target, easeInOutCirc(m_timer));
+                if (m_timer < 1)
+                    m_timer += in_rUpdateInfo.DeltaTime * 0.8f;
+                else
+                    m_movingUp = false;
+            }            
+            else
+            {
+                m_playerPolePositionPrevTarget = m_playerVerticalProgress;
+            }
+            if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickUp))
+            {
+                MoveVertical(1);
+            }
             if (inputPtr->IsTapped(Sonic::eKeyState_A))
             {
                 playerContext->m_Velocity = CVector(0, 0, 0);
@@ -228,7 +260,7 @@ public:
             }
             if(progress < 1)
             progress += in_rUpdateInfo.DeltaTime * 0.8f;
-            m_playerVerticalProgress += inputPtr->LeftStickVertical / 30;
+            m_playerVerticalProgress += inputPtr->LeftStickVertical / 20;
             if (inputPtr->IsTapped(Sonic::eKeyState_DpadRight))
             {
                 side++;
@@ -250,7 +282,7 @@ public:
             targetPos.y() = playerPos.y();
 
             playerContext->m_spMatrixNode->m_Transform.m_Rotation = TransformUtilities::QuaternionFaceTowards(targetPos, playerPos, playerContext->m_spMatrixNode->m_Transform.m_Rotation);
-            playerContext->m_spMatrixNode->m_Transform.m_Position = Hedgehog::Math::CVector(m_spMatrixNodeTransform->m_Transform.m_Position.x() + 1, m_spMatrixNodeTransform->m_Transform.m_Position.y() + m_playerVerticalProgress, m_spMatrixNodeTransform->m_Transform.m_Position.z());
+            playerContext->m_spMatrixNode->m_Transform.m_Position = Hedgehog::Math::CVector(m_spMatrixNodeTransform->m_Transform.m_Position.x() + 0.4f, m_spMatrixNodeTransform->m_Transform.m_Position.y() + m_playerVerticalProgress, m_spMatrixNodeTransform->m_Transform.m_Position.z());
             playerContext->m_spMatrixNode->m_Transform.m_Position = TransformUtilities::MoveAroundPivot(playerContext->m_spMatrixNode->m_Transform.m_Position, m_spMatrixNodeTransform->m_Transform.m_Position, Hedgehog::math::CVector(m_playerPoleRotation, 0, m_playerPoleRotation));
 
             

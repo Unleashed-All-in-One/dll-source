@@ -1,6 +1,9 @@
 #pragma once
 using namespace hh::math;
 
+class ObjectExample :public Sonic::CObjectBase, public Sonic::IAnimationContext, public Sonic::CAnimationStateMachine
+{
+};
 class Hintring :public Sonic::CObjectBase, public Sonic::CSetObjectListener, public Sonic::IAnimationContext, public Sonic::CAnimationStateMachine
 {
 public:
@@ -9,7 +12,7 @@ public:
     boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
     boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
 
-    boost::shared_ptr<Hedgehog::Animation::CAnimationPose> animatorTest;
+    boost::shared_ptr<Hedgehog::Animation::CAnimationPose> m_AnimatorPose;
     static HintDataList* hintData;
     bool m_playerInsideCollider;    
     static HelpCaptionUIContainer* m_HintUI;
@@ -19,6 +22,8 @@ public:
     uint32_t m_HintDataIndex = 0;
     bool m_PlayerStop = true;
     bool m_NeedInput = true;
+    float m_TimerWaitReset;
+    bool m_Cooldown = false;
     std::vector<NewAnimationData> animations;
     boost::shared_ptr<Sonic::CAnimationStateMachine> animationStateMachine;
     bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
@@ -27,44 +32,50 @@ public:
         hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
         boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
         m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
-        animatorTest = boost::make_shared<Hedgehog::Animation::CAnimationPose>(in_spDatabase, assetName);
+        m_AnimatorPose = boost::make_shared<Hedgehog::Animation::CAnimationPose>(in_spDatabase, assetName);
         animations = std::vector<NewAnimationData>();
-        animations.push_back(NewAnimationData("Appear", "cmn_obj_sk2_hintring_appear", 1, true, nullptr));
+        animations.push_back(NewAnimationData("Idle", "cmn_obj_sk2_hintring", 1, true, nullptr));
+        animations.push_back(NewAnimationData("Appear", "cmn_obj_sk2_hintring_appear", 1, false, nullptr));
+        animations.push_back(NewAnimationData("Touch", "cmn_obj_sk2_hintring_touch", 1, false, "Idle"));
 
         this->SetContext(this); //why?
         CAnimationStateInfo* pEntries = new CAnimationStateInfo[animations.size()];
-
-        pEntries[0].m_Name = animations[0].m_stateName;
-        pEntries[0].m_FileName = animations[0].m_fileName;
-        pEntries[0].m_Speed = animations[0].m_speed;
-        pEntries[0].m_PlaybackType = !animations[0].m_isLoop;
-        pEntries[0].field10 = 0;
-        pEntries[0].field14 = -1.0f;
-        pEntries[0].field18 = -1.0f;
-        pEntries[0].field1C = 0;
-        pEntries[0].field20 = -1;
-        pEntries[0].field24 = -1;
-        pEntries[0].field28 = -1;
-        pEntries[0].field2C = -1;
+        for (size_t i = 0; i < animations.size(); i++)
+        {
+            pEntries[i].m_Name = animations[i].m_stateName;
+            pEntries[i].m_FileName = animations[i].m_fileName;
+            pEntries[i].m_Speed = animations[i].m_speed;
+            pEntries[i].m_PlaybackType = !animations[i].m_isLoop;
+            pEntries[i].field10 = 0;
+            pEntries[i].field14 = -1.0f;
+            pEntries[i].field18 = -1.0f;
+            pEntries[i].field1C = 0;
+            pEntries[i].field20 = -1;
+            pEntries[i].field24 = -1;
+            pEntries[i].field28 = -1;
+            pEntries[i].field2C = -1;
+        }
         
-        animatorTest->AddAnimationList(pEntries, animations.size());
+        m_AnimatorPose->AddAnimationList(pEntries, animations.size());
         //animationStateMachine = boost::make_shared< Sonic::CAnimationStateMachine>();
         //auto test = animationStateMachine->GetContext();
-        animatorTest->CreateAnimationCache();
+        m_AnimatorPose->CreateAnimationCache();
         m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
-        m_spExampleElement->BindAnimationPose(animatorTest);
+        m_spExampleElement->BindAnimationPose(m_AnimatorPose);
+        this->AddAnimationState("Idle");
         this->AddAnimationState("Appear");
+        this->AddAnimationState("Touch");
         //m_spExampleElement->BindAnimationPose(animatorTest);
         //ChangeState("Appear");
         AddRenderable("Object", m_spExampleElement, true);
         DebugDrawText::log("I EXIST!!", 10);
 
-        this->ChangeState("Appear");
+        this->ChangeState("Idle");
         return true;
     }
     Hedgehog::Animation::CAnimationPose* GetAnimationPose()
     {
-        return animatorTest.get();
+        return m_AnimatorPose.get();
     }
     Hedgehog::Math::CVector GetVelocityForAnimationSpeed()
     {
@@ -104,6 +115,8 @@ public:
                     m_HintUI->Reset();
                     m_HintUI->strings = hintData->hintData[m_HintDataIndex];
                     m_HintUI->Show();
+                    m_Cooldown = true;
+                    this->ChangeState("Touch");
                 }
                 return true;
             }    
@@ -141,7 +154,18 @@ public:
 
     void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
     {
-        animatorTest->Update(in_rUpdateInfo.DeltaTime);
+        if (m_Cooldown && !m_playerInsideCollider)
+        {
+            m_TimerWaitReset += in_rUpdateInfo.DeltaTime;
+            if (m_TimerWaitReset > 5)
+            {
+                m_Cooldown = false;
+                m_TimerWaitReset = 0;
+
+                this->ChangeState("Appear");
+            }
+        }
+        m_AnimatorPose->Update(in_rUpdateInfo.DeltaTime);
         auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
         if (m_playerInsideCollider && !m_IsExiting)
         {            
