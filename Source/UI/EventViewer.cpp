@@ -18,6 +18,7 @@ public:
 	float resourceID;
 	float startFrame;
 	float endFrame;
+	bool hasBeenUsed = false;
 
 	Trigger(float resourceID, float startFrame, float endFrame)
 		: resourceID(resourceID), startFrame(startFrame), endFrame(endFrame) {}
@@ -181,25 +182,24 @@ InspireResource* resource;
 Trigger* nextTrigger;
 AudioHandle soundhandle;
 int currentEventIndex = 0;
+int startFrameTime;
 HOOK(void, __fastcall, EventUpdate, 0x00B24A40, Sonic::CGameObject* This, void* Edx, const hh::fnd::SUpdateInfo& in_rUpdateInfo)
 {
 	doCount = !doCount;
 	if (doCount)
-		frame += 1;
+		frame += (1.0f / in_rUpdateInfo.DeltaTime) / 60.0f;
 	if (resource == nullptr)
 	{
 		return originalEventUpdate(This, Edx, in_rUpdateInfo);
 	}
 	for (size_t i = currentEventIndex; i < resource->triggers.size(); i++)
 	{
-		if (frame >= resource->triggers[i].startFrame)
+		if (frame >= resource->triggers[i].startFrame && !resource->triggers[i].hasBeenUsed)
 		{
-
-			MiniAudioHelper::playSound(soundhandle, 0, resource->resources[currentEventIndex].cueName, false, true);
-			DebugDrawText::log(std::format("PLAYSOUND: {0}", resource->resources[currentEventIndex].cueName).c_str(), 5);
-			const char* in_Name = resource->resources[currentEventIndex].cueName.c_str();
-			
-			currentEventIndex++;
+			MiniAudioHelper::playSound(soundhandle, 0, resource->resources[i].cueName, false, true);
+			DebugDrawText::log(std::format("PLAYSOUND: {0}", resource->resources[i].cueName).c_str(), 5);
+			const char* in_Name = resource->resources[i].cueName.c_str();
+			resource->triggers[i].hasBeenUsed = true;
 		}
 	}
 	

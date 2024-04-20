@@ -1,7 +1,7 @@
 #pragma once
 using namespace hh::math;
 
-class Hintring :public Sonic::CObjectBase, public Sonic::CSetObjectListener
+class Hintring :public Sonic::CObjectBase, public Sonic::CSetObjectListener, public Sonic::IAnimationContext, public Sonic::CAnimationStateMachine
 {
 public:
     BB_SET_OBJECT_MAKE("Hintring")
@@ -12,7 +12,7 @@ public:
     boost::shared_ptr<Hedgehog::Animation::CAnimationPose> animatorTest;
     static HintDataList* hintData;
     bool m_playerInsideCollider;    
-    static SubtitleUIContainer* m_HintUI;
+    static HelpCaptionUIContainer* m_HintUI;
     bool m_IsExiting;
 
     //from Set data
@@ -27,12 +27,11 @@ public:
         hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
         boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
         m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
-
         animatorTest = boost::make_shared<Hedgehog::Animation::CAnimationPose>(in_spDatabase, assetName);
-
         animations = std::vector<NewAnimationData>();
         animations.push_back(NewAnimationData("Appear", "cmn_obj_sk2_hintring_appear", 1, true, nullptr));
 
+        this->SetContext(this); //why?
         CAnimationStateInfo* pEntries = new CAnimationStateInfo[animations.size()];
 
         pEntries[0].m_Name = animations[0].m_stateName;
@@ -47,18 +46,36 @@ public:
         pEntries[0].field24 = -1;
         pEntries[0].field28 = -1;
         pEntries[0].field2C = -1;
-
+        
         animatorTest->AddAnimationList(pEntries, animations.size());
         //animationStateMachine = boost::make_shared< Sonic::CAnimationStateMachine>();
         //auto test = animationStateMachine->GetContext();
-        
+        animatorTest->CreateAnimationCache();
         m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
+        m_spExampleElement->BindAnimationPose(animatorTest);
+        this->AddAnimationState("Appear");
         //m_spExampleElement->BindAnimationPose(animatorTest);
         //ChangeState("Appear");
         AddRenderable("Object", m_spExampleElement, true);
         DebugDrawText::log("I EXIST!!", 10);
+
+        this->ChangeState("Appear");
         return true;
     }
+    Hedgehog::Animation::CAnimationPose* GetAnimationPose()
+    {
+        return animatorTest.get();
+    }
+    Hedgehog::Math::CVector GetVelocityForAnimationSpeed()
+    {
+        return Hedgehog::Math::CVector(1.0f, 1.0f, 1.0f);
+    }
+    Hedgehog::Math::CVector GetVelocityForAnimationChange()
+    {
+        return Hedgehog::Math::CVector(1.0f, 1.0f, 1.0f);
+    }
+    //virtual  = 0;
+    //virtual Hedgehog::Math::CVector GetVelocityForAnimationChange() = 0;
     bool ProcessMessage(Hedgehog::Universe::Message& in_rMsg, bool in_Flag) override
     {
         if (in_Flag)
@@ -73,7 +90,7 @@ public:
                     if (m_HintUI == nullptr)
                     {
                         //may not be a good idea to parent this to the player
-                        m_HintUI = SubtitleUIContainer::Generate(playerContext->m_pPlayer);
+                        m_HintUI = HelpCaptionUIContainer::Generate(playerContext->m_pPlayer);
                     }
                     if (m_PlayerStop)
                     {
@@ -124,6 +141,7 @@ public:
 
     void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
     {
+        animatorTest->Update(in_rUpdateInfo.DeltaTime);
         auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
         if (m_playerInsideCollider && !m_IsExiting)
         {            

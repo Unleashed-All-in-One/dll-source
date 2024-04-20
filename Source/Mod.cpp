@@ -19,7 +19,7 @@ std::string getDirectoryPath(const std::string& path)
 
 extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 {
-	MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
+	//MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
 
 	// Set random seed
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -69,6 +69,8 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	TitleWorldMap::applyPatches();
 	TitleWorldMapPause::applyPatches();
 	EventViewer::applyPatches();
+	SubtitleUI::applyPatches();
+	SubtitleUI::m_captionData.init();
 	// NOTE: Because we're essentially remaking the title experience to be the exact same, we might want to make the options change in the
 	// same way unleashed does it (via an small options sub-tab-thing and remove TitleOption entirely.
 	// Right now, exiting from Options will cause a crash due to the saving/loading in the WorldMap.

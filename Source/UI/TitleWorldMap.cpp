@@ -1443,11 +1443,11 @@ HOOK(Hedgehog::Mirage::CRenderable*, __fastcall, AddRenderableTitle, 0x58E650, D
 }
 HOOK(int, __cdecl, sub_7C931F, 0x7C931F, int a1, const char* a2)
 {
-	printf("[WorldMap] %s\n", a2);
+	printf("[CRIWARE Audio] %s\n", a2);
 	return originalsub_7C931F(a1, a2);
 }HOOK(int, __fastcall, sub_7E27B0, 0x7E27B0, char* a1, ...)
 {
-	printf("[WorldMap] %s\n", a1);
+	printf("[CRIWARE Audio] %s\n", a1);
 	return originalsub_7E27B0(a1);
 }
 

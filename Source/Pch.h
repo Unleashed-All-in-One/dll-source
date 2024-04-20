@@ -20,6 +20,7 @@
 #include <fstream>
 #include <iomanip>
 #include <math.h>
+#include <regex>
 #include <filesystem>
 //#include <queue>
 
@@ -105,6 +106,7 @@
 #include "UI/TitleOption.h"
 #include "UI/TitleWorldMapPause.h"
 #include "UI/EventViewer.h"
+#include "UI/HelpCaptionUI.h"
 #include "UI/SubtitleUI.h"
 #include "UI/ItemboxUI.h"
 #include "UI/ETFStageGateUI.h"
