@@ -15,7 +15,7 @@ public:
 
     bool activateGate;
     bool disagreed;
-    uint32_t stageID, actIndex, worldIndex, stageType;
+    int stageID, actIndex, worldIndex, stageType;
     static ETFStageGateUIContainer* containerUI;
     SharedPtrTypeless handle1;
     void fpAddParticle2(Sonic::CParticleManager* manager, SharedPtrTypeless& handle, void* node, const hh::base::CSharedString& name, uint32_t flag)
@@ -79,7 +79,7 @@ public:
         }
         //fpAddParticle2(Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager.get(), handle1, &node, "ef_ch_sng_yh1_spinattack", 1);
         Common::fCGlitterCreate(playerContext, handle1, &node, particleName, 0);
-        AddRenderable("Object", m_spExampleElement, true);
+        Sonic::CGameObject::AddRenderable("Object", m_spExampleElement, true);
         DebugDrawText::log("I EXIST!!", 10);
         return true;
     }
@@ -195,10 +195,10 @@ public:
     }
     void InitializeEditParam(Sonic::CEditParam& in_rEditParam) override
     {
-        in_rEditParam.SetInt(&stageID, "StageIDNumber");
-        in_rEditParam.SetInt(&worldIndex, "WorldIndex");
-        in_rEditParam.SetInt(&actIndex, "ActIndex");
-        in_rEditParam.SetInt(&stageType, "StageType");
+        in_rEditParam.CreateParamInt(&stageID, "StageIDNumber");
+        in_rEditParam.CreateParamInt(&worldIndex, "WorldIndex");
+        in_rEditParam.CreateParamInt(&actIndex, "ActIndex");
+        in_rEditParam.CreateParamInt(&stageType, "StageType");
     }
 
     static void registerObject();

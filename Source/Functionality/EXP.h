@@ -47,7 +47,7 @@ public:
         m_spModel = boost::make_shared<hh::mr::CSingleElement>(spModelData);
 
         m_spModel->BindMatrixNode(m_spMatrixNodeTransform);
-        AddRenderable("Object", m_spModel, true);
+        Sonic::CGameObject::AddRenderable("Object", m_spModel, true);
         Sonic::Player::CPlayerSpeedContext* context = Sonic::Player::CPlayerSpeedContext::GetInstance();
         return true;
     }

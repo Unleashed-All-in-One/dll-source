@@ -96,7 +96,7 @@ public:
     float cooldownTimer;
     float side = 0;
     float progress;
-    uint32_t m_setColliderLength;
+    int m_setColliderLength;
     bool m_setRotation90Snap;
     bool m_movingUp;
     float m_timer;
@@ -111,7 +111,7 @@ public:
         m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
        
         m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
-        AddRenderable("Object", m_spExampleElement, true);
+        Sonic::CGameObject::AddRenderable("Object", m_spExampleElement, true);
         return true;
     }
     bool ProcessMessage(Hedgehog::Universe::Message& in_rMsg, bool in_Flag) override
@@ -251,7 +251,7 @@ public:
             {
                 playerContext->m_Velocity = CVector(0, 0, 0);
                 AddImpulse(playerContext->m_spMatrixNode->m_Transform.m_Rotation * Hedgehog::Math::CVector(0, 5, -130), true);
-                playerContext->ChangeState(Sonic::Player::StateAction::Jump);
+                playerContext->ChangeState(Sonic::Player::EPlayerSpeedState::ePlayerSpeedState_Jump);
                 playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = false;
 
                 playerContext->m_pPlayer->m_PostureStateMachine.ChangeState("Standard");
@@ -291,8 +291,8 @@ public:
     }
     void InitializeEditParam(Sonic::CEditParam& in_rEditParam) override
     {
-        in_rEditParam.SetInt(&m_setColliderLength, "Length");
-        in_rEditParam.SetBool(&m_setRotation90Snap, "Rotation90Snap");
+        in_rEditParam.CreateParamInt(&m_setColliderLength, "Length");
+        in_rEditParam.CreateParamBool(&m_setRotation90Snap, "Rotation90Snap");
     }
     static void registerObject();
 };

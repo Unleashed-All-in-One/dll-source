@@ -19,7 +19,7 @@ public:
     bool m_IsExiting;
 
     //from Set data
-    uint32_t m_HintDataIndex = 0;
+    int m_HintDataIndex = 0;
     bool m_PlayerStop = true;
     bool m_NeedInput = true;
     float m_TimerWaitReset;
@@ -39,35 +39,35 @@ public:
         animations.push_back(NewAnimationData("Touch", "cmn_obj_sk2_hintring_touch", 1, false, "Idle"));
 
         this->SetContext(this); //why?
-        CAnimationStateInfo* pEntries = new CAnimationStateInfo[animations.size()];
+        Hedgehog::Animation::SMotionInfo* pEntries = new Hedgehog::Animation::SMotionInfo[animations.size()];
         for (size_t i = 0; i < animations.size(); i++)
         {
-            pEntries[i].m_Name = animations[i].m_stateName;
-            pEntries[i].m_FileName = animations[i].m_fileName;
-            pEntries[i].m_Speed = animations[i].m_speed;
-            pEntries[i].m_PlaybackType = !animations[i].m_isLoop;
-            pEntries[i].field10 = 0;
-            pEntries[i].field14 = -1.0f;
-            pEntries[i].field18 = -1.0f;
-            pEntries[i].field1C = 0;
-            pEntries[i].field20 = -1;
-            pEntries[i].field24 = -1;
-            pEntries[i].field28 = -1;
-            pEntries[i].field2C = -1;
+            pEntries[i].Name = animations[i].m_stateName;
+            pEntries[i].FileName = animations[i].m_fileName;
+            pEntries[i].Speed = animations[i].m_speed;
+            pEntries[i].RepeatType = !animations[i].m_isLoop;
+            pEntries[i].Field10 = 0;
+            pEntries[i].Field14 = -1.0f;
+            pEntries[i].Field18 = -1.0f;
+            pEntries[i].Field1C = 0;
+            pEntries[i].Field20 = -1;
+            pEntries[i].Field24 = -1;
+            pEntries[i].Field28 = -1;
+            pEntries[i].Field2C = -1;
         }
         
-        m_AnimatorPose->AddAnimationList(pEntries, animations.size());
+        m_AnimatorPose->AddMotionInfo(pEntries, animations.size());
         //animationStateMachine = boost::make_shared< Sonic::CAnimationStateMachine>();
         //auto test = animationStateMachine->GetContext();
         m_AnimatorPose->CreateAnimationCache();
         m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
-        m_spExampleElement->BindAnimationPose(m_AnimatorPose);
+        m_spExampleElement->BindPose(m_AnimatorPose);
         this->AddAnimationState("Idle");
         this->AddAnimationState("Appear");
         this->AddAnimationState("Touch");
         //m_spExampleElement->BindAnimationPose(animatorTest);
         //ChangeState("Appear");
-        AddRenderable("Object", m_spExampleElement, true);
+        Sonic::CGameObject::AddRenderable("Object", m_spExampleElement, true);
         DebugDrawText::log("I EXIST!!", 10);
 
         this->ChangeState("Idle");
@@ -133,9 +133,6 @@ public:
             if (std::strstr(in_rMsg.GetType(), "MsgGetHomingAttackPosition") != nullptr)
             {
 
-                DWORD* msg = (DWORD*)&in_rMsg;
-                *(Hedgehog::Math::CVector*)(msg + 16) = m_spMatrixNodeTransform->m_Transform.m_Position;
-                SendMessageImm(in_rMsg.m_SenderActorID, (Hedgehog::Universe::MessageTypeSet*)msg);
             }
         }
         return Sonic::CObjectBase::ProcessMessage(in_rMsg, in_Flag);
@@ -192,10 +189,9 @@ public:
     }
     void InitializeEditParam(Sonic::CEditParam& in_rEditParam) override
     {
-        //...why ceramic... why did you have to name these "set" if they're meant to "get"...
-        in_rEditParam.SetBool(&m_NeedInput, "NeedInput");
-        in_rEditParam.SetBool(&m_PlayerStop, "PlayerStop");
-        in_rEditParam.SetInt(&m_HintDataIndex, "HintDataIndex");
+        in_rEditParam.CreateParamBool(&m_NeedInput, "NeedInput");
+        in_rEditParam.CreateParamBool(&m_PlayerStop, "PlayerStop");
+        in_rEditParam.CreateParamInt(&m_HintDataIndex, "HintDataIndex");
     }
     static void registerObject();
 };

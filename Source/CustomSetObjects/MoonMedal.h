@@ -19,7 +19,7 @@ public:
         m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
         m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
         //m_spExampleElement->BindAnimationPose(animatorTest);
-        AddRenderable("Object", m_spExampleElement, true);
+        Sonic::CGameObject::AddRenderable("Object", m_spExampleElement, true);
         DebugDrawText::log("I EXIST!!", 10);
         return true;
     }

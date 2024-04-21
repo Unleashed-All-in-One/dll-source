@@ -20,7 +20,7 @@ public:
 		if (!spModelData)
 			return;
 
-		AddRenderable("Object", m_spRenderable, true);
+		Sonic::CGameObject::AddRenderable("Object", m_spRenderable, true);
 	}
 };
 class TestClass1 : public Hedgehog::Universe::TStateMachine<TestClass1>, public Hedgehog::Universe::CStateMachineBase, public Hedgehog::Universe::IStateMachineMessageReceiver, public  Hedgehog::Base::CObject, public Hedgehog::Universe::CMessageActor, public Hedgehog::Universe::IMessageProcess, public Hedgehog::Universe::IParallelJob {
@@ -145,7 +145,7 @@ DWORD* storyseq;
 //		/*sonic->m_pPlayer->m_spCharacterModel = nullptr;
 //		sonic->m_pPlayer->m_spCharacterModel =
 //			boost::make_shared<hh::mr::CSingleElement>(hh::mr::CMirageDatabaseWrapper(spDatabase.get()).GetModelData("chr_Sonic_HD_werehog"));
-//		sonic->m_pPlayer->AddRenderable("Object", sonic->m_pPlayer->m_spCharacterModel, false);*/
+//		sonic->m_pPlayer->Sonic::CGameObject::AddRenderable("Object", sonic->m_pPlayer->m_spCharacterModel, false);*/
 //		/*FUNCTION_PTR(void, __fastcall, RequestChange, 0x00548290, Hedgehog::Universe::CMessageActor * This);
 //		RequestChange(This);*/
 //		/*auto luaread = (*(int(__thiscall**)(DWORD*))(*serviceScriptman + 16))(serviceScriptman);

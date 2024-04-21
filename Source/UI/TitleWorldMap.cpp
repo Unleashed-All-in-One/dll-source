@@ -138,7 +138,7 @@ public:
 		m_spModel = boost::make_shared<hh::mr::CSingleElement>(hh::mr::CMirageDatabaseWrapper(spDatabase.get()).GetModelData(name));
 		
 
-		AddRenderable("Object", m_spModel, false);
+		Sonic::CGameObject::AddRenderable("Object", m_spModel, false);
 
 
 	}
