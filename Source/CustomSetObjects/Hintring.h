@@ -1,9 +1,6 @@
 #pragma once
 using namespace hh::math;
 
-class ObjectExample :public Sonic::CObjectBase, public Sonic::IAnimationContext, public Sonic::CAnimationStateMachine
-{
-};
 class Hintring :public Sonic::CObjectBase, public Sonic::CSetObjectListener, public Sonic::IAnimationContext, public Sonic::CAnimationStateMachine
 {
 public:
@@ -57,8 +54,6 @@ public:
         }
         
         m_AnimatorPose->AddMotionInfo(pEntries, animations.size());
-        //animationStateMachine = boost::make_shared< Sonic::CAnimationStateMachine>();
-        //auto test = animationStateMachine->GetContext();
         m_AnimatorPose->CreateAnimationCache();
         m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
         m_spExampleElement->BindPose(m_AnimatorPose);

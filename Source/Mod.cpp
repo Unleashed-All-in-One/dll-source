@@ -63,6 +63,8 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	SpeedDownCollision::registerObject();
 	ETFStageGate::registerObject();
 	MoonMedal::registerObject();
+	EvilEnemyReckless::registerObject();
+	EvilLiftDoor::registerObject();
 
 	//---------------UI---------------
 	Title::applyPatches();

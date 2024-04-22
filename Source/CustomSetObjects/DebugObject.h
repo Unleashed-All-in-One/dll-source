@@ -211,11 +211,12 @@ public:
 
         return rotation = rotationQuaternion * rotation;
     }
-    void MoveVertical(int increase)
+    void MoveVerticalA(Sonic::Player::CPlayerSpeedContext* playerContext, int increase)
     {
         m_target = m_spMatrixNodeTransform->m_Transform.m_Position.y() + m_playerVerticalProgress + increase;
         m_timer = 0;
         m_movingUp = true;
+        playerContext->ChangeAnimation("Evilsonic_pillar_upH");
     }
     float easeInOutCirc(float x)
     {
@@ -223,19 +224,104 @@ public:
             ? (1 - sqrt(1 - pow(2 * x, 2))) / 2
             : (sqrt(1 - pow(-2 * x + 2, 2)) + 1) / 2;
     }
+    bool isLeftStickUpPressed = false;
+    bool isAPressed = false;
+    float m_LastFrame;
+    void VerticalMovementRegular(Sonic::Player::CPlayerSpeedContext* playerContext, Sonic::SPadState* inputPtr)
+    {
+        if (!m_movingUp && progress >= 1)
+        {
+            float stickVerticalValue = inputPtr->LeftStickVertical / 40;
+            if (stickVerticalValue < 0)
+                stickVerticalValue *= 2;
+            m_playerVerticalProgress += stickVerticalValue;
+
+            const auto spAnimInfo = boost::make_shared<Sonic::Message::MsgGetAnimationInfo>();
+            playerContext->m_pPlayer->SendMessageImm(playerContext->m_pPlayer->m_ActorID, spAnimInfo);
+            if (stickVerticalValue > 0 && spAnimInfo->m_Name != "Evilsonic_pillar_up")
+                playerContext->ChangeAnimation("Evilsonic_pillar_up");
+            
+            if (stickVerticalValue == 0 && spAnimInfo->m_Name != "Evilsonic_pillar_idle")
+                playerContext->ChangeAnimation("Evilsonic_pillar_idle");
+            
+            if (stickVerticalValue < 0 && spAnimInfo->m_Name != "Evilsonic_pillar_fall")
+                playerContext->ChangeAnimation("Evilsonic_pillar_fall");
+            
+        }
+        
+
+    }
+    void Rotation(Sonic::Player::CPlayerSpeedContext* playerContext, Sonic::SPadState* inputPtr, float deltaTime)
+    {
+        if (inputPtr->IsTapped(Sonic::eKeyState_DpadRight))
+        {
+            side++;
+            m_playerPoleRotationPrevTarget = m_playerPoleRotationTarget;
+            playerContext->ChangeAnimation("Evilsonic_pillar_turnL");
+            m_playerPoleRotationTarget += 1.5f;
+            progress = 0;
+        }
+        if (inputPtr->IsTapped(Sonic::eKeyState_DpadLeft))
+        {
+            side--;
+            m_playerPoleRotationPrevTarget = m_playerPoleRotationTarget;
+            playerContext->ChangeAnimation("Evilsonic_pillar_turnR");
+            m_playerPoleRotationTarget -= 1.5f;
+            progress = 0;
+        }
+        //
+        const auto spAnimInfo = boost::make_shared<Sonic::Message::MsgGetAnimationInfo>();
+        playerContext->m_pPlayer->SendMessageImm(playerContext->m_pPlayer->m_ActorID, spAnimInfo);
+        if (spAnimInfo->m_Frame > 10 && (spAnimInfo->m_Name == "Evilsonic_pillar_turnR" || spAnimInfo->m_Name == "Evilsonic_pillar_turnL"))
+        {
+            m_playerPoleRotation = m_playerPoleRotationTarget;
+        }
+        if (progress < 1)
+        {
+            progress += deltaTime * 2;
+        }
+        //Clamp
+        if (m_playerPoleRotationTarget > 6)
+            m_playerPoleRotationTarget = 0;
+
+        if (m_playerPoleRotationTarget < -1.5f)
+            m_playerPoleRotationTarget = 4.5f;
+
+        if (m_playerPoleRotation >= 6.0f)
+        {
+            m_playerPoleRotationTarget = 0;
+            m_playerPoleRotationPrevTarget = 0;
+            m_playerPoleRotation = 0;
+        }
+        if (m_playerPoleRotation <= -1.5f)
+        {
+            m_playerPoleRotationTarget = 4.5f;
+            m_playerPoleRotationPrevTarget = 4.5f;
+            m_playerPoleRotation = 4.5f;
+        }
+       
+    }
     void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
     {
-        auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
-        const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
+        Sonic::SPadState* inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
+        Sonic::Player::CPlayerSpeedContext* playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
+        isAPressed = inputPtr->IsTapped(Sonic::eKeyState_A);
+        isLeftStickUpPressed = inputPtr->IsDown(Sonic::eKeyState_LeftStickUp);
         if (m_playerInsideCollider && inputPtr->IsTapped(Sonic::eKeyState_B))
             m_playerOnPole = true;
         if (m_playerOnPole)
         {
+
+            DebugDrawText::log("###PLAYER CURRENTLY ON POLE###", 0);
+            DebugDrawText::log(std::format("PoleVerticalProgress: {0}", m_playerVerticalProgress).c_str(), 0);
+            DebugDrawText::log(std::format("PoleRotation: {0}", m_playerPoleRotation).c_str(), 0);
+            DebugDrawText::log(std::format("PoleRotationPrevTarget: {0}", m_playerPoleRotationPrevTarget).c_str(), 0);
+            DebugDrawText::log(std::format("PoleRotationTarget: {0}", m_playerPoleRotationTarget).c_str(), 0);
             if (m_movingUp)
             {
-                m_playerVerticalProgress = Common::lerpUnclampedf(m_playerPolePositionPrevTarget, m_target, easeInOutCirc(m_timer));
+                m_playerVerticalProgress = Common::lerpUnclampedf(m_playerPolePositionPrevTarget, m_target,m_timer);
                 if (m_timer < 1)
-                    m_timer += in_rUpdateInfo.DeltaTime * 0.8f;
+                    m_timer += in_rUpdateInfo.DeltaTime * 2;
                 else
                     m_movingUp = false;
             }            
@@ -243,11 +329,11 @@ public:
             {
                 m_playerPolePositionPrevTarget = m_playerVerticalProgress;
             }
-            if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickUp))
+            if (isLeftStickUpPressed && isAPressed && !m_movingUp)
             {
-                MoveVertical(1);
+                MoveVerticalA(playerContext, 2);
             }
-            if (inputPtr->IsTapped(Sonic::eKeyState_A))
+            if (isAPressed && !isLeftStickUpPressed)
             {
                 playerContext->m_Velocity = CVector(0, 0, 0);
                 AddImpulse(playerContext->m_spMatrixNode->m_Transform.m_Rotation * Hedgehog::Math::CVector(0, 5, -130), true);
@@ -258,34 +344,22 @@ public:
                 m_playerOnPole = false;
                 return;
             }
-            if(progress < 1)
-            progress += in_rUpdateInfo.DeltaTime * 0.8f;
-            m_playerVerticalProgress += inputPtr->LeftStickVertical / 20;
-            if (inputPtr->IsTapped(Sonic::eKeyState_DpadRight))
+            else
             {
-                side++;
-                m_playerPoleRotationPrevTarget = m_playerPoleRotationTarget;
-                m_playerPoleRotationTarget += 1.5f;
-                progress = 0;
             }
-            if (m_playerPoleRotationTarget > 4.5f)
-                m_playerPoleRotationTarget = 0;
 
-            if (m_playerPoleRotationTarget < 0)
-                m_playerPoleRotationTarget = 4.5f;
-            m_playerPoleRotation = Common::lerpUnclampedf(m_playerPoleRotationPrevTarget, m_playerPoleRotationTarget, progress);
-            
-            playerContext->ChangeAnimation("Evilsonic_pillar_idle");
-            playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = true;
+            VerticalMovementRegular(playerContext, inputPtr);
+            Rotation(playerContext, inputPtr, in_rUpdateInfo.DeltaTime);
             auto playerPos = playerContext->m_spMatrixNode->m_Transform.m_Position;
             auto targetPos = m_spMatrixNodeTransform->m_Transform.m_Position;
             targetPos.y() = playerPos.y();
+            playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = true;
+            auto quat = TransformUtilities::QuaternionFaceTowards(targetPos, playerPos, playerContext->m_spMatrixNode->m_Transform.m_Rotation);
 
-            playerContext->m_spMatrixNode->m_Transform.m_Rotation = TransformUtilities::QuaternionFaceTowards(targetPos, playerPos, playerContext->m_spMatrixNode->m_Transform.m_Rotation);
+            DebugDrawText::log(std::format("Quat: {0}, {1}, {2}", quat.x(), quat.y(), quat.z()).c_str(), 0);
+            playerContext->m_spMatrixNode->m_Transform.SetRotation(quat);
             playerContext->m_spMatrixNode->m_Transform.m_Position = Hedgehog::Math::CVector(m_spMatrixNodeTransform->m_Transform.m_Position.x() + 0.4f, m_spMatrixNodeTransform->m_Transform.m_Position.y() + m_playerVerticalProgress, m_spMatrixNodeTransform->m_Transform.m_Position.z());
             playerContext->m_spMatrixNode->m_Transform.m_Position = TransformUtilities::MoveAroundPivot(playerContext->m_spMatrixNode->m_Transform.m_Position, m_spMatrixNodeTransform->m_Transform.m_Position, Hedgehog::math::CVector(m_playerPoleRotation, 0, m_playerPoleRotation));
-
-            
         }
 
     }

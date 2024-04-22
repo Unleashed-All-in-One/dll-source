@@ -119,6 +119,8 @@
 #include "CustomSetObjects/SpeedDownCollision.h"
 #include "CustomSetObjects/ETFStageGate.h"
 #include "CustomSetObjects/MoonMedal.h"
+#include "CustomSetObjects/EvilEnemyReckless.h"
+#include "CustomSetObjects/EvilLiftDoor.h"
 
 //Rest
 #include "Testing/TestingCode.h"

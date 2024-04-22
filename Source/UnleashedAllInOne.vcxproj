@@ -122,6 +122,8 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="CustomSetObjects\DebugObject.cpp" />
     <ClCompile Include="CustomSetObjects\ETFStageGate.cpp" />
     <ClCompile Include="CustomSetObjects\ETFTimeSwitch.cpp" />
+    <ClCompile Include="CustomSetObjects\EvilEnemyReckless.cpp" />
+    <ClCompile Include="CustomSetObjects\EvilLiftDoor.cpp" />
     <ClCompile Include="CustomSetObjects\Hintring.cpp" />
     <ClCompile Include="CustomSetObjects\MoonMedal.cpp" />
     <ClCompile Include="CustomSetObjects\Paraloop.cpp" />
@@ -203,6 +205,8 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="CustomSetObjects\DebugObject.h" />
     <ClInclude Include="CustomSetObjects\ETFStageGate.h" />
     <ClInclude Include="CustomSetObjects\ETFTimeSwitch.h" />
+    <ClInclude Include="CustomSetObjects\EvilEnemyReckless.h" />
+    <ClInclude Include="CustomSetObjects\EvilLiftDoor.h" />
     <ClInclude Include="CustomSetObjects\Hintring.h" />
     <ClInclude Include="CustomSetObjects\MoonMedal.h" />
     <ClInclude Include="CustomSetObjects\Paraloop.h" />
