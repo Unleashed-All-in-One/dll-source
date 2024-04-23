@@ -91,7 +91,7 @@
 #include "System/DebugMenu/ImguiManager.h"
 #include "System/DebugMenu/ImGuiTheme.h"
 #include "System/DebugMenu/SynchronizedObject.h"
-#include "System/DebugMenu/Types.h"
+#include "System/DebugMenu/TypesParamRemove.h"
 
 //Functionality
 #include "Functionality/Patches.h"

@@ -19,7 +19,7 @@ public:
 	float yNormal;
 	float counterB;
 	bool complete;
-
+	SharedPtrTypeless soundGrunt;
 	bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
 	{
 		/* returning false if your renderable doesn't exist is recommended, your object simply wont render / will cease construction or w/e. */
@@ -88,14 +88,20 @@ public:
 		AddRigidBody(m_spRigidBody, shapeEventTrigger1, *pColID_Common, m_spNodeEventCollision);
 		return true;
 	}
-
+	void SetDoorPos(CVector pos)
+	{
+		m_spMatrixNodeTransform->m_Transform.m_Position = pos;
+		m_spMatrixNodeTransform->m_Transform.UpdateMatrix();
+		m_spMatrixNodeTransform->NotifyChanged();
+	}
 
 	void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
 	{
 		Sonic::Player::CPlayerSpeedContext* playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-		if (m_isPlayerInside && !complete)
+		auto handVector = (CVector)playerContext->m_pPlayer->m_spCharacterModel->GetNode("Hand_R")->m_WorldMatrix.matrix().col(3);
+		auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
+		if (m_isPlayerInside)
 		{
-			auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
 			if (inputPtr->IsTapped(Sonic::eKeyState_B))
 			{
 				if (!isDoingIt)
@@ -104,24 +110,30 @@ public:
 					isDoingIt = true;
 					playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = true;
 					playerContext->ChangeAnimation("Evilsonic_gate");
+					Common::PlaySoundStaticCueName(soundGrunt, "V_WHG_023");
 				}
-				timerForOff = 5;				
+				timerForOff = 5;
 			}
+		}
+		if (isDoingIt && !complete)
+		{		
 			DebugDrawText::log(std::format("TimerOff {0} | TimerComp {1}", timerForOff, timerForCompletion).c_str(), 0);
 			if (isDoingIt)
 			{
 				timerForOff -= in_rUpdateInfo.DeltaTime;
 				timerForCompletion += in_rUpdateInfo.DeltaTime;
-				if (timerForOff > 0 && timerForCompletion >  5)
+				if (timerForOff > 0 && timerForCompletion > 1.9f)
 				{
 					complete = true;
-					m_spMatrixNodeTransform->m_Transform.m_Position = CVector(m_spMatrixNodeTransform->m_Transform.m_Position.x(), m_spMatrixNodeTransform->m_Transform.m_Position.y() + 2, m_spMatrixNodeTransform->m_Transform.m_Position.z());
-					m_spMatrixNodeTransform->m_Transform.UpdateMatrix();
-					m_spMatrixNodeTransform->NotifyChanged();
+					SetDoorPos(CVector(m_spMatrixNodeTransform->m_Transform.m_Position.x(), m_spMatrixNodeTransform->m_Transform.m_Position.y() + 3, m_spMatrixNodeTransform->m_Transform.m_Position.z()));
 					m_spNodeEventCollision->NotifyChanged();
-					m_spNodeEventCollisionSolid->m_Transform.SetPosition(CVector(0, 1000, 0));
-					m_spNodeEventCollisionSolid->m_Transform.UpdateMatrix();
-					m_spNodeEventCollisionSolid->NotifyChanged();
+					m_spNodeEventCollision->m_Transform.SetPosition(CVector(0, 1000, 0));
+					m_spNodeEventCollision->m_Transform.UpdateMatrix();
+					m_spNodeEventCollision->NotifyChanged();
+				}
+				else if (!complete)
+				{
+					SetDoorPos(CVector(m_spMatrixNodeTransform->m_Transform.m_Position.x(), handVector.y(), m_spMatrixNodeTransform->m_Transform.m_Position.z()));
 					playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = false;
 				}
 				if (timerForOff <= 0)

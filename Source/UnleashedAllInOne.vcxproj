@@ -122,8 +122,8 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="CustomSetObjects\DebugObject.cpp" />
     <ClCompile Include="CustomSetObjects\ETFStageGate.cpp" />
     <ClCompile Include="CustomSetObjects\ETFTimeSwitch.cpp" />
-    <ClCompile Include="CustomSetObjects\EvilEnemyReckless.cpp" />
-    <ClCompile Include="CustomSetObjects\EvilLiftDoor.cpp" />
+    <ClCompile Include="CustomSetObjects\EvilEnemyRecklessC.cpp" />
+    <ClCompile Include="CustomSetObjects\EvilLiftDoorC.cpp" />
     <ClCompile Include="CustomSetObjects\Hintring.cpp" />
     <ClCompile Include="CustomSetObjects\MoonMedal.cpp" />
     <ClCompile Include="CustomSetObjects\Paraloop.cpp" />
@@ -165,7 +165,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="System\DebugMenu\imgui_tables.cpp" />
     <ClCompile Include="System\DebugMenu\imgui_widgets.cpp" />
     <ClCompile Include="System\DebugMenu\SynchronizedObject.cpp" />
-    <ClCompile Include="System\DebugMenu\Types.cpp" />
+    <ClCompile Include="System\DebugMenu\TypesParamRemove.cpp" />
     <ClCompile Include="System\DiscordStatus.cpp" />
     <ClCompile Include="System\DiscordGameSDK\achievement_manager.cpp" />
     <ClCompile Include="System\DiscordGameSDK\activity_manager.cpp" />
@@ -243,7 +243,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="System\DebugMenu\imstb_textedit.h" />
     <ClInclude Include="System\DebugMenu\imstb_truetype.h" />
     <ClInclude Include="System\DebugMenu\SynchronizedObject.h" />
-    <ClInclude Include="System\DebugMenu\Types.h" />
+    <ClInclude Include="System\DebugMenu\TypesParamRemove.h" />
     <ClInclude Include="System\DiscordStatus.h" />
     <ClInclude Include="System\DiscordGameSDK\achievement_manager.h" />
     <ClInclude Include="System\DiscordGameSDK\activity_manager.h" />
