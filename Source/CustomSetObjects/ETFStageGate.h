@@ -15,7 +15,7 @@ public:
 
     bool activateGate;
     bool disagreed;
-    uint32_t stageID, actIndex, worldIndex, stageType;
+    int stageID, actIndex, worldIndex, stageType;
     static ETFStageGateUIContainer* containerUI;
     SharedPtrTypeless handle1;
     void fpAddParticle2(Sonic::CParticleManager* manager, SharedPtrTypeless& handle, void* node, const hh::base::CSharedString& name, uint32_t flag)
@@ -47,7 +47,7 @@ public:
     {
         if (stageType != GetServiceGameplay2(Sonic::CApplicationDocument::GetInstance())[1])
         {
-            DebugDrawText::log(std::format("[ETFSTAGEGATE] StageType doesn't match ServiceGameplay PlayerClass. {0}, {1}", stageType, GetServiceGameplay2(Sonic::CApplicationDocument::GetInstance())[1]).c_str(), 10);
+            DebugDrawText::log(std::format("[SonicUnleashedConversion] StageType doesn't match ServiceGameplay PlayerClass. {0}, {1}", stageType, GetServiceGameplay2(Sonic::CApplicationDocument::GetInstance())[1]).c_str(), 10);
             return false;
         }
         const char* assetName = "cmn_obj_km_etfdoor_NAC";
@@ -79,7 +79,7 @@ public:
         }
         //fpAddParticle2(Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager.get(), handle1, &node, "ef_ch_sng_yh1_spinattack", 1);
         Common::fCGlitterCreate(playerContext, handle1, &node, particleName, 0);
-        AddRenderable("Object", m_spExampleElement, true);
+        Sonic::CGameObject::AddRenderable("Object", m_spExampleElement, true);
         DebugDrawText::log("I EXIST!!", 10);
         return true;
     }
@@ -123,7 +123,7 @@ public:
     {
         if (stageType != GetServiceGameplay2(Sonic::CApplicationDocument::GetInstance())[1])
         {
-            DebugDrawText::log(std::format("[ETFSTAGEGATE] StageType doesn't match ServiceGameplay PlayerClass. {0}, {1}", stageType, GetServiceGameplay2(Sonic::CApplicationDocument::GetInstance())[1]).c_str(), 10);
+            DebugDrawText::log(std::format("[SonicUnleashedConversion] StageType doesn't match ServiceGameplay PlayerClass. {0}, {1}", stageType, GetServiceGameplay2(Sonic::CApplicationDocument::GetInstance())[1]).c_str(), 10);
             return false;
         }
         m_spNodeEventCollision = boost::make_shared<Sonic::CMatrixNodeTransform>();
@@ -143,6 +143,7 @@ public:
             * Eigen::AngleAxisf(euler.z(), Eigen::Vector3f::UnitZ());
         return q;
     }
+    CQuaternion rotation;
     void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
     {
         auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
@@ -161,9 +162,11 @@ public:
                     containerUI = ETFStageGateUIContainer::Generate(playerContext->m_pPlayer, false, false);
                 containerUI->UpdateState(SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID), actIndex, worldIndex);
                 containerUI->Show();
+                playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = false;
+
                 playerContext->m_pPlayer->m_PostureStateMachine.ChangeState("Stop");
                 playerContext->m_spMatrixNode->m_Transform.m_Position = m_spMatrixNodeTransform->m_Transform.m_Position;
-                playerContext->m_spMatrixNode->m_Transform.SetRotation(EulerToQuaternion(Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera()->m_MyCamera.m_Direction));
+                rotation = (EulerToQuaternion(Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera()->m_MyCamera.m_Direction));
             }
             else
             {
@@ -176,6 +179,7 @@ public:
                     const char* stageToLoad = stageToLoadS.c_str();
 
                     LevelLoadingManager::setETFInfo(SequenceHelpers::getCurrentStageName(false));
+                    LevelLoadingManager::setGameParameters(SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID), "");
                     TitleWorldMap::LoadingReplacementEnabled = true;
                     LevelLoadingManager::WhiteWorldEnabled = false;
                     SequenceHelpers::loadStage((SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID)).c_str(), 0);
@@ -191,10 +195,10 @@ public:
     }
     void InitializeEditParam(Sonic::CEditParam& in_rEditParam) override
     {
-        in_rEditParam.SetInt(&stageID, "StageIDNumber");
-        in_rEditParam.SetInt(&worldIndex, "WorldIndex");
-        in_rEditParam.SetInt(&actIndex, "ActIndex");
-        in_rEditParam.SetInt(&stageType, "StageType");
+        in_rEditParam.CreateParamInt(&stageID, "StageIDNumber");
+        in_rEditParam.CreateParamInt(&worldIndex, "WorldIndex");
+        in_rEditParam.CreateParamInt(&actIndex, "ActIndex");
+        in_rEditParam.CreateParamInt(&stageType, "StageType");
     }
 
     static void registerObject();

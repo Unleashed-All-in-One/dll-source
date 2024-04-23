@@ -20,6 +20,7 @@
 #include <fstream>
 #include <iomanip>
 #include <math.h>
+#include <regex>
 #include <filesystem>
 //#include <queue>
 
@@ -41,6 +42,7 @@
 #include <tweeny-3.2.0.h>
 #include <INIReader.h>
 #include <json/json.h>
+#include <rapidxml/rapidxml.hpp>
 #include <Helpers.h>
 #include <Light.h>
 #include "System/DiscordGameSDK/discord.h"
@@ -70,6 +72,7 @@
 #include "Gameplay/Pole.h"
 
 //System
+#include "System/PhysicsObject.h"
 #include "System/LevelLoadingManager.h"
 #include "System/DiscordStatus.h"
 #include "System/AnimationSetPatcher.h"
@@ -88,9 +91,10 @@
 #include "System/DebugMenu/ImguiManager.h"
 #include "System/DebugMenu/ImGuiTheme.h"
 #include "System/DebugMenu/SynchronizedObject.h"
-#include "System/DebugMenu/Types.h"
+#include "System/DebugMenu/TypesParamRemove.h"
 
 //Functionality
+#include "Functionality/Patches.h"
 #include "Functionality/PauseBgm.h"
 #include "Functionality/FallCam.h"
 #include "Functionality/RingEnergy.h"
@@ -102,6 +106,7 @@
 #include "UI/TitleOption.h"
 #include "UI/TitleWorldMapPause.h"
 #include "UI/EventViewer.h"
+#include "UI/HelpCaptionUI.h"
 #include "UI/SubtitleUI.h"
 #include "UI/ItemboxUI.h"
 #include "UI/ETFStageGateUI.h"
@@ -114,6 +119,8 @@
 #include "CustomSetObjects/SpeedDownCollision.h"
 #include "CustomSetObjects/ETFStageGate.h"
 #include "CustomSetObjects/MoonMedal.h"
+#include "CustomSetObjects/EvilEnemyReckless.h"
+#include "CustomSetObjects/EvilLiftDoor.h"
 
 //Rest
 #include "Testing/TestingCode.h"

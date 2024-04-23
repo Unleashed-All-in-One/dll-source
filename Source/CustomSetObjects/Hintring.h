@@ -1,7 +1,7 @@
 #pragma once
 using namespace hh::math;
 
-class Hintring :public Sonic::CObjectBase, public Sonic::CSetObjectListener
+class Hintring :public Sonic::CObjectBase, public Sonic::CSetObjectListener, public Sonic::IAnimationContext, public Sonic::CAnimationStateMachine
 {
 public:
     BB_SET_OBJECT_MAKE("Hintring")
@@ -9,16 +9,18 @@ public:
     boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
     boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
 
-    boost::shared_ptr<Hedgehog::Animation::CAnimationPose> animatorTest;
+    boost::shared_ptr<Hedgehog::Animation::CAnimationPose> m_AnimatorPose;
     static HintDataList* hintData;
     bool m_playerInsideCollider;    
-    static SubtitleUIContainer* m_HintUI;
+    static HelpCaptionUIContainer* m_HintUI;
     bool m_IsExiting;
 
     //from Set data
-    uint32_t m_HintDataIndex = 0;
+    int m_HintDataIndex = 0;
     bool m_PlayerStop = true;
     bool m_NeedInput = true;
+    float m_TimerWaitReset;
+    bool m_Cooldown = false;
     std::vector<NewAnimationData> animations;
     boost::shared_ptr<Sonic::CAnimationStateMachine> animationStateMachine;
     bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
@@ -27,38 +29,59 @@ public:
         hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
         boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
         m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
-
-        animatorTest = boost::make_shared<Hedgehog::Animation::CAnimationPose>(in_spDatabase, assetName);
-
+        m_AnimatorPose = boost::make_shared<Hedgehog::Animation::CAnimationPose>(in_spDatabase, assetName);
         animations = std::vector<NewAnimationData>();
-        animations.push_back(NewAnimationData("Appear", "cmn_obj_sk2_hintring_appear", 1, true, nullptr));
+        animations.push_back(NewAnimationData("Idle", "cmn_obj_sk2_hintring", 1, true, nullptr));
+        animations.push_back(NewAnimationData("Appear", "cmn_obj_sk2_hintring_appear", 1, false, nullptr));
+        animations.push_back(NewAnimationData("Touch", "cmn_obj_sk2_hintring_touch", 1, false, "Idle"));
 
-        CAnimationStateInfo* pEntries = new CAnimationStateInfo[animations.size()];
-
-        pEntries[0].m_Name = animations[0].m_stateName;
-        pEntries[0].m_FileName = animations[0].m_fileName;
-        pEntries[0].m_Speed = animations[0].m_speed;
-        pEntries[0].m_PlaybackType = !animations[0].m_isLoop;
-        pEntries[0].field10 = 0;
-        pEntries[0].field14 = -1.0f;
-        pEntries[0].field18 = -1.0f;
-        pEntries[0].field1C = 0;
-        pEntries[0].field20 = -1;
-        pEntries[0].field24 = -1;
-        pEntries[0].field28 = -1;
-        pEntries[0].field2C = -1;
-
-        animatorTest->AddAnimationList(pEntries, animations.size());
-        //animationStateMachine = boost::make_shared< Sonic::CAnimationStateMachine>();
-        //auto test = animationStateMachine->GetContext();
+        this->SetContext(this); //why?
+        Hedgehog::Animation::SMotionInfo* pEntries = new Hedgehog::Animation::SMotionInfo[animations.size()];
+        for (size_t i = 0; i < animations.size(); i++)
+        {
+            pEntries[i].Name = animations[i].m_stateName;
+            pEntries[i].FileName = animations[i].m_fileName;
+            pEntries[i].Speed = animations[i].m_speed;
+            pEntries[i].RepeatType = !animations[i].m_isLoop;
+            pEntries[i].Field10 = 0;
+            pEntries[i].Field14 = -1.0f;
+            pEntries[i].Field18 = -1.0f;
+            pEntries[i].Field1C = 0;
+            pEntries[i].Field20 = -1;
+            pEntries[i].Field24 = -1;
+            pEntries[i].Field28 = -1;
+            pEntries[i].Field2C = -1;
+        }
         
+        m_AnimatorPose->AddMotionInfo(pEntries, animations.size());
+        m_AnimatorPose->CreateAnimationCache();
         m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
+        m_spExampleElement->BindPose(m_AnimatorPose);
+        this->AddAnimationState("Idle");
+        this->AddAnimationState("Appear");
+        this->AddAnimationState("Touch");
         //m_spExampleElement->BindAnimationPose(animatorTest);
         //ChangeState("Appear");
-        AddRenderable("Object", m_spExampleElement, true);
+        Sonic::CGameObject::AddRenderable("Object", m_spExampleElement, true);
         DebugDrawText::log("I EXIST!!", 10);
+
+        this->ChangeState("Idle");
         return true;
     }
+    Hedgehog::Animation::CAnimationPose* GetAnimationPose()
+    {
+        return m_AnimatorPose.get();
+    }
+    Hedgehog::Math::CVector GetVelocityForAnimationSpeed()
+    {
+        return Hedgehog::Math::CVector(1.0f, 1.0f, 1.0f);
+    }
+    Hedgehog::Math::CVector GetVelocityForAnimationChange()
+    {
+        return Hedgehog::Math::CVector(1.0f, 1.0f, 1.0f);
+    }
+    //virtual  = 0;
+    //virtual Hedgehog::Math::CVector GetVelocityForAnimationChange() = 0;
     bool ProcessMessage(Hedgehog::Universe::Message& in_rMsg, bool in_Flag) override
     {
         if (in_Flag)
@@ -73,7 +96,7 @@ public:
                     if (m_HintUI == nullptr)
                     {
                         //may not be a good idea to parent this to the player
-                        m_HintUI = SubtitleUIContainer::Generate(playerContext->m_pPlayer);
+                        m_HintUI = HelpCaptionUIContainer::Generate(playerContext->m_pPlayer);
                     }
                     if (m_PlayerStop)
                     {
@@ -87,6 +110,8 @@ public:
                     m_HintUI->Reset();
                     m_HintUI->strings = hintData->hintData[m_HintDataIndex];
                     m_HintUI->Show();
+                    m_Cooldown = true;
+                    this->ChangeState("Touch");
                 }
                 return true;
             }    
@@ -103,9 +128,6 @@ public:
             if (std::strstr(in_rMsg.GetType(), "MsgGetHomingAttackPosition") != nullptr)
             {
 
-                DWORD* msg = (DWORD*)&in_rMsg;
-                *(Hedgehog::Math::CVector*)(msg + 16) = m_spMatrixNodeTransform->m_Transform.m_Position;
-                SendMessageImm(in_rMsg.m_SenderActorID, (Hedgehog::Universe::MessageTypeSet*)msg);
             }
         }
         return Sonic::CObjectBase::ProcessMessage(in_rMsg, in_Flag);
@@ -124,6 +146,18 @@ public:
 
     void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
     {
+        if (m_Cooldown && !m_playerInsideCollider)
+        {
+            m_TimerWaitReset += in_rUpdateInfo.DeltaTime;
+            if (m_TimerWaitReset > 5)
+            {
+                m_Cooldown = false;
+                m_TimerWaitReset = 0;
+
+                this->ChangeState("Appear");
+            }
+        }
+        m_AnimatorPose->Update(in_rUpdateInfo.DeltaTime);
         auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
         if (m_playerInsideCollider && !m_IsExiting)
         {            
@@ -150,10 +184,9 @@ public:
     }
     void InitializeEditParam(Sonic::CEditParam& in_rEditParam) override
     {
-        //...why ceramic... why did you have to name these "set" if they're meant to "get"...
-        in_rEditParam.SetBool(&m_NeedInput, "NeedInput");
-        in_rEditParam.SetBool(&m_PlayerStop, "PlayerStop");
-        in_rEditParam.SetInt(&m_HintDataIndex, "HintDataIndex");
+        in_rEditParam.CreateParamBool(&m_NeedInput, "NeedInput");
+        in_rEditParam.CreateParamBool(&m_PlayerStop, "PlayerStop");
+        in_rEditParam.CreateParamInt(&m_HintDataIndex, "HintDataIndex");
     }
     static void registerObject();
 };

@@ -92,25 +92,33 @@ void SequenceHelpers::loadStage(const char* in_StageName, int sequenceEventExtra
 	auto message2 = Sonic::Message::MsgStorySequenceEvent(0, 0);
 	auto test = Sonic::Sequence::Main::GetInstance();
 	//void __thiscall StorySeqProcessStorySequenceEvent(int storySequence, CMsgStorySequenceEvent *storySequenceEvent)
-
+	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
+	char** h = (char**)stageTerrainAddress;
+	const char* terr = *h;
+	strcpy(*(char**)stageTerrainAddress, in_StageName);
 	if (resetStorySequence)
 	{
 		SequenceHelpers::resetStorySequence();
 	}
 	Sonic::Sequence::Main::ProcessMessage(&message);
+	uint32_t stageIDAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x0 });
+	uint32_t* test2 = &stageIDAddress;
+	*test2 = 0;
 }
 /// <summary>
 /// Uses the SetupPlayer and SetupPlayerForce functions from CStorySequence to change player classes
 /// NOTE: This does not switch players in realtime.
 /// </summary>
 /// <param name="in_PlayerType"></param>
-void SequenceHelpers::setPlayerType(int in_PlayerType)
+void SequenceHelpers::setPlayerType(int in_PlayerType, bool forced)
 {
-	FUNCTION_PTR(char, __thiscall, SetupPlayerForce, 0xD72270, Sonic::Sequence::Story* This, int a2, LuaIntegerEntryContainer * a3);
-	
 	nextPlayerType = in_PlayerType;
-	LuaIntegerEntryContainer newLuaMessage = LuaIntegerEntryContainer(in_PlayerType);
-	SetupPlayerForce(storySequenceInstance, 0, &newLuaMessage);
+	if (forced)
+	{
+		FUNCTION_PTR(char, __thiscall, SetupPlayerForce, 0xD72270, Sonic::Sequence::Story * This, int a2, LuaIntegerEntryContainer * a3);
+		LuaIntegerEntryContainer newLuaMessage = LuaIntegerEntryContainer(in_PlayerType);
+		SetupPlayerForce(storySequenceInstance, 0, &newLuaMessage);
+	}
 }
 
 

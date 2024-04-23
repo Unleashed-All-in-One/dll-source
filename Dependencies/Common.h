@@ -1828,7 +1828,15 @@ namespace Common
 			sub_75FA60((void*)syncObject[8], soundHandle, cueID);
 		}
 	}
-
+	inline void PlaySoundStaticCueName(SharedPtrTypeless& soundHandle, Hedgehog::base::CSharedString cueID)
+	{
+		uint32_t* syncObject = *(uint32_t**)0x1E79044;
+		if (syncObject)
+		{
+			FUNCTION_PTR(void*, __thiscall, sub_75FA60, 0x75FA90, void* This, SharedPtrTypeless&, const Hedgehog::base::CSharedString & cueId);
+			sub_75FA60((void*)syncObject[8], soundHandle, cueID);
+		}
+	}
 	inline void SpawnBoostParticle(uint32_t** This, Eigen::Vector3f const& pos, int amount)
 	{
 		if (amount <= 0) return;

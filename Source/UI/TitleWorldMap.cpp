@@ -138,7 +138,7 @@ public:
 		m_spModel = boost::make_shared<hh::mr::CSingleElement>(hh::mr::CMirageDatabaseWrapper(spDatabase.get()).GetModelData(name));
 		
 
-		AddRenderable("Object", m_spModel, false);
+		Sonic::CGameObject::AddRenderable("Object", m_spModel, false);
 
 
 	}
@@ -965,7 +965,7 @@ void CapitalWindow_Update()
 				WRITE_STRING(0x0169A304, GetStageToLoad());
 
 			}*/
-			Title::showTransition();
+			Title::showTransition(true);
 		}
 		else
 		{
@@ -1010,7 +1010,7 @@ void StageWindow_Update(Sonic::CGameObject* This)
 		MiniAudioHelper::playSound(stageSelectHandle, 3, "Boot");
 		LevelLoadingManager::WhiteWorldEnabled = Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].data[TitleWorldMap::StageSelectedWindow].isWhiteWorld;
 
-		Title::showTransition();
+		Title::showTransition(true);
 	}
 	//Selection increase
 	if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickDown) && TitleWorldMap::StageSelectedWindow != stageSelectedWindowMax)
@@ -1443,11 +1443,11 @@ HOOK(Hedgehog::Mirage::CRenderable*, __fastcall, AddRenderableTitle, 0x58E650, D
 }
 HOOK(int, __cdecl, sub_7C931F, 0x7C931F, int a1, const char* a2)
 {
-	printf("[WorldMap] %s\n", a2);
+	printf("[CRIWARE Audio] %s\n", a2);
 	return originalsub_7C931F(a1, a2);
 }HOOK(int, __fastcall, sub_7E27B0, 0x7E27B0, char* a1, ...)
 {
-	printf("[WorldMap] %s\n", a1);
+	printf("[CRIWARE Audio] %s\n", a1);
 	return originalsub_7E27B0(a1);
 }
 

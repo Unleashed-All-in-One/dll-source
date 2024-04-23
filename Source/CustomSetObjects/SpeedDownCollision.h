@@ -87,10 +87,10 @@ public:
     }
     void InitializeEditParam(Sonic::CEditParam& in_rEditParam) override
     {
-        in_rEditParam.SetFloat(&m_CollisionHeight, "Collision_Height");
-        in_rEditParam.SetFloat(&m_CollisionLength, "Collision_Length");
-        in_rEditParam.SetFloat(&m_CollisionWidth, "Collision_Width");
-        in_rEditParam.SetFloat(&m_Speed, "Speed");
+        in_rEditParam.CreateParamFloat(&m_CollisionHeight, "Collision_Height");
+        in_rEditParam.CreateParamFloat(&m_CollisionLength, "Collision_Length");
+        in_rEditParam.CreateParamFloat(&m_CollisionWidth, "Collision_Width");
+        in_rEditParam.CreateParamFloat(&m_Speed, "Speed");
     }
     static void registerObject();
 };

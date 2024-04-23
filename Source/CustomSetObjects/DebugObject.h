@@ -76,7 +76,7 @@ class WerehogPole :public Sonic::CObjectBase, public Sonic::CSetObjectListener
 {
 public:
     // This macro initializes the "make" function, takes the XML's object name.
-    BB_SET_OBJECT_MAKE("TestObjectNextino")
+    BB_SET_OBJECT_MAKE("EvilColumn")
 
         /* Make your fields */
         boost::shared_ptr<hh::mr::CSingleElement> m_spExampleElement;
@@ -92,9 +92,15 @@ public:
     float m_playerPoleRotation;
     float m_playerPoleRotationTarget;
     float m_playerPoleRotationPrevTarget;
+    float m_playerPolePositionPrevTarget;
     float cooldownTimer;
     float side = 0;
     float progress;
+    int m_setColliderLength;
+    bool m_setRotation90Snap;
+    bool m_movingUp;
+    float m_timer;
+    float m_target;
     /* Renderable methods */
     bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
     {
@@ -103,10 +109,9 @@ public:
         hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
         boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
         m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
-
+       
         m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
-        AddRenderable("Object", m_spExampleElement, true);
-        DebugDrawText::log("I EXIST!!", 10);
+        Sonic::CGameObject::AddRenderable("Object", m_spExampleElement, true);
         return true;
     }
     bool ProcessMessage(Hedgehog::Universe::Message& in_rMsg, bool in_Flag) override
@@ -131,10 +136,26 @@ public:
                 }
                 return true;
             }
+            if (std::strstr(in_rMsg.GetType(), "MsgGetHomingAttackPriority") != nullptr)
+            {
+                const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
+
+                Sonic::Message::MsgGetHomingAttackPriority& msg = (Sonic::Message::MsgGetHomingAttackPriority&)(in_rMsg);
+                *msg.m_pPriority = 0;
+                return true;
+            }
             if (std::strstr(in_rMsg.GetType(), "MsgSetPosition") != nullptr)
             {
                 Sonic::Message::MsgSetPosition& msg = (Sonic::Message::MsgSetPosition&)(in_rMsg);
                 m_spMatrixNodeTransform->m_Transform.m_Position = msg.m_Position;
+                return true;
+            }
+            if (std::strstr(in_rMsg.GetType(), "MsgGetHomingAttackPosition") != nullptr)
+            {
+                const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
+
+                Sonic::Message::MsgGetHomingAttackPosition& msg = (Sonic::Message::MsgGetHomingAttackPosition&)(in_rMsg);
+                *msg.m_pPosition = playerContext->m_spMatrixNode->m_Transform.m_Position;
                 return true;
             }
         }
@@ -147,8 +168,14 @@ public:
         m_spNodeEventCollision->NotifyChanged();
         m_spNodeEventCollision->SetParent(m_spMatrixNodeTransform.get());
         //void __thiscall sub_10C0E00(_DWORD *this, int a2)
-        hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(1, 6, 1);
+        hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(1, m_setColliderLength, 1);
         AddEventCollision("Object", shapeEventTrigger1, *pColID_PlayerEvent, true, m_spNodeEventCollision);
+       /* AddRigidBody(m_spRigidBody, shapeEventTrigger1, *pColID_PlayerEvent, m_spNodeEventCollision);
+        m_spRigidBody->ApplyPropertyID(0, 0);
+        m_spRigidBody->m_pHkpRigidBody->m_Unk1 = 1;
+        void* ffaf = *(void**)m_spRigidBody->m_pHkpRigidBody->m_Collideable.m_Motion;
+        */// bool AddRigidBody(const boost::shared_ptr<CRigidBody>& rigidBody, hk2010_2_0::hkpShape* shape, int collisionID, const boost::shared_ptr<Hedgehog::Mirage::CMatrixNode>& matrixNode)
+        
         // You don't need to override this if you're not using it, but this would be for setting up event colliders & rigidbodies.
         // note you can do this in "SetAddRenderables" but sonic team *tends to* do collision stuff here.
         return true;
@@ -184,57 +211,162 @@ public:
 
         return rotation = rotationQuaternion * rotation;
     }
-    // You'll do update logic here for the most part.
-    // Again don't add this if you don't need to, but you usually will for interactables.
+    void MoveVerticalA(Sonic::Player::CPlayerSpeedContext* playerContext, int increase)
+    {
+        m_target = m_spMatrixNodeTransform->m_Transform.m_Position.y() + m_playerVerticalProgress + increase;
+        m_timer = 0;
+        m_movingUp = true;
+        playerContext->ChangeAnimation("Evilsonic_pillar_upH");
+    }
+    float easeInOutCirc(float x)
+    {
+        return x < 0.5
+            ? (1 - sqrt(1 - pow(2 * x, 2))) / 2
+            : (sqrt(1 - pow(-2 * x + 2, 2)) + 1) / 2;
+    }
+    bool isLeftStickUpPressed = false;
+    bool isAPressed = false;
+    float m_LastFrame;
+    void VerticalMovementRegular(Sonic::Player::CPlayerSpeedContext* playerContext, Sonic::SPadState* inputPtr)
+    {
+        if (!m_movingUp && progress >= 1)
+        {
+            float stickVerticalValue = inputPtr->LeftStickVertical / 40;
+            if (stickVerticalValue < 0)
+                stickVerticalValue *= 2;
+            m_playerVerticalProgress += stickVerticalValue;
+
+            const auto spAnimInfo = boost::make_shared<Sonic::Message::MsgGetAnimationInfo>();
+            playerContext->m_pPlayer->SendMessageImm(playerContext->m_pPlayer->m_ActorID, spAnimInfo);
+            if (stickVerticalValue > 0 && spAnimInfo->m_Name != "Evilsonic_pillar_up")
+                playerContext->ChangeAnimation("Evilsonic_pillar_up");
+            
+            if (stickVerticalValue == 0 && spAnimInfo->m_Name != "Evilsonic_pillar_idle")
+                playerContext->ChangeAnimation("Evilsonic_pillar_idle");
+            
+            if (stickVerticalValue < 0 && spAnimInfo->m_Name != "Evilsonic_pillar_fall")
+                playerContext->ChangeAnimation("Evilsonic_pillar_fall");
+            
+        }
+        
+
+    }
+    void Rotation(Sonic::Player::CPlayerSpeedContext* playerContext, Sonic::SPadState* inputPtr, float deltaTime)
+    {
+        if (inputPtr->IsTapped(Sonic::eKeyState_DpadRight))
+        {
+            side++;
+            m_playerPoleRotationPrevTarget = m_playerPoleRotationTarget;
+            playerContext->ChangeAnimation("Evilsonic_pillar_turnL");
+            m_playerPoleRotationTarget += 1.5f;
+            progress = 0;
+        }
+        if (inputPtr->IsTapped(Sonic::eKeyState_DpadLeft))
+        {
+            side--;
+            m_playerPoleRotationPrevTarget = m_playerPoleRotationTarget;
+            playerContext->ChangeAnimation("Evilsonic_pillar_turnR");
+            m_playerPoleRotationTarget -= 1.5f;
+            progress = 0;
+        }
+        //
+        const auto spAnimInfo = boost::make_shared<Sonic::Message::MsgGetAnimationInfo>();
+        playerContext->m_pPlayer->SendMessageImm(playerContext->m_pPlayer->m_ActorID, spAnimInfo);
+        if (spAnimInfo->m_Frame > 10 && (spAnimInfo->m_Name == "Evilsonic_pillar_turnR" || spAnimInfo->m_Name == "Evilsonic_pillar_turnL"))
+        {
+            m_playerPoleRotation = m_playerPoleRotationTarget;
+        }
+        if (progress < 1)
+        {
+            progress += deltaTime * 2;
+        }
+        //Clamp
+        if (m_playerPoleRotationTarget > 6)
+            m_playerPoleRotationTarget = 0;
+
+        if (m_playerPoleRotationTarget < -1.5f)
+            m_playerPoleRotationTarget = 4.5f;
+
+        if (m_playerPoleRotation >= 6.0f)
+        {
+            m_playerPoleRotationTarget = 0;
+            m_playerPoleRotationPrevTarget = 0;
+            m_playerPoleRotation = 0;
+        }
+        if (m_playerPoleRotation <= -1.5f)
+        {
+            m_playerPoleRotationTarget = 4.5f;
+            m_playerPoleRotationPrevTarget = 4.5f;
+            m_playerPoleRotation = 4.5f;
+        }
+       
+    }
     void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
     {
-        auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
-        const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
+        Sonic::SPadState* inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
+        Sonic::Player::CPlayerSpeedContext* playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
+        isAPressed = inputPtr->IsTapped(Sonic::eKeyState_A);
+        isLeftStickUpPressed = inputPtr->IsDown(Sonic::eKeyState_LeftStickUp);
         if (m_playerInsideCollider && inputPtr->IsTapped(Sonic::eKeyState_B))
             m_playerOnPole = true;
         if (m_playerOnPole)
         {
-            if (inputPtr->IsTapped(Sonic::eKeyState_A))
+
+            DebugDrawText::log("###PLAYER CURRENTLY ON POLE###", 0);
+            DebugDrawText::log(std::format("PoleVerticalProgress: {0}", m_playerVerticalProgress).c_str(), 0);
+            DebugDrawText::log(std::format("PoleRotation: {0}", m_playerPoleRotation).c_str(), 0);
+            DebugDrawText::log(std::format("PoleRotationPrevTarget: {0}", m_playerPoleRotationPrevTarget).c_str(), 0);
+            DebugDrawText::log(std::format("PoleRotationTarget: {0}", m_playerPoleRotationTarget).c_str(), 0);
+            if (m_movingUp)
+            {
+                m_playerVerticalProgress = Common::lerpUnclampedf(m_playerPolePositionPrevTarget, m_target,m_timer);
+                if (m_timer < 1)
+                    m_timer += in_rUpdateInfo.DeltaTime * 2;
+                else
+                    m_movingUp = false;
+            }            
+            else
+            {
+                m_playerPolePositionPrevTarget = m_playerVerticalProgress;
+            }
+            if (isLeftStickUpPressed && isAPressed && !m_movingUp)
+            {
+                MoveVerticalA(playerContext, 2);
+            }
+            if (isAPressed && !isLeftStickUpPressed)
             {
                 playerContext->m_Velocity = CVector(0, 0, 0);
                 AddImpulse(playerContext->m_spMatrixNode->m_Transform.m_Rotation * Hedgehog::Math::CVector(0, 5, -130), true);
-                playerContext->ChangeState(Sonic::Player::StateAction::Jump);
+                playerContext->ChangeState(Sonic::Player::EPlayerSpeedState::ePlayerSpeedState_Jump);
                 playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = false;
 
                 playerContext->m_pPlayer->m_PostureStateMachine.ChangeState("Standard");
                 m_playerOnPole = false;
                 return;
             }
-            if(progress < 1)
-            progress += in_rUpdateInfo.DeltaTime * 0.8f;
-            m_playerVerticalProgress += inputPtr->LeftStickVertical / 30;
-            if (inputPtr->IsTapped(Sonic::eKeyState_DpadRight))
+            else
             {
-                side++;
-                m_playerPoleRotationPrevTarget = m_playerPoleRotationTarget;
-                m_playerPoleRotationTarget += 1.5f;
-                progress = 0;
             }
-            if (m_playerPoleRotationTarget > 4.5f)
-                m_playerPoleRotationTarget = 0;
 
-            if (m_playerPoleRotationTarget < 0)
-                m_playerPoleRotationTarget = 4.5f;
-            m_playerPoleRotation = Common::lerpUnclampedf(m_playerPoleRotationPrevTarget, m_playerPoleRotationTarget, progress);
-            
-            playerContext->ChangeAnimation("Evilsonic_pillar_idle");
-            playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = true;
+            VerticalMovementRegular(playerContext, inputPtr);
+            Rotation(playerContext, inputPtr, in_rUpdateInfo.DeltaTime);
             auto playerPos = playerContext->m_spMatrixNode->m_Transform.m_Position;
             auto targetPos = m_spMatrixNodeTransform->m_Transform.m_Position;
             targetPos.y() = playerPos.y();
+            playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = true;
+            auto quat = TransformUtilities::QuaternionFaceTowards(targetPos, playerPos, playerContext->m_spMatrixNode->m_Transform.m_Rotation);
 
-            playerContext->m_spMatrixNode->m_Transform.m_Rotation = TransformUtilities::QuaternionFaceTowards(targetPos, playerPos, playerContext->m_spMatrixNode->m_Transform.m_Rotation);
-            playerContext->m_spMatrixNode->m_Transform.m_Position = Hedgehog::Math::CVector(m_spMatrixNodeTransform->m_Transform.m_Position.x() + 1, m_spMatrixNodeTransform->m_Transform.m_Position.y() + m_playerVerticalProgress, m_spMatrixNodeTransform->m_Transform.m_Position.z());
+            DebugDrawText::log(std::format("Quat: {0}, {1}, {2}", quat.x(), quat.y(), quat.z()).c_str(), 0);
+            playerContext->m_spMatrixNode->m_Transform.SetRotation(quat);
+            playerContext->m_spMatrixNode->m_Transform.m_Position = Hedgehog::Math::CVector(m_spMatrixNodeTransform->m_Transform.m_Position.x() + 0.4f, m_spMatrixNodeTransform->m_Transform.m_Position.y() + m_playerVerticalProgress, m_spMatrixNodeTransform->m_Transform.m_Position.z());
             playerContext->m_spMatrixNode->m_Transform.m_Position = TransformUtilities::MoveAroundPivot(playerContext->m_spMatrixNode->m_Transform.m_Position, m_spMatrixNodeTransform->m_Transform.m_Position, Hedgehog::math::CVector(m_playerPoleRotation, 0, m_playerPoleRotation));
-
-            
         }
-    }
 
+    }
+    void InitializeEditParam(Sonic::CEditParam& in_rEditParam) override
+    {
+        in_rEditParam.CreateParamInt(&m_setColliderLength, "Length");
+        in_rEditParam.CreateParamBool(&m_setRotation90Snap, "Rotation90Snap");
+    }
     static void registerObject();
 };

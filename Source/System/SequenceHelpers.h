@@ -5,7 +5,7 @@ enum PlayerType : int
 	CLASSIC_SONIC = 1,
 	SUPER_SONIC = 2
 };
-enum ModuleFlow
+enum ModuleFlow	
 {
 	Unknown,
 	Boot,
@@ -117,7 +117,7 @@ public:
 	static void playEvent(const char* in_EventName, ModuleFlow in_EventModule);
 	static void queueEvent(const char* in_EventName);
 	static void loadStage(const char* in_StageName, int sequenceEventExtra = 0, bool resetStorySequence = true);
-	static void setPlayerType(int in_PlayerType);
+	static void setPlayerType(int in_PlayerType, bool forced = true);
 	static void applyPatches();
 	static std::string getCurrentStageName(bool withoutNumber);
 	static void update();

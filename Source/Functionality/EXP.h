@@ -47,8 +47,7 @@ public:
         m_spModel = boost::make_shared<hh::mr::CSingleElement>(spModelData);
 
         m_spModel->BindMatrixNode(m_spMatrixNodeTransform);
-        AddRenderable("Object", m_spModel, true);
-
+        Sonic::CGameObject::AddRenderable("Object", m_spModel, true);
         Sonic::Player::CPlayerSpeedContext* context = Sonic::Player::CPlayerSpeedContext::GetInstance();
         return true;
     }
@@ -140,7 +139,7 @@ public:
                 m_IsGoingTowardsPlayer = true;
                 m_PositionAtStartHoming = m_TargetPosition;
             }
-            m_TimerLerp += updateInfo.DeltaTime / 1.2f;
+            m_TimerLerp += updateInfo.DeltaTime / 0.8f;
             m_Position = Common::Lerp(m_PositionAtStartHoming, context->m_spMatrixNode->m_Transform.m_Position + (Eigen::Vector3f::UnitY() * 0.5f), m_TimerLerp);
             
         }

@@ -8,7 +8,8 @@ std::string Context::imGuiIniPath = "ImGui.ini";
 
 HWND Context::window;
 IUnknown* Context::device;
-ImFont* Context::font;
+ImFont* Context::fontDroidSans;
+ImFont* Context::fontSeuratProM;
 Backend Context::backend;
 std::string Context::getModDirectoryPath()
 {
@@ -41,22 +42,32 @@ void Context::initialize(HWND window, IUnknown* device)
     io.DisplaySize = { (float)*WIDTH, (float)*HEIGHT };
     ImGuiTheme::ImGuiSetTheme(ImThemeColor(0, 0, 0), ImThemeColor(155, 155, 155), ImThemeColor(200, 200, 200), ImThemeColor(212, 212, 212), ImThemeColor(155, 155, 155));
     const float fontSize = max(16, *HEIGHT / 1080.0f * 16);
+    ImFontConfig font_cfg;
+    font_cfg.GlyphExtraSpacing.x = -2;
+    fontSeuratProM = io.Fonts->AddFontFromFileTTF((modDirectoryPath + "/disk/Fonts/SeuratProM.otf").c_str(), max(42, *HEIGHT / 1080.0f * 42), &font_cfg, io.Fonts->GetGlyphRangesDefault());
+    fontDroidSans = io.Fonts->AddFontFromFileTTF((modDirectoryPath + "/disk/Fonts/DroidSans.ttf").c_str(), fontSize, nullptr, io.Fonts->GetGlyphRangesDefault());
 
-    if ((font = io.Fonts->AddFontFromFileTTF((modDirectoryPath + "/Fonts/DroidSans.ttf").c_str(), fontSize, nullptr, io.Fonts->GetGlyphRangesDefault())) == nullptr)
+    if (fontDroidSans == nullptr)
     {
         DebugDrawText::log("Failed to load DroidSans.ttf", 1);
-        font = io.Fonts->AddFontDefault();
+        fontDroidSans = io.Fonts->AddFontDefault();
+    }
+    if (fontSeuratProM == nullptr)
+    {
+        DebugDrawText::log("Failed to load SeuratProM.otf", 1);
+        fontSeuratProM = io.Fonts->AddFontDefault();
     }
 
     ImFontConfig fontConfig;
     fontConfig.MergeMode = true;
 
-    if (!io.Fonts->AddFontFromFileTTF((modDirectoryPath + "/Fonts/DroidSansJapanese.ttf").c_str(), fontSize * 1.25f, &fontConfig, io.Fonts->GetGlyphRangesJapanese()))
+    if (!io.Fonts->AddFontFromFileTTF((modDirectoryPath + "/disk/Fonts/DroidSansJapanese.ttf").c_str(), fontSize * 1.25f, &fontConfig, io.Fonts->GetGlyphRangesJapanese()))
         DebugDrawText::log("Failed to load DroidSansJapanese.ttf", 1);
 
     io.Fonts->Build();
 
-    DebugDrawText::log("Press Esc to hide/show the UI.", 1);
+    DebugDrawText::log("UnleashedConversion init success", 1);
+    DebugDrawText::log(std::format("UnleashedConversion {0} {1}", __DATE__, __TIME__).c_str(), 10);
 }
 bool Context::loadTextureFromFile(const wchar_t* filename, IUnknown** out_texture, int* out_width, int* out_height)
 {
@@ -132,21 +143,36 @@ bool Context::loadTextureFromFile(const wchar_t* filename, IUnknown** out_textur
     }
     }
 
-    printf("[UIContext] Error reading texture! (0x%08x)\n", hr);
+    printf("[SonicUnleashedConversion] (UIContext) Error reading texture! (0x%08x)\n", hr);
     return false;
 }
 void Context::update()
 {
+    switch (backend)
+    {
+    case Backend::DX9:
+        ImGui_ImplDX9_NewFrame();
+        break;
+
+    case Backend::DX11:
+        ImGui_ImplDX11_NewFrame();
+        break;
+    }
+
+    ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
     if (GetAsyncKeyState(VK_TAB) & 1)
         ImguiManager::visible ^= true;
 
-
-    ImGui::PushFont(font);
-
+    //Draw all elements until the pop with DroidSans
+    ImGui::PushFont(fontDroidSans);
     ImguiManager::update();
+    ImGui::PopFont();
 
+    //Draw all elements until the pop with SeuratPro (dialogue font)
+    ImGui::PushFont(fontSeuratProM);
+    SubtitleUI::draw();
     ImGui::PopFont();
 
     ImGui::EndFrame();

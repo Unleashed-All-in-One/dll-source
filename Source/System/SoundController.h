@@ -18,7 +18,7 @@ public:
 	{
 		Sonic::CGameDocument* gameDocument = Sonic::CGameDocument::GetInstance().get().get();
 		hh::vector<Sonic::SBGMData>* audioData = &gameDocument->m_pMember->m_AudioData;
-		Hedgehog::Sound::CSoundHandleBgm* bgm = audioData->at(in_BgmIndex).m_spSoundHandleBGM.get();
+		Hedgehog::Sound::CSoundHandleBgm* bgm = audioData->at(in_BgmIndex).spSoundHandleBGM.get();
 		CSoundPlayerCri* soundPlayer = (CSoundPlayerCri*)bgm->GetSoundPlayer();
 		return soundPlayer->m_Volume;
 	}
@@ -29,8 +29,8 @@ public:
 
 		for (int i = 0; i < audioData->size(); ++i)
 		{
-			printf(audioData->at(i).m_SongName.c_str());
-			Hedgehog::Sound::CSoundHandleBgm* bgm = audioData->at(i).m_spSoundHandleBGM.get();
+			printf(audioData->at(i).Name.c_str());
+			Hedgehog::Sound::CSoundHandleBgm* bgm = audioData->at(i).spSoundHandleBGM.get();
 
 			CSoundPlayerCri* soundPlayer = (CSoundPlayerCri*)bgm->GetSoundPlayer();
 

@@ -45,7 +45,7 @@ public:
         m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
 
         m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
-        AddRenderable("Object", m_spExampleElement, true);
+        Sonic::CGameObject::AddRenderable("Object", m_spExampleElement, true);
         static bool init = false;
         initialize();
         

@@ -6,7 +6,7 @@ struct AudioData {
 SoLoud::Soloud* soloud  ; // Create an instance of the SoLoud engine
 std::vector<AudioData> wavs; // Create a vector to store multiple instances of WAV audio files
 static std::vector<int> handles; // Create a vector to store multiple instances of WAV audio files
-const char* modPath;
+std::string modPath;
 void LoadFile(SoLoud::Wav* source, std::string cueName)
 {
     source->load(cueName.c_str()); // Load the audio file at the specified path
@@ -22,7 +22,7 @@ unsigned int MiniAudioHelper::playAudio(std::string cueName, const bool& sfxOrAu
     if (cueName.rfind(".mp3") != cueName.size() - 4) {
         cueName.append(".mp3");
     }
-    cueName.insert(0, "Audio\\");
+    cueName.insert(0, "\\disk\\Audio\\");
     cueName.insert(0, modPath);
     std::ifstream file(cueName);
     if (!file)

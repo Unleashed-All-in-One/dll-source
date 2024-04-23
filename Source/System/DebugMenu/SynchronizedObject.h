@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Types.h"
+#include "TypesParamRemove.h"
 
 struct SynchronizedObject
 {

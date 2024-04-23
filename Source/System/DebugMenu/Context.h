@@ -17,7 +17,8 @@ class Context
     static IUnknown* device;
     static Backend backend;
 
-    static ImFont* font;
+    static ImFont* fontDroidSans;
+    static ImFont* fontSeuratProM;
 
 public:
     static bool loadTextureFromFile(const wchar_t* filename, IUnknown** out_texture, int* out_width = nullptr, int* out_height = nullptr);

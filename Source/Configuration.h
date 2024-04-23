@@ -36,6 +36,10 @@ struct ArchiveTreeDefinitions
 
 class Configuration
 {
+private:
+	static float m_deltaTime;
+	static int m_frameDeltaTime;
+	static float m_hudDeltaTime;
 public:
 	static void load(const char* path);
 
@@ -54,6 +58,12 @@ public:
 	static std::string modPath;
 	static std::vector<std::string> getAllLevelIDs(bool onlyCustom);
 	static std::vector<std::string> getAllWhiteWorld();
+	static void setDeltaTime(float dt) { m_deltaTime = dt; }
+	static float getDeltaTime() { return m_deltaTime; }
+	static float getFrameDeltaTime() { return m_frameDeltaTime; }
+	static void setHudDeltaTime(float dt) { m_hudDeltaTime = dt; }
+	static void setFrameDeltaTime(int dt) { m_frameDeltaTime = dt; }
+	static float getHudDeltaTime() { return m_hudDeltaTime == 0.0f ? 0.0f : m_deltaTime; }
 	static int getFlagFromStage(const char* stage);
 	static std::vector<std::string> gensStages;
 	static int getCapital(int flagID);

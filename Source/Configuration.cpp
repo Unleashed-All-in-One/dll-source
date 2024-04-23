@@ -19,7 +19,20 @@ WorldData Configuration::worldData;
 ArchiveTreeDefinitions Configuration::archiveTree;
 SequenceData Configuration::queueData;
 std::string Configuration::modPath;
+float Configuration::m_deltaTime = 0.0f;
+float Configuration::m_hudDeltaTime = 0.0f;
+int Configuration::m_frameDeltaTime = 0;
+HOOK(void*, __fastcall, UpdateApplication, 0xE7BED0, void* This, void* Edx, float elapsedTime, uint8_t a3)
+{
+	Configuration::setDeltaTime(elapsedTime);
+	return originalUpdateApplication(This, Edx, elapsedTime, a3);
+}
 
+HOOK(void, __fastcall, CHudSonicStageUpdate, 0x1098A50, void* This, void* Edx, float* dt)
+{
+	Configuration::setHudDeltaTime(*dt);
+	originalCHudSonicStageUpdate(This, Edx, dt);
+}
 void Configuration::load(const char* path)
 {
 	INIReader reader(INI_FILE);
@@ -29,6 +42,9 @@ void Configuration::load(const char* path)
 		exit(-1);
 		return;
 	}
+
+	INSTALL_HOOK(CHudSonicStageUpdate);
+	INSTALL_HOOK(UpdateApplication);
 	std::filesystem::path modP = path;
 	Configuration::modPath = modP.parent_path().string();
 

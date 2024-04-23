@@ -51,7 +51,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>C:\Program Files (x86)\Steam\steamapps\common\Sonic Generations\Mods\UnleashedTitlescreenGens\</OutDir>
+    <OutDir>$(SolutionDir)..\Build\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -79,8 +79,8 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)..\Build\bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E
-xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Generations\mods\UnleashedTitlescreenGens" /Y /I /E</Command>
+      <Command>xcopy "$(SolutionDir)..\Build\bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\su-conversion" /Y /I /E
+xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Generations\mods\su-conversion" /Y /I /E</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -113,8 +113,8 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)..\Build\bin\$(Platform)\$(Configuration)\*.*" "C:\Program Files (x86)\Steam\steamapps\common\Sonic Generations\Mods\UnleashedTitlescreenGens" /Y /I /E
-xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapps\common\Sonic Generations\Mods\UnleashedTitlescreenGens" /Y /I /E</Command>
+      <Command>xcopy "$(SolutionDir)..\Build\bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\su-conversion" /Y /I /E
+xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Generations\mods\su-conversion" /Y /I /E</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -122,15 +122,19 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClCompile Include="CustomSetObjects\DebugObject.cpp" />
     <ClCompile Include="CustomSetObjects\ETFStageGate.cpp" />
     <ClCompile Include="CustomSetObjects\ETFTimeSwitch.cpp" />
+    <ClCompile Include="CustomSetObjects\EvilEnemyRecklessC.cpp" />
+    <ClCompile Include="CustomSetObjects\EvilLiftDoorC.cpp" />
     <ClCompile Include="CustomSetObjects\Hintring.cpp" />
     <ClCompile Include="CustomSetObjects\MoonMedal.cpp" />
     <ClCompile Include="CustomSetObjects\Paraloop.cpp" />
     <ClCompile Include="CustomSetObjects\SpeedDownCollision.cpp" />
     <ClCompile Include="Functionality\EXP.cpp" />
     <ClCompile Include="Functionality\FallCam.cpp" />
+    <ClCompile Include="Functionality\Patches.cpp" />
     <ClCompile Include="Functionality\PauseBgm.cpp" />
     <ClCompile Include="Functionality\RingEnergy.cpp" />
     <ClCompile Include="Gameplay\Drift.cpp" />
+    <ClCompile Include="Gameplay\EnemyMotoraTemp.cpp" />
     <ClCompile Include="Gameplay\Pole.cpp" />
     <ClCompile Include="Gameplay\Ramp.cpp" />
     <ClCompile Include="Gameplay\ShortJump.cpp" />
@@ -161,7 +165,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClCompile Include="System\DebugMenu\imgui_tables.cpp" />
     <ClCompile Include="System\DebugMenu\imgui_widgets.cpp" />
     <ClCompile Include="System\DebugMenu\SynchronizedObject.cpp" />
-    <ClCompile Include="System\DebugMenu\Types.cpp" />
+    <ClCompile Include="System\DebugMenu\TypesParamRemove.cpp" />
     <ClCompile Include="System\DiscordStatus.cpp" />
     <ClCompile Include="System\DiscordGameSDK\achievement_manager.cpp" />
     <ClCompile Include="System\DiscordGameSDK\activity_manager.cpp" />
@@ -189,6 +193,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClCompile Include="Testing\TestingCode.cpp" />
     <ClCompile Include="UI\ETFStageGateUI.cpp" />
     <ClCompile Include="UI\EventViewer.cpp" />
+    <ClCompile Include="UI\SubtitleUI.cpp" />
     <ClCompile Include="UI\Title.cpp" />
     <ClCompile Include="UI\TitleOption.cpp" />
     <ClCompile Include="UI\TitleWorldMap.cpp" />
@@ -196,18 +201,23 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Configuration.h" />
+    <ClInclude Include="CustomSetObjects\DebugEnemy.h" />
     <ClInclude Include="CustomSetObjects\DebugObject.h" />
     <ClInclude Include="CustomSetObjects\ETFStageGate.h" />
     <ClInclude Include="CustomSetObjects\ETFTimeSwitch.h" />
+    <ClInclude Include="CustomSetObjects\EvilEnemyReckless.h" />
+    <ClInclude Include="CustomSetObjects\EvilLiftDoor.h" />
     <ClInclude Include="CustomSetObjects\Hintring.h" />
     <ClInclude Include="CustomSetObjects\MoonMedal.h" />
     <ClInclude Include="CustomSetObjects\Paraloop.h" />
     <ClInclude Include="CustomSetObjects\SpeedDownCollision.h" />
     <ClInclude Include="Functionality\EXP.h" />
     <ClInclude Include="Functionality\FallCam.h" />
+    <ClInclude Include="Functionality\Patches.h" />
     <ClInclude Include="Functionality\PauseBgm.h" />
     <ClInclude Include="Functionality\RingEnergy.h" />
     <ClInclude Include="Gameplay\Drift.h" />
+    <ClInclude Include="Gameplay\EnemyMotoraTemp.h" />
     <ClInclude Include="Gameplay\Pole.h" />
     <ClInclude Include="Gameplay\Ramp.h" />
     <ClInclude Include="Gameplay\ShortJump.h" />
@@ -233,7 +243,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClInclude Include="System\DebugMenu\imstb_textedit.h" />
     <ClInclude Include="System\DebugMenu\imstb_truetype.h" />
     <ClInclude Include="System\DebugMenu\SynchronizedObject.h" />
-    <ClInclude Include="System\DebugMenu\Types.h" />
+    <ClInclude Include="System\DebugMenu\TypesParamRemove.h" />
     <ClInclude Include="System\DiscordStatus.h" />
     <ClInclude Include="System\DiscordGameSDK\achievement_manager.h" />
     <ClInclude Include="System\DiscordGameSDK\activity_manager.h" />
@@ -259,6 +269,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClInclude Include="System\Light.h" />
     <ClInclude Include="System\LuaManager.h" />
     <ClInclude Include="System\MiniAudioHelper.h" />
+    <ClInclude Include="System\PhysicsObject.h" />
     <ClInclude Include="System\SaveManager.h" />
     <ClInclude Include="System\SequenceHelpers.h" />
     <ClInclude Include="System\SoundController.h" />
@@ -266,9 +277,10 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <ClInclude Include="Temporary.h" />
     <ClInclude Include="UI\ETFStageGateUI.h" />
     <ClInclude Include="UI\ItemboxUI.h" />
-    <ClInclude Include="UI\SubtitleUI.h" />
+    <ClInclude Include="UI\HelpCaptionUI.h" />
     <ClInclude Include="Testing\TestingCode.h" />
     <ClInclude Include="UI\EventViewer.h" />
+    <ClInclude Include="UI\SubtitleUI.h" />
     <ClInclude Include="UI\Title.h" />
     <ClInclude Include="UI\TitleOption.h" />
     <ClInclude Include="UI\TitleWorldMap.h" />
@@ -282,6 +294,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets" Condition="Exists('packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" />
     <Import Project="packages\lua.5.4.6\build\native\Lua.targets" Condition="Exists('packages\lua.5.4.6\build\native\Lua.targets')" />
+    <Import Project="packages\rapidxml.1.13\build\native\rapidxml.targets" Condition="Exists('packages\rapidxml.1.13\build\native\rapidxml.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -290,5 +303,6 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "C:\Program Files (x86)\Steam\steamapp
     <Error Condition="!Exists('packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets'))" />
     <Error Condition="!Exists('packages\SoLoud-wav.2020.2.7.2\build\native\SoLoud-wav.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\SoLoud-wav.2020.2.7.2\build\native\SoLoud-wav.props'))" />
     <Error Condition="!Exists('packages\lua.5.4.6\build\native\Lua.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\lua.5.4.6\build\native\Lua.targets'))" />
+    <Error Condition="!Exists('packages\rapidxml.1.13\build\native\rapidxml.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\rapidxml.1.13\build\native\rapidxml.targets'))" />
   </Target>
 </Project>

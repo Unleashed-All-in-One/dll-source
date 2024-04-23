@@ -1,7 +1,7 @@
 
 #define HINTSFILE_NAME_FORMAT "{0}\\disk\\Hints\\hints_{1}.json"
 HintDataList* Hintring::hintData;
-SubtitleUIContainer* Hintring::m_HintUI;
+HelpCaptionUIContainer* Hintring::m_HintUI;
 HOOK(void*, __fastcall, InitializePlayer, 0x00D96110, void* This)
 {
     uint32_t stageIDAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
