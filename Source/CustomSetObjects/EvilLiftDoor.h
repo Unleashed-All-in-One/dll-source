@@ -20,12 +20,17 @@ public:
 	float counterB;
 	bool complete;
 	SharedPtrTypeless soundGrunt;
+	static EvilQTEUI* m_ItemBoxUI;
 	bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
 	{
 		/* returning false if your renderable doesn't exist is recommended, your object simply wont render / will cease construction or w/e. */
 		const char* assetName = "evl_myk_obj_soc_doorA_000";
 		hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
 		boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
+		if (spModelData == nullptr)
+		{
+			throw std::runtime_error("The model data for this object could not be loaded. An archive may have not been loaded properly.");
+		}
 		m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
 		m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);				
 		Sonic::CGameObject::AddRenderable("Object", m_spExampleElement, true);
@@ -50,6 +55,12 @@ public:
 				if (in_rMsg.m_SenderActorID == playerContext->m_pPlayer->m_ActorID)
 				{
 					m_isPlayerInside = true;
+					if (m_ItemBoxUI == nullptr)
+					{
+						m_ItemBoxUI = EvilQTEUI::Generate(playerContext->m_pPlayer, true, 1);
+					}
+					m_ItemBoxUI->Show();
+					m_ItemBoxUI->rcBtn->GetNode("img")->SetPatternIndex(1);
 				}
 				return true;
 			}
@@ -94,7 +105,22 @@ public:
 		m_spMatrixNodeTransform->m_Transform.UpdateMatrix();
 		m_spMatrixNodeTransform->NotifyChanged();
 	}
-
+	void SetMotionSpeed(uint32_t* anim,float speed)
+	{
+		static uint32_t pAddrCall = 0xCDEF60;
+		__asm
+		{
+			push speed
+			mov     eax, anim
+			call[pAddrCall]
+		}
+	}
+	void MotionTest()
+	{
+		Sonic::Player::CPlayerSpeedContext* playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
+		uint32_t* p = (uint32_t*)playerContext->m_pPlayer;
+		SetMotionSpeed((p + 244), 0);
+	}
 	void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
 	{
 		Sonic::Player::CPlayerSpeedContext* playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
@@ -125,11 +151,12 @@ public:
 				if (timerForOff > 0 && timerForCompletion > 1.9f)
 				{
 					complete = true;
-					SetDoorPos(CVector(m_spMatrixNodeTransform->m_Transform.m_Position.x(), m_spMatrixNodeTransform->m_Transform.m_Position.y() + 3, m_spMatrixNodeTransform->m_Transform.m_Position.z()));
+					SetDoorPos(CVector(m_spMatrixNodeTransform->m_Transform.m_Position.x(), m_spMatrixNodeTransform->m_Transform.m_Position.y() + 2, m_spMatrixNodeTransform->m_Transform.m_Position.z()));
 					m_spNodeEventCollision->NotifyChanged();
 					m_spNodeEventCollision->m_Transform.SetPosition(CVector(0, 1000, 0));
 					m_spNodeEventCollision->m_Transform.UpdateMatrix();
 					m_spNodeEventCollision->NotifyChanged();
+					m_ItemBoxUI->Dissapear();
 				}
 				else if (!complete)
 				{
