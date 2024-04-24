@@ -1,11 +1,6 @@
 
 // The other macros are your object's class name, not XML name.
 BB_SET_OBJECT_MAKE_HOOK(WerehogPole);
-
- float TransformUtilities::werehogArmHoming_timer;
- bool TransformUtilities::isDoingHoming;
- SharedPtrTypeless TransformUtilities::soundArmStretch;
- CVector TransformUtilities::posStartArm;
 class OnPolePosture : public Sonic::Player::CPlayerSpeedPosture3DCommon
 {
 public:

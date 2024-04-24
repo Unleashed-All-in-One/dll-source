@@ -110,7 +110,6 @@
 #include "UI/SubtitleUI.h"
 #include "UI/ItemboxUI.h"
 #include "UI/ETFStageGateUI.h"
-#include "UI/EvilQTEUI.h"
 
 //Set objects
 #include "CustomSetObjects/Hintring.h"

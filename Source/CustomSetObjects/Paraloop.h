@@ -31,7 +31,7 @@ public:
                     if (particle == nullptr && abs(playerContext->m_Velocity.norm()) >= playerContext->m_spParameter->Get<float>(Sonic::Player::ePlayerSpeedParameter_ParaloopMinSpeed)) {
                         void* matrixNode = (void*)((uint32_t)*PLAYER_CONTEXT + 0x30);
                         Common::fCGlitterCreate(playerContext, particle, matrixNode, *pSuperSonicContext ? "ef_ch_sps_lms_paraloop02" : "ef_ch_sng_lms_paraloop02", 0);
-                        Common::PlaySoundStaticCueName(sound, "suc_paraloop");
+                        Common::PlaySoundStatic(sound, 2002501);
                     }         
                     m_playerInsideCollider = true;
                 }

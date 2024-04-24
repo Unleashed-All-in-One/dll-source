@@ -11,7 +11,7 @@ public:
 	boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
 	boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
 	boost::shared_ptr<Hedgehog::Animation::CAnimationPose> m_AnimatorPose;
-	SharedPtrTypeless sound;
+
 	std::vector<NewAnimationData> animations;
 
 	bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
@@ -85,7 +85,7 @@ public:
 			}
 			if (std::strstr(in_rMsg.GetType(), "MsgDamage") != nullptr)
 			{
-				Common::PlaySoundStaticCueName(sound, "es_damage_norm");
+
 				return true;
 			}
 		}
