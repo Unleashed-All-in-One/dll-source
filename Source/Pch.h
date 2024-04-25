@@ -60,7 +60,7 @@
 #include <StateManager.h>
 #include "System/ArchiveTreePatcher.h"
 #include "System/SequenceHelpers.h"
-#include "Configuration.h"
+#include "Project.h"
 #include "Temporary.h"
 
 //Gameplay

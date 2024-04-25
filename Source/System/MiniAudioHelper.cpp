@@ -68,7 +68,7 @@ void MiniAudioHelper::shutdown()
 
 void MiniAudioHelper::playSound(AudioHandle& handle, int cueCri, std::string cueSoloud, bool loop, bool forceSoloud)
 {
-    if (!Configuration::compatibilityMode && forceSoloud == false)
+    if (!Project::compatibilityMode && forceSoloud == false)
     {
         Common::PlaySoundStatic(handle.handleCri, cueCri);
     }
@@ -79,7 +79,7 @@ void MiniAudioHelper::playSound(AudioHandle& handle, int cueCri, std::string cue
 }
 void MiniAudioHelper::stopSound(AudioHandle& handle, bool forceSoloud)
 {
-    if (!Configuration::compatibilityMode && forceSoloud == false)
+    if (!Project::compatibilityMode && forceSoloud == false)
     {
         handle.handleCri.reset();
     }

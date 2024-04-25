@@ -4230,7 +4230,7 @@ void ImGui::NewFrame()
 
     CallContextHooks(&g, ImGuiContextHookType_NewFramePre);
 
-    // Check and assert for various common IO and Configuration mistakes
+    // Check and assert for various common IO and Project mistakes
     ErrorCheckNewFrameSanityChecks();
 
     // Load settings on first frame, save settings when modified (after a delay)

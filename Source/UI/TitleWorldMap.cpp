@@ -366,12 +366,12 @@ void SetLevelTextCast(const char* text)
 
 void PopulateStageSelect(int id)
 {
-	if (Configuration::worldData.data.size() < id)
+	if (Project::worldData.data.size() < id)
 	{
 		printf("\n[WorldMap] Missing config for FlagID %d", id);
 		return;
 	}
-	stageSelectedWindowMax = TitleWorldMap::Flag[id].night && Configuration::worldData.data[id].dataNight.size() != 0 ? Configuration::worldData.data[id].dataNight.size() - 1 : Configuration::worldData.data[id].data.size() - 1;
+	stageSelectedWindowMax = TitleWorldMap::Flag[id].night && Project::worldData.data[id].dataNight.size() != 0 ? Project::worldData.data[id].dataNight.size() - 1 : Project::worldData.data[id].data.size() - 1;
 	Common::ClampInt(stageSelectedWindowMax, 0, 6);
 	for (size_t i = 0; i < 6; i++)
 	{
@@ -384,10 +384,10 @@ void PopulateStageSelect(int id)
 			break;
 
 		const char* optionName;
-		if(TitleWorldMap::Flag[id].night && Configuration::worldData.data[id].dataNight.size() != 0)
-			optionName = Configuration::worldData.data[id].dataNight[i].optionName.c_str();
+		if(TitleWorldMap::Flag[id].night && Project::worldData.data[id].dataNight.size() != 0)
+			optionName = Project::worldData.data[id].dataNight[i].optionName.c_str();
 		else
-			optionName = Configuration::worldData.data[id].data[i].optionName.c_str();
+			optionName = Project::worldData.data[id].data[i].optionName.c_str();
 
 		deco_text[i]->SetHideFlag(false);
 		deco_text[i]->GetNode("Text_blue")->SetText(optionName);
@@ -395,26 +395,26 @@ void PopulateStageSelect(int id)
 }
 TitleWorldMap::SaveStageInfo GetInfoForStage(std::string id)
 {
-	std::vector<std::string>::iterator it = std::find(Configuration::gensStages.begin(), Configuration::gensStages.end(), id);
+	std::vector<std::string>::iterator it = std::find(Project::gensStages.begin(), Project::gensStages.end(), id);
 	TitleWorldMap::SaveStageInfo returnI = TitleWorldMap::SaveStageInfo();
 	returnI.stageID_string = id;
 	//Return an empty Info struct if the stage isnt a native gens stage. This should be expanded to have custom stage slot save files in the future.
-	if (it == Configuration::gensStages.end())
+	if (it == Project::gensStages.end())
 		return returnI;
 
-	returnI.stageIDForGens = std::distance(Configuration::gensStages.begin(), it);
+	returnI.stageIDForGens = std::distance(Project::gensStages.begin(), it);
 	returnI.isStageCompleted = Common::IsStageCompleted(returnI.stageIDForGens);
 	Common::GetStageData(returnI.stageIDForGens, returnI.bestScore, returnI.bestTime, returnI.bestTime2, returnI.bestTime3, returnI.bestRank, returnI.bestRing, returnI.redRingCount);
 	return returnI;
 }
 void PopulateCountryPreviewInfo(int flag)
 {
-	int redRingMax = 5 * Configuration::worldData.data[flag].data.size();
+	int redRingMax = 5 * Project::worldData.data[flag].data.size();
 	int redRingCurrent = 0;
 	int stageCompletedAmount = 0;
-	for (size_t i = 0; i < Configuration::worldData.data[flag].data.size() ; i++)
+	for (size_t i = 0; i < Project::worldData.data[flag].data.size() ; i++)
 	{
-		auto e = GetInfoForStage(Configuration::worldData.data[flag].data[i].levelID);
+		auto e = GetInfoForStage(Project::worldData.data[flag].data[i].levelID);
 		redRingCurrent += e.redRingCount;
 		stageCompletedAmount += e.isStageCompleted;
 	}
@@ -424,7 +424,7 @@ void PopulateCountryPreviewInfo(int flag)
 	char* stageCount = new char[8];
 	sprintf(redRingsCurrent, "%02d", redRingCurrent);
 	sprintf(redRingsMax, "%02d", redRingMax);
-	sprintf(stageMax, "%02d", Configuration::worldData.data[flag].data.size());
+	sprintf(stageMax, "%02d", Project::worldData.data[flag].data.size());
 	sprintf(stageCount, "%02d", stageCompletedAmount);
 
 	cts_guide_4_misson->GetNode("num_nume")->SetText(stageCount);
@@ -955,7 +955,7 @@ void CapitalWindow_Update()
 		if (selectedCapital == 0)
 		{
 			MiniAudioHelper::playSound(stageSelectHandle, 3, "Boot");
-			LevelLoadingManager::WhiteWorldEnabled = Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].data[Configuration::getCapital(TitleWorldMap::LastValidFlagSelected)].isWhiteWorld;
+			LevelLoadingManager::WhiteWorldEnabled = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[Project::getCapital(TitleWorldMap::LastValidFlagSelected)].isWhiteWorld;
 
 			/*if (LevelLoadingManager::WhiteWorldEnabled)
 			{
@@ -1008,7 +1008,7 @@ void StageWindow_Update(Sonic::CGameObject* This)
 	if (inputPtr->IsTapped(Sonic::eKeyState_A) && timeStageSelectDelay >= 5)
 	{
 		MiniAudioHelper::playSound(stageSelectHandle, 3, "Boot");
-		LevelLoadingManager::WhiteWorldEnabled = Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].data[TitleWorldMap::StageSelectedWindow].isWhiteWorld;
+		LevelLoadingManager::WhiteWorldEnabled = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[TitleWorldMap::StageSelectedWindow].isWhiteWorld;
 
 		Title::showTransition(true);
 	}
@@ -1030,7 +1030,7 @@ void StageWindow_Update(Sonic::CGameObject* This)
 	}
 	SetStageSelectionScreenshot();
 	Common::ClampInt(TitleWorldMap::StageSelectedWindow, 0, stageSelectedWindowMax);
-	PopulateStageWindowInfo(Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].data[TitleWorldMap::StageSelectedWindow].levelID);
+	PopulateStageWindowInfo(Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[TitleWorldMap::StageSelectedWindow].levelID);
 }
 
 void LoadTest(Hedgehog::base::CSharedString a1, Sonic::CGameObject* a2)
@@ -1091,7 +1091,7 @@ HOOK(void*, __fastcall, TitleWorldMap_UpdateApplication, 0xE7BED0, Sonic::CGameO
 						MiniAudioHelper::playSound(cursorSelectHandle, 800004, "CursorSelect", false);
 
 						PopulateCountryPreviewInfo(TitleWorldMap::LastValidFlagSelected);
-						SetLevelTextCast(Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].description.c_str());
+						SetLevelTextCast(Project::worldData.data[TitleWorldMap::LastValidFlagSelected].description.c_str());
 					}
 					else
 					{
@@ -1122,7 +1122,7 @@ HOOK(void*, __fastcall, TitleWorldMap_UpdateApplication, 0xE7BED0, Sonic::CGameO
 						cts_name_2->GetNode("img_1")->SetPatternIndex(TitleWorldMap::LastValidFlagSelected);
 						stageSelectFlag->GetNode("img")->SetPatternIndex(TitleWorldMap::LastValidFlagSelected);
 
-						if (Configuration::getCapital(TitleWorldMap::LastValidFlagSelected) != -1)
+						if (Project::getCapital(TitleWorldMap::LastValidFlagSelected) != -1)
 						{
 							TitleWorldMap::CapitalWindowOpen = true;
 							ShowTextAct(false);
@@ -1465,8 +1465,8 @@ HOOK(int, __fastcall, CHudGateMenuMainIntroInfo, 0x1080110, hh::fnd::CStateMachi
 	int index = stageID == 0 ? stageID : stageID + 1;
 	const char* idArchive = (const char*)((int*)0x015BBA34)[stageID];
 
-	Common::ClampUInt(stageID, 0, Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].data.size()-1);
-	LevelLoadingManager::NextLevelLoad = Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].data[stageID].levelID.c_str();
+	Common::ClampUInt(stageID, 0, Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data.size()-1);
+	LevelLoadingManager::NextLevelLoad = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[stageID].levelID.c_str();
 	return returne;
 }
 
@@ -1477,7 +1477,7 @@ HOOK(char, *_stdcall, StageGate_MoveToOtherStage, 0x107FBC0, int a1)
 {
 	char* returned = originalStageGate_MoveToOtherStage(a1);
 	uint8_t stageID = (*(uint8_t*)(a1 + 336));
-	LevelLoadingManager::NextLevelLoad = Configuration::worldData.data[TitleWorldMap::LastValidFlagSelected].data[stageID].levelID.c_str();
+	LevelLoadingManager::NextLevelLoad = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[stageID].levelID.c_str();
 	return returned;
 
 }

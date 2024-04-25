@@ -118,7 +118,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Configuration.cpp" />
+    <ClCompile Include="Project.cpp" />
     <ClCompile Include="CustomSetObjects\DebugObject.cpp" />
     <ClCompile Include="CustomSetObjects\ETFStageGate.cpp" />
     <ClCompile Include="CustomSetObjects\ETFTimeSwitch.cpp" />
@@ -200,7 +200,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="UI\TitleWorldMapPause.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Configuration.h" />
+    <ClInclude Include="Project.h" />
     <ClInclude Include="CustomSetObjects\DebugEnemy.h" />
     <ClInclude Include="CustomSetObjects\DebugObject.h" />
     <ClInclude Include="CustomSetObjects\ETFStageGate.h" />

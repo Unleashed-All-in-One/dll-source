@@ -110,7 +110,7 @@ void __declspec(naked) TitleUI_SetCustomExecFunction()
 	static uint32_t adContinue = 0x00572E2F;
 	static uint32_t adOptions = 0x00573008;
 	static uint32_t adQuit = 0x00573153;
-	if (Configuration::menuType <= 1)
+	if (Project::menuType <= 1)
 	{
 		__asm // this is an else if chain. i wanted to do a switch statement but it didnt work.
 		{
@@ -373,12 +373,12 @@ HOOK(int, __fastcall, Title_CMain, 0x0056FBE0, Sonic::CGameObject* This, void* E
 	//1: USA
 	//2: JPN
 	//3: Generations Demo
-	sprintf(buffer, "title_%d", Configuration::logoType == 0 || Configuration::logoType == 1 ? 1 : Configuration::logoType);
+	sprintf(buffer, "title_%d", Project::logoType == 0 || Project::logoType == 1 ? 1 : Project::logoType);
 	rcTitleLogo_1 = rcTitleScreenLogos->CreateScene(buffer);
 
 	
 
-	if (Configuration::logoType == 0)
+	if (Project::logoType == 0)
 	{
 		rcConversionLogo = rcTitleScreenLogos->CreateScene("conversionlogo");
 		rcTitleLogo_1->SetPosition(68, 3);
@@ -387,7 +387,7 @@ HOOK(int, __fastcall, Title_CMain, 0x0056FBE0, Sonic::CGameObject* This, void* E
 		rcConversionLogo->SetScale(0.9f, 0.9f);
 		CSDCommon::PlayAnimation(*rcConversionLogo, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 	}
-	switch (Configuration::menuType)
+	switch (Project::menuType)
 	{
 	case 0:
 	{

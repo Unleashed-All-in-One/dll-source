@@ -210,7 +210,7 @@ HOOK(long, __fastcall, sub_B1ECF0, 0xB1ECF0, int This, void* Edx, int a2, int a3
 {
 	frame = 0;
 	doCount = true;
-	auto string = std::format("{0}\\disk\\EventSceneResource\\{1}_voice_English.inspire_resource.xml", Configuration::modPath, LevelLoadingManager::getEventID());
+	auto string = std::format("{0}\\disk\\EventSceneResource\\{1}_voice_English.inspire_resource.xml", Project::modPath, LevelLoadingManager::getEventID());
 	if (!std::filesystem::exists(string))
 	{
 		printf("\n[SonicUnleashedConversion] Missing InspireResource file.");

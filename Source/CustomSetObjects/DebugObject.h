@@ -4,7 +4,6 @@ using namespace hh::math;
 class TransformUtilities
 {
 public:
-
 	static Hedgehog::Math::CVector MoveAroundPivot(Hedgehog::Math::CVector& player, const Hedgehog::Math::CVector& pivot, const Hedgehog::Math::CVector& rotationAngles)
 	{
 
@@ -75,11 +74,7 @@ public:
 			? (1 - sqrt(1 - pow(2 * x, 2))) / 2
 			: (sqrt(1 - pow(-2 * x + 2, 2)) + 1) / 2;
 	}
-	//move all this to werehog mod eventually
-	static float werehogArmHoming_timer;
-	static bool isDoingHoming;
-	static SharedPtrTypeless soundArmStretch;
-	static CVector posStartArm;
+
 	static bool DoWerehogArmHomingIfClose(boost::shared_ptr<Sonic::CMatrixNodeTransform> target, float maxDistance, float deltaTime)
 	{
 		Sonic::Player::CPlayerSpeedContext* playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
@@ -87,31 +82,11 @@ public:
 		float distance = abs(TransformUtilities::Distance(playerContext->m_spMatrixNode->m_Transform.m_Position, target->m_Transform.m_Position));
 		if (distance < 5)
 		{
-			DebugDrawText::log("CanDo", 0);
-			if (isDoingHoming)
+			if (inputPtr->IsTapped(Sonic::eKeyState_B) && playerContext->m_pPlayer->m_StateMachine.GetCurrentState()->GetStateName() != "EvilArmSwing")
 			{
-				if (werehogArmHoming_timer >= 1)
-				{
-					werehogArmHoming_timer = 0;
-					return false;
-				}
-				werehogArmHoming_timer += deltaTime;
-
-				playerContext->m_spMatrixNode->m_Transform.SetPosition(
-					CVector(
-						Common::lerpUnclampedf(posStartArm.x(), target->m_Transform.m_Position.x(), easeInOutQuart(werehogArmHoming_timer / 1)),
-						Common::lerpUnclampedf(posStartArm.y(), target->m_Transform.m_Position.y(), easeInOutQuart(werehogArmHoming_timer / 1)),
-						Common::lerpUnclampedf(posStartArm.z(), target->m_Transform.m_Position.z(), easeInOutQuart(werehogArmHoming_timer / 1))
-					)
-				);
-				playerContext->m_Velocity = CVector(0, 0, 0);
+				Project::nodeForArmswing = target;
+				playerContext->ChangeState("EvilArmSwing");
 				return true;
-			}
-			if (inputPtr->IsTapped(Sonic::eKeyState_B) && !isDoingHoming)
-			{
-				Common::PlaySoundStaticCueName(soundArmStretch, "es_armstretch");
-				isDoingHoming = true;
-				posStartArm = playerContext->m_spMatrixNode->m_Transform.m_Position;
 			}
 		}
 		else
@@ -119,8 +94,6 @@ public:
 			return false;
 		}
 	}
-
-
 };
 class PoleStyle
 {
@@ -141,6 +114,7 @@ public:
 	BB_SET_OBJECT_MAKE("EvilColumn")
 	boost::shared_ptr<hh::mr::CSingleElement> m_spModelPoleMid, m_spModelPoleTop, m_spModelPoleBtm;
 	boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
+	boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeColumnTop;
 	boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
 
 	//## Set params
@@ -184,8 +158,13 @@ public:
 		m_spModelPoleTop = boost::make_shared<hh::mr::CSingleElement>(spModelDataT);
 		m_spModelPoleBtm = boost::make_shared<hh::mr::CSingleElement>(spModelDataB);
 
+		m_spNodeColumnTop = boost::make_shared<Sonic::CMatrixNodeTransform>();
+		m_spNodeColumnTop->m_Transform.SetPosition(Hedgehog::Math::CVector(0, m_setColliderLength, 0));
+		m_spNodeColumnTop->NotifyChanged();
+		m_spNodeColumnTop->SetParent(m_spMatrixNodeTransform.get());
+
 		m_spModelPoleMid->BindMatrixNode(m_spMatrixNodeTransform);
-		m_spModelPoleTop->BindMatrixNode(m_spMatrixNodeTransform);
+		m_spModelPoleTop->BindMatrixNode(m_spNodeColumnTop);
 		m_spModelPoleBtm->BindMatrixNode(m_spMatrixNodeTransform);
 		Sonic::CGameObject::AddRenderable("Object", m_spModelPoleMid, true);
 		Sonic::CGameObject::AddRenderable("Object", m_spModelPoleTop, true);

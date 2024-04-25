@@ -3,9 +3,9 @@
 extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 {
 	// Load configuration
-	Configuration::load(modInfo->CurrentMod->Path);
+	Project::load(modInfo->CurrentMod->Path);
 	//Make Gens support 4gb+
-	if(Configuration::use4gbMode)
+	if(Project::use4gbMode)
 	modInfo->API->SendMessageToLoader(ML_MSG_REQ_LARGE_ADDRESS_AWARE, nullptr);
 }
 

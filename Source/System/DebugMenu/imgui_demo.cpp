@@ -432,12 +432,12 @@ void ImGui::ShowDemoWindow(bool* p_open)
         ImGui::ShowUserGuide();
     }
 
-    IMGUI_DEMO_MARKER("Configuration");
-    if (ImGui::CollapsingHeader("Configuration"))
+    IMGUI_DEMO_MARKER("Project");
+    if (ImGui::CollapsingHeader("Project"))
     {
         ImGuiIO& io = ImGui::GetIO();
 
-        if (ImGui::TreeNode("Configuration##2"))
+        if (ImGui::TreeNode("Project##2"))
         {
             ImGui::CheckboxFlags("io.ConfigFlags: NavEnableKeyboard",    &io.ConfigFlags, ImGuiConfigFlags_NavEnableKeyboard);
             ImGui::SameLine(); HelpMarker("Enable keyboard controls.");
@@ -475,7 +475,7 @@ void ImGui::ShowDemoWindow(bool* p_open)
             ImGui::Separator();
         }
 
-        IMGUI_DEMO_MARKER("Configuration/Backend Flags");
+        IMGUI_DEMO_MARKER("Project/Backend Flags");
         if (ImGui::TreeNode("Backend Flags"))
         {
             HelpMarker(
@@ -493,7 +493,7 @@ void ImGui::ShowDemoWindow(bool* p_open)
             ImGui::Separator();
         }
 
-        IMGUI_DEMO_MARKER("Configuration/Style");
+        IMGUI_DEMO_MARKER("Project/Style");
         if (ImGui::TreeNode("Style"))
         {
             HelpMarker("The same contents can be accessed in 'Tools->Style Editor' or by calling the ShowStyleEditor() function.");
@@ -502,7 +502,7 @@ void ImGui::ShowDemoWindow(bool* p_open)
             ImGui::Separator();
         }
 
-        IMGUI_DEMO_MARKER("Configuration/Capture, Logging");
+        IMGUI_DEMO_MARKER("Project/Capture, Logging");
         if (ImGui::TreeNode("Capture/Logging"))
         {
             HelpMarker(
