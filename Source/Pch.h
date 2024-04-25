@@ -60,7 +60,7 @@
 #include <StateManager.h>
 #include "System/ArchiveTreePatcher.h"
 #include "System/SequenceHelpers.h"
-#include "Configuration.h"
+#include "Project.h"
 #include "Temporary.h"
 
 //Gameplay
@@ -110,6 +110,7 @@
 #include "UI/SubtitleUI.h"
 #include "UI/ItemboxUI.h"
 #include "UI/ETFStageGateUI.h"
+#include "UI/EvilQTEUI.h"
 
 //Set objects
 #include "CustomSetObjects/Hintring.h"

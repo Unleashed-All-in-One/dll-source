@@ -72,17 +72,17 @@ const char* LevelLoadingManager::getStageToLoad()
 	int stageSelected = TitleWorldMap::StageSelectedWindow;
 
 	if (TitleWorldMap::CapitalWindowOpen)
-		stageToLoad = Configuration::worldData.data[latestFlag].data[Configuration::getCapital(latestFlag)].levelID.c_str();
+		stageToLoad = Project::worldData.data[latestFlag].data[Project::getCapital(latestFlag)].levelID.c_str();
 	else
 	{
-		if (Configuration::worldData.data[latestFlag].dataNight.size() != 0 && TitleWorldMap::Flag[latestFlag].night)
+		if (Project::worldData.data[latestFlag].dataNight.size() != 0 && TitleWorldMap::Flag[latestFlag].night)
 		{
-			stageToLoad = Configuration::worldData.data[latestFlag].dataNight[stageSelected].levelID.c_str();
+			stageToLoad = Project::worldData.data[latestFlag].dataNight[stageSelected].levelID.c_str();
 			SequenceHelpers::setPlayerType(1);
 		}
 		else
 		{
-			stageToLoad = Configuration::worldData.data[latestFlag].data[stageSelected].levelID.c_str();
+			stageToLoad = Project::worldData.data[latestFlag].data[stageSelected].levelID.c_str();
 			SequenceHelpers::setPlayerType(0);
 		}
 	}
@@ -221,8 +221,8 @@ void SetCorrectStageFromPAM(uint32_t stageIDPam)
 	char** h = (char**)stageTerrainAddress;
 	const char* stageToLoad = "ghz200";
 	//get current flag based on the pam stage loaded
-	int flag = Configuration::getFlagFromStage(*h);
-	stageToLoad = Configuration::worldData.data[flag].data[stageIDPam].levelID.c_str();
+	int flag = Project::getFlagFromStage(*h);
+	stageToLoad = Project::worldData.data[flag].data[stageIDPam].levelID.c_str();
 	lastStageID = stageToLoad;
 	SequenceHelpers::loadStage(stageToLoad);
 	strcpy(*(char**)stageTerrainAddress, stageToLoad);
@@ -250,7 +250,7 @@ void SetCorrectStageFromFlag()
 			}
 			return;
 		}
-		if (Configuration::worldData.data.size() < TitleWorldMap::LastValidFlagSelected)
+		if (Project::worldData.data.size() < TitleWorldMap::LastValidFlagSelected)
 		{
 			//if only cpp had the same ${} system as c#
 			std::string message = "This country has an invalid configuration. Loading " + std::string(stageToLoad) + " instead.";
@@ -295,10 +295,10 @@ void SetCorrectStageFromFlag()
 		//{
 		//	if (inStoryBefore == LevelLoadingManager::InStory)
 		//		LevelLoadingManager::LastSavedQueueIndex++;
-		//	ExecuteSequenceData(Configuration::queueData.data);
+		//	ExecuteSequenceData(Project::queueData.data);
 		//}
-		//if(Configuration::queueData.data[LevelLoadingManager::LastSavedQueueIndex].type != 5)
-		//strcpy(*(char**)stageTerrainAddress, Configuration::queueData.data[LevelLoadingManager::LastSavedQueueIndex].dataName.c_str());
+		//if(Project::queueData.data[LevelLoadingManager::LastSavedQueueIndex].type != 5)
+		//strcpy(*(char**)stageTerrainAddress, Project::queueData.data[LevelLoadingManager::LastSavedQueueIndex].dataName.c_str());
 		//skipCurrentQueueEvent = false;
 	}
 
@@ -580,12 +580,12 @@ HOOK(void*, __fastcall, sub_B1ECF0, 0xB1ECF0, int* This, void* Edx, int a2, int 
 	//auto v4 = *((DWORD*)appdocMember + 109);
 	//auto e = (Hedgehog::Base::CSharedString*)(*((DWORD*)v4 + 32) + 44);
 	//auto e2 = (Hedgehog::Base::CSharedString*)(*((DWORD*)v4 + 32) + 48);
-	//*e2 = std::string(Configuration::queueData.data[LevelLoadingManager::LastSavedQueueIndex + 1].dataName).c_str();
+	//*e2 = std::string(Project::queueData.data[LevelLoadingManager::LastSavedQueueIndex + 1].dataName).c_str();
 	//
 	//uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 	//char** h = (char**)stageTerrainAddress;
 	//
-	//strcpy(*(char**)stageTerrainAddress, std::string(Configuration::queueData.data[LevelLoadingManager::LastSavedQueueIndex + 1].dataName).c_str());
+	//strcpy(*(char**)stageTerrainAddress, std::string(Project::queueData.data[LevelLoadingManager::LastSavedQueueIndex + 1].dataName).c_str());
 	skipCurrentQueueEvent = true;
 	return originalsub_B1ECF0(This, Edx, a2, a3, a4);
 }

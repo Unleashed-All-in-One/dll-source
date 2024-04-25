@@ -1,6 +1,7 @@
 
 // The other macros are your object's class name, not XML name.
 BB_SET_OBJECT_MAKE_HOOK(WerehogPole);
+
 class OnPolePosture : public Sonic::Player::CPlayerSpeedPosture3DCommon
 {
 public:

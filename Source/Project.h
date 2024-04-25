@@ -34,7 +34,7 @@ struct ArchiveTreeDefinitions
 	std::vector<ArchiveDependency> data;
 };
 
-class Configuration
+class Project
 {
 private:
 	static float m_deltaTime;
@@ -55,6 +55,7 @@ public:
 		Preview,
 		E3
 	};
+	static boost::shared_ptr<Sonic::CMatrixNodeTransform> nodeForArmswing;
 	static std::string modPath;
 	static std::vector<std::string> getAllLevelIDs(bool onlyCustom);
 	static std::vector<std::string> getAllWhiteWorld();

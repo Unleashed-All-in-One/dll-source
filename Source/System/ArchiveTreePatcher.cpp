@@ -92,12 +92,12 @@ boost::shared_ptr<hh::db::CRawData>* __fastcall ArchiveTreePatcher_GetRawDataImp
 
 void ArchiveTreePatcher::applyPatches()
 {
-    for (size_t i = 0; i < Configuration::archiveTree.data.size(); i++)
+    for (size_t i = 0; i < Project::archiveTree.data.size(); i++)
     {
-        m_archiveDependencies.push_back(Configuration::archiveTree.data[i]);
+        m_archiveDependencies.push_back(Project::archiveTree.data[i]);
     }
     m_archiveDependencies.push_back(ArchiveDependency("UIFade", { "SystemCommon" }));
-    std::vector<std::string> whiteworld = Configuration::getAllWhiteWorld();
+    std::vector<std::string> whiteworld = Project::getAllWhiteWorld();
     for (size_t i = 0; i < whiteworld.size(); i++)
     {
         m_archiveDependencies.push_back(ArchiveDependency("SonicPam", { whiteworld[i] }));      

@@ -160,7 +160,7 @@ void SubtitleUI::applyPatches()
 std::map<uint32_t, wchar_t> SubtitleUI::m_fontDatabase;
 bool SubtitleUI::initFontDatabase()
 {
-    std::ifstream database(Configuration::modPath + "\\disk\\Fonts\\FontDatabase.txt");
+    std::ifstream database(Project::modPath + "\\disk\\Fonts\\FontDatabase.txt");
     if (database.is_open())
     {
         std::stringstream ss;
@@ -430,7 +430,7 @@ void SubtitleUI::draw()
         }
         ImGui::End();
 
-        m_captionData.m_timer += m_captionData.m_isCutscene ? Configuration::getDeltaTime() : Configuration::getHudDeltaTime();
+        m_captionData.m_timer += m_captionData.m_isCutscene ? Project::getDeltaTime() : Project::getHudDeltaTime();
         if (m_captionData.m_timer > caption.m_duration)
         {
             m_captionData.m_captions.pop_front();

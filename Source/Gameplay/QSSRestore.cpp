@@ -1,5 +1,5 @@
 #include "QSSRestore.h"
-#include "../Configuration.h"
+#include "../Project.h"
 
 void QSSRestore_IncreaseSpeed(char const* targetState)
 {
@@ -28,7 +28,7 @@ HOOK(void, __fastcall, QSSRestore_CSonicStateStompingAdvance, 0x12548C0, int Thi
 
 void QSSRestore::applyPatches()
 {
-	if (!Configuration::m_bQSS)
+	if (!Project::m_bQSS)
 	{
 		return;
 	}

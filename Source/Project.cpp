@@ -1,4 +1,4 @@
-#include "Configuration.h"
+#include "Project.h"
 
 #define INI_FILE "UnleashedConversion.ini"
 #define STAGE_LIST_FILE "stage_list.json"
@@ -6,34 +6,41 @@
 #define QUEUE_LIST_FILE "sequence.json"
 
 //---------------Gameplay---------------
-bool Configuration::m_bQSS = true;
+bool Project::m_bQSS = true;
 
 //---------------UI---------------
-std::vector<std::string> Configuration::gensStages;
-bool Configuration::ignoreWarnings = false;
-bool Configuration::use4gbMode = false;
-bool Configuration::compatibilityMode = false;
-int Configuration::logoType = 0;
-Configuration::TitleType Configuration::menuType = (TitleType)0;
-WorldData Configuration::worldData;
-ArchiveTreeDefinitions Configuration::archiveTree;
-SequenceData Configuration::queueData;
-std::string Configuration::modPath;
-float Configuration::m_deltaTime = 0.0f;
-float Configuration::m_hudDeltaTime = 0.0f;
-int Configuration::m_frameDeltaTime = 0;
+std::vector<std::string> Project::gensStages;
+bool Project::ignoreWarnings = false;
+bool Project::use4gbMode = false;
+bool Project::compatibilityMode = false;
+int Project::logoType = 0;
+Project::TitleType Project::menuType = (TitleType)0;
+WorldData Project::worldData;
+ArchiveTreeDefinitions Project::archiveTree;
+SequenceData Project::queueData;
+std::string Project::modPath;
+float Project::m_deltaTime = 0.0f;
+float Project::m_hudDeltaTime = 0.0f;
+int Project::m_frameDeltaTime = 0;
+boost::shared_ptr<Sonic::CMatrixNodeTransform> Project::nodeForArmswing;
+
+//didnt know where else to put this
+extern "C" __declspec(dllexport) boost::shared_ptr<Sonic::CMatrixNodeTransform> API_GetClosestSetObjectForArmswing()
+{
+	return Project::nodeForArmswing;
+}
 HOOK(void*, __fastcall, UpdateApplication, 0xE7BED0, void* This, void* Edx, float elapsedTime, uint8_t a3)
 {
-	Configuration::setDeltaTime(elapsedTime);
+	Project::setDeltaTime(elapsedTime);
 	return originalUpdateApplication(This, Edx, elapsedTime, a3);
 }
 
 HOOK(void, __fastcall, CHudSonicStageUpdate, 0x1098A50, void* This, void* Edx, float* dt)
 {
-	Configuration::setHudDeltaTime(*dt);
+	Project::setHudDeltaTime(*dt);
 	originalCHudSonicStageUpdate(This, Edx, dt);
 }
-void Configuration::load(const char* path)
+void Project::load(const char* path)
 {
 	INIReader reader(INI_FILE);
 	if (reader.ParseError() != 0)
@@ -46,7 +53,7 @@ void Configuration::load(const char* path)
 	INSTALL_HOOK(CHudSonicStageUpdate);
 	INSTALL_HOOK(UpdateApplication);
 	std::filesystem::path modP = path;
-	Configuration::modPath = modP.parent_path().string();
+	Project::modPath = modP.parent_path().string();
 
 	//---------------Gameplay---------------
 	m_bQSS = reader.GetBoolean("Gameplay", "bQSS", m_bQSS);
@@ -62,7 +69,7 @@ void Configuration::load(const char* path)
 	getLevelQueue();
 	getTempCustomArchiveTree();
 }
-void Configuration::getLevelQueue()
+void Project::getLevelQueue()
 {
 	std::ifstream jsonFile(QUEUE_LIST_FILE);
 
@@ -108,7 +115,7 @@ void Configuration::getLevelQueue()
 		break;
 	}
 }
-int Configuration::getFlagFromStage(const char* stage)
+int Project::getFlagFromStage(const char* stage)
 {
 	std::string stageString = stage;
 	//if only c++ had linq
@@ -132,7 +139,7 @@ int Configuration::getFlagFromStage(const char* stage)
 	}
 	return -1;
 }
-void Configuration::getTempCustomArchiveTree()
+void Project::getTempCustomArchiveTree()
 {
 	std::ifstream jsonFile(ARCHIVE_LIST_FILE);
 
@@ -161,7 +168,7 @@ void Configuration::getTempCustomArchiveTree()
 	}
 
 }
-void Configuration::getStageList()
+void Project::getStageList()
 {
 	std::ifstream jsonFile(STAGE_LIST_FILE);
 
@@ -217,49 +224,49 @@ void Configuration::getStageList()
 		break;
 	}
 }
-std::vector<std::string> Configuration::getAllLevelIDs(bool onlyCustom)
+std::vector<std::string> Project::getAllLevelIDs(bool onlyCustom)
 {
 	std::vector<std::string> returned;
-	for (size_t i = 0; i < Configuration::worldData.data.size(); i++)
+	for (size_t i = 0; i < Project::worldData.data.size(); i++)
 	{
-		for (size_t x = 0; x < Configuration::worldData.data[i].data.size(); x++)
+		for (size_t x = 0; x < Project::worldData.data[i].data.size(); x++)
 		{
 			if (onlyCustom)
 			{
-				if (std::find(gensStages.begin(), gensStages.end(), Configuration::worldData.data[i].data[x].levelID) == gensStages.end())
+				if (std::find(gensStages.begin(), gensStages.end(), Project::worldData.data[i].data[x].levelID) == gensStages.end())
 				{
-					returned.push_back(Configuration::worldData.data[i].data[x].levelID);
+					returned.push_back(Project::worldData.data[i].data[x].levelID);
 					continue;
 				}
 			}
 			else
-				returned.push_back(Configuration::worldData.data[i].data[x].levelID);
+				returned.push_back(Project::worldData.data[i].data[x].levelID);
 		}
 	}
 	return returned;
 }
-std::vector<std::string> Configuration::getAllWhiteWorld()
+std::vector<std::string> Project::getAllWhiteWorld()
 {
 	std::vector<std::string> returned;
-	for (size_t i = 0; i < Configuration::worldData.data.size(); i++)
+	for (size_t i = 0; i < Project::worldData.data.size(); i++)
 	{
-		for (size_t x = 0; x < Configuration::worldData.data[i].data.size(); x++)
+		for (size_t x = 0; x < Project::worldData.data[i].data.size(); x++)
 		{
-			if (Configuration::worldData.data[i].data[x].isWhiteWorld)
+			if (Project::worldData.data[i].data[x].isWhiteWorld)
 			{
-				returned.push_back(Configuration::worldData.data[i].data[x].levelID);
+				returned.push_back(Project::worldData.data[i].data[x].levelID);
 				continue;
 			}
 		}
 	}
 	return returned;
 }
-int Configuration::getCapital(int flagID)
+int Project::getCapital(int flagID)
 {
 	int returned = -1;
-	for (size_t i = 0; i < Configuration::worldData.data[flagID].data.size(); i++)
+	for (size_t i = 0; i < Project::worldData.data[flagID].data.size(); i++)
 	{
-		if (Configuration::worldData.data[flagID].data[i].isCapital)
+		if (Project::worldData.data[flagID].data[i].isCapital)
 		{
 			returned = i;
 			return returned;
