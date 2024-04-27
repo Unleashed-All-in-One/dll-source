@@ -72,7 +72,6 @@
 #include "Gameplay/Pole.h"
 
 //System
-#include "System/PhysicsObject.h"
 #include "System/LevelLoadingManager.h"
 #include "System/DiscordStatus.h"
 #include "System/AnimationSetPatcher.h"

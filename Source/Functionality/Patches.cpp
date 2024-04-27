@@ -42,7 +42,7 @@ HOOK(void, __fastcall, Sonic_CObjIronPole_UpdateSerial, 0xFFF100, Sonic::CGameOb
 		originalSonic_CObjIronPole_UpdateSerial(This, Edx, a2);
 		return;
 	}
-	TransformUtilities::DoWerehogArmHomingIfClose(This->m_spMatrixNodeTransform, 5, a2->DeltaTime);
+	TransformUtilities::DoWerehogArmHomingIfClose(This->m_spMatrixNodeTransform->m_Transform.m_Position, 5, a2->DeltaTime);
 	/*Sonic::Player::CPlayerSpeedContext* playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
 	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
 	float distance = abs(TransformUtilities::Distance(playerContext->m_spMatrixNode->m_Transform.m_Position, This->m_spMatrixNodeTransform->m_Transform.m_Position));
@@ -80,10 +80,17 @@ HOOK(void, __fastcall, Sonic_CObjIronPole_UpdateSerial, 0xFFF100, Sonic::CGameOb
 	}*/
 	originalSonic_CObjIronPole_UpdateSerial(This, Edx, a2);
 }
+
+//int __thiscall sub_D10CC0(_DWORD *this, int a2)
+HOOK(int, __fastcall, sub_D10CC0, 0xD10CC0, DWORD* This, void* Edx, int a2)
+{
+	return 0;
+}
 void Patches::applyPatches()
 {
 	INSTALL_HOOK(Sonic_CObjIronPole_UpdateSerial);
 	INSTALL_HOOK(sub_E9FD10);
+	INSTALL_HOOK(sub_D10CC0);
     //Makes Sonic's result animations work again for modern
     WRITE_JUMP(0X00CFDBD5, 0x00CFD840);
 

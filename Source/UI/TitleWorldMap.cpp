@@ -139,6 +139,7 @@ public:
 		
 
 		Sonic::CGameObject::AddRenderable("Object", m_spModel, false);
+		Common::ObjectCGlitterPlayerOneShot(this, "worldmap_sun");
 
 
 	}
@@ -149,7 +150,6 @@ public:
 	) override
 	{
 
-		Common::ObjectCGlitterPlayerOneShot(this, "worldmap_sun");
 		m_spMatrixNodeTransform->m_Transform.SetRotation(rotationEarth);
 	}
 

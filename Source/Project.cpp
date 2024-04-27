@@ -22,10 +22,10 @@ std::string Project::modPath;
 float Project::m_deltaTime = 0.0f;
 float Project::m_hudDeltaTime = 0.0f;
 int Project::m_frameDeltaTime = 0;
-boost::shared_ptr<Sonic::CMatrixNodeTransform> Project::nodeForArmswing;
+Hedgehog::Math::CVector Project::nodeForArmswing;
 
 //didnt know where else to put this
-extern "C" __declspec(dllexport) boost::shared_ptr<Sonic::CMatrixNodeTransform> API_GetClosestSetObjectForArmswing()
+extern "C" __declspec(dllexport) Hedgehog::Math::CVector API_GetClosestSetObjectForArmswing()
 {
 	return Project::nodeForArmswing;
 }

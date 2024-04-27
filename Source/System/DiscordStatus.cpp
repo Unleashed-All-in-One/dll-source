@@ -23,7 +23,7 @@ void DiscordStatus::initialize()
 	//i hate discord's game sdk -Nextin
 	discord::Result coreResult;
 
-	coreResult = discord::Core::Create(CLIENT_ID, DiscordCreateFlags_Default, &core);
+	coreResult = discord::Core::Create(CLIENT_ID, DiscordCreateFlags_NoRequireDiscord, &core);
 	coreResult == discord::Result::Ok && core
 		? printf("[DiscordStatus] Core Initialized Successfully!\n")
 		: printf("[DiscordStatus] Core Initialization failed!\n");

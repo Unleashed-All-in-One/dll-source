@@ -75,12 +75,13 @@ public:
 			: (sqrt(1 - pow(-2 * x + 2, 2)) + 1) / 2;
 	}
 
-	static bool DoWerehogArmHomingIfClose(boost::shared_ptr<Sonic::CMatrixNodeTransform> target, float maxDistance, float deltaTime)
+	static bool DoWerehogArmHomingIfClose(Hedgehog::Math::CVector target, float maxDistance, float deltaTime)
 	{
 		Sonic::Player::CPlayerSpeedContext* playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
 		auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
-		float distance = abs(TransformUtilities::Distance(playerContext->m_spMatrixNode->m_Transform.m_Position, target->m_Transform.m_Position));
-		if (distance < 5)
+		CVector front = playerContext->m_spMatrixNode->m_Transform.m_Rotation * CVector(0, 0, -1);
+		float distance = abs(TransformUtilities::Distance(playerContext->m_spMatrixNode->m_Transform.m_Position + front, target));
+		if (distance < maxDistance)
 		{
 			if (inputPtr->IsTapped(Sonic::eKeyState_B) && playerContext->m_pPlayer->m_StateMachine.GetCurrentState()->GetStateName() != "EvilArmSwing")
 			{
@@ -139,6 +140,7 @@ public:
 	bool m_isLeaping;
 	float m_timerLeap;
 	float timerSound;
+	CVector swingPosition;
 
 	bool isLeftStickUpPressed = false;
 	bool isAPressed = false;
@@ -166,6 +168,8 @@ public:
 		m_spModelPoleMid->BindMatrixNode(m_spMatrixNodeTransform);
 		m_spModelPoleTop->BindMatrixNode(m_spNodeColumnTop);
 		m_spModelPoleBtm->BindMatrixNode(m_spMatrixNodeTransform);
+
+		swingPosition = CVector(m_spMatrixNodeTransform->m_Transform.m_Position.x(), m_spMatrixNodeTransform->m_Transform.m_Position.y(), m_spMatrixNodeTransform->m_Transform.m_Position.z());
 		Sonic::CGameObject::AddRenderable("Object", m_spModelPoleMid, true);
 		Sonic::CGameObject::AddRenderable("Object", m_spModelPoleTop, true);
 		Sonic::CGameObject::AddRenderable("Object", m_spModelPoleBtm, true);
@@ -354,8 +358,10 @@ public:
 		Sonic::Player::CPlayerSpeedContext* playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
 		isAPressed = inputPtr->IsTapped(Sonic::eKeyState_A);
 		isLeftStickUpPressed = inputPtr->IsDown(Sonic::eKeyState_LeftStickUp);
-
-		if (m_playerInsideCollider && inputPtr->IsTapped(Sonic::eKeyState_B))
+		swingPosition.y() = playerContext->m_spMatrixNode->m_Transform.m_Position.y();
+		if(!m_playerInsideCollider)
+		TransformUtilities::DoWerehogArmHomingIfClose(swingPosition, 3, in_rUpdateInfo.DeltaTime);
+		if (m_playerInsideCollider && (inputPtr->IsTapped(Sonic::eKeyState_B) || playerContext->m_pPlayer->m_StateMachine.GetCurrentState()->m_Name == "EvilArmSwing"))
 		{
 			playerContext->ChangeState(Sonic::Player::ePlayerSpeedState_JumpHurdle);
 			m_playerOnPole = true;
