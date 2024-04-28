@@ -14,8 +14,6 @@ std::string getDirectoryPath(const std::string& path)
 	const size_t pos = path.find_last_of("\\/");
 	return path.substr(0, pos != std::string::npos ? pos : 0);
 }
-//00E62450
-//int __thiscall Sonic::Player::CPlayerSpeedContext::UpdateFunc(CSonicContext *this, float *deltaTime)
 
 extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 {

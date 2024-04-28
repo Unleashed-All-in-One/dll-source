@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="packages\SoLoud-wav.2020.2.7.2\build\native\SoLoud-wav.props" Condition="Exists('packages\SoLoud-wav.2020.2.7.2\build\native\SoLoud-wav.props')" />
   <ItemGroup Label="ProjectConfigurations">
@@ -184,7 +184,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="System\EnemyTrigger.cpp" />
     <ClCompile Include="System\ImguiInitializer.cpp" />
     <ClCompile Include="System\LetterboxHelper.cpp" />
-    <ClCompile Include="System\LevelLoadingManager.cpp" />
+    <ClCompile Include="System\StageManager.cpp" />
     <ClCompile Include="System\LuaManager.cpp" />
     <ClCompile Include="System\MiniAudioHelper.cpp" />
     <ClCompile Include="System\SaveManager.cpp" />
@@ -265,7 +265,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="System\EnemyTrigger.h" />
     <ClInclude Include="System\ImguiInitializer.h" />
     <ClInclude Include="System\LetterboxHelper.h" />
-    <ClInclude Include="System\LevelLoadingManager.h" />
+    <ClInclude Include="System\StageManager.h" />
     <ClInclude Include="System\Light.h" />
     <ClInclude Include="System\LuaManager.h" />
     <ClInclude Include="System\MiniAudioHelper.h" />

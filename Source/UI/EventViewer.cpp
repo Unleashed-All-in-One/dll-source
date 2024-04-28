@@ -171,10 +171,10 @@ HOOK(Hedgehog::Base::CSharedString*, __fastcall, sub_10fe500, 0x10FE500, DWORD* 
 	return originalsub_10fe500(EventQueue, Edx, a2);
 }
 //_DWORD *__thiscall sub_645C40(_DWORD *this, char a2)
-HOOK(char, __fastcall, sub_10FE9E0, 0x10FE9E0, void* This, void* Edx, DWORD* a1, int a2)
+HOOK(char, __fastcall, CEventQueueImpl_ProcessMessage, 0x10FE9E0, void* This, void* Edx, DWORD* a1, int a2)
 {
 	isInEventViewer = true;
-	return originalsub_10FE9E0(This, Edx, a1,a2);
+	return originalCEventQueueImpl_ProcessMessage(This, Edx, a1,a2);
 }
 float frame = 0;
 bool doCount = true;
@@ -206,7 +206,7 @@ HOOK(void, __fastcall, EventUpdate, 0x00B24A40, Sonic::CGameObject* This, void* 
 	DebugDrawText::log(std::format("EVENT_FRAME CUSTOM: {0}", frame).c_str(), 0);
 	return originalEventUpdate(This, Edx, in_rUpdateInfo);
 }
-HOOK(long, __fastcall, sub_B1ECF0, 0xB1ECF0, int This, void* Edx, int a2, int a3, int _38)
+HOOK(long, __fastcall, CEventSceneStart, 0xB1ECF0, int This, void* Edx, int a2, int a3, int _38)
 {
 	frame = 0;
 	doCount = true;
@@ -220,18 +220,18 @@ HOOK(long, __fastcall, sub_B1ECF0, 0xB1ECF0, int This, void* Edx, int a2, int a3
 		resource = new InspireResource(string.c_str());
 	}
 	//currentEventIndex = 0;
-	return originalsub_B1ECF0(This, Edx, a2, a3, _38);
+	return originalCEventSceneStart(This, Edx, a2, a3, _38);
 }
 //
 //Sonic::CEventScene::UpdateSerial(_DWORD *this, float *a2)
-//char __thiscall sub_10FE9E0(void *this, DWORD *a1, int a2)
+//char __thiscall CEventQueueImpl_ProcessMessage(void *this, DWORD *a1, int a2)
 void EventViewer::applyPatches()
 {
 	INSTALL_HOOK(CreateBTNSKip);
 	INSTALL_HOOK(EventUpdate);
-	INSTALL_HOOK(sub_B1ECF0);
+	INSTALL_HOOK(CEventSceneStart);
 	INSTALL_HOOK(sub_10fe500);
-	INSTALL_HOOK(sub_10FE9E0);
+	INSTALL_HOOK(CEventQueueImpl_ProcessMessage);
 	//WRITE_JUMP(0x00B21AD0, InterceptProject);
 	//WRITE_JUMP(0x00B21A33, InterceptGameObject);
 

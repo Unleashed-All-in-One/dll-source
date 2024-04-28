@@ -187,7 +187,7 @@ void StageManager::triggerSequenceEvents(int type, bool dontSetPlayerType)
 	}
 	}
 }
-void ExecuteSequenceData(std::vector<QueueData> dataList)
+void executeSequenceData(std::vector<QueueData> dataList)
 {
 	int index = StageManager::LastSavedQueueIndex;
 	QueueData data = dataList[index];
@@ -215,7 +215,7 @@ void ExecuteSequenceData(std::vector<QueueData> dataList)
 	//}
 }
 
-void SetCorrectStageFromPAM(uint32_t stageIDPam)
+void calculateNextStageFromHub(uint32_t stageIDPam)
 {
 	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 	char** h = (char**)stageTerrainAddress;
@@ -227,7 +227,7 @@ void SetCorrectStageFromPAM(uint32_t stageIDPam)
 	SequenceHelpers::loadStage(stageToLoad);
 	strcpy(*(char**)stageTerrainAddress, stageToLoad);
 }
-void SetCorrectStageFromFlag()
+void calculateNextStage()
 {
 	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 	char** h = (char**)stageTerrainAddress;
@@ -295,7 +295,7 @@ void SetCorrectStageFromFlag()
 		//{
 		//	if (inStoryBefore == StageManager::InStory)
 		//		StageManager::LastSavedQueueIndex++;
-		//	ExecuteSequenceData(Project::queueData.data);
+		//	executeSequenceData(Project::queueData.data);
 		//}
 		//if(Project::queueData.data[StageManager::LastSavedQueueIndex].type != 5)
 		//strcpy(*(char**)stageTerrainAddress, Project::queueData.data[StageManager::LastSavedQueueIndex].dataName.c_str());
@@ -305,7 +305,7 @@ void SetCorrectStageFromFlag()
 	DebugDrawText::log((std::string("Stage Loading: ") + std::string(*h)).c_str());
 	inStoryBefore = StageManager::InStory;
 }
-void __declspec(naked) SetCorrectTerrainForMission_ASM()
+void __declspec(naked) ASM_OverrideStageIDLoading()
 {
 	static uint32_t sub_662010 = 0x662010;
 	static uint32_t returnAddress = 0xD56CCF;
@@ -313,16 +313,12 @@ void __declspec(naked) SetCorrectTerrainForMission_ASM()
 	{
 		call[sub_662010]
 		push    esi
-		call    SetCorrectStageFromFlag
+		call    calculateNextStage
 		pop     esi
 		jmp[returnAddress]
 	}
 }
-void __declspec(naked) Test(int in)
-{
-	printf("in");
-}
-void __declspec(naked) InterceptGameplayFlowLoading()
+void __declspec(naked) ASM_InterceptGameplayFlowLoading()
 {
 	static uint32_t normal = 0x00D0E166;
 	static uint32_t loc_D0E170 = 0xD0E170;
@@ -394,23 +390,9 @@ HOOK(int32_t*, __fastcall, HudLoading_CHudLoadingCStateOutroBegin, 0x1093410, hh
 	StageManager::NextLevelLoad = nullptr;
 	return originalHudLoading_CHudLoadingCStateOutroBegin(This);
 }
-
-HOOK(void, __fastcall, LoadPamSettings, 0x00D0A850, DWORD* This)
+HOOK(DWORD*, __fastcall, CStoryImplConstructor, 0xD76930)
 {
-	static boost::shared_ptr<hh::db::CRawData> rawData;
-	auto database = hh::db::CDatabase::CreateDatabase();
-	auto& databaseLoader = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spDatabaseLoader;
-	rawData = database->GetRawData("pamSetting.lua");
-	if (!rawData)
-	{
-		MessageBox(nullptr, TEXT("There is no pamSetting file attached to this capital.\nThe game will crash if you touch a StageGate object."), TEXT("WARNING"), MB_ICONERROR);
-	}
-	originalLoadPamSettings(This);
-
-}
-HOOK(DWORD*, __fastcall, ConstructStorySequence, 0xD76930)
-{
-	storySequence = originalConstructStorySequence();
+	storySequence = originalCStoryImplConstructor();
 	return storySequence;
 }
 void __declspec(naked) SkipEvent()
@@ -429,10 +411,9 @@ void __declspec(naked) SkipEvent()
 }
 void StageManager::setCorrectStage()
 {
-	SetCorrectStageFromFlag();
+	calculateNextStage();
 }
-//int __thiscall CalledOnResultEnd(CTempState *this)
-HOOK(int, __fastcall, CalledOnResultEnd, 0x00CFB300, void* This, void* Edx)
+HOOK(int, __fastcall, CGameplayFlowStage_CStateWaitEnd, 0x00CFB300, void* This, void* Edx)
 {
 	if (StageManager::enteredStageFromETF)
 	{
@@ -451,7 +432,7 @@ HOOK(int, __fastcall, CalledOnResultEnd, 0x00CFB300, void* This, void* Edx)
 	}
 	else
 	{
-		SetCorrectStageFromFlag();
+		calculateNextStage();
 		skipCurrentQueueEvent = true;
 	}
 	return 0;
@@ -461,8 +442,7 @@ HOOK(void, __fastcall, HudResult_CHudResultAdvance, 0x10B96D0, Sonic::CGameObjec
 	if (*(uint32_t*)0x10B96E6 != 0xFFD285E8)
 	{
 		if (!stageEnded)
-		{
-			
+		{			
 			//SequenceHelpers::resetStorySequence();
 		}
 		stageEnded = true;
@@ -512,7 +492,7 @@ HOOK(void, __fastcall, CHudGateMenuMainCStateOutroBegin, 0x107B770, hh::fnd::CSt
 			if (v8 == 2)
 			{
 				StageManager::WhiteWorldEnabled = false;
-				SetCorrectStageFromPAM(stageID);
+				calculateNextStageFromHub(stageID);
 			}
 		}
 		else
@@ -522,29 +502,25 @@ HOOK(void, __fastcall, CHudGateMenuMainCStateOutroBegin, 0x107B770, hh::fnd::CSt
 			if (v9 != 7 && v9 != 11 && v9 != 13)
 			{
 				StageManager::WhiteWorldEnabled = false;
-				SetCorrectStageFromPAM(stageID);
+				calculateNextStageFromHub(stageID);
 			}
 		}
 	}
 	originalCHudGateMenuMainCStateOutroBegin(This);
 }
-//int __cdecl GetEventIndex(Hedgehog::Base::CSharedString *in_EventName)
-HOOK(int, __cdecl, GetEventIndex, 0x00B266B0, Hedgehog::Base::CSharedString* in_EventName)
-{
-	return 4;
-}
-void SetStuffTest()
+
+void setCorrectStageForCutscene_OnRealtime()
 {
 	std::string stageIdCopy = std::string(StageManager::nextStageID);
 	std::string evsNameCopy = std::string(StageManager::nextEvsID);
 	DebugDrawText::log(std::format("[LLM] Loading Event ID \"{}\" as {}", evsNameCopy, stageIdCopy).c_str(), 5);
 	StageManager::setGameParameters(stageIdCopy, evsNameCopy);
 }
-void MovieStuff()
+void setCorrectStageForCutscene_OnMovie()
 {
-
+	// -shrug-
 }
-void __declspec(naked) SetCorrectStageForCutscene()
+void __declspec(naked) ASM_SetCorrectStageForCutscene()
 {
 	static uint32_t sub_662010 = 0x662010;
 	static uint32_t returnAddress = 0x00B26861;
@@ -553,41 +529,31 @@ void __declspec(naked) SetCorrectStageForCutscene()
 		cmp isMovieCutscene, 1
 		je PlayStuff
 		push edi
-		call MovieStuff
+		call setCorrectStageForCutscene_OnMovie
 		pop edi
 		mov al, 0
 		retn
 
 		PlayStuff:
 		push edi
-		call SetStuffTest
+		call setCorrectStageForCutscene_OnRealtime
 		pop edi
 		mov al, 1
 		retn
 	}
 }
-HOOK(void, __fastcall, CEventScene_OnEnd, 0xB1EA80, int* This, void* Edx, int a2)
+HOOK(void, __fastcall, CEventSceneEnd, 0xB1EA80, int* This, void* Edx, int a2)
 {
 	skipCurrentQueueEvent = false;
 	//StageManager::LastSavedQueueIndex++;
-	SetCorrectStageFromFlag();
-	return originalCEventScene_OnEnd(This, Edx, a2);
+	calculateNextStage();
+	return originalCEventSceneEnd(This, Edx, a2);
 }
-//LONG __thiscall sub_B1ECF0(int this, int a2, int a3, int _38)
-HOOK(void*, __fastcall, sub_B1ECF0, 0xB1ECF0, int* This, void* Edx, int a2, int a3, int a4)
+
+HOOK(void*, __fastcall, CEventSceneStart, 0xB1ECF0, int* This, void* Edx, int a2, int a3, int a4)
 {
-	//uint32_t* appdocMember = (uint32_t*)Sonic::CApplicationDocument::GetInstance()->m_pMember;
-	//auto v4 = *((DWORD*)appdocMember + 109);
-	//auto e = (Hedgehog::Base::CSharedString*)(*((DWORD*)v4 + 32) + 44);
-	//auto e2 = (Hedgehog::Base::CSharedString*)(*((DWORD*)v4 + 32) + 48);
-	//*e2 = std::string(Project::queueData.data[StageManager::LastSavedQueueIndex + 1].dataName).c_str();
-	//
-	//uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-	//char** h = (char**)stageTerrainAddress;
-	//
-	//strcpy(*(char**)stageTerrainAddress, std::string(Project::queueData.data[StageManager::LastSavedQueueIndex + 1].dataName).c_str());
 	skipCurrentQueueEvent = true;
-	return originalsub_B1ECF0(This, Edx, a2, a3, a4);
+	return originalCEventSceneStart(This, Edx, a2, a3, a4);
 }
 extern "C" __declspec(dllexport) bool API_IsEvent()
 {
@@ -621,29 +587,18 @@ HOOK(void, __fastcall, Sonic_Mission_CScriptImpl_SendMissionType, 0x011041E0, fl
 }
 void StageManager::initialize()
 {
-	WRITE_JUMP(0xD56CCA, SetCorrectTerrainForMission_ASM);
-	WRITE_JUMP(0x00D0E164, InterceptGameplayFlowLoading);
-	
-	//WRITE_JUMP(0x00D0DEB1, ForceGoToPlayableMenu);
 	//Blocks Gate UI options and switch
 	WRITE_JUMP(0x01080F02, 0x01080FB7);
-
-	WRITE_JUMP(0x00B267D0, SetCorrectStageForCutscene)
-	////btn skip
-	//WRITE_JUMP(0x00B21D38, SkipEvent);
-	////dont spawn button ui
-	//WRITE_JUMP(0x00B21CF5, 0x00B21CF3);
-	//INSTALL_HOOK(GetEventIndex);
-
+	WRITE_JUMP(0xD56CCA, ASM_OverrideStageIDLoading);
+	WRITE_JUMP(0x00B267D0, ASM_SetCorrectStageForCutscene);
+	WRITE_JUMP(0x00D0E164, ASM_InterceptGameplayFlowLoading);
+	INSTALL_HOOK(CStoryImplConstructor);
+	INSTALL_HOOK(CEventSceneStart);
+	INSTALL_HOOK(CEventSceneEnd);
+	INSTALL_HOOK(CGameplayFlowStage_CStateWaitEnd);
+	INSTALL_HOOK(CHudGateMenuMainCStateOutroBegin);
+	INSTALL_HOOK(HudLoading_CHudLoadingCStateOutroBegin);
 
 	//Patch out reading MissionScript to avoid crashes when loading stages without the stgXXX archive name format
 	INSTALL_HOOK(Sonic_Mission_CScriptImpl_SendMissionType);
-	INSTALL_HOOK(CalledOnResultEnd);
-	INSTALL_HOOK(sub_B1ECF0);
-	INSTALL_HOOK(CEventScene_OnEnd);
-	INSTALL_HOOK(HudLoading_CHudLoadingCStateOutroBegin);
-	INSTALL_HOOK(CHudGateMenuMainCStateOutroBegin);
-	//INSTALL_HOOK(HudResult_CHudResultAdvance);
-	INSTALL_HOOK(LoadPamSettings);
-	INSTALL_HOOK(ConstructStorySequence);
 }
