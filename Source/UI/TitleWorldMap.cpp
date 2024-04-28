@@ -955,9 +955,9 @@ void CapitalWindow_Update()
 		if (selectedCapital == 0)
 		{
 			MiniAudioHelper::playSound(stageSelectHandle, 3, "Boot");
-			LevelLoadingManager::WhiteWorldEnabled = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[Project::getCapital(TitleWorldMap::LastValidFlagSelected)].isWhiteWorld;
+			StageManager::WhiteWorldEnabled = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[Project::getCapital(TitleWorldMap::LastValidFlagSelected)].isWhiteWorld;
 
-			/*if (LevelLoadingManager::WhiteWorldEnabled)
+			/*if (StageManager::WhiteWorldEnabled)
 			{
 				WRITE_STRING(0x015B499C, GetStageToLoad());
 				WRITE_STRING(0x015C789C, GetStageToLoad());
@@ -1008,7 +1008,7 @@ void StageWindow_Update(Sonic::CGameObject* This)
 	if (inputPtr->IsTapped(Sonic::eKeyState_A) && timeStageSelectDelay >= 5)
 	{
 		MiniAudioHelper::playSound(stageSelectHandle, 3, "Boot");
-		LevelLoadingManager::WhiteWorldEnabled = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[TitleWorldMap::StageSelectedWindow].isWhiteWorld;
+		StageManager::WhiteWorldEnabled = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[TitleWorldMap::StageSelectedWindow].isWhiteWorld;
 
 		Title::showTransition(true);
 	}
@@ -1466,7 +1466,7 @@ HOOK(int, __fastcall, CHudGateMenuMainIntroInfo, 0x1080110, hh::fnd::CStateMachi
 	const char* idArchive = (const char*)((int*)0x015BBA34)[stageID];
 
 	Common::ClampUInt(stageID, 0, Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data.size()-1);
-	LevelLoadingManager::NextLevelLoad = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[stageID].levelID.c_str();
+	StageManager::NextLevelLoad = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[stageID].levelID.c_str();
 	return returne;
 }
 
@@ -1477,13 +1477,13 @@ HOOK(char, *_stdcall, StageGate_MoveToOtherStage, 0x107FBC0, int a1)
 {
 	char* returned = originalStageGate_MoveToOtherStage(a1);
 	uint8_t stageID = (*(uint8_t*)(a1 + 336));
-	LevelLoadingManager::NextLevelLoad = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[stageID].levelID.c_str();
+	StageManager::NextLevelLoad = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[stageID].levelID.c_str();
 	return returned;
 
 }
 HOOK(int, __fastcall, CHudGateMenuMainOutro, 0x107B770, hh::fnd::CStateMachineBase::CStateBase* This)
 {
-	LevelLoadingManager::ActiveReplacement = true;
+	StageManager::ActiveReplacement = true;
 	return originalCHudGateMenuMainOutro(This);
 }
 

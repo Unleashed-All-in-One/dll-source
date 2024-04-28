@@ -152,7 +152,7 @@ void __declspec(naked) TitleUI_SetCustomExecFunction()
 void OnNewGame()
 {
 	Title::showTransition(false);
-	LevelLoadingManager::InStory = true;
+	StageManager::InStory = true;
 	SaveManager::deleteSave();
 	auto save = SaveManager::getCurrentSave();
 	save->lives = 5;
@@ -521,7 +521,7 @@ HOOK(void*, __fastcall, Title_UpdateApplication, 0xE7BED0, Sonic::CGameObject* T
 		{
 			if (bg_transition->m_MotionDisableFlag)
 			{
-				SequenceHelpers::loadStage(LevelLoadingManager::getStageToLoad());
+				SequenceHelpers::loadStage(StageManager::getStageToLoad());
 				canLoad = 0;
 			}
 		}

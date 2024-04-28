@@ -33,7 +33,7 @@ void ImguiManager::update()
 		if(ImGui::Button("Load as cutscene"))
 		{
 			SequenceHelpers::loadStage(sceneIndexToLoad.c_str());
-			LevelLoadingManager::forcePlayCutscene(eventIndexToLoad, sceneIndexToLoad, false, 0);
+			StageManager::forcePlayCutscene(eventIndexToLoad, sceneIndexToLoad, false, 0);
 		}
 		
 	}

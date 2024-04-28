@@ -19,8 +19,8 @@ static int triggerStageLoad(lua_State* L)
     const char* stageID = lua_tostring(L, 1);
     int playerID = (int)lua_tonumber(L, 2);
     int stageType = (int)lua_tonumber(L, 3);
-    LevelLoadingManager::setGameParameters(stageID, "");
-    LevelLoadingManager::triggerSequenceEvents(stageType, true);
+    StageManager::setGameParameters(stageID, "");
+    StageManager::triggerSequenceEvents(stageType, true);
     SequenceHelpers::setPlayerType(playerID, true);
     return 0; // how many params we're passing to Lua
 }
@@ -30,8 +30,8 @@ static int triggerMovieLoad(lua_State* L)
     const char* stageID = lua_tostring(L, 2);
     int playerType = (int)lua_tonumber(L, 3);
     int stageType = (int)lua_tonumber(L, 4);
-    LevelLoadingManager::setGameParameters(stageID, evsID);
-    LevelLoadingManager::triggerSequenceEvents(4 + stageType, true);
+    StageManager::setGameParameters(stageID, evsID);
+    StageManager::triggerSequenceEvents(4 + stageType, true);
     SequenceHelpers::setPlayerType(playerType, true);
     return 0; // how many params we're passing to Lua
 }
@@ -58,17 +58,17 @@ static int getSaveBoolKey(lua_State* L)
 }
 static int getCurrentEVSID(lua_State* L)
 {
-    lua_pushstring(L, LevelLoadingManager::nextEvsID.c_str());
+    lua_pushstring(L, StageManager::nextEvsID.c_str());
     return 1;
 }
 static int getCurrentStageID(lua_State* L)
 {
-    lua_pushstring(L, LevelLoadingManager::nextStageID.c_str());
+    lua_pushstring(L, StageManager::nextStageID.c_str());
     return 1;
 }
 static int isLoadingFromETF(lua_State* L)
 {
-    lua_pushboolean(L, LevelLoadingManager::enteredStageFromETF);
+    lua_pushboolean(L, StageManager::enteredStageFromETF);
     return 1;
 }
 static int printToScreen(lua_State* L)

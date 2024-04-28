@@ -18,7 +18,7 @@ struct LuaParamPlayEvent
 	LuaParamPlayEventEntry* entry;
 	LuaParamPlayEventEntry* entry1;
 };
-class LevelLoadingManager
+class StageManager
 {
 
 public:

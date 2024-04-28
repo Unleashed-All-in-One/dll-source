@@ -151,14 +151,14 @@ HOOK(volatile signed int*, __stdcall, CreateBTNSKip, 0x00B21A30, DWORD* This)
 
 void EventViewer::update()
 {
-	DebugDrawText::log(std::to_string(LevelLoadingManager::LastSavedQueueIndex).c_str(), 0);
+	DebugDrawText::log(std::to_string(StageManager::LastSavedQueueIndex).c_str(), 0);
 	if (isInEventViewer)
 	{
 		if (isGoingToSkip)
 		{
 			//if (UnleashedHUD_API::IsLoadingFadeoutCompleted())
 			//{
-				//LevelLoadingManager::setCorrectStage();
+				//StageManager::setCorrectStage();
 				isGoingToSkip = false;
 				objecttt[77] = 2;
 			//}
@@ -210,7 +210,7 @@ HOOK(long, __fastcall, sub_B1ECF0, 0xB1ECF0, int This, void* Edx, int a2, int a3
 {
 	frame = 0;
 	doCount = true;
-	auto string = std::format("{0}\\disk\\EventSceneResource\\{1}_voice_English.inspire_resource.xml", Project::modPath, LevelLoadingManager::getEventID());
+	auto string = std::format("{0}\\disk\\EventSceneResource\\{1}_voice_English.inspire_resource.xml", Project::modPath, StageManager::getEventID());
 	if (!std::filesystem::exists(string))
 	{
 		printf("\n[SonicUnleashedConversion] Missing InspireResource file.");

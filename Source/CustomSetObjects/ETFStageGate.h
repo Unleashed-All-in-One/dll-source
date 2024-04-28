@@ -178,10 +178,10 @@ public:
                     char** h = (char**)stageTerrainAddress;
                     const char* stageToLoad = stageToLoadS.c_str();
 
-                    LevelLoadingManager::setETFInfo(SequenceHelpers::getCurrentStageName(false));
-                    LevelLoadingManager::setGameParameters(SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID), "");
+                    StageManager::setETFInfo(SequenceHelpers::getCurrentStageName(false));
+                    StageManager::setGameParameters(SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID), "");
                     TitleWorldMap::LoadingReplacementEnabled = true;
-                    LevelLoadingManager::WhiteWorldEnabled = false;
+                    StageManager::WhiteWorldEnabled = false;
                     SequenceHelpers::loadStage((SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID)).c_str(), 0);
                     strcpy(*(char**)stageTerrainAddress, stageToLoad);
                 }

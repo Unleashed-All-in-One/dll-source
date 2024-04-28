@@ -29,7 +29,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	// Functionality patches that don't necessarily need their own file
 	Patches::applyPatches();
 	//---------------System---------------
-	LevelLoadingManager::initialize();
+	StageManager::initialize();
 	ArchiveTreePatcher::applyPatches();
 	AnimationSetPatcher::applyPatches();
 	EnemyTrigger::applyPatches();
@@ -107,7 +107,7 @@ extern "C" void __declspec(dllexport) OnFrame()
 	ImguiInitializer::update();
 	CSDCommon::update();
 	//DiscordStatus::update();
-	LevelLoadingManager::update();
+	StageManager::update();
 	EventViewer::update();
 	SequenceHelpers::update();
 }

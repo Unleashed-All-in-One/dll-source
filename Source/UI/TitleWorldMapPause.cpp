@@ -170,9 +170,9 @@ void PauseCase(int pos)
 	}
 	case 4:
 	{
-		LevelLoadingManager::ActiveReplacement = false;
+		StageManager::ActiveReplacement = false;
 		Title::inInstall = true;
-		LevelLoadingManager::NextLevelLoad = "pla201";
+		StageManager::NextLevelLoad = "pla201";
 		TitleWorldMap::LoadingReplacementEnabled = true;
 		SequenceHelpers::loadStage("pla201");
 		break;

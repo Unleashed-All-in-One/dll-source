@@ -1,20 +1,20 @@
 
-const char* LevelLoadingManager::NextLevelLoad;
-bool LevelLoadingManager::ActiveReplacement;
-bool LevelLoadingManager::ReplacingNext;
+const char* StageManager::NextLevelLoad;
+bool StageManager::ActiveReplacement;
+bool StageManager::ReplacingNext;
 const char* lastStageID = "";
 const char* lastStageIDGate = "";
-bool LevelLoadingManager::WhiteWorldEnabled = false;
-int LevelLoadingManager::LastSavedQueueIndex = -1;
+bool StageManager::WhiteWorldEnabled = false;
+int StageManager::LastSavedQueueIndex = -1;
 uint32_t nextPlayerType = 0;
-std::string LevelLoadingManager::nextStageID;
-std::string LevelLoadingManager::nextEvsID;
+std::string StageManager::nextStageID;
+std::string StageManager::nextEvsID;
 const char* temp_nextStageIDCutscene = "ev011";
 const char* temp_nextEVSIDCutscene = "ghz100";
 bool isMovieCutscene;
-bool LevelLoadingManager::enteredStageFromETF;
+bool StageManager::enteredStageFromETF;
 std::string etfHubName = "ghz205";
-bool LevelLoadingManager::InStory;
+bool StageManager::InStory;
 bool inStoryBefore;
 bool stageEnded;
 bool skipCurrentQueueEvent;
@@ -34,7 +34,7 @@ void __declspec(naked) sub_00D40070(int skipped, DWORD* a2, Hedgehog::Base::CSha
 	}
 }
 
-void LevelLoadingManager::setGameParameters(std::string stageID, std::string evsID)
+void StageManager::setGameParameters(std::string stageID, std::string evsID)
 {
 	nextStageID = stageID;
 	nextEvsID = evsID;
@@ -45,13 +45,13 @@ void LevelLoadingManager::setGameParameters(std::string stageID, std::string evs
 	*evsIDLoc = evsID.c_str();
 	*stageIDLoc = stageID.c_str();
 }
-std::string LevelLoadingManager::getEventID()
+std::string StageManager::getEventID()
 {
 	return nextEvsID;
 }
-void LevelLoadingManager::setETFInfo(std::string etfHubStageName)
+void StageManager::setETFInfo(std::string etfHubStageName)
 {
-	LevelLoadingManager::enteredStageFromETF = true;
+	StageManager::enteredStageFromETF = true;
 	skipCurrentQueueEvent = false;
 	etfHubName = etfHubStageName;
 }
@@ -59,12 +59,12 @@ void loadCapital(std::string stageName, bool isWerehog)
 {
 	SequenceHelpers::loadStage(stageName.c_str(), 0, false);
 	TitleWorldMap::LoadingReplacementEnabled = true;
-	LevelLoadingManager::WhiteWorldEnabled = true;
+	StageManager::WhiteWorldEnabled = true;
 	//SequenceHelpers::changeModule(ModuleFlow::PlayableMenu);
 	SequenceHelpers::setPlayerType(isWerehog ? PlayerType::CLASSIC_SONIC : PlayerType::GENERIC_SONIC);
 	DebugDrawText::log(std::format("[LLM] Loading Capital (Day) \"{}\" as {}", stageName, isWerehog ? "Werehog" : "Modern").c_str(), 5);
 }
-const char* LevelLoadingManager::getStageToLoad()
+const char* StageManager::getStageToLoad()
 {
 	const char* stageToLoad = "ghz200";
 
@@ -88,7 +88,7 @@ const char* LevelLoadingManager::getStageToLoad()
 	}
 	return stageToLoad;
 }
-void LevelLoadingManager::forcePlayCutscene(std::string in_EventName, std::string in_StageName, bool flag, int playerType)
+void StageManager::forcePlayCutscene(std::string in_EventName, std::string in_StageName, bool flag, int playerType)
 {
 	auto playEventRequest = new LuaParamPlayEvent();
 	playEventRequest->entry = new LuaParamPlayEventEntry();
@@ -110,34 +110,34 @@ void LevelLoadingManager::forcePlayCutscene(std::string in_EventName, std::strin
 	//const char* stageToLoad = in_StageName.c_str();
 	//strcpy(*(char**)stageTerrainAddress, stageToLoad);
 }
-void LevelLoadingManager::triggerSequenceEvents(int type, bool dontSetPlayerType)
+void StageManager::triggerSequenceEvents(int type, bool dontSetPlayerType)
 {
 	switch (type)
 	{
 	case 0:
 	{
 		//Play stage (day)
-		SequenceHelpers::loadStage(LevelLoadingManager::nextStageID.c_str(), 0, false);
+		SequenceHelpers::loadStage(StageManager::nextStageID.c_str(), 0, false);
 		if(!dontSetPlayerType)
 			SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
-		LevelLoadingManager::WhiteWorldEnabled = 0;
-		DebugDrawText::log(std::format("[LLM] Loading Stage (Day) \"{}\" as {}",LevelLoadingManager::nextStageID, (int)PlayerType::GENERIC_SONIC).c_str(), 5);
+		StageManager::WhiteWorldEnabled = 0;
+		DebugDrawText::log(std::format("[LLM] Loading Stage (Day) \"{}\" as {}",StageManager::nextStageID, (int)PlayerType::GENERIC_SONIC).c_str(), 5);
 		break;
 	}
 	case 1:
 	{
 		//Play stage (night)
-		SequenceHelpers::loadStage(LevelLoadingManager::nextStageID.c_str(), 0, false);
+		SequenceHelpers::loadStage(StageManager::nextStageID.c_str(), 0, false);
 		if (!dontSetPlayerType)
 		SequenceHelpers::setPlayerType(PlayerType::CLASSIC_SONIC);
-		LevelLoadingManager::WhiteWorldEnabled = 0;
-		DebugDrawText::log(std::format("[LLM] Loading Stage (Night) \"{}\" as {}", LevelLoadingManager::nextStageID, (int)PlayerType::CLASSIC_SONIC).c_str(), 5);
+		StageManager::WhiteWorldEnabled = 0;
+		DebugDrawText::log(std::format("[LLM] Loading Stage (Night) \"{}\" as {}", StageManager::nextStageID, (int)PlayerType::CLASSIC_SONIC).c_str(), 5);
 		break;
 	}
 	case 2:
 	{
 		//Go to capital (day)
-		loadCapital(LevelLoadingManager::nextStageID, 0);
+		loadCapital(StageManager::nextStageID, 0);
 		if (!dontSetPlayerType)
 		SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
 		break;
@@ -145,20 +145,20 @@ void LevelLoadingManager::triggerSequenceEvents(int type, bool dontSetPlayerType
 	case 3:
 	{
 		//Go to capital (day)
-		loadCapital(LevelLoadingManager::nextStageID, 1);
+		loadCapital(StageManager::nextStageID, 1);
 		if (!dontSetPlayerType)
 		SequenceHelpers::setPlayerType(PlayerType::CLASSIC_SONIC);
 		break;
 	}
 	case 4:
 	{
-		SequenceHelpers::playEvent(LevelLoadingManager::nextEvsID.c_str(), ModuleFlow::Event);
+		SequenceHelpers::playEvent(StageManager::nextEvsID.c_str(), ModuleFlow::Event);
 		if (!dontSetPlayerType)
 		SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
 		auto message = Sonic::Message::MsgSequenceEvent(5, 0);
 		Sonic::Sequence::Main::ProcessMessage(&message);
 		isMovieCutscene = false;
-		LevelLoadingManager::nextStageID = "ghz100";
+		StageManager::nextStageID = "ghz100";
 		break;
 	}
 	case 5:
@@ -167,7 +167,7 @@ void LevelLoadingManager::triggerSequenceEvents(int type, bool dontSetPlayerType
 		
 		auto playEventRequest = new LuaParamPlayEvent();
 		playEventRequest->entry = new LuaParamPlayEventEntry();
-		playEventRequest->entry->eventName = LevelLoadingManager::nextEvsID.c_str();
+		playEventRequest->entry->eventName = StageManager::nextEvsID.c_str();
 		playEventRequest->entry->eventStageType = IntStuffPlayEvent();
 		playEventRequest->entry->eventStageType.value = 0;
 		FUNCTION_PTR(void, __thiscall, PlayEventLuanne, 0x00D72520, Sonic::Sequence::Story * StorySeq, int a2, LuaParamPlayEvent* a3);
@@ -181,7 +181,7 @@ void LevelLoadingManager::triggerSequenceEvents(int type, bool dontSetPlayerType
 		//SequenceHelpers::setPlayerType(0);
 		uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 		char** h = (char**)stageTerrainAddress;
-		const char* stageToLoad = LevelLoadingManager::nextStageID.c_str();
+		const char* stageToLoad = StageManager::nextStageID.c_str();
 		strcpy(*(char**)stageTerrainAddress, stageToLoad);
 		break;
 	}
@@ -189,7 +189,7 @@ void LevelLoadingManager::triggerSequenceEvents(int type, bool dontSetPlayerType
 }
 void ExecuteSequenceData(std::vector<QueueData> dataList)
 {
-	int index = LevelLoadingManager::LastSavedQueueIndex;
+	int index = StageManager::LastSavedQueueIndex;
 	QueueData data = dataList[index];
 	//if (data.type == 4 && data.immediate)
 	//{
@@ -201,7 +201,7 @@ void ExecuteSequenceData(std::vector<QueueData> dataList)
 	//	{
 	//		if (dataList[i].type == 4 && dataList[i].immediate == false)
 	//		{
-	//			LevelLoadingManager::LastSavedQueueIndex++;
+	//			StageManager::LastSavedQueueIndex++;
 	//			DebugDrawText::log(std::format("[LLM] Queueing event \"{}\"", dataList[i].dataName).c_str(), 5);
 	//			SequenceHelpers::queueEvent(dataList[i].dataName.c_str());
 	//		}
@@ -233,8 +233,8 @@ void SetCorrectStageFromFlag()
 	char** h = (char**)stageTerrainAddress;
 	TitleWorldMap::CamInitialized = false;
 
-	//strcpy(*(char**)stageTerrainAddress, LevelLoadingManager::NextLevelLoad);
-	if (!LevelLoadingManager::InStory)
+	//strcpy(*(char**)stageTerrainAddress, StageManager::NextLevelLoad);
+	if (!StageManager::InStory)
 	{		
 		const char* stageToLoad = "ghz200";
 		if (!TitleWorldMap::LoadingReplacementEnabled)
@@ -259,23 +259,23 @@ void SetCorrectStageFromFlag()
 		}
 		else
 		{
-			stageToLoad = LevelLoadingManager::getStageToLoad();
+			stageToLoad = StageManager::getStageToLoad();
 		}
 		TitleWorldMap::Active = false;
-		if (LevelLoadingManager::NextLevelLoad != nullptr)
+		if (StageManager::NextLevelLoad != nullptr)
 		{
-			stageToLoad = LevelLoadingManager::NextLevelLoad;
-			LevelLoadingManager::NextLevelLoad = nullptr;
+			stageToLoad = StageManager::NextLevelLoad;
+			StageManager::NextLevelLoad = nullptr;
 		}
 
 		strcpy(*(char**)stageTerrainAddress, stageToLoad);
 	}
 	else
 	{
-		if (LevelLoadingManager::enteredStageFromETF)
+		if (StageManager::enteredStageFromETF)
 		{
-			strcpy(*(char**)stageTerrainAddress, LevelLoadingManager::nextStageID.c_str());
-			//LevelLoadingManager::enteredStageFromETF = false;
+			strcpy(*(char**)stageTerrainAddress, StageManager::nextStageID.c_str());
+			//StageManager::enteredStageFromETF = false;
 		}
 		if (!skipCurrentQueueEvent)
 		{
@@ -283,27 +283,27 @@ void SetCorrectStageFromFlag()
 		}
 		else
 		{
-			LevelLoadingManager::enteredStageFromETF = false;
+			StageManager::enteredStageFromETF = false;
 			skipCurrentQueueEvent = false;
 		}
-		//if (LevelLoadingManager::LastSavedQueueIndex == -1)
+		//if (StageManager::LastSavedQueueIndex == -1)
 		//{
-		//	printf("[LevelLoadingManager] No saves have been found.");
-		//	LevelLoadingManager::LastSavedQueueIndex = 0;
+		//	printf("[StageManager] No saves have been found.");
+		//	StageManager::LastSavedQueueIndex = 0;
 		//}
 		//if (!skipCurrentQueueEvent)
 		//{
-		//	if (inStoryBefore == LevelLoadingManager::InStory)
-		//		LevelLoadingManager::LastSavedQueueIndex++;
+		//	if (inStoryBefore == StageManager::InStory)
+		//		StageManager::LastSavedQueueIndex++;
 		//	ExecuteSequenceData(Project::queueData.data);
 		//}
-		//if(Project::queueData.data[LevelLoadingManager::LastSavedQueueIndex].type != 5)
-		//strcpy(*(char**)stageTerrainAddress, Project::queueData.data[LevelLoadingManager::LastSavedQueueIndex].dataName.c_str());
+		//if(Project::queueData.data[StageManager::LastSavedQueueIndex].type != 5)
+		//strcpy(*(char**)stageTerrainAddress, Project::queueData.data[StageManager::LastSavedQueueIndex].dataName.c_str());
 		//skipCurrentQueueEvent = false;
 	}
 
 	DebugDrawText::log((std::string("Stage Loading: ") + std::string(*h)).c_str());
-	inStoryBefore = LevelLoadingManager::InStory;
+	inStoryBefore = StageManager::InStory;
 }
 void __declspec(naked) SetCorrectTerrainForMission_ASM()
 {
@@ -349,7 +349,7 @@ void __declspec(naked) InterceptGameplayFlowLoading()
 		jmp[loc_D0E170]
 
 		ChangeToAct :
-		cmp LevelLoadingManager::WhiteWorldEnabled, 1
+		cmp StageManager::WhiteWorldEnabled, 1
 			je FunctionFinish
 			mov ecx, 6
 			jmp[loc_D0E170]
@@ -362,7 +362,7 @@ void __declspec(naked) InterceptGameplayFlowLoading()
 			jmp[loc_D0E170]
 
 			ChangeToWhiteWorld :
-			cmp LevelLoadingManager::WhiteWorldEnabled, 1
+			cmp StageManager::WhiteWorldEnabled, 1
 			jne ChangeModuleDefault
 			mov ecx, 5
 			jmp[loc_D0E170]
@@ -371,27 +371,27 @@ void __declspec(naked) InterceptGameplayFlowLoading()
 			jmp[loc_D0E170]
 	}
 }
-void LevelLoadingManager::update()
+void StageManager::update()
 {
 	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 	char** h = (char**)stageTerrainAddress;
 	const char* terr = *h;
 	DebugDrawText::log(terr, 0);
 	lastStageID = terr;
-	/*if (LevelLoadingManager::ActiveReplacement && LevelLoadingManager::NextLevelLoad != nullptr)
+	/*if (StageManager::ActiveReplacement && StageManager::NextLevelLoad != nullptr)
 	{
 		if (lastStageIDGate == nullptr)
 			lastStageIDGate = terr;
-		if (terr != LevelLoadingManager::NextLevelLoad)
+		if (terr != StageManager::NextLevelLoad)
 		{
-			strcpy(*(char**)stageTerrainAddress, LevelLoadingManager::NextLevelLoad);
+			strcpy(*(char**)stageTerrainAddress, StageManager::NextLevelLoad);
 		}
 	}	*/
 }
 HOOK(int32_t*, __fastcall, HudLoading_CHudLoadingCStateOutroBegin, 0x1093410, hh::fnd::CStateMachineBase::CStateBase* This)
 {
-	LevelLoadingManager::ActiveReplacement = false;
-	LevelLoadingManager::NextLevelLoad = nullptr;
+	StageManager::ActiveReplacement = false;
+	StageManager::NextLevelLoad = nullptr;
 	return originalHudLoading_CHudLoadingCStateOutroBegin(This);
 }
 
@@ -427,26 +427,26 @@ void __declspec(naked) SkipEvent()
 		jmp[pAddrNothing]
 	}
 }
-void LevelLoadingManager::setCorrectStage()
+void StageManager::setCorrectStage()
 {
 	SetCorrectStageFromFlag();
 }
 //int __thiscall CalledOnResultEnd(CTempState *this)
 HOOK(int, __fastcall, CalledOnResultEnd, 0x00CFB300, void* This, void* Edx)
 {
-	if (LevelLoadingManager::enteredStageFromETF)
+	if (StageManager::enteredStageFromETF)
 	{
-		std::string stageBef = LevelLoadingManager::nextStageID.c_str();
-		std::string evsBef = LevelLoadingManager::nextEvsID.c_str();
+		std::string stageBef = StageManager::nextStageID.c_str();
+		std::string evsBef = StageManager::nextEvsID.c_str();
 		LuaManager::onStageEnd();
-		if (LevelLoadingManager::nextStageID == stageBef && LevelLoadingManager::nextEvsID == evsBef)
+		if (StageManager::nextStageID == stageBef && StageManager::nextEvsID == evsBef)
 		{
 			loadCapital(etfHubName, 0);
 			skipCurrentQueueEvent = false;
 		}
 		else
 		{
-			LevelLoadingManager::enteredStageFromETF = false;
+			StageManager::enteredStageFromETF = false;
 		}
 	}
 	else
@@ -480,7 +480,7 @@ void __declspec(naked) ForceGoToPlayableMenu()
 	static uint32_t stage = 0x00D0DEB3;
 	__asm
 	{
-		cmp LevelLoadingManager::WhiteWorldEnabled, 1
+		cmp StageManager::WhiteWorldEnabled, 1
 		je WhiteWorld
 		mov     ebp, esp
 		jmp[stage]
@@ -511,7 +511,7 @@ HOOK(void, __fastcall, CHudGateMenuMainCStateOutroBegin, 0x107B770, hh::fnd::CSt
 		{
 			if (v8 == 2)
 			{
-				LevelLoadingManager::WhiteWorldEnabled = false;
+				StageManager::WhiteWorldEnabled = false;
 				SetCorrectStageFromPAM(stageID);
 			}
 		}
@@ -521,7 +521,7 @@ HOOK(void, __fastcall, CHudGateMenuMainCStateOutroBegin, 0x107B770, hh::fnd::CSt
 			uint32_t v9 = *(uint32_t*)(contextBase + 520);
 			if (v9 != 7 && v9 != 11 && v9 != 13)
 			{
-				LevelLoadingManager::WhiteWorldEnabled = false;
+				StageManager::WhiteWorldEnabled = false;
 				SetCorrectStageFromPAM(stageID);
 			}
 		}
@@ -535,10 +535,10 @@ HOOK(int, __cdecl, GetEventIndex, 0x00B266B0, Hedgehog::Base::CSharedString* in_
 }
 void SetStuffTest()
 {
-	std::string stageIdCopy = std::string(LevelLoadingManager::nextStageID);
-	std::string evsNameCopy = std::string(LevelLoadingManager::nextEvsID);
+	std::string stageIdCopy = std::string(StageManager::nextStageID);
+	std::string evsNameCopy = std::string(StageManager::nextEvsID);
 	DebugDrawText::log(std::format("[LLM] Loading Event ID \"{}\" as {}", evsNameCopy, stageIdCopy).c_str(), 5);
-	LevelLoadingManager::setGameParameters(stageIdCopy, evsNameCopy);
+	StageManager::setGameParameters(stageIdCopy, evsNameCopy);
 }
 void MovieStuff()
 {
@@ -569,7 +569,7 @@ void __declspec(naked) SetCorrectStageForCutscene()
 HOOK(void, __fastcall, CEventScene_OnEnd, 0xB1EA80, int* This, void* Edx, int a2)
 {
 	skipCurrentQueueEvent = false;
-	//LevelLoadingManager::LastSavedQueueIndex++;
+	//StageManager::LastSavedQueueIndex++;
 	SetCorrectStageFromFlag();
 	return originalCEventScene_OnEnd(This, Edx, a2);
 }
@@ -580,12 +580,12 @@ HOOK(void*, __fastcall, sub_B1ECF0, 0xB1ECF0, int* This, void* Edx, int a2, int 
 	//auto v4 = *((DWORD*)appdocMember + 109);
 	//auto e = (Hedgehog::Base::CSharedString*)(*((DWORD*)v4 + 32) + 44);
 	//auto e2 = (Hedgehog::Base::CSharedString*)(*((DWORD*)v4 + 32) + 48);
-	//*e2 = std::string(Project::queueData.data[LevelLoadingManager::LastSavedQueueIndex + 1].dataName).c_str();
+	//*e2 = std::string(Project::queueData.data[StageManager::LastSavedQueueIndex + 1].dataName).c_str();
 	//
 	//uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 	//char** h = (char**)stageTerrainAddress;
 	//
-	//strcpy(*(char**)stageTerrainAddress, std::string(Project::queueData.data[LevelLoadingManager::LastSavedQueueIndex + 1].dataName).c_str());
+	//strcpy(*(char**)stageTerrainAddress, std::string(Project::queueData.data[StageManager::LastSavedQueueIndex + 1].dataName).c_str());
 	skipCurrentQueueEvent = true;
 	return originalsub_B1ECF0(This, Edx, a2, a3, a4);
 }
@@ -615,7 +615,11 @@ extern "C" __declspec(dllexport) int API_GetLoadingScreenMotionIndex()
 
 	return stageMap[prefix] + indexOffset;
 }
-void LevelLoadingManager::initialize()
+HOOK(void, __fastcall, Sonic_Mission_CScriptImpl_SendMissionType, 0x011041E0, float a1, void* Edx, int a2, int a3, int a4)
+{
+	return;
+}
+void StageManager::initialize()
 {
 	WRITE_JUMP(0xD56CCA, SetCorrectTerrainForMission_ASM);
 	WRITE_JUMP(0x00D0E164, InterceptGameplayFlowLoading);
@@ -630,6 +634,10 @@ void LevelLoadingManager::initialize()
 	////dont spawn button ui
 	//WRITE_JUMP(0x00B21CF5, 0x00B21CF3);
 	//INSTALL_HOOK(GetEventIndex);
+
+
+	//Patch out reading MissionScript to avoid crashes when loading stages without the stgXXX archive name format
+	INSTALL_HOOK(Sonic_Mission_CScriptImpl_SendMissionType);
 	INSTALL_HOOK(CalledOnResultEnd);
 	INSTALL_HOOK(sub_B1ECF0);
 	INSTALL_HOOK(CEventScene_OnEnd);

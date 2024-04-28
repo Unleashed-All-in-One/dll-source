@@ -72,7 +72,7 @@
 #include "Gameplay/Pole.h"
 
 //System
-#include "System/LevelLoadingManager.h"
+#include "System/StageManager.h"
 #include "System/DiscordStatus.h"
 #include "System/AnimationSetPatcher.h"
 #include "System/EnemyTrigger.h"
