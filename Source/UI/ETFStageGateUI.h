@@ -41,7 +41,7 @@ public:
 		return dataOut;
 	}
 
-	void UpdateState(std::string in_StageID, int actNumber, int worldIndex)
+	void UpdateState(std::string in_StageID, int actNumber, int subIndex, int worldIndex)
 	{
 		auto saveObj = SaveManager::getCurrentSave();
 		int index = saveObj->getStageDataIndexFromID(in_StageID);
@@ -149,8 +149,13 @@ public:
 			rcInfo_6->GetNode("rank")->SetPatternIndex(indexMotion);
 			rcInfo_6->GetNode("rank_shade")->SetPatternIndex(indexMotion);
 		}
+		std::string actText = std::format("Act {0}", actNumber);
+		if (subIndex != -1)
+		{
+			actText += std::format("-{0}", subIndex);
+		}
 		if (rcActNumber)
-			rcActNumber->GetNode("txt_box")->SetPatternIndex(actNumber);
+			rcActNumber->GetNode("txt_box")->SetText(actText.c_str());
 		if (rcArea_Tag)
 			rcArea_Tag->GetNode("img_en")->SetPatternIndex(worldIndex);
 	}

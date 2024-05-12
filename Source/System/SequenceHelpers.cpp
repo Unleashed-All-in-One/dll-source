@@ -164,9 +164,6 @@ HOOK(Sonic::Sequence::Story*, __fastcall, ConstructStorySequence, 0xD76930)
 	SequenceHelpers::storySequenceInstance = originalConstructStorySequence();
 	return SequenceHelpers::storySequenceInstance;
 }
-void SequenceHelpers::update()
-{
-}
 void SequenceHelpers::applyPatches()
 {
 	INSTALL_HOOK(ConstructStorySequence);

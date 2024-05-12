@@ -783,7 +783,7 @@ HOOK(int, __fastcall, TitleWorldMap_CTitleMain, 0x0056FBE0, Sonic::CGameObject* 
 	deco_text[7] = rcWorldMap->CreateScene("deco_text_centered");
 
 	deco_text[6]->GetNode("Text_blue")->SetText("Go to capital");
-	deco_text[7]->GetNode("Text_blue")->SetText("Select Stage");
+	deco_text[7]->GetNode("Text_blue")->SetText("Select stage");
 
 	deco_text[6]->SetPosition(LetterboxHelper::ScreenHalfPoint->x(), LetterboxHelper::ScreenHalfPoint->y() - 45);
 	deco_text[7]->SetPosition(LetterboxHelper::ScreenHalfPoint->x(), LetterboxHelper::ScreenHalfPoint->y() + 25);
@@ -955,7 +955,7 @@ void CapitalWindow_Update()
 		if (selectedCapital == 0)
 		{
 			MiniAudioHelper::playSound(stageSelectHandle, 3, "Boot");
-			StageManager::WhiteWorldEnabled = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[Project::getCapital(TitleWorldMap::LastValidFlagSelected)].isWhiteWorld;
+			StageManager::WhiteWorldEnabled = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[Project::getCapital(TitleWorldMap::LastValidFlagSelected, TitleWorldMap::Flag[TitleWorldMap::LastValidFlagSelected].night)].isWhiteWorld;
 
 			/*if (StageManager::WhiteWorldEnabled)
 			{
@@ -1122,7 +1122,7 @@ HOOK(void*, __fastcall, TitleWorldMap_UpdateApplication, 0xE7BED0, Sonic::CGameO
 						cts_name_2->GetNode("img_1")->SetPatternIndex(TitleWorldMap::LastValidFlagSelected);
 						stageSelectFlag->GetNode("img")->SetPatternIndex(TitleWorldMap::LastValidFlagSelected);
 
-						if (Project::getCapital(TitleWorldMap::LastValidFlagSelected) != -1)
+						if (Project::getCapital(TitleWorldMap::LastValidFlagSelected, TitleWorldMap::Flag[TitleWorldMap::LastValidFlagSelected].night) != -1)
 						{
 							TitleWorldMap::CapitalWindowOpen = true;
 							ShowTextAct(false);

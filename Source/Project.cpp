@@ -18,6 +18,7 @@ Project::TitleType Project::menuType = (TitleType)0;
 WorldData Project::worldData;
 ArchiveTreeDefinitions Project::archiveTree;
 SequenceData Project::queueData;
+DebugStageTree Project::debugStageTree;
 std::string Project::modPath;
 float Project::m_deltaTime = 0.0f;
 float Project::m_hudDeltaTime = 0.0f;
@@ -68,6 +69,114 @@ void Project::load(const char* path)
 	getStageList();
 	getLevelQueue();
 	getTempCustomArchiveTree();
+}
+void parseStageTree(const Json::Value& jsonTree, DebugStageTreeNode& stageTree)
+{
+	stageTree.name = jsonTree["name"].asString();
+	stageTree.children = std::vector<DebugStageTreeNode>();
+	const Json::Value& treeEntries = jsonTree["TreeEntry"];
+	if (!treeEntries.isArray())
+	{
+		printf("StageTreeEntry is not a valid array.\n");
+		return;
+	}
+	if (jsonTree["children"])
+	{
+		for (const auto& tree : jsonTree["children"])
+		{
+			DebugStageTreeNode stageTreeC;
+			parseStageTree(tree, stageTreeC);
+			stageTree.children.push_back(stageTreeC);
+		}
+	}
+	std::vector< DebugStageTreeNodeEntry> entries;
+	for (const auto& entry : treeEntries)
+	{
+		DebugStageTreeNodeEntry treeEntry;
+		treeEntry.stage = entry["stage"].asString();
+		if (entry["cutsceneID"])
+			treeEntry.cutsceneID = entry["cutsceneID"].asString();
+		
+		if (entry["displayName"])
+		{
+			treeEntry.displayName = entry["displayName"].asString();
+		}
+		else
+		{
+			if (!treeEntry.cutsceneID.empty())
+				treeEntry.displayName = std::format("{0} @{1}", treeEntry.cutsceneID, treeEntry.stage);
+			else
+				treeEntry.displayName = treeEntry.stage;
+		}
+		entries.push_back(treeEntry);
+	}
+	stageTree.treeEntries = entries;
+}
+void Project::getDebugTree()
+{
+	std::string path = Project::modPath + "\\debuglist.json";
+	std::ifstream jsonFile(path.c_str());
+
+	debugStageTree = DebugStageTree();
+
+	if (!jsonFile)
+	{		
+		return;
+	}
+
+	Json::Value root;
+	jsonFile >> root;
+
+	const Json::Value& stageTreeT = root["StageTree"];
+	if (!stageTreeT.isArray())
+	{
+		printf("StageTree is not a valid array.\n");
+		return;
+	}
+
+	std::vector<DebugStageTreeNode> stageTrees;
+	for (const auto& tree : stageTreeT) {
+		DebugStageTreeNode stageTree;
+		parseStageTree(tree, stageTree);
+		stageTrees.push_back(stageTree);
+	}
+
+	/*for (const auto& tree : stageTreeT)
+	{
+		DebugStageTreeNode stageTreeObj;
+		stageTreeObj.name = tree["name"].asString();
+
+		const Json::Value& treeEntries = tree["TreeEntry"];
+		if (!treeEntries.isArray())
+		{
+			printf("StageTreeEntry is not a valid array.\n");
+			return;
+		}
+
+		for (const auto& entry : treeEntries)
+		{
+			DebugStageTreeNodeEntry treeEntry;
+			treeEntry.stage = entry["stage"].asString();
+			if(entry["cutsceneID"])
+				treeEntry.cutsceneID = entry["cutsceneID"].asString();
+			if (entry["displayName"])
+			{
+				treeEntry.displayName = entry["displayName"].asString();
+			}
+			else
+			{
+				if (!treeEntry.cutsceneID.empty())
+					treeEntry.displayName = std::format("{0} @{1}", treeEntry.cutsceneID, treeEntry.stage);
+				else
+					treeEntry.displayName = treeEntry.stage;
+			}
+			stageTreeObj.treeEntries.push_back(treeEntry);
+		}
+
+		stageTrees.push_back(stageTreeObj);
+	}*/
+	debugStageTree.treeNodes = stageTrees;
+
 }
 void Project::getLevelQueue()
 {
@@ -261,12 +370,13 @@ std::vector<std::string> Project::getAllWhiteWorld()
 	}
 	return returned;
 }
-int Project::getCapital(int flagID)
+int Project::getCapital(int flagID, bool isNight)
 {
 	int returned = -1;
-	for (size_t i = 0; i < Project::worldData.data[flagID].data.size(); i++)
+	std::vector<LevelData> levels = isNight ? Project::worldData.data[flagID].dataNight : Project::worldData.data[flagID].data;
+	for (size_t i = 0; i < levels.size(); i++)
 	{
-		if (Project::worldData.data[flagID].data[i].isCapital)
+		if (levels[i].isCapital)
 		{
 			returned = i;
 			return returned;

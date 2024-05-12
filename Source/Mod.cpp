@@ -14,10 +14,18 @@ std::string getDirectoryPath(const std::string& path)
 	const size_t pos = path.find_last_of("\\/");
 	return path.substr(0, pos != std::string::npos ? pos : 0);
 }
-
+void __declspec(naked) ASMTest()
+{
+	static uint32_t retn = 0x011031E4;
+	__asm
+	{
+		mov[esp + 34h + -1Ch], 0
+		jmp[retn]
+	}
+}
 extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 {
-	//MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
+	MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
 
 	// Set random seed
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -77,6 +85,8 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	TitleOption::applyPatches();
 
 	TestingCode::applyPatches();
+
+	WRITE_JUMP(0x011031DC, ASMTest);
 }
 
 extern "C" __declspec(dllexport) void PostInit()
@@ -107,5 +117,4 @@ extern "C" void __declspec(dllexport) OnFrame()
 	//DiscordStatus::update();
 	StageManager::update();
 	EventViewer::update();
-	SequenceHelpers::update();
 }

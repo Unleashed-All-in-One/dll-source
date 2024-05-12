@@ -162,18 +162,21 @@ void Context::update()
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    if (GetAsyncKeyState(VK_TAB) & 1)
+    if (GetAsyncKeyState(VK_F1) & 1)
         ImguiManager::visible ^= true;
 
-    //Draw all elements until the pop with DroidSans
-    ImGui::PushFont(fontDroidSans);
-    ImguiManager::update();
-    ImGui::PopFont();
 
     //Draw all elements until the pop with SeuratPro (dialogue font)
     ImGui::PushFont(fontSeuratProM);
     SubtitleUI::draw();
     ImGui::PopFont();
+    
+    //Draw all elements until the pop with DroidSans
+    ImGui::PushFont(fontDroidSans);
+    ImguiManager::update();
+    ImGui::PopFont();
+
+
 
     ImGui::EndFrame();
     ImGui::Render();

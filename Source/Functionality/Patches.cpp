@@ -33,4 +33,5 @@ void Patches::applyPatches()
 
 	//Patch out a weird check for the results music
 	WRITE_JUMP(0x00CFD472, 0x00CFD492);
+
 }

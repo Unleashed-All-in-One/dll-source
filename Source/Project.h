@@ -33,7 +33,22 @@ struct ArchiveTreeDefinitions
 {
 	std::vector<ArchiveDependency> data;
 };
+struct DebugStageTreeNodeEntry {
+	std::string stage;
+	std::string cutsceneID;
+	std::string displayName;
+};
 
+struct DebugStageTreeNode {
+	std::string name;
+	std::vector<DebugStageTreeNodeEntry> treeEntries;
+	std::vector<DebugStageTreeNode> children;
+};
+
+struct DebugStageTree
+{
+	std::vector<DebugStageTreeNode> treeNodes;
+};
 class Project
 {
 private:
@@ -49,6 +64,7 @@ public:
 	//---------------UI---------------
 	static void getStageList();
 	static void getLevelQueue();
+	static void getDebugTree();
 	static void getTempCustomArchiveTree();
 	enum TitleType {
 		Retail,
@@ -67,12 +83,13 @@ public:
 	static float getHudDeltaTime() { return m_hudDeltaTime == 0.0f ? 0.0f : m_deltaTime; }
 	static int getFlagFromStage(const char* stage);
 	static std::vector<std::string> gensStages;
-	static int getCapital(int flagID);
+	static int getCapital(int flagID, bool isNight);
 	static int logoType;
 	static bool ignoreWarnings;
 	static bool use4gbMode;
 	static bool compatibilityMode;
 	static WorldData worldData;
+	static DebugStageTree debugStageTree;
 	static ArchiveTreeDefinitions archiveTree;
 	static SequenceData queueData;
 	static TitleType menuType;

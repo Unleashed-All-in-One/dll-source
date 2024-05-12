@@ -15,8 +15,11 @@ public:
 
     bool activateGate;
     bool disagreed;
-    int stageID, actIndex, worldIndex, stageType;
+    int stageID, actIndex, worldIndex;
+    bool stageType;
+    int subStageIndex = -1;
     static ETFStageGateUIContainer* containerUI;
+    std::string countryNames[9] = {"Mykonos", "Europe","China","Africa","Snow","Petra","Beach","NewYork","Eggmanland"};
     SharedPtrTypeless handle1;
     void fpAddParticle2(Sonic::CParticleManager* manager, SharedPtrTypeless& handle, void* node, const hh::base::CSharedString& name, uint32_t flag)
     {
@@ -148,6 +151,7 @@ public:
     {
         auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
         const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
+        playerContext->m_spMatrixNode->m_Transform.m_Rotation = rotation;
         if (m_playerInsideCollider && !disagreed)
         {
             if (timerGate <= 2)
@@ -160,10 +164,11 @@ public:
                 activateGate = true;
                 if (containerUI == nullptr)
                     containerUI = ETFStageGateUIContainer::Generate(playerContext->m_pPlayer, false, false);
-                containerUI->UpdateState(SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID), actIndex, worldIndex);
+
+                std::string stageIDN = std::format("{0}{1}_{2}", stageType ? "D" : "N", countryNames[worldIndex], actIndex);
+                containerUI->UpdateState(stageIDN, actIndex, subStageIndex, worldIndex);
                 containerUI->Show();
                 playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = false;
-
                 playerContext->m_pPlayer->m_PostureStateMachine.ChangeState("Stop");
                 playerContext->m_spMatrixNode->m_Transform.m_Position = m_spMatrixNodeTransform->m_Transform.m_Position;
                 rotation = (EulerToQuaternion(Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera()->m_MyCamera.m_Direction));
@@ -178,12 +183,17 @@ public:
                     char** h = (char**)stageTerrainAddress;
                     const char* stageToLoad = stageToLoadS.c_str();
 
+                    std::string stageIDN = std::format("{0}{1}_{2}", stageType ? "D" : "N", countryNames[worldIndex], actIndex);
+                    if (subStageIndex != -1)
+                    {
+                        stageIDN = stageIDN + std::format("-{0}", subStageIndex);
+                    }
                     StageManager::setETFInfo(SequenceHelpers::getCurrentStageName(false));
-                    StageManager::setGameParameters(SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID), "");
+                    StageManager::setGameParameters(stageIDN, "");
                     TitleWorldMap::LoadingReplacementEnabled = true;
                     StageManager::WhiteWorldEnabled = false;
-                    SequenceHelpers::loadStage((SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID)).c_str(), 0);
-                    strcpy(*(char**)stageTerrainAddress, stageToLoad);
+                    SequenceHelpers::loadStage(stageIDN.c_str(), 0);
+                    strcpy(*(char**)stageTerrainAddress, stageIDN.c_str());
                 }
                 if (inputPtr->IsTapped(Sonic::eKeyState_B))
                 {
@@ -198,7 +208,8 @@ public:
         in_rEditParam.CreateParamInt(&stageID, "StageIDNumber");
         in_rEditParam.CreateParamInt(&worldIndex, "WorldIndex");
         in_rEditParam.CreateParamInt(&actIndex, "ActIndex");
-        in_rEditParam.CreateParamInt(&stageType, "StageType");
+        in_rEditParam.CreateParamInt(&subStageIndex, "SubStage");
+        in_rEditParam.CreateParamBool(&stageType, "IsDay");
     }
 
     static void registerObject();

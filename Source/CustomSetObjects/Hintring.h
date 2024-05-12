@@ -90,7 +90,7 @@ public:
             if (std::strstr(in_rMsg.GetType(), "MsgHitEventCollision") != nullptr)
             {
                 const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-                if (in_rMsg.m_SenderActorID == playerContext->m_pPlayer->m_ActorID)
+                if (in_rMsg.m_SenderActorID == playerContext->m_pPlayer->m_ActorID && hintData != nullptr)
                 {
                     m_playerInsideCollider = true;
                     if (m_HintUI == nullptr)

@@ -72,7 +72,7 @@ const char* StageManager::getStageToLoad()
 	int stageSelected = TitleWorldMap::StageSelectedWindow;
 
 	if (TitleWorldMap::CapitalWindowOpen)
-		stageToLoad = Project::worldData.data[latestFlag].data[Project::getCapital(latestFlag)].levelID.c_str();
+		stageToLoad = Project::worldData.data[latestFlag].data[Project::getCapital(latestFlag, TitleWorldMap::Flag[latestFlag].night)].levelID.c_str();
 	else
 	{
 		if (Project::worldData.data[latestFlag].dataNight.size() != 0 && TitleWorldMap::Flag[latestFlag].night)

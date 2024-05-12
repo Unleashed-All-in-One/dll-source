@@ -522,6 +522,7 @@ HOOK(void*, __fastcall, Title_UpdateApplication, 0xE7BED0, Sonic::CGameObject* T
 			if (bg_transition->m_MotionDisableFlag)
 			{
 				SequenceHelpers::loadStage(StageManager::getStageToLoad());
+				SequenceHelpers::setPlayerType(GENERIC_SONIC);
 				canLoad = 0;
 			}
 		}
