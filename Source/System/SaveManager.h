@@ -80,6 +80,7 @@ private:
 
 	static SaveObject* save;
 public:
+	static void GenerationsSave();
 	static SaveObject* getCurrentSave(bool returnNewIfNull = true)
 	{
 		if (save == nullptr)

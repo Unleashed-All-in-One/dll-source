@@ -149,6 +149,9 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="Gameplay\QSSRestore.cpp" />
     <ClCompile Include="System\AnimationSetPatcher.cpp" />
     <ClCompile Include="System\ArchiveTreePatcher.cpp" />
+    <ClCompile Include="System\CrashHandler\CrashHandler.cpp" />
+    <ClCompile Include="System\CrashHandler\MemoryStatus.cpp" />
+    <ClCompile Include="System\CrashHandler\StackTrace.cpp" />
     <ClCompile Include="System\CSDCommon.cpp" />
     <ClCompile Include="System\DebugMenu\Context.cpp" />
     <ClCompile Include="System\DebugMenu\CsdImGui.cpp" />
@@ -226,6 +229,9 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="Gameplay\QSSRestore.h" />
     <ClInclude Include="System\AnimationSetPatcher.h" />
     <ClInclude Include="System\ArchiveTreePatcher.h" />
+    <ClInclude Include="System\CrashHandler\CrashHandler.h" />
+    <ClInclude Include="System\CrashHandler\MemoryStatus.h" />
+    <ClInclude Include="System\CrashHandler\StackTrace.h" />
     <ClInclude Include="System\CSDCommon.h" />
     <ClInclude Include="System\DebugMenu\Context.h" />
     <ClInclude Include="System\DebugMenu\CsdImGui.h" />

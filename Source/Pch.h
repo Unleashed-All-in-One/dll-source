@@ -84,6 +84,7 @@
 #include "System/ImguiInitializer.h"
 #include "System/SaveManager.h"
 #include "System/LuaManager.h"
+#include "System/CrashHandler/CrashHandler.h"
 
 //Debug Menu
 #include "System/DebugMenu/Context.h"

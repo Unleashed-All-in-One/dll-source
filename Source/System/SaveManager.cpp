@@ -3,6 +3,11 @@ SaveObject* SaveManager::save;
 boost::shared_ptr<SaveLoadTestStruct> m_spSaveT;
 
 FUNCTION_PTR(void, __thiscall, SaveManager_CTitleOptionCStateOutroSaving, 0xD22A70, boost::shared_ptr<SaveLoadTestStruct>& spSave, void* a2);
+
+void SaveManager::GenerationsSave()
+{
+	SaveManager_CTitleOptionCStateOutroSaving(m_spSaveT, nullptr);
+}
 HOOK(bool, __fastcall, CSaveLoadTestPC_SaveContentsRead, 0x00E7A220, void* ecx, void* edx, void* buffer, size_t bufsize)
 {
 	DebugDrawText::log("CSaveLoadTestPC_SaveContentsRead", 5);

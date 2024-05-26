@@ -559,27 +559,39 @@ extern "C" __declspec(dllexport) bool API_IsEvent()
 {
 	return false;
 }
+std::string splitStr(std::string const& s, char separator)
+{
+	std::string::size_type pos = s.find(separator);
+	if (pos != std::string::npos)
+	{
+		return s.substr(0, pos);
+	}
+	else
+	{
+		return s;
+	}
+}
 extern "C" __declspec(dllexport) int API_GetLoadingScreenMotionIndex()
 {
 	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 	char** h = (char**)stageTerrainAddress;
 	std::string stageIDName = *h;
 	std::unordered_map<std::string, int> stageMap = {
-		{"ghz", 0}, {"cpz", 2}, {"ssz", 4}, {"sph", 6},
-		{"cte", 8}, {"ssh", 10}, {"csc", 12}, {"euc", 14},
-		{"pla", 16}
+		{"Mykonos", 0}, {"Africa", 2}, {"Europe", 4}, {"China", 6},
+		{"Snow", 8}, {"Petra", 10}, {"NewYork", 12}, {"Beach", 14},
+		{"EggmanLand", 16}
 	};
-
+	std::string splitName = splitStr(stageIDName, '_').erase(0, 1);
+	
 	// if the stage id is not any of the stages, return the mono pic
-	if (stageMap.find(stageIDName.substr(0, 3)) == stageMap.end()) {
+	if (stageMap.find(splitName) == stageMap.end()) {
 		return 18;
 	}
 
-	std::string prefix = stageIDName.substr(0, 3);
-	int indexOffset = (stageIDName[3] == '2') ? 1 : 0; // add 1 if its werehog
+	int indexOffset = (stageIDName[0] == 'N') ? 1 : 0; // add 1 if its werehog
 	std::string numberPart = stageIDName.substr(3 + indexOffset, 3);
 
-	return stageMap[prefix] + indexOffset;
+	return stageMap[splitName] + indexOffset;
 }
 HOOK(void, __fastcall, Sonic_Mission_CScriptImpl_SendMissionType, 0x011041E0, float a1, void* Edx, int a2, int a3, int a4)
 {

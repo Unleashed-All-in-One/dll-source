@@ -1,6 +1,7 @@
 ﻿Chao::CSD::RCPtr<Chao::CSD::CProject> rcTitleScreen;
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcTitleScreenLogos;
 Chao::CSD::RCPtr<Chao::CSD::CScene> rcTitleLogo_1, rcTitlebg, rcTitleMenu, rcTitleMenuScroll, rcTitleMenuTXT, black_bg, bg_window, fg_window, txt_window, footer_window, bg_transition;
+Chao::CSD::RCPtr<Chao::CSD::CScene> rcTitleProgressbar;
 Chao::CSD::RCPtr<Chao::CSD::CScene> rcConversionLogo;
 boost::shared_ptr<Sonic::CGameObjectCSD> spTitleScreen;
 boost::shared_ptr<Sonic::CGameObjectCSD> spTitleScreenLogos;
@@ -15,13 +16,16 @@ int canLoad = 0;
 bool Title::inInstall = 0;
 int maxTitleIndex = 3;
 int holdTimer = 0;
+bool inOptions = false;
 
 boost::shared_ptr<Sonic::CCamera> spCamera;
 static uint32_t cameraInitRan = 0;
 static AudioHandle stageSelectHandle;
+static SharedPtrTypeless optionsHandle;
 void* TitleStateContextBase;
 
 
+FUNCTION_PTR(void, __thiscall, TitleUI_TinyChangeState, 0x773250, void* This, SharedPtrTypeless& spState, const Hedgehog::Base::CSharedString name);
 void Title::setSubmenu(bool enabled)
 {
 	isInSubmenu = enabled;
@@ -256,6 +260,9 @@ void __fastcall CTitleRemoveCallback(Sonic::CGameObject* This, void*, Sonic::CGa
 	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), txt_window);
 	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), footer_window);
 	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), bg_transition);
+
+	//rcTitleOptionTXT1, rcTitleOptionTXT2, rcTitleOptionTXT3, rcTitleProgressbar
+	Chao::CSD::CProject::DestroyScene(rcTitleScreen.Get(), rcTitleProgressbar);
 	rcTitleScreen = nullptr;
 	rcTitleScreenLogos = nullptr;
 	enteredStart, isInSubmenu, moved, hasSavefile, playingStartAnim, reversedAnim, isStartAnimComplete, startButtonAnimComplete, startBgAnimComplete, showedWindow = false;
@@ -276,16 +283,12 @@ void Title::setHideEverything(bool visible, bool logoVisible)
 		else*/
 		rcTitleLogo_1->SetHideFlag(visible);
 	}
-	if (rcTitlebg)
-		rcTitlebg->SetHideFlag(visible);
-	if (rcTitleMenu)
-		rcTitleMenu->SetHideFlag(visible);
-	if (rcTitleMenuScroll)
-		rcTitleMenuScroll->SetHideFlag(visible);
-	if (rcTitleMenuTXT)
-		rcTitleMenuTXT->SetHideFlag(visible);
-	if (rcConversionLogo)
-		rcConversionLogo->SetHideFlag(visible);
+	if (rcTitlebg)          rcTitlebg->SetHideFlag(visible);
+	if (rcTitleMenu)        rcTitleMenu->SetHideFlag(visible);
+	if (rcTitleMenuScroll)  rcTitleMenuScroll->SetHideFlag(visible);
+	if (rcTitleMenuTXT)     rcTitleMenuTXT->SetHideFlag(visible);
+	if (rcConversionLogo)   rcConversionLogo->SetHideFlag(visible);
+	if (rcTitleProgressbar) rcTitleProgressbar->SetHideFlag(visible);
 }
 void Title::createScreen(Sonic::CGameObject* pParentGameObject)
 {
@@ -409,6 +412,7 @@ HOOK(int, __fastcall, Title_CMain, 0x0056FBE0, Sonic::CGameObject* This, void* E
 	rcTitleMenu = rcTitleScreen->CreateScene("menu");
 	rcTitleMenuScroll = rcTitleScreen->CreateScene("menu_scroll");
 	rcTitleMenuTXT = rcTitleScreen->CreateScene("txt");
+	rcTitleProgressbar = rcTitleScreen->CreateScene("progress");
 	black_bg = rcTitleScreen->CreateScene("black_bg");
 	bg_window = rcTitleScreen->CreateScene("bg_window");
 	fg_window = rcTitleScreen->CreateScene("window_box");
@@ -420,6 +424,7 @@ HOOK(int, __fastcall, Title_CMain, 0x0056FBE0, Sonic::CGameObject* This, void* E
 	txt_window->SetHideFlag(true);
 	footer_window->SetHideFlag(true);
 	bg_transition->SetHideFlag(true);
+	rcTitleProgressbar->SetHideFlag(true);
 	CSDCommon::PlayAnimation(*fg_window, "Size_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, 0);
 	CSDCommon::FreezeMotion(*fg_window, 48 /* TIMES the maximum characters in a line in the text.*/);
 	black_bg->SetHideFlag(true);
@@ -459,7 +464,10 @@ HOOK(DWORD, *__cdecl, Title_CMain_CState_SelectMenu, 0x11D1210, hh::fnd::CStateM
 
 	TitleWorldMap::PlayPanningAnim();
 	if (rcTitleMenu)
+	{
 		CSDCommon::FreezeMotion(*rcTitleMenu);
+		rcTitleMenu->SetPosition(0, 0);
+	}
 	if (rcTitlebg)
 		CSDCommon::PlayAnimation(*rcTitlebg, "Intro_Anim_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 	if (rcTitleMenu)
@@ -725,10 +733,363 @@ HOOK(void, __cdecl, DebugDrawTextDraw, 0x750820, void*, float x, float y, void*,
 	size_t aspect = (resx / resy) * scale->x();
 	DebugDrawText::draw(formattedMultiByte, { (size_t)(x / *(size_t*)0x180C6B0 * resx) % resx, (size_t)(y / *(size_t*)0x1B24560 * resy) % resy }, aspect);
 }
+#pragma region OptionsSubmenu
 
-HOOK(void, __fastcall, TitleUI_SetCustomExecFunctionAdvance, 0x005732A0, DWORD* This)
+
+LanguageType* TitleUI_GetVoiceLanguageType()
 {
-	DWORD* v2 = (DWORD*)This[2];
+	uint32_t voiceOverAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x7C, 0x10 });
+	return (LanguageType*)voiceOverAddress;
+}
+uint32_t* TitleUI_GetOptionFlag()
+{
+	uint32_t flagsAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x7C, 0x18 });
+	return (uint32_t*)flagsAddress;
+}
+float* TitleUI_GetMusicVolume()
+{
+	// range [0.0 - 0.63]
+	uint32_t musicVolumeAddress = Common::GetMultiLevelAddress(0x1E77290, { 0x38 });
+	return (float*)musicVolumeAddress;
+}
+
+float* TitleUI_GetEffectVolume()
+{
+	// range [0.0 - 0.63]
+	uint32_t effectVolumeAddress = Common::GetMultiLevelAddress(0x1E77290, { 0x3C });
+	return (float*)effectVolumeAddress;
+}
+void TitleUI_SetMusicVolume(float volume)
+{
+	uint32_t* pCSoundModuleManager = *(uint32_t**)0x1E77290;
+	FUNCTION_PTR(void, __thiscall, SetMusicVolume, 0x75EEF0, void* This, int a2, float volume);
+
+	SetMusicVolume(pCSoundModuleManager, 0, volume);
+	*(uint8_t*)((uint32_t)TitleUI_GetVoiceLanguageType() + 1) = (uint8_t)volume;
+}
+
+void TitleUI_SetEffectVolume(float volume)
+{
+	uint32_t* pCSoundModuleManager = *(uint32_t**)0x1E77290;
+	FUNCTION_PTR(void, __thiscall, SetMusicVolume, 0x75EEF0, void* This, int a2, float volume);
+
+	SetMusicVolume(pCSoundModuleManager, 1, volume);
+	*(uint8_t*)((uint32_t)TitleUI_GetVoiceLanguageType() + 2) = (uint8_t)volume;
+}
+int currentOptionMainIndex;
+bool enteredOptionSub1;
+int currentOptionSubIndex1;
+bool enteredOptionSub2;
+int currentOptionSubIndex2;
+enum OptionsMainEnum
+{
+	VOICE = 0,
+	SUBTITLES = 1,
+	SOUND = 2,
+	CAMERA = 3,
+	BRIGHTNESS = 4
+};
+static SharedPtrTypeless spOutState;
+std::string temp[5] = { "VOICE", "SUBTITLES", "SOUND", "CAMERA", "BRIGHTNESS" };
+std::string optionsLastCastMainTxt;
+std::string optionsLastCastSub1Txt;
+std::string optionsLastCastSub2Txt;
+void OptionsRefreshText()
+{
+	if (!optionsLastCastMainTxt.empty())
+		rcTitleMenuTXT->GetNode(optionsLastCastMainTxt.c_str())->SetHideFlag(true);
+	if (!optionsLastCastSub1Txt.empty())
+		rcTitleMenuTXT->GetNode(optionsLastCastSub1Txt.c_str())->SetHideFlag(true);
+	if (!optionsLastCastSub2Txt.empty())
+		rcTitleMenuTXT->GetNode(optionsLastCastSub2Txt.c_str())->SetHideFlag(true);
+
+	optionsLastCastMainTxt = std::format("txt_2_{0}", (currentOptionMainIndex == 0 ? currentOptionMainIndex : currentOptionMainIndex + 1) + 1).c_str();
+	if (enteredOptionSub1)
+		optionsLastCastSub1Txt = std::format("txt_2_{0}_{1}", (currentOptionMainIndex == 0 ? currentOptionMainIndex : currentOptionMainIndex + 1) + 1, currentOptionSubIndex1 + 1).c_str();
+	if (enteredOptionSub2 && currentOptionMainIndex == OptionsMainEnum::CAMERA)
+		optionsLastCastSub2Txt = std::format("txt_2_5_1_{0}", currentOptionSubIndex2 + 1).c_str();
+
+	rcTitleMenuTXT->GetNode(optionsLastCastMainTxt.c_str())->SetHideFlag(false);
+	if (enteredOptionSub1)
+		rcTitleMenuTXT->GetNode(optionsLastCastSub1Txt.c_str())->SetHideFlag(false);
+	if (enteredOptionSub2 && currentOptionMainIndex == OptionsMainEnum::CAMERA)
+		rcTitleMenuTXT->GetNode(optionsLastCastSub2Txt.c_str())->SetHideFlag(false);
+}
+void OpenOptions()
+{
+	isInSubmenu = true;
+	inOptions = true;
+	CSDCommon::PlayAnimation(*rcTitleMenu, "Intro_Anim_3", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+	CSDCommon::PlayAnimation(*rcTitleMenuTXT, "Intro_Anim_3", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+	OptionsRefreshText();
+}
+void OptionsUpdateSlider(float progress)
+{
+	Common::PlaySoundStaticCueName(optionsHandle, "sys_actstg_twn_speechbutton");
+	CSDCommon::PlayAnimation(*rcTitleProgressbar, "Size_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, 0);
+	CSDCommon::FreezeMotion(*rcTitleProgressbar, ((progress) / 0.63f) * 100.0f);
+}
+void OptionsUpdate(Hedgehog::Universe::CStateMachineBase::CStateBase* TitleState)
+{
+	auto inputState = Sonic::CInputState::GetInstance();
+	auto inputPtr = &inputState->m_PadStates[inputState->m_CurrentPadStateIndex];
+	
+	DebugDrawText::log(std::format("##OPTIONS##\nMAININDEX: {0}\nSUB1: {1}\nSUB2: {2}\nENABLED1: {3}\nENABLED2: {4}", currentOptionMainIndex, currentOptionSubIndex1, currentOptionSubIndex2, enteredOptionSub1, enteredOptionSub2).c_str(), 0);
+	//Logic Update
+	switch ((OptionsMainEnum)currentOptionMainIndex)
+	{
+		case OptionsMainEnum::SUBTITLES:
+		{
+			if (enteredOptionSub1)
+			{				
+				if (inputPtr->IsTapped(Sonic::eKeyState_A))
+				{
+					if (currentOptionSubIndex1 == 0)
+					{
+						*TitleUI_GetOptionFlag() |= 0x10; //on
+					}
+					else
+					{
+						*TitleUI_GetOptionFlag() &= 0xFFFFFFEF; //off
+					}
+					bool isEnabled = (*TitleUI_GetOptionFlag() & 0x10) != 0;
+					
+					DebugDrawText::log("SUBTITLES SET", 10);
+				}
+				rcTitleMenu->GetNode("box_off")->SetHideFlag(false);
+				//if its enabled and the option is set to ON, or if its disabled and its set to OFF, make the box illuminate
+				if ((*TitleUI_GetOptionFlag() & 0x10) != 0 && currentOptionSubIndex1 == 0 || (*TitleUI_GetOptionFlag() & 0x10) == 0 && currentOptionSubIndex1 == 1)
+				{
+					rcTitleMenu->GetNode("box_on")->SetHideFlag(false);
+					rcTitleMenuScroll->GetNode("box_on")->SetHideFlag(false);
+				}
+				else
+				{
+					rcTitleMenu->GetNode("box_on")->SetHideFlag(true);
+					rcTitleMenuScroll->GetNode("box_on")->SetHideFlag(true);
+				}
+			}
+			break;
+		}
+		case OptionsMainEnum::SOUND:
+		{
+			if (enteredOptionSub2)
+			{
+				if (currentOptionSubIndex1 == 0) //music
+				{
+					float musicVol = *TitleUI_GetMusicVolume();
+					if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickLeft))
+					{
+						if(musicVol != 0)
+							musicVol -= 0.63f / 10.0f;
+						TitleUI_SetMusicVolume(musicVol);
+						OptionsUpdateSlider(musicVol);
+					}
+					if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickRight))
+					{
+						if (musicVol != 0.63f)
+							musicVol += 0.63f / 10.0f;
+						TitleUI_SetMusicVolume(musicVol);
+						OptionsUpdateSlider(musicVol);
+					}
+				}
+				else //sfx
+				{
+					float sfxVol = *TitleUI_GetEffectVolume();
+					if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickLeft))
+					{
+						if (sfxVol != 0)
+							sfxVol -= 0.63f / 10.0f;
+						TitleUI_SetEffectVolume(sfxVol);
+						OptionsUpdateSlider(sfxVol);
+					}
+					if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickRight))
+					{
+						if (sfxVol != 0.63f)
+							sfxVol += 0.63f / 10.0f;
+						TitleUI_SetEffectVolume(sfxVol);
+						OptionsUpdateSlider(sfxVol);
+					}
+				}
+			}
+			break;
+		}
+	}
+	
+	//UI Update
+	if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickLeft))
+	{
+		if (!enteredOptionSub1 && !enteredOptionSub2)
+		{
+			CSDCommon::PlayAnimation(*rcTitleMenuScroll, "Scroll_Anim_3_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			CSDCommon::PlayAnimation(*rcTitleMenu, "Scroll_Anim_3_1", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 100, false, true);
+
+			Common::PlaySoundStaticCueName(optionsHandle, "sys_worldmap_cursor");
+			currentOptionMainIndex--;
+			//Repeat
+			if (currentOptionMainIndex < 0)
+				currentOptionMainIndex = 4;
+		}
+		if (enteredOptionSub1 && !enteredOptionSub2)
+		{
+			Common::PlaySoundStaticCueName(optionsHandle, "sys_worldmap_cursor");
+			currentOptionSubIndex1--;
+			if (currentOptionSubIndex1 < 0) 
+			{
+				currentOptionSubIndex1 = 1;
+			}			
+		}
+		OptionsRefreshText();
+	}
+	if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickRight))
+	{
+		if (!enteredOptionSub1 && !enteredOptionSub2)
+		{
+			Common::PlaySoundStaticCueName(optionsHandle, "sys_worldmap_cursor");
+			CSDCommon::PlayAnimation(*rcTitleMenuScroll, "Scroll_Anim_3_1", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0);
+			CSDCommon::PlayAnimation(*rcTitleMenu, "Scroll_Anim_3_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 100, false, true);
+			currentOptionMainIndex++;
+			//Repeat
+			if (currentOptionMainIndex > 4)
+				currentOptionMainIndex = 0;
+		}
+		if (enteredOptionSub1 && !enteredOptionSub2)
+		{
+			Common::PlaySoundStaticCueName(optionsHandle, "sys_worldmap_cursor");
+			currentOptionSubIndex1++;
+			if (currentOptionSubIndex1 > 1)
+			{
+				currentOptionSubIndex1 = 0;
+			}
+		}
+		OptionsRefreshText();
+	}
+	if (inputPtr->IsTapped(Sonic::eKeyState_A))
+	{
+		if (!enteredOptionSub1 && !enteredOptionSub2)
+		{
+			enteredOptionSub1 = true;
+			if (currentOptionMainIndex == 4)
+			{
+				CSDCommon::PlayAnimation(*rcTitleMenu, "Select_Anim_4", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+				rcTitleProgressbar->SetHideFlag(false);
+				float volMusic = 0.63f;
+				if(currentOptionSubIndex1 == 0)
+					volMusic = *TitleUI_GetMusicVolume();
+				else
+					volMusic = *TitleUI_GetEffectVolume();
+				CSDCommon::PlayAnimation(*rcTitleProgressbar, "Size_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, 0);
+				CSDCommon::FreezeMotion(*rcTitleProgressbar, ((volMusic) / 0.63f) * 100.0f);
+				CSDCommon::PlayAnimation(*rcTitleProgressbar, "Intro_Anim_4", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			}
+			else
+			{
+				rcTitleProgressbar->SetHideFlag(true);
+				CSDCommon::PlayAnimation(*rcTitleMenu, "Intro_Anim_4", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+				CSDCommon::PlayAnimation(*rcTitleMenuTXT, "Intro_Anim_4", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			}
+			Common::PlaySoundStaticCueName(optionsHandle, "sys_worldmap_decide");
+			OptionsRefreshText();
+			return;
+		}
+
+		//Enter submenu 1
+		if ((enteredOptionSub1 && !enteredOptionSub2) && (currentOptionMainIndex == OptionsMainEnum::SOUND || currentOptionSubIndex1 == OptionsMainEnum::CAMERA))
+		{
+			rcTitleMenu->GetNode("box_on")->SetHideFlag(true);
+			rcTitleMenu->GetNode("box_off")->SetHideFlag(true);
+			if (currentOptionMainIndex == 2)
+			{
+				CSDCommon::PlayAnimation(*rcTitleMenu, "Select_Anim_5", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+				rcTitleProgressbar->SetHideFlag(false);
+				CSDCommon::PlayAnimation(*rcTitleProgressbar, "Intro_Anim_5", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			}
+			else
+			{
+
+			}	
+
+			OptionsRefreshText();
+			enteredOptionSub2 = true;
+			Common::PlaySoundStaticCueName(optionsHandle, "sys_worldmap_decide");
+			return;
+		}
+		//Enter submenu 2 / apply option
+		if (enteredOptionSub1 && enteredOptionSub2)
+		{			
+			return;
+		}
+	}
+	if (inputPtr->IsTapped(Sonic::eKeyState_B))
+	{
+		//Exit from options
+		if (!enteredOptionSub1 && !enteredOptionSub2)
+		{
+			isInSubmenu = false;
+			inOptions = false;
+
+			CSDCommon::PlayAnimation(*rcTitleMenu, "Intro_Anim_3", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, true);
+			CSDCommon::PlayAnimation(*rcTitleMenuTXT, "Intro_Anim_3", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, true);
+			rcTitleProgressbar->SetHideFlag(true);
+			TitleUI_TinyChangeState(TitleState, spOutState, "SelectMenu"); 
+			SaveManager::GenerationsSave();
+
+			Common::PlaySoundStaticCueName(optionsHandle, "sys_worldmap_cansel");
+			return;
+		}
+		//Exit from first submenu
+		if (enteredOptionSub1 && !enteredOptionSub2)
+		{
+			if (currentOptionMainIndex == 4)
+			{
+				CSDCommon::PlayAnimation(*rcTitleProgressbar, "Intro_Anim_4", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, true);
+			}
+			else
+			{
+				CSDCommon::PlayAnimation(*rcTitleMenuTXT, "Intro_Anim_4", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, true);
+			}
+			CSDCommon::PlayAnimation(*rcTitleMenu, "Intro_Anim_4", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, true);
+			enteredOptionSub1 = false;
+			currentOptionSubIndex1 = 0;
+			Common::PlaySoundStaticCueName(optionsHandle, "sys_worldmap_cansel");
+			return;
+		}
+		//Exit from second submenu
+		if (enteredOptionSub1 && enteredOptionSub2)
+		{
+			CSDCommon::PlayAnimation(*rcTitleMenu, "Select_Anim_5", Chao::CSD::eMotionRepeatType_PlayOnce, 0, 0);
+			CSDCommon::PlayAnimation(*rcTitleMenu, "Intro_Anim_4", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			CSDCommon::FreezeMotion(*rcTitleMenu, 100);
+			CSDCommon::PlayAnimation(*rcTitleProgressbar, "Intro_Anim_5", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, true);
+			enteredOptionSub2 = false;
+			currentOptionSubIndex2 = 0;
+			Common::PlaySoundStaticCueName(optionsHandle, "sys_worldmap_cansel");
+			return;
+		}
+		OptionsRefreshText();
+	}
+}
+#pragma endregion
+//This function is largely useless as this wont run at all at times but Advance will, however it can be used to intercept specific buttons' functionalities
+HOOK(int, __fastcall, TitleUI_SetCustomExecFunctionNoASM, 0x00572D00, Hedgehog::Universe::CStateMachineBase::CStateBase* This)
+{
+	isInSubmenu = true;
+	if (currentTitleIndex == 2)
+	{
+		OpenOptions();
+		return currentTitleIndex;
+	}
+	
+	return originalTitleUI_SetCustomExecFunctionNoASM(This);
+}
+HOOK(void, __stdcall, OutpuDebugString, 0x013C40C4, LPCSTR lpOutputString)
+{
+	DebugDrawText::log(lpOutputString);
+	originalOutpuDebugString(lpOutputString);
+}
+HOOK(void, __fastcall, TitleUI_SetCustomExecFunctionAdvance, 0x005732A0, Hedgehog::Universe::CStateMachineBase::CStateBase* This)
+{
+	DWORD* v2 = (DWORD*)((DWORD*)This)[2];
 	//This calls Title_GetSelectionIndex
 	*((byte*)v2 + 429) = 1;
 	int i = (*(int (__thiscall **)(DWORD *))(*v2 + 56))(v2);
@@ -737,7 +1098,6 @@ HOOK(void, __fastcall, TitleUI_SetCustomExecFunctionAdvance, 0x005732A0, DWORD* 
 		case 0:
 		{
 			OnNewGame();
-
 			originalTitleUI_SetCustomExecFunctionAdvance(This); 
 			break;
 		}
@@ -752,6 +1112,11 @@ HOOK(void, __fastcall, TitleUI_SetCustomExecFunctionAdvance, 0x005732A0, DWORD* 
 			ContinueToWM();
 			break;
 		}
+		case 2:
+		{
+			OptionsUpdate(This);
+			break;
+		}
 		default:
 			originalTitleUI_SetCustomExecFunctionAdvance(This);
 
@@ -760,7 +1125,10 @@ HOOK(void, __fastcall, TitleUI_SetCustomExecFunctionAdvance, 0x005732A0, DWORD* 
 
 HOOK(int, __fastcall, Title_GetSelectionIndex, 0x0056FBB0, DWORD* This)
 {
-	isInSubmenu = true;
+	if (currentTitleIndex == 2) //options in gens is the 6th option for whatever reason
+		return 5;
+	if (currentTitleIndex == 3) //quit in gens is the 9th option for whatever reason
+		return 8;
 	return currentTitleIndex;
 }
 
@@ -775,12 +1143,13 @@ void Title::applyPatches()
 	//Set up title screen so that it resembles Unleashed function-wise
 	// //571A25 - cause of crash with direct9ex 11
 	WRITE_JUMP(0x00571FCA, TitleUI_SetCutsceneTimer); //Set title AFK wait amount - it varies depending on framerate
-	WRITE_JUMP(0x00572D23, TitleUI_SetCustomExecFunction); //Override Button Function
+	//WRITE_JUMP(0x00572D23, TitleUI_SetCustomExecFunction); //Override Button Function
 	//WRITE_JUMP(0x005732C3, TitleUI_SetCustomExecFunctionAdvance); //Override button after-function
 	WRITE_JUMP(0x00572B2E, (void*)0x00572B45); //Disable scroll sound	
 	//Try forcing out loading the world map if the save is invalid
 	//WRITE_JUMP(0x0057342B, 0x0057346B);
 	//UI
+	INSTALL_HOOK(TitleUI_SetCustomExecFunctionNoASM);
 	INSTALL_HOOK(TitleUI_SetCustomExecFunctionAdvance);
 	INSTALL_HOOK(Title_GetSelectionIndex);
 	INSTALL_HOOK(Title_UpdateApplication);
@@ -792,6 +1161,7 @@ void Title::applyPatches()
 	//Prevent going back to PRESS START screen after entering
 	WRITE_JUMP(0x00572B92, (void*)0x572CF7);
 
+	INSTALL_HOOK(OutpuDebugString);
 	//State Hooks
 	INSTALL_HOOK(sub_571F80);
 	INSTALL_HOOK(Title_CMain);

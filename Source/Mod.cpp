@@ -1,5 +1,3 @@
-
-
 extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 {
 	// Load configuration
@@ -23,6 +21,11 @@ void __declspec(naked) ASMTest()
 		jmp[retn]
 	}
 }
+//void __thiscall sub_B1F080(_DWORD *this, int *a2, Hedgehog::Base::SSymbolNode *a3, int a4)
+HOOK(void, __fastcall, moviedisp, 0xB1F080, void* This, void* Edx, void* a2, Hedgehog::Base::SSymbolNode* a3, int a4)
+{
+	return;
+}
 extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 {
 	MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
@@ -30,8 +33,8 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	// Set random seed
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 	std::string path =  std::string(modInfo->CurrentMod->Path);
-	path = path.substr(0, path.find_last_of("/\\"));
 
+	path = path.substr(0, path.find_last_of("/\\"));
 	// Functionality patches that don't necessarily need their own file
 	Patches::applyPatches();
 	//---------------System---------------
@@ -85,7 +88,6 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	TitleOption::applyPatches();
 
 	TestingCode::applyPatches();
-
 	WRITE_JUMP(0x011031DC, ASMTest);
 }
 
