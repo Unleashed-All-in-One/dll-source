@@ -5,7 +5,7 @@ class Hintring :public Sonic::CObjectBase, public Sonic::CSetObjectListener, pub
 {
 public:
     BB_SET_OBJECT_MAKE("Hintring")
-    boost::shared_ptr<hh::mr::CSingleElement> m_spExampleElement;
+    boost::shared_ptr<hh::mr::CSingleElement> m_spSpawnedModel;
     boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
     boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
 
@@ -28,7 +28,7 @@ public:
         const char* assetName = "cmn_obj_sk2_hintring";
         hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
         boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
-        m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
+        m_spSpawnedModel = boost::make_shared<hh::mr::CSingleElement>(spModelData);
         m_AnimatorPose = boost::make_shared<Hedgehog::Animation::CAnimationPose>(in_spDatabase, assetName);
         animations = std::vector<NewAnimationData>();
         animations.push_back(NewAnimationData("Idle", "cmn_obj_sk2_hintring", 1, true, nullptr));
@@ -55,14 +55,14 @@ public:
         
         m_AnimatorPose->AddMotionInfo(pEntries, animations.size());
         m_AnimatorPose->CreateAnimationCache();
-        m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
-        m_spExampleElement->BindPose(m_AnimatorPose);
+        m_spSpawnedModel->BindMatrixNode(m_spMatrixNodeTransform);
+        m_spSpawnedModel->BindPose(m_AnimatorPose);
         this->AddAnimationState("Idle");
         this->AddAnimationState("Appear");
         this->AddAnimationState("Touch");
-        //m_spExampleElement->BindAnimationPose(animatorTest);
+        //m_spSpawnedModel->BindAnimationPose(animatorTest);
         //ChangeState("Appear");
-        Sonic::CGameObject::AddRenderable("Object", m_spExampleElement, true);
+        Sonic::CGameObject::AddRenderable("Object", m_spSpawnedModel, true);
         DebugDrawText::log("I EXIST!!", 10);
 
         this->ChangeState("Idle");

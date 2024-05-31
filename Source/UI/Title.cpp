@@ -1161,7 +1161,7 @@ void Title::applyPatches()
 	//Prevent going back to PRESS START screen after entering
 	WRITE_JUMP(0x00572B92, (void*)0x572CF7);
 
-	INSTALL_HOOK(OutpuDebugString);
+	//INSTALL_HOOK(OutpuDebugString);
 	//State Hooks
 	INSTALL_HOOK(sub_571F80);
 	INSTALL_HOOK(Title_CMain);

@@ -173,6 +173,7 @@ void Context::update()
     
     //Draw all elements until the pop with DroidSans
     ImGui::PushFont(fontDroidSans);
+    SetEditorTest::draw();
     ImguiManager::update();
     ImGui::PopFont();
 

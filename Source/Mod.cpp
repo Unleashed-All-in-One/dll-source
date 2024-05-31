@@ -21,11 +21,13 @@ void __declspec(naked) ASMTest()
 		jmp[retn]
 	}
 }
+
 //void __thiscall sub_B1F080(_DWORD *this, int *a2, Hedgehog::Base::SSymbolNode *a3, int a4)
-HOOK(void, __fastcall, moviedisp, 0xB1F080, void* This, void* Edx, void* a2, Hedgehog::Base::SSymbolNode* a3, int a4)
-{
-	return;
-}
+//HOOK(void, __fastcall, moviedisp, 0xB1F080, void* This, void* Edx, void* a2, Hedgehog::Base::SSymbolNode* a3, int a4)
+//{
+//	return;
+//}
+// uint32_t __thiscall sub_EB2A80(_DWORD *this, int a2, int a3, int a4)
 extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 {
 	MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
@@ -33,7 +35,6 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	// Set random seed
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 	std::string path =  std::string(modInfo->CurrentMod->Path);
-
 	path = path.substr(0, path.find_last_of("/\\"));
 	// Functionality patches that don't necessarily need their own file
 	Patches::applyPatches();
@@ -44,12 +45,14 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	EnemyTrigger::applyPatches();
 	LetterboxHelper::initialize(1280, 720);
 	MiniAudioHelper::initialize(path.c_str());
-	DiscordStatus::initialize();
+	//DiscordStatus::initialize();
 	SequenceHelpers::applyPatches();
 	ImguiInitializer::initialize();
 	Context::setModDirectoryPath(getDirectoryPath(modInfo->CurrentMod->Path));
 	SaveManager::applyPatches();
 	LuaManager::initialize();
+	SetEditorTest::applyPatches();
+
 	//---------------Gameplay---------------
 	QSSRestore::applyPatches();
 	Sweepkick::applyPatches();
@@ -74,6 +77,9 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	MoonMedal::registerObject();
 	EvilEnemyReckless::registerObject();
 	EvilLiftDoor::registerObject();
+	Icicle::registerObject();
+	Pelican::registerObject();
+	IrremovableMobMykonos::registerObject();
 
 	//---------------UI---------------
 	Title::applyPatches();
@@ -86,7 +92,6 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	// same way unleashed does it (via an small options sub-tab-thing and remove TitleOption entirely.
 	// Right now, exiting from Options will cause a crash due to the saving/loading in the WorldMap.
 	TitleOption::applyPatches();
-
 	TestingCode::applyPatches();
 	WRITE_JUMP(0x011031DC, ASMTest);
 }
@@ -111,8 +116,9 @@ extern "C" __declspec(dllexport) void PostInit()
 	}
 }
 
+//char __thiscall Sonic::CSetObjectManager::ProcessMessage(char *this, int a1, int a2
 extern "C" void __declspec(dllexport) OnFrame()
-{
+{	
 	//---------------System---------------
 	ImguiInitializer::update();
 	CSDCommon::update();

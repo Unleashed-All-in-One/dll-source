@@ -118,16 +118,20 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Project.cpp" />
     <ClCompile Include="CustomSetObjects\DebugObject.cpp" />
     <ClCompile Include="CustomSetObjects\ETFStageGate.cpp" />
     <ClCompile Include="CustomSetObjects\ETFTimeSwitch.cpp" />
     <ClCompile Include="CustomSetObjects\EvilEnemyRecklessC.cpp" />
     <ClCompile Include="CustomSetObjects\EvilLiftDoorC.cpp" />
     <ClCompile Include="CustomSetObjects\Hintring.cpp" />
+    <ClCompile Include="CustomSetObjects\Holoska\Icicle.cpp" />
     <ClCompile Include="CustomSetObjects\MoonMedal.cpp" />
+    <ClCompile Include="CustomSetObjects\Mykonos\IrremovableMobMykonos.cpp" />
+    <ClCompile Include="CustomSetObjects\Mykonos\Pelican.cpp" />
+    <ClCompile Include="CustomSetObjects\ObjectUtility.cpp" />
     <ClCompile Include="CustomSetObjects\Paraloop.cpp" />
     <ClCompile Include="CustomSetObjects\SpeedDownCollision.cpp" />
+    <ClCompile Include="Project.cpp" />
     <ClCompile Include="Functionality\EXP.cpp" />
     <ClCompile Include="Functionality\FallCam.cpp" />
     <ClCompile Include="Functionality\Patches.cpp" />
@@ -149,9 +153,6 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="Gameplay\QSSRestore.cpp" />
     <ClCompile Include="System\AnimationSetPatcher.cpp" />
     <ClCompile Include="System\ArchiveTreePatcher.cpp" />
-    <ClCompile Include="System\CrashHandler\CrashHandler.cpp" />
-    <ClCompile Include="System\CrashHandler\MemoryStatus.cpp" />
-    <ClCompile Include="System\CrashHandler\StackTrace.cpp" />
     <ClCompile Include="System\CSDCommon.cpp" />
     <ClCompile Include="System\DebugMenu\Context.cpp" />
     <ClCompile Include="System\DebugMenu\CsdImGui.cpp" />
@@ -187,6 +188,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="System\EnemyTrigger.cpp" />
     <ClCompile Include="System\ImguiInitializer.cpp" />
     <ClCompile Include="System\LetterboxHelper.cpp" />
+    <ClCompile Include="System\SetEditorTest.cpp" />
     <ClCompile Include="System\StageManager.cpp" />
     <ClCompile Include="System\LuaManager.cpp" />
     <ClCompile Include="System\MiniAudioHelper.cpp" />
@@ -203,17 +205,21 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="UI\TitleWorldMapPause.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Project.h" />
-    <ClInclude Include="CustomSetObjects\DebugEnemy.h" />
     <ClInclude Include="CustomSetObjects\DebugObject.h" />
     <ClInclude Include="CustomSetObjects\ETFStageGate.h" />
     <ClInclude Include="CustomSetObjects\ETFTimeSwitch.h" />
     <ClInclude Include="CustomSetObjects\EvilEnemyReckless.h" />
     <ClInclude Include="CustomSetObjects\EvilLiftDoor.h" />
     <ClInclude Include="CustomSetObjects\Hintring.h" />
+    <ClInclude Include="CustomSetObjects\Holoska\Icicle.h" />
     <ClInclude Include="CustomSetObjects\MoonMedal.h" />
+    <ClInclude Include="CustomSetObjects\Mykonos\IrremovableMobMykonos.h" />
+    <ClInclude Include="CustomSetObjects\Mykonos\Pelican.h" />
+    <ClInclude Include="CustomSetObjects\ObjectUtility.h" />
     <ClInclude Include="CustomSetObjects\Paraloop.h" />
     <ClInclude Include="CustomSetObjects\SpeedDownCollision.h" />
+    <ClInclude Include="Project.h" />
+    <ClInclude Include="CustomSetObjects\DebugEnemy.h" />
     <ClInclude Include="Functionality\EXP.h" />
     <ClInclude Include="Functionality\FallCam.h" />
     <ClInclude Include="Functionality\Patches.h" />
@@ -271,6 +277,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="System\EnemyTrigger.h" />
     <ClInclude Include="System\ImguiInitializer.h" />
     <ClInclude Include="System\LetterboxHelper.h" />
+    <ClInclude Include="System\SetEditorTest.h" />
     <ClInclude Include="System\StageManager.h" />
     <ClInclude Include="System\Light.h" />
     <ClInclude Include="System\LuaManager.h" />

@@ -17,7 +17,7 @@ HOOK(void, __fastcall, Sonic_CObjIronPole_UpdateSerial, 0xFFF100, Sonic::CGameOb
 		originalSonic_CObjIronPole_UpdateSerial(This, Edx, a2);
 		return;
 	}
-	TransformUtilities::DoWerehogArmHomingIfClose(This->m_spMatrixNodeTransform->m_Transform.m_Position, 5, a2->DeltaTime);
+	ObjectUtility::DoWerehogArmHomingIfClose(This->m_spMatrixNodeTransform->m_Transform.m_Position, 5, a2->DeltaTime);
 	originalSonic_CObjIronPole_UpdateSerial(This, Edx, a2);
 }
 void Patches::applyPatches()

@@ -1,101 +1,6 @@
 #pragma once
 using namespace hh::math;
 
-class TransformUtilities
-{
-public:
-	static Hedgehog::Math::CVector MoveAroundPivot(Hedgehog::Math::CVector& player, const Hedgehog::Math::CVector& pivot, const Hedgehog::Math::CVector& rotationAngles)
-	{
-
-		if (rotationAngles.x() == 0)
-			return player;
-
-		float x = player.x();
-		float y = player.z();
-
-		float px = pivot.x();
-		float py = pivot.z();
-		float s = sin(rotationAngles.x());
-		float c = cos(rotationAngles.x());
-
-		x -= px;
-		y -= py;
-
-		double nx = (x * c) - (y * s);
-		double ny = (x * s) + (y * c);
-
-		x = nx + px;
-		y = ny + py;
-		player.x() = x;
-		player.z() = y;
-		return Hedgehog::Math::CVector(x, player.y(), y);
-	}
-	static CQuaternion QuaternionFromAngleAxisUtil(float angle, const CVector& axis)
-	{
-		CQuaternion q;
-		float m = sqrt(axis.x() * axis.x() + axis.y() * axis.y() + axis.z() * axis.z());
-		float s = sinf(angle / 2) / m;
-		q.x() = axis.x() * s;
-		q.y() = axis.y() * s;
-		q.z() = axis.z() * s;
-		q.w() = cosf(angle / 2);
-		return q;
-	}
-	static float Distance(const Eigen::Vector3f& v1, const Eigen::Vector3f& v2)
-	{
-		Eigen::Vector3f diff = v1 - v2;
-		double distanceSquared = diff.dot(diff);
-		return std::sqrt(distanceSquared);
-	}
-	static Eigen::Vector3f ClampMagnitudeMax(const Eigen::Vector3f& vec, float minMagnitude, float maxMagnitude) {
-		float magnitude = vec.norm();
-		Eigen::Vector3f clampedVec = vec;
-
-
-		if (magnitude > maxMagnitude)
-		{
-			clampedVec *= maxMagnitude / magnitude;
-		}
-
-		return clampedVec;
-	}
-	static CQuaternion QuaternionFaceTowards(const Eigen::Vector3f& targetPoint, const Eigen::Vector3f& position, CQuaternion rotation) {
-		Eigen::Vector3f currentForward = rotation * Eigen::Vector3f::UnitZ();
-		Eigen::Vector3f targetDirection = (targetPoint - position).normalized();
-
-		Eigen::Quaternionf rotationQuaternion;
-		rotationQuaternion.setFromTwoVectors(currentForward, targetDirection);
-
-		return rotation = rotationQuaternion * rotation;
-	}
-	static float easeInOutQuart(float x)
-	{
-		return x < 0.5
-			? (1 - sqrt(1 - pow(2 * x, 2))) / 2
-			: (sqrt(1 - pow(-2 * x + 2, 2)) + 1) / 2;
-	}
-
-	static bool DoWerehogArmHomingIfClose(Hedgehog::Math::CVector target, float maxDistance, float deltaTime)
-	{
-		Sonic::Player::CPlayerSpeedContext* playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-		auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
-		CVector front = playerContext->m_spMatrixNode->m_Transform.m_Rotation * CVector(0, 0, -1);
-		float distance = abs(TransformUtilities::Distance(playerContext->m_spMatrixNode->m_Transform.m_Position + front, target));
-		if (distance < maxDistance)
-		{
-			if (inputPtr->IsTapped(Sonic::eKeyState_B) && playerContext->m_pPlayer->m_StateMachine.GetCurrentState()->GetStateName() != "EvilArmSwing")
-			{
-				Project::nodeForArmswing = target;
-				playerContext->ChangeState("EvilArmSwing");
-				return true;
-			}
-		}
-		else
-		{
-			return false;
-		}
-	}
-};
 class PoleStyle
 {
 public:
@@ -360,7 +265,7 @@ public:
 		isLeftStickUpPressed = inputPtr->IsDown(Sonic::eKeyState_LeftStickUp);
 		swingPosition.y() = playerContext->m_spMatrixNode->m_Transform.m_Position.y();
 		if(!m_playerInsideCollider)
-		TransformUtilities::DoWerehogArmHomingIfClose(swingPosition, 3, in_rUpdateInfo.DeltaTime);
+		ObjectUtility::DoWerehogArmHomingIfClose(swingPosition, 3, in_rUpdateInfo.DeltaTime);
 		if (m_playerInsideCollider && (inputPtr->IsTapped(Sonic::eKeyState_B) || playerContext->m_pPlayer->m_StateMachine.GetCurrentState()->m_Name == "EvilArmSwing"))
 		{
 			playerContext->ChangeState(Sonic::Player::ePlayerSpeedState_JumpHurdle);
@@ -408,12 +313,12 @@ public:
 			auto targetPos = m_spMatrixNodeTransform->m_Transform.m_Position;
 			targetPos.y() = playerPos.y();
 			playerContext->m_pStateFlag->m_Flags[Sonic::Player::CPlayerSpeedContext::EStateFlag::eStateFlag_IgnorePadInput] = true;
-			auto quat = TransformUtilities::QuaternionFaceTowards(targetPos, playerPos, playerContext->m_spMatrixNode->m_Transform.m_Rotation);
+			auto quat = ObjectUtility::QuaternionFaceTowards(targetPos, playerPos, playerContext->m_spMatrixNode->m_Transform.m_Rotation);
 
 			DebugDrawText::log(std::format("Quat: {0}, {1}, {2}", quat.x(), quat.y(), quat.z()).c_str(), 0);
 			playerContext->m_spMatrixNode->m_Transform.SetRotation(quat);
 			playerContext->m_spMatrixNode->m_Transform.m_Position = Hedgehog::Math::CVector(m_spMatrixNodeTransform->m_Transform.m_Position.x() + 0.4f, m_spMatrixNodeTransform->m_Transform.m_Position.y() + m_playerVerticalProgress, m_spMatrixNodeTransform->m_Transform.m_Position.z());
-			playerContext->m_spMatrixNode->m_Transform.m_Position = TransformUtilities::MoveAroundPivot(playerContext->m_spMatrixNode->m_Transform.m_Position, m_spMatrixNodeTransform->m_Transform.m_Position, Hedgehog::math::CVector(m_playerPoleRotation, 0, m_playerPoleRotation));
+			playerContext->m_spMatrixNode->m_Transform.m_Position = ObjectUtility::MoveAroundPivot(playerContext->m_spMatrixNode->m_Transform.m_Position, m_spMatrixNodeTransform->m_Transform.m_Position, Hedgehog::math::CVector(m_playerPoleRotation, 0, m_playerPoleRotation));
 			
 		}
 

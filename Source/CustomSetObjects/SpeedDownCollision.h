@@ -6,7 +6,7 @@ public:
     static float m_PlayerOriginalSpeed;
     static ItemboxUI* m_ItemBoxUI;
     BB_SET_OBJECT_MAKE("SpeedDownCollision")
-    boost::shared_ptr<hh::mr::CSingleElement> m_spExampleElement;
+    boost::shared_ptr<hh::mr::CSingleElement> m_spSpawnedModel;
     boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
     boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;   
     bool m_playerInsideCollider;

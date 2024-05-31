@@ -84,7 +84,7 @@
 #include "System/ImguiInitializer.h"
 #include "System/SaveManager.h"
 #include "System/LuaManager.h"
-#include "System/CrashHandler/CrashHandler.h"
+#include "System/SetEditorTest.h"
 
 //Debug Menu
 #include "System/DebugMenu/Context.h"
@@ -113,6 +113,7 @@
 #include "UI/EvilQTEUI.h"
 
 //Set objects
+#include "CustomSetObjects/ObjectUtility.h"
 #include "CustomSetObjects/Hintring.h"
 #include "CustomSetObjects/DebugObject.h"
 #include "CustomSetObjects/ETFTimeSwitch.h"
@@ -122,6 +123,9 @@
 #include "CustomSetObjects/MoonMedal.h"
 #include "CustomSetObjects/EvilEnemyReckless.h"
 #include "CustomSetObjects/EvilLiftDoor.h"
+#include "CustomSetObjects/Holoska/Icicle.h"
+#include "CustomSetObjects/Mykonos/Pelican.h"
+#include "CustomSetObjects/Mykonos/IrremovableMobMykonos.h"
 
 //Rest
 #include "Testing/TestingCode.h"

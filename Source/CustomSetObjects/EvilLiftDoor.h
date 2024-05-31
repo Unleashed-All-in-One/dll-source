@@ -8,7 +8,7 @@ public:
 	// This macro initializes the "make" function, takes the XML's object name.
 	BB_SET_OBJECT_MAKE("EvilLiftDoor")
 
-		boost::shared_ptr<hh::mr::CSingleElement> m_spExampleElement;
+		boost::shared_ptr<hh::mr::CSingleElement> m_spSpawnedModel;
 	boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
 	boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollisionSolid;
 	boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
@@ -31,9 +31,9 @@ public:
 		{
 			throw std::runtime_error("The model data for this object could not be loaded. An archive may have not been loaded properly.");
 		}
-		m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
-		m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);				
-		Sonic::CGameObject::AddRenderable("Object", m_spExampleElement, true);
+		m_spSpawnedModel = boost::make_shared<hh::mr::CSingleElement>(spModelData);
+		m_spSpawnedModel->BindMatrixNode(m_spMatrixNodeTransform);				
+		Sonic::CGameObject::AddRenderable("Object", m_spSpawnedModel, true);
 		yNormal = m_spMatrixNodeTransform->m_Transform.m_Position.y();
 
 		return true;

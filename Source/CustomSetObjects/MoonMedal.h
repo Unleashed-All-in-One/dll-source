@@ -5,7 +5,7 @@ class MoonMedal :public Sonic::CObjectBase, public Sonic::CSetObjectListener
 {
 public:
     BB_SET_OBJECT_MAKE("MoonMedal")
-    boost::shared_ptr<hh::mr::CSingleElement> m_spExampleElement;
+    boost::shared_ptr<hh::mr::CSingleElement> m_spSpawnedModel;
     boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
     boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
     boost::shared_ptr<Hedgehog::Animation::CAnimationPose> animatorTest;
@@ -16,10 +16,10 @@ public:
         const char* assetName = "cmn_boj_km_medalMoon_000";
         hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
         boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
-        m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
-        m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
-        //m_spExampleElement->BindAnimationPose(animatorTest);
-        Sonic::CGameObject::AddRenderable("Object", m_spExampleElement, true);
+        m_spSpawnedModel = boost::make_shared<hh::mr::CSingleElement>(spModelData);
+        m_spSpawnedModel->BindMatrixNode(m_spMatrixNodeTransform);
+        //m_spSpawnedModel->BindAnimationPose(animatorTest);
+        Sonic::CGameObject::AddRenderable("Object", m_spSpawnedModel, true);
         DebugDrawText::log("I EXIST!!", 10);
         return true;
     }
@@ -32,7 +32,7 @@ public:
                 const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
                 if (in_rMsg.m_SenderActorID == playerContext->m_pPlayer->m_ActorID)
                 {
-                    m_spExampleElement->m_Enabled = false;
+                    m_spSpawnedModel->m_Enabled = false;
                 }
                 return true;
             }
@@ -53,7 +53,7 @@ public:
     float t;
     void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
     {
-        //m_spExampleElement->BindAnimationPose()
+        //m_spSpawnedModel->BindAnimationPose()
     }
     void InitializeEditParam(Sonic::CEditParam& in_rEditParam) override
     {

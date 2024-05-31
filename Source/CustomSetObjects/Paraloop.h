@@ -4,7 +4,7 @@ class Paraloop :public Sonic::CObjectBase, public Sonic::CSetObjectListener
 {
 public:
     BB_SET_OBJECT_MAKE("Paraloop")
-    boost::shared_ptr<hh::mr::CSingleElement> m_spExampleElement;
+    boost::shared_ptr<hh::mr::CSingleElement> m_spSpawnedModel;
     boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
     boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;   
     bool m_playerInsideCollider;
@@ -73,7 +73,7 @@ public:
             if (abs(playerContext->m_Velocity.norm()) < playerContext->m_spParameter->Get<float>(Sonic::Player::ePlayerSpeedParameter_ParaloopMinSpeed)) {
                 StopParaloop();
             }
-            if (TransformUtilities::Distance(m_spMatrixNodeTransform->m_Transform.m_Position, playerContext->m_spMatrixNode->m_Transform.m_Position) > 50)
+            if (ObjectUtility::Distance(m_spMatrixNodeTransform->m_Transform.m_Position, playerContext->m_spMatrixNode->m_Transform.m_Position) > 50)
             {
                 StopParaloop();
             }

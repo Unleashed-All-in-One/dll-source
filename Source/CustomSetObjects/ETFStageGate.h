@@ -5,7 +5,7 @@ class ETFStageGate :public Sonic::CObjectBase, public Sonic::CSetObjectListener
 {
 public:
     BB_SET_OBJECT_MAKE("ETFStageGate")
-    boost::shared_ptr<hh::mr::CSingleElement> m_spExampleElement;
+    boost::shared_ptr<hh::mr::CSingleElement> m_spSpawnedModel;
 
     boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
 
@@ -56,11 +56,11 @@ public:
         const char* assetName = "cmn_obj_km_etfdoor_NAC";
         hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
         boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
-        m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
+        m_spSpawnedModel = boost::make_shared<hh::mr::CSingleElement>(spModelData);
 
-        m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
+        m_spSpawnedModel->BindMatrixNode(m_spMatrixNodeTransform);
         const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-        auto node = m_spExampleElement->GetNode("ETFdoor_Mark_00");
+        auto node = m_spSpawnedModel->GetNode("ETFdoor_Mark_00");
         const char* particleName = "stage1";
         switch (stageType)
         {
@@ -82,7 +82,7 @@ public:
         }
         //fpAddParticle2(Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager.get(), handle1, &node, "ef_ch_sng_yh1_spinattack", 1);
         Common::fCGlitterCreate(playerContext, handle1, &node, particleName, 0);
-        Sonic::CGameObject::AddRenderable("Object", m_spExampleElement, true);
+        Sonic::CGameObject::AddRenderable("Object", m_spSpawnedModel, true);
         DebugDrawText::log("I EXIST!!", 10);
         return true;
     }

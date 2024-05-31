@@ -26,7 +26,7 @@ public:
     BB_SET_OBJECT_MAKE("ETFTimeSwitch")
 
         /* Make your fields */
-        boost::shared_ptr<hh::mr::CSingleElement> m_spExampleElement;
+        boost::shared_ptr<hh::mr::CSingleElement> m_spSpawnedModel;
 
     boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
 
@@ -42,10 +42,10 @@ public:
         const char* assetName = "cmn_obj_km_etftimeswich_000";
         hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
         boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
-        m_spExampleElement = boost::make_shared<hh::mr::CSingleElement>(spModelData);
+        m_spSpawnedModel = boost::make_shared<hh::mr::CSingleElement>(spModelData);
 
-        m_spExampleElement->BindMatrixNode(m_spMatrixNodeTransform);
-        Sonic::CGameObject::AddRenderable("Object", m_spExampleElement, true);
+        m_spSpawnedModel->BindMatrixNode(m_spMatrixNodeTransform);
+        Sonic::CGameObject::AddRenderable("Object", m_spSpawnedModel, true);
         static bool init = false;
         initialize();
         
