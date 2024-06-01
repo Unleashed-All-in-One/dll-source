@@ -30,8 +30,9 @@ void __declspec(naked) ASMTest()
 // uint32_t __thiscall sub_EB2A80(_DWORD *this, int a2, int a3, int a4)
 extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 {
+#if _DEBUG
 	MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
-
+#endif
 	// Set random seed
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 	std::string path =  std::string(modInfo->CurrentMod->Path);

@@ -10,61 +10,59 @@ class IrremovableMobMykonos :public Sonic::CObjectBase, public Sonic::CSetObject
 public:
 	//name of the set object for the XMLs
 	BB_SET_OBJECT_MAKE("IrremovableMobMykonos")
-
 	boost::shared_ptr<hh::mr::CSingleElement> m_spSpawnedModel;
 	boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
 	boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
 
 	boost::shared_ptr<Hedgehog::Animation::CAnimationPose> m_AnimatorPose;
-	std::string mobNames[9] = { "man01a", "","","", "man02b", "wom01a","", "wom02a", "wom02c"};
-	std::string animNames[18] = {"idle01L","walk01L", "clash01", "plant01L", "talk01L", "talk02L", "audiance01L","audiance02L","working01L", "window01L", "cafe01L", "sitL01L","newspaper01L", "fishing01L", "spieler01L", "book01L", "legs01L", "wash01L"};
+	std::string mobNames[9] = { "man01a", "","","", "man02b", "wom01a","", "wom02a", "wom02c" };
+	std::string mobSkels[9] = { "enm_man01@LT", "","","", "manB@LT", "enm_wom01@LT","", "womB@LT", "womB@LT" };
+	std::string animNames[18] = { "idle01L","walk01L", "clash01", "plant01L", "talk01L", "talk02L", "audiance01L","audiance02L","working01L", "window01L", "cafe01L", "sitL01L","newspaper01L", "fishing01L", "spieler01L", "book01L", "legs01L", "wash01L" };
 	std::vector<NewAnimationData> animations;
 
 	bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
 	{
-		const char* assetName;
-		const char* animName;
 		std::string mobName;
 
-		assetName = _strdup(std::format("mob_enm_{0}",mobNames[m_characterType]).c_str());
+		const char* modelName = _strdup(std::format("mob_enm_{0}", mobNames[m_characterType]).c_str());
+		const char* skelName = _strdup(std::format("mob_{0}", mobSkels[m_characterType]).c_str());
 		switch (m_characterType) {
-			case 0: {
-				mobName = "manA";
-				break;
-			}
-			case 4: {
-				mobName = "manB";
-				break;
-			}
-			case 5: {
-				mobName = "womA";
-				break;
-			}
-			case 7:
-			case 8: {
-				mobName = "womB";
-				break;
-			}
-			default: {
-				mobName = "manA";
-				break;
-			}
+		case 0: {
+			mobName = "manA";
+			break;
 		}
-		animName = animNames[m_motionType].c_str();
+		case 4: {
+			mobName = "manB";
+			break;
+		}
+		case 5: {
+			mobName = "womA";
+			break;
+		}
+		case 7:
+		case 8: {
+			mobName = "womB";
+			break;
+		}
+		default: {
+			mobName = "manA";
+			break;
+		}
+		}
+		const char* animName = animNames[m_motionType].c_str();
 		if (m_motionType == 11)
 		{
-			if (m_characterType == 5) 
+			if (m_characterType == 5)
 			{
 				animName = "sitR01L";
 			}
 		}
 
 		hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
-		boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
-		
-		if (!spModelData)
+		boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(modelName, 0);
+		if(!spModelData)
 		{
-			DebugDrawText::log("Missing model for IrremovableMobMykonos");
+			DebugDrawText::log(std::format("Missing model for set object. ({0})", modelName).c_str());
 			return false;
 		}
 		m_spSpawnedModel = boost::make_shared<hh::mr::CSingleElement>(spModelData);
@@ -74,15 +72,16 @@ public:
 		std::string motionFilename = animPrefix + animName;
 		std::string motionFilenameClash = animPrefix + "clash01";
 
-		m_AnimatorPose = boost::make_shared<Hedgehog::Animation::CAnimationPose>(in_spDatabase, assetName);
+		m_AnimatorPose = boost::make_shared<Hedgehog::Animation::CAnimationPose>(in_spDatabase, skelName);
 		animations = std::vector<NewAnimationData>();
 
 		animations.push_back(NewAnimationData(animName, _strdup(motionFilename.c_str()), 1, true, nullptr));
-		animations.push_back(NewAnimationData("Clash01", _strdup(motionFilenameClash.c_str()), 1, false, nullptr));
-		
+		//animations.push_back(NewAnimationData("Clash01", _strdup(motionFilenameClash.c_str()), 1, false, nullptr));
+		animations.push_back(NewAnimationData("clash01", _strdup(motionFilenameClash.c_str()), 1, false, nullptr));
+
 		this->SetContext(this); //set Context of AnimatorStateMachine to IAnimatorContext
 		ObjectUtility::RegisterAnimations(m_AnimatorPose, animations, m_spSpawnedModel, this);
-		Sonic::CGameObject::AddRenderable("Object", m_spSpawnedModel, true);
+		CGameObject::AddRenderable("Object", m_spSpawnedModel, true);
 		this->ChangeState(animName);
 		return true;
 	}
@@ -91,13 +90,13 @@ public:
 	{
 		return m_AnimatorPose.get();
 	}
-	Hedgehog::Math::CVector GetVelocityForAnimationSpeed()
+	CVector GetVelocityForAnimationSpeed()
 	{
-		return Hedgehog::Math::CVector(1.0f, 1.0f, 1.0f);
+		return CVector(1.0f, 1.0f, 1.0f);
 	}
-	Hedgehog::Math::CVector GetVelocityForAnimationChange()
+	CVector GetVelocityForAnimationChange()
 	{
-		return Hedgehog::Math::CVector(1, 1, 1);
+		return CVector(1, 1, 1);
 	}
 
 	bool ProcessMessage(Hedgehog::Universe::Message& in_rMsg, bool in_Flag) override
@@ -122,12 +121,12 @@ public:
 				return true;
 			}
 		}
-		return Sonic::CObjectBase::ProcessMessage(in_rMsg, in_Flag);
+		return CObjectBase::ProcessMessage(in_rMsg, in_Flag);
 	};
 	bool SetAddColliders(const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
 	{
 		m_spNodeEventCollision = boost::make_shared<Sonic::CMatrixNodeTransform>();
-		m_spNodeEventCollision->m_Transform.SetPosition(Hedgehog::Math::CVector(0, 0, 0));
+		m_spNodeEventCollision->m_Transform.SetPosition(CVector(0, 0, 0));
 		m_spNodeEventCollision->NotifyChanged();
 		m_spNodeEventCollision->SetParent(m_spMatrixNodeTransform.get());
 

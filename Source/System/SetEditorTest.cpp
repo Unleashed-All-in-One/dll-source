@@ -112,6 +112,6 @@ HOOK(void*, __fastcall, SetUpdateApplication, 0xE7BED0, void* This, void* Edx, f
 }
 void SetEditorTest::applyPatches()
 {
-	INSTALL_HOOK(SetUpdateApplication);
+	//INSTALL_HOOK(SetUpdateApplication);
 	INSTALL_HOOK(SetObjectManager_ProcessMessage);
 }

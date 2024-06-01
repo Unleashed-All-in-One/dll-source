@@ -597,6 +597,26 @@ HOOK(void, __fastcall, Sonic_Mission_CScriptImpl_SendMissionType, 0x011041E0, fl
 {
 	return;
 }
+//int *__thiscall Sonic::Sequence::CSequenceMainImpl::LuanneFunctions::StartModule(DWORD *this, int a2, Luanne_IntegerMessageContainer *a3)
+HOOK(int*, __fastcall, StartModule, 0x00D77020, DWORD* StorySequence,void* Edx, int a2, LuaStringEntryContainer* a3)
+{
+	//if(a3->entry->content == 5 || a3->entry->content == 6)
+	//a3->entry->content = (int)ModuleFlow::Genesis;
+	if(TitleWorldMap::LoadingReplacementEnabled)
+	{
+		if(StageManager::WhiteWorldEnabled)
+		{
+			a3->entry->content = "PlayableMenu";
+		}
+
+		if (TitleWorldMap::ForceLoadToFlowTitle)
+		{
+			a3->entry->content = "Title";
+		}
+	}
+	DebugDrawText::log(std::format("[LUASTORYSEQUENCE] Loading module \"{0}\"", a3->entry->content).c_str());
+	return originalStartModule(StorySequence, Edx, a2, a3);
+}
 void StageManager::initialize()
 {
 	//Blocks Gate UI options and switch
@@ -610,6 +630,7 @@ void StageManager::initialize()
 	INSTALL_HOOK(CGameplayFlowStage_CStateWaitEnd);
 	INSTALL_HOOK(CHudGateMenuMainCStateOutroBegin);
 	INSTALL_HOOK(HudLoading_CHudLoadingCStateOutroBegin);
+	INSTALL_HOOK(StartModule);
 
 	//Patch out reading MissionScript to avoid crashes when loading stages without the stgXXX archive name format
 	INSTALL_HOOK(Sonic_Mission_CScriptImpl_SendMissionType);

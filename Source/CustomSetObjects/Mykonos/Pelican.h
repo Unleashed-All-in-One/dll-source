@@ -4,10 +4,9 @@ using namespace hh::math;
 class Pelican :public Sonic::CObjectBase, public Sonic::CSetObjectListener, public Sonic::IAnimationContext, public Sonic::CAnimationStateMachine
 {
 public:
-	// This macro initializes the "make" function, takes the XML's object name.
 	BB_SET_OBJECT_MAKE("Pelican")
 
-		boost::shared_ptr<hh::mr::CSingleElement> m_spSpawnedModel;
+    boost::shared_ptr<hh::mr::CSingleElement> m_spSpawnedModel;
 	boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
 	boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
 	boost::shared_ptr<Hedgehog::Animation::CAnimationPose> m_AnimatorPose;
@@ -99,8 +98,6 @@ public:
 	void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
 	{
 		m_AnimatorPose->Update(in_rUpdateInfo.DeltaTime);
-		Sonic::Player::CPlayerSpeedContext* playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-		float distance = abs(ObjectUtility::Distance(playerContext->m_spMatrixNode->m_Transform.m_Position, m_spMatrixNodeTransform->m_Transform.m_Position));
 		if (GetCurrentState()->m_Name == "Surprise")
 		{
 			timer += in_rUpdateInfo.DeltaTime;
