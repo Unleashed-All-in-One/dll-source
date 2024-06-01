@@ -89,6 +89,22 @@ bool ObjectUtility::DoWerehogArmHomingIfClose(Hedgehog::Math::CVector target, fl
 		return false;
 	}
 }
+bool ObjectUtility::IsResourceAvailableHKX(const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase, std::string in_assetName)
+{
+	auto rawData = in_spDatabase->GetRawData(_strdup(std::format("{0}.anm.hkx", in_assetName).c_str()));
+	if (rawData && rawData->IsMadeAll())
+		return true;
+	else
+		return false;
+}
+bool ObjectUtility::IsResourceAvailableMODEL(const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase, std::string in_assetName)
+{
+	auto rawData = in_spDatabase->GetRawData(_strdup(std::format("{0}", in_assetName).c_str()));
+	if (rawData && rawData->IsMadeAll())
+		return true;
+	else
+		return false;
+}
 void ObjectUtility::RegisterAnimations(const boost::shared_ptr<Hedgehog::Animation::CAnimationPose>& animPose, std::vector<NewAnimationData> anims, const boost::shared_ptr<hh::mr::CSingleElement>& model, Sonic::CAnimationStateMachine* stateMachine)
 {
 	Hedgehog::Animation::SMotionInfo* pEntries = new Hedgehog::Animation::SMotionInfo[anims.size()];

@@ -61,7 +61,12 @@ public:
 
 		hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
 		boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
-
+		
+		if (!spModelData)
+		{
+			DebugDrawText::log("Missing model for IrremovableMobMykonos");
+			return false;
+		}
 		m_spSpawnedModel = boost::make_shared<hh::mr::CSingleElement>(spModelData);
 		m_spSpawnedModel->BindMatrixNode(m_spMatrixNodeTransform);
 
