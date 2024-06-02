@@ -198,6 +198,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="Testing\TestingCode.cpp" />
     <ClCompile Include="UI\ETFStageGateUI.cpp" />
     <ClCompile Include="UI\EventViewer.cpp" />
+    <ClCompile Include="UI\HudButtonGuide.cpp" />
     <ClCompile Include="UI\SubtitleUI.cpp" />
     <ClCompile Include="UI\Title.cpp" />
     <ClCompile Include="UI\TitleOption.cpp" />
@@ -290,6 +291,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="Temporary.h" />
     <ClInclude Include="UI\ETFStageGateUI.h" />
     <ClInclude Include="UI\EvilQTEUI.h" />
+    <ClInclude Include="UI\HudButtonGuide.h" />
     <ClInclude Include="UI\ItemboxUI.h" />
     <ClInclude Include="UI\HelpCaptionUI.h" />
     <ClInclude Include="Testing\TestingCode.h" />

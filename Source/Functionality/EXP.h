@@ -98,6 +98,7 @@ public:
         context->m_ChaosEnergy += Common::RandomFloat(0.25f, 0.75f);
         Common::ClampFloat(context->m_ChaosEnergy, 0.0f, 100.0f);
 
+        displayHUD();
         Kill();
     }
 
@@ -157,5 +158,6 @@ public:
     }
 
     static void applyPatches();
+    static void displayHUD();
     static void removeEXPCollect(Sonic::CGameObject* exp);
 };

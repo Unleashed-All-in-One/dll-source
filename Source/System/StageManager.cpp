@@ -617,6 +617,16 @@ HOOK(int*, __fastcall, StartModule, 0x00D77020, DWORD* StorySequence,void* Edx, 
 	DebugDrawText::log(std::format("[LUASTORYSEQUENCE] Loading module \"{0}\"", a3->entry->content).c_str());
 	return originalStartModule(StorySequence, Edx, a2, a3);
 }
+
+//void __stdcall sub_D6BE60(int a1, int a2)
+HOOK(void, __fastcall, ModuleStuffTest, 0xD6BE60, int a1, void* Edx, int a2)
+{
+	auto v2 = a1;
+	auto v6 = *(DWORD*)(v2 + 4);
+	auto v7 = *(DWORD*)(v6 + 52);
+	
+	return originalModuleStuffTest(a1, Edx, a2);
+}
 void StageManager::initialize()
 {
 	//Blocks Gate UI options and switch
@@ -624,6 +634,7 @@ void StageManager::initialize()
 	WRITE_JUMP(0xD56CCA, ASM_OverrideStageIDLoading);
 	WRITE_JUMP(0x00B267D0, ASM_SetCorrectStageForCutscene);
 	WRITE_JUMP(0x00D0E164, ASM_InterceptGameplayFlowLoading);
+	//INSTALL_HOOK(ModuleStuffTest);
 	INSTALL_HOOK(CStoryImplConstructor);
 	INSTALL_HOOK(CEventSceneStart);
 	INSTALL_HOOK(CEventSceneEnd);

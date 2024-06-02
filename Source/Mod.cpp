@@ -89,6 +89,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	EventViewer::applyPatches();
 	SubtitleUI::applyPatches();
 	SubtitleUI::m_captionData.init();
+	HudButtonGuide::applyPatches();
 	// NOTE: Because we're essentially remaking the title experience to be the exact same, we might want to make the options change in the
 	// same way unleashed does it (via an small options sub-tab-thing and remove TitleOption entirely.
 	// Right now, exiting from Options will cause a crash due to the saving/loading in the WorldMap.

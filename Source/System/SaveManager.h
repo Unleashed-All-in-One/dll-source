@@ -28,6 +28,12 @@ public:
 	std::string keyName;
 	bool keyValue;
 };
+class KeyFloat
+{
+public:
+	std::string keyName;
+	float keyValue;
+};
 class SaveObject
 {
 public:
@@ -38,6 +44,7 @@ public:
 	int sunMedalAcquired;
 	std::vector<StageSaveData*> stageData;
 	std::vector<KeyBool*> keysBool;
+	std::vector<KeyFloat*> keysFloat;
 	int getStageDataIndexFromID(std::string stageID)
 	{
 		//oh linq... i miss you...
@@ -69,6 +76,17 @@ public:
 			if (keyName == keysBool.at(i)->keyName)
 			{
 				return keysBool.at(i)->keyValue;
+			}
+		}
+		return -1;
+	}
+	float getSaveFloatKeyValue(std::string keyName)
+	{
+		for (size_t i = 0; i < keysFloat.size(); i++)
+		{
+			if (keyName == keysFloat.at(i)->keyName)
+			{
+				return keysFloat.at(i)->keyValue;
 			}
 		}
 		return -1;

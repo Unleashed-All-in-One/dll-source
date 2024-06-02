@@ -1,6 +1,89 @@
+#pragma region UI
+
+boost::shared_ptr<Sonic::CGameObjectCSD> spExp;
+Chao::CSD::RCPtr<Chao::CSD::CProject> rcExp;
+Chao::CSD::RCPtr<Chao::CSD::CScene> exp_count;
+
+bool displayedHUD = false;
+
+float expProgress = 0.0f; // can u make this saveable :happi:
+int expLevel = 0; // can u make this saveable :happi:
+
+void CreateScreenEXP(Sonic::CGameObject* pParentGameObject)
+{
+	if (rcExp && !spExp)
+		pParentGameObject->m_pMember->m_pGameDocument->AddGameObject(spExp = boost::make_shared<Sonic::CGameObjectCSD>(rcExp, 0.5f, "HUD", false), "main", pParentGameObject);
+}
+
+void KillScreenEXP()
+{
+	if (!spExp)
+		return;
+	spExp->SendMessage(spExp->m_ActorID, boost::make_shared<Sonic::Message::MsgKill>());
+	spExp = nullptr;
+}
+
+void __fastcall CHudSonicStageRemoveCallbackEXP(Sonic::CGameObject* This, void*, Sonic::CGameDocument* pGameDocument)
+{
+	KillScreenEXP();
+	Chao::CSD::CProject::DestroyScene(rcExp.Get(), exp_count);
+	rcExp = nullptr;
+	exp_count = nullptr;
+}
+
+HOOK(void, __fastcall, CHudSonicStageDelayProcessImpEXP, 0x109A8D0, Sonic::CGameObject* This)
+{
+	originalCHudSonicStageDelayProcessImpEXP(This);
+	if (!*pModernSonicContext)
+		return
+
+	CHudSonicStageRemoveCallbackEXP(This, nullptr, nullptr);
+
+	Sonic::CCsdDatabaseWrapper wrapperExp(This->m_pMember->m_pGameDocument->m_pMember->m_spDatabase.get());
+
+	auto spCsdProjectExp = wrapperExp.GetCsdProject("ui_playscreen_exp");
+
+	rcExp = spCsdProjectExp->m_rcProject;
+	exp_count = rcExp->CreateScene("exp_count");
+	exp_count->SetPosition(0, 0);
+	CSDCommon::FreezeMotion(*exp_count);
+
+	CreateScreenEXP(This);
+}
+
+void EXPCollect::displayHUD()
+{
+	if (displayedHUD)
+		return;
+
+	displayedHUD = true;
+
+	expProgress = SaveManager::getCurrentSave()->getSaveBoolKeyValue("EXPProgress");
+	expLevel = SaveManager::getCurrentSave()->getSaveBoolKeyValue("EXPLevel");
+}
+
+HOOK(void, __fastcall, HudSonicEXPUpdate, 0x1098A50, Sonic::CGameObject* This, void* Edx, const hh::fnd::SUpdateInfo& in_rUpdateInfo)
+{
+	originalHudSonicEXPUpdate(This, Edx, in_rUpdateInfo);
+	if (!displayedHUD)
+		return;
+
+
+	float frameBefore = exp_count->m_MotionFrame;
+	CSDCommon::PlayAnimation(*exp_count, "size", Chao::CSD::eMotionRepeatType_PlayOnce, 1, expProgress);
+	CSDCommon::FreezeMotion(*exp_count, expProgress);
+	CSDCommon::PlayAnimation(*exp_count, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, frameBefore + 1);
+
+	char text[256];
+	sprintf(text, "%02d", expLevel);
+	exp_count->GetNode("exp")->SetText(text);
+}
+#pragma endregion
+#pragma region Orbs
 std::vector<Sonic::CGameObject*> expCache;
 
-void ChaosEnergyLogic(uint32_t amount) {
+void ChaosEnergyLogic(uint32_t amount)
+{
 	Sonic::Player::CPlayerSpeedContext* context = Sonic::Player::CPlayerSpeedContext::GetInstance();
 
 	if (!context)
@@ -19,24 +102,24 @@ uint32_t __fastcall getEnemyChaosEnergyTypeImpl(uint32_t* pEnemy, uint32_t amoun
 {
 	switch (pEnemy[0])
 	{
-		case 0x016F593C: 
-			ChaosEnergyLogic(1); // EFighter
-			break;
-		case 0x016F70BC:
-			ChaosEnergyLogic(3); // Spinner
-			break;
-		case 0x016FB1FC: 
-			ChaosEnergyLogic(1); // EFighterMissile
-			break;
-		case 0x016FB62C: 
-			ChaosEnergyLogic(4); // AirCannon
-			break;
-		case 0x016F912C: 
-			ChaosEnergyLogic(2); // Mole
-			break;
-		default:
-			ChaosEnergyLogic(3);
-			break;
+	case 0x016F593C:
+		ChaosEnergyLogic(1); // EFighter
+		break;
+	case 0x016F70BC:
+		ChaosEnergyLogic(3); // Spinner
+		break;
+	case 0x016FB1FC:
+		ChaosEnergyLogic(1); // EFighterMissile
+		break;
+	case 0x016FB62C:
+		ChaosEnergyLogic(4); // AirCannon
+		break;
+	case 0x016F912C:
+		ChaosEnergyLogic(2); // Mole
+		break;
+	default:
+		ChaosEnergyLogic(3);
+		break;
 	}
 
 	return 0;
@@ -59,11 +142,15 @@ void __declspec(naked) getEnemyChaosEnergyType()
 	}
 }
 
-void EXPCollect::applyPatches() {
+void EXPCollect::removeEXPCollect(Sonic::CGameObject* exp)
+{
+	expCache.erase(std::find(expCache.begin(), expCache.end(), exp));
+}
+#pragma endregion
+void EXPCollect::applyPatches()
+{
 	WRITE_STRING(0x1613B98, ""); // disable stinky hud particles EW!
 	WRITE_JUMP(0xBE05EF, getEnemyChaosEnergyType);
-}
-
-void EXPCollect::removeEXPCollect(Sonic::CGameObject* exp) {
-	expCache.erase(std::find(expCache.begin(), expCache.end(), exp));
+	INSTALL_HOOK(CHudSonicStageDelayProcessImpEXP);
+	INSTALL_HOOK(HudSonicEXPUpdate);
 }

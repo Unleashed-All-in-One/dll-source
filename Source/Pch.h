@@ -111,6 +111,7 @@
 #include "UI/ItemboxUI.h"
 #include "UI/ETFStageGateUI.h"
 #include "UI/EvilQTEUI.h"
+#include "UI/HudButtonGuide.h"
 
 //Set objects
 #include "CustomSetObjects/ObjectUtility.h"
