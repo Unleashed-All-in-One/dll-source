@@ -5,8 +5,10 @@ Chao::CSD::RCPtr<Chao::CSD::CProject> rcExp;
 Chao::CSD::RCPtr<Chao::CSD::CScene> exp_count;
 
 bool displayedHUD = false;
+float m_timerFade;
 
 float expProgress = 0.0f; // can u make this saveable :happi:
+float expProgressPrevious = 0.0f; // can u make this saveable :happi:
 int expLevel = 0; // can u make this saveable :happi:
 
 void CreateScreenEXP(Sonic::CGameObject* pParentGameObject)
@@ -24,7 +26,7 @@ void KillScreenEXP()
 }
 
 void __fastcall CHudSonicStageRemoveCallbackEXP(Sonic::CGameObject* This, void*, Sonic::CGameDocument* pGameDocument)
-{
+{	
 	KillScreenEXP();
 	Chao::CSD::CProject::DestroyScene(rcExp.Get(), exp_count);
 	rcExp = nullptr;
@@ -47,19 +49,29 @@ HOOK(void, __fastcall, CHudSonicStageDelayProcessImpEXP, 0x109A8D0, Sonic::CGame
 	exp_count = rcExp->CreateScene("exp_count");
 	exp_count->SetPosition(0, 0);
 	CSDCommon::FreezeMotion(*exp_count);
-
+	if (SaveManager::getCurrentSave() != nullptr)
+	{
+		expProgress = SaveManager::getCurrentSave()->getSaveBoolKeyValue("EXPProgress");
+		expLevel = SaveManager::getCurrentSave()->getSaveBoolKeyValue("EXPLevel");
+	}
+	if (expLevel > 99)
+		expLevel = 99;
 	CreateScreenEXP(This);
+}
+void EXPCollect::addProgress(float progress)
+{
+	expProgressPrevious = expProgress;
+	expProgress += progress;
 }
 
 void EXPCollect::displayHUD()
 {
+	m_timerFade = 0;
 	if (displayedHUD)
 		return;
 
 	displayedHUD = true;
-
-	expProgress = SaveManager::getCurrentSave()->getSaveBoolKeyValue("EXPProgress");
-	expLevel = SaveManager::getCurrentSave()->getSaveBoolKeyValue("EXPLevel");
+	exp_count->SetMotionFrame(0);	
 }
 
 HOOK(void, __fastcall, HudSonicEXPUpdate, 0x1098A50, Sonic::CGameObject* This, void* Edx, const hh::fnd::SUpdateInfo& in_rUpdateInfo)
@@ -68,13 +80,25 @@ HOOK(void, __fastcall, HudSonicEXPUpdate, 0x1098A50, Sonic::CGameObject* This, v
 	if (!displayedHUD)
 		return;
 
+	m_timerFade += in_rUpdateInfo.DeltaTime;
 
 	float frameBefore = exp_count->m_MotionFrame;
-	CSDCommon::PlayAnimation(*exp_count, "size", Chao::CSD::eMotionRepeatType_PlayOnce, 1, expProgress);
-	CSDCommon::FreezeMotion(*exp_count, expProgress);
-	CSDCommon::PlayAnimation(*exp_count, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, frameBefore + 1);
+	if(m_timerFade >= 5)
+	{
+		CSDCommon::PlayAnimation(*exp_count, "size", Chao::CSD::eMotionRepeatType_PlayOnce, 1, expProgress);
+		CSDCommon::FreezeMotion(*exp_count, expProgress);
+		CSDCommon::PlayAnimation(*exp_count, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);		
+		displayedHUD = false;
+		m_timerFade = 0;		
+	}
+	else
+	{
+		CSDCommon::PlayAnimation(*exp_count, "size", Chao::CSD::eMotionRepeatType_PlayOnce, 1, Common::LerpFloat(expProgressPrevious, expProgress, m_timerFade <= 2 ? m_timerFade / 2 : 1));
+		CSDCommon::FreezeMotion(*exp_count, expProgress);
+		CSDCommon::PlayAnimation(*exp_count, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, frameBefore + 1);		
+	}
 
-	char text[256];
+	char text[4];
 	sprintf(text, "%02d", expLevel);
 	exp_count->GetNode("exp")->SetText(text);
 }
@@ -100,7 +124,7 @@ void ChaosEnergyLogic(uint32_t amount)
 
 uint32_t __fastcall getEnemyChaosEnergyTypeImpl(uint32_t* pEnemy, uint32_t amount)
 {
-	//Sonic::CGameObject3D* test = (Sonic::CGameObject3D*)pEnemy[1];
+	//TODO: find way of getting enemy position to spawn exp
 	switch (pEnemy[0])
 	{
 	case 0x016F593C:
@@ -147,6 +171,11 @@ void EXPCollect::removeEXPCollect(Sonic::CGameObject* exp)
 {
 	expCache.erase(std::find(expCache.begin(), expCache.end(), exp));
 }
+//if (SaveManager::getCurrentSave() != nullptr)
+//{
+//	SaveManager::getCurrentSave()->keysFloat.push_back(new KeyFloat("EXPProgress", expProgress));
+//	SaveManager::getCurrentSave()->keysFloat.push_back(new KeyFloat("EXPLevel", expLevel));
+//}
 #pragma endregion
 void EXPCollect::applyPatches()
 {
