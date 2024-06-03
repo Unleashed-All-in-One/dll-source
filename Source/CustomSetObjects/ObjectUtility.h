@@ -11,6 +11,7 @@ public:
 	static float easeInOutQuart(float x);
 	static bool DoWerehogArmHomingIfClose(Hedgehog::Math::CVector target, float maxDistance, float deltaTime);
 	static void RegisterAnimations(const boost::shared_ptr<Hedgehog::Animation::CAnimationPose>& animPose, std::vector<NewAnimationData> anims, const boost::shared_ptr<hh::mr::CSingleElement>& model, Sonic::CAnimationStateMachine* stateMachine);
+	static void SetTransformScale(Hedgehog::Mirage::CTransform& in_Transform, Hedgehog::math::CVector scale);
 	static bool IsResourceAvailableHKX(const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase, std::string in_assetName);
 	static bool IsResourceAvailableMODEL(const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase, std::string in_assetName);
 };

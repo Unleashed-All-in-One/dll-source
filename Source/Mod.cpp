@@ -117,10 +117,10 @@ extern "C" __declspec(dllexport) void PostInit()
 		exit(-1);
 	}
 }
-
+const char* a3 = "Stage";
 //char __thiscall Sonic::CSetObjectManager::ProcessMessage(char *this, int a1, int a2
 extern "C" void __declspec(dllexport) OnFrame()
-{	
+{
 	//---------------System---------------
 	ImguiInitializer::update();
 	CSDCommon::update();

@@ -100,6 +100,7 @@ void ChaosEnergyLogic(uint32_t amount)
 
 uint32_t __fastcall getEnemyChaosEnergyTypeImpl(uint32_t* pEnemy, uint32_t amount)
 {
+	//Sonic::CGameObject3D* test = (Sonic::CGameObject3D*)pEnemy[1];
 	switch (pEnemy[0])
 	{
 	case 0x016F593C:

@@ -37,9 +37,9 @@ public:
 		strcpy(allocatedStr, value);
 		return allocatedStr;
 	}
-	LuaStringEntry(const char* integer)
+	LuaStringEntry(const char* integer, bool allocate = true)
 	{
-		content = allocateStr(integer);
+		content = allocate ? allocateStr(integer) : integer;
 	}
 };
 
@@ -48,10 +48,10 @@ class LuaStringEntryContainer
 public:
 	void* unknown;
 	LuaStringEntry* entry;
-	LuaStringEntryContainer(const char* content)
+	LuaStringEntryContainer(const char* content, bool allocate = true)
 	{
-		LuaStringEntry newEntry = LuaStringEntry(content);
-		entry = &newEntry;
+		LuaStringEntry* newEntry = new LuaStringEntry(content, allocate);
+		entry = newEntry;
 	}
 };
 

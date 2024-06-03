@@ -85,6 +85,7 @@
 #include "System/SaveManager.h"
 #include "System/LuaManager.h"
 #include "System/SetEditorTest.h"
+#include "CustomSetObjects/ObjectUtility.h"
 
 //Debug Menu
 #include "System/DebugMenu/Context.h"
@@ -114,7 +115,6 @@
 #include "UI/HudButtonGuide.h"
 
 //Set objects
-#include "CustomSetObjects/ObjectUtility.h"
 #include "CustomSetObjects/Hintring.h"
 #include "CustomSetObjects/DebugObject.h"
 #include "CustomSetObjects/ETFTimeSwitch.h"

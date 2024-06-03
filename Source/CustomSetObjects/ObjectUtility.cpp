@@ -134,3 +134,14 @@ void ObjectUtility::RegisterAnimations(const boost::shared_ptr<Hedgehog::Animati
 		stateMachine->AddAnimationState(anims[i].m_stateName);
 	}
 }
+void ObjectUtility::SetTransformScale(Hedgehog::Mirage::CTransform& in_Transform, Hedgehog::math::CVector in_Scale)
+{
+	//thanks skyth! -Nextin
+	auto& rMatrix = in_Transform.m_Matrix.matrix();
+	const float scale = max(rMatrix.col(0).head<3>().norm(),
+		max(rMatrix.col(1).head<3>().norm(), rMatrix.col(2).head<3>().norm()));
+
+	rMatrix.col(0) /= (scale / in_Scale.x());
+	rMatrix.col(1) /= (scale / in_Scale.y());
+	rMatrix.col(2) /= (scale / in_Scale.z());
+}

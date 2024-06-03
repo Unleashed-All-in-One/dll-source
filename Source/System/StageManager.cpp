@@ -597,21 +597,30 @@ HOOK(void, __fastcall, Sonic_Mission_CScriptImpl_SendMissionType, 0x011041E0, fl
 {
 	return;
 }
-//int *__thiscall Sonic::Sequence::CSequenceMainImpl::LuanneFunctions::StartModule(DWORD *this, int a2, Luanne_IntegerMessageContainer *a3)
-HOOK(int*, __fastcall, StartModule, 0x00D77020, DWORD* StorySequence,void* Edx, int a2, LuaStringEntryContainer* a3)
+std::string ModeStrings[4] = { "Stage", "Event", "PlayableMenu", "Title" };
+//figure out a way to call this as a function
+HOOK(int*, __fastcall, StartModule, 0x00D77020, DWORD* StorySequence,void* Edx, DWORD* a2, LuaStringEntryContainer* a3)
 {
-	//if(a3->entry->content == 5 || a3->entry->content == 6)
-	//a3->entry->content = (int)ModuleFlow::Genesis;
-	if(TitleWorldMap::LoadingReplacementEnabled)
+	auto exampleRead = a3->entry->content;
+	if (!StageManager::WhiteWorldEnabled)
 	{
-		if(StageManager::WhiteWorldEnabled)
+		if(std::string(exampleRead) == "PlayableMenu")
 		{
-			a3->entry->content = "PlayableMenu";
+			a3 = new LuaStringEntryContainer(_strdup(ModeStrings[0].c_str()));
 		}
-
-		if (TitleWorldMap::ForceLoadToFlowTitle)
+	}
+	else
+	{
+		if (std::string(exampleRead) == "Stage" || std::string(exampleRead) == "Event")
 		{
-			a3->entry->content = "Title";
+			a3 = new LuaStringEntryContainer(_strdup(ModeStrings[2].c_str()));
+		}
+	}
+	if (TitleWorldMap::ForceLoadToFlowTitle)
+	{
+		if (std::string(exampleRead) != "Title")
+		{
+			a3 = new LuaStringEntryContainer(_strdup(ModeStrings[3].c_str()));
 		}
 	}
 	DebugDrawText::log(std::format("[LUASTORYSEQUENCE] Loading module \"{0}\"", a3->entry->content).c_str());
@@ -633,7 +642,7 @@ void StageManager::initialize()
 	WRITE_JUMP(0x01080F02, 0x01080FB7);
 	WRITE_JUMP(0xD56CCA, ASM_OverrideStageIDLoading);
 	WRITE_JUMP(0x00B267D0, ASM_SetCorrectStageForCutscene);
-	WRITE_JUMP(0x00D0E164, ASM_InterceptGameplayFlowLoading);
+	//WRITE_JUMP(0x00D0E164, ASM_InterceptGameplayFlowLoading);
 	//INSTALL_HOOK(ModuleStuffTest);
 	INSTALL_HOOK(CStoryImplConstructor);
 	INSTALL_HOOK(CEventSceneStart);
