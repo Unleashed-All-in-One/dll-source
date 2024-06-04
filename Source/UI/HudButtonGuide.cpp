@@ -147,10 +147,6 @@ void CallBoostGuide()
 }
 void CallQuickstepGuide()
 {
-	if (!spQTE)
-		HudButtonGuide::spawn(Sonic::Player::CPlayerSpeedContext::GetInstance()->m_pPlayer, HudButtonGuide::BUTTON_LEFTBUMPER, HudButtonGuide::QUICKSTEP_BOTH);
-	else
-		HudButtonGuide::configure(HudButtonGuide::BUTTON_LEFTBUMPER, HudButtonGuide::QUICKSTEP_BOTH);
 }
 void __fastcall CHudSonicStageRemoveCallbackQTE(Sonic::CGameObject* This, void*, Sonic::CGameDocument* pGameDocument)
 {
@@ -222,11 +218,25 @@ HOOK(void, __fastcall, CHudSonicStageUpdateQTE, 0x1098A50, void* This, void* Edx
 	}
 	originalCHudSonicStageUpdateQTE(This, Edx, dt);
 }
+HOOK(void, __fastcall, MsgStartBoostSign, 0x528740, void* This, void* Edx, void* message)
+{
+	CallBoostGuide();
+	Common::PlaySoundStatic(soundHandle, 3000812983);
+	//originalMsgStartBoostSign(This, Edx, message);
+}
+HOOK(void, __fastcall, MsgStartQuickStepSign, 0x528870, void* This, void* Edx, int* message)
+{
+	CallQuickstepGuide();
+	Common::PlaySoundStatic(soundHandle, 3000812983);
+	//originalMsgStartQuickStepSign(This, Edx, message);
+}
 void HudButtonGuide::applyPatches()
 {
 	//these 2 asm hooks can be replaced with function hooks
-	WRITE_JUMP(0x005287A0, ASM_MsgStartBoostSign);
-	WRITE_JUMP(0x005288D0, ASM_MsgStartQuickStepSign);
+	//WRITE_JUMP(0x005287A0, ASM_MsgStartBoostSign);
+	//WRITE_JUMP(0x005288D0, ASM_MsgStartQuickStepSign);
+	INSTALL_HOOK(MsgStartBoostSign);
+	INSTALL_HOOK(MsgStartQuickStepSign);
 	INSTALL_HOOK(CHudSonicStageUpdateQTE);
 	INSTALL_HOOK(ProcMsgStartCommonButtonSign);
 	WRITE_MEMORY(0x16A467C, void*, CHudSonicStageRemoveCallbackQTE);

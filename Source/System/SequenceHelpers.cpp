@@ -101,8 +101,8 @@ void SequenceHelpers::loadStage(const char* in_StageName, int sequenceEventExtra
 		SequenceHelpers::resetStorySequence();
 	}
 	FUNCTION_PTR(int, __thiscall, StartModuleF, 0x00D77020, Sonic::Sequence::Story * StorySequence, int a2, LuaStringEntryContainer * a3);
-	StartModuleF(storySequenceInstance, 0, new LuaStringEntryContainer(_strdup("Stage")));
-	//Sonic::Sequence::Main::ProcessMessage(&message);
+	//StartModuleF(storySequenceInstance, 0, new LuaStringEntryContainer(_strdup("Stage")));
+	Sonic::Sequence::Main::ProcessMessage(&message);
 	uint32_t stageIDAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x0 });
 	uint32_t* test2 = &stageIDAddress;
 	*test2 = 0;
