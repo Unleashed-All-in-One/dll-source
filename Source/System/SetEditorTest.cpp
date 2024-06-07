@@ -4,19 +4,28 @@ class MsgRemakeAllSetObject : public Hedgehog::Universe::MessageTypeSet
 public:
 	HH_FND_MSG_MAKE_TYPE(0x0167EE98);
 };
+
+BB_ASSERT_SIZEOF(MsgRemakeAllSetObject, 0x10);
 class ActivateLayer : public Hedgehog::Universe::MessageTypeSet
 {
 public:
 	HH_FND_MSG_MAKE_TYPE(0x0167F0C0);
-	Hedgehog::base::CSharedString layerName;
-	bool unk;
+	Hedgehog::base::CSharedString m_SetLayerName;
+	bool m_Field18;
+	ActivateLayer(const Hedgehog::base::CSharedString& in_SetLayerName, const bool in_Field18) : m_SetLayerName(in_SetLayerName), m_Field18(in_Field18) {}
 };
-class Deactivatelayer : public Hedgehog::Universe::MessageTypeSet
+BB_ASSERT_OFFSETOF(ActivateLayer, m_SetLayerName, 0x10);
+BB_ASSERT_OFFSETOF(ActivateLayer, m_Field18, 0x14);
+BB_ASSERT_SIZEOF(ActivateLayer, 0x18);
+class MsgDeactivatelayer : public Hedgehog::Universe::MessageTypeSet
 {
 public:
 	HH_FND_MSG_MAKE_TYPE(0x0167F0D4);
-	Hedgehog::base::CSharedString layerName;
+	Hedgehog::base::CSharedString m_SetLayerName;
 };
+
+BB_ASSERT_OFFSETOF(MsgDeactivatelayer, m_SetLayerName, 0x10);
+BB_ASSERT_SIZEOF(MsgDeactivatelayer, 0x14);
 
 
 inline FUNCTION_PTR(char, __thiscall, SetObjectManager_ProcessMessageF, 0x00EB3BE0, DWORD* This, Hedgehog::Universe::Message&, int flag);
@@ -31,17 +40,15 @@ void SetEditorTest::remakeAllObjects()
 	MsgRemakeAllSetObject msg = MsgRemakeAllSetObject();
 	SetObjectManager_ProcessMessageF(SetManager, msg, 0);
 }
-void SetEditorTest::activateLayer(const char* layerName)
+void SetEditorTest::activateLayer(const char* m_SetLayerName)
 {
-	ActivateLayer msg = ActivateLayer();
-	msg.layerName = "base";
-	msg.unk = true;
+	ActivateLayer msg = ActivateLayer("base", true);
 	SetObjectManager_ProcessMessageF(SetManager, msg, 0);
 }
-void SetEditorTest::deactivateLayer(const char* layerName)
+void SetEditorTest::deactivateLayer(const char* m_SetLayerName)
 {
-	Deactivatelayer msg = Deactivatelayer();
-	msg.layerName = "base";
+	MsgDeactivatelayer msg = MsgDeactivatelayer();
+	msg.m_SetLayerName = "base";
 	SetObjectManager_ProcessMessageF(SetManager, msg, 0);
 }
 bool showSetTest = false;
@@ -76,17 +83,11 @@ int numb;
 HOOK(void*, __fastcall, SetUpdateApplication, 0xE7BED0, void* This, void* Edx, float elapsedTime, uint8_t a3)
 {
 	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
-	if (inputPtr->IsTapped(Sonic::eKeyState_Y))
-	{
-		ActivateLayer msg = ActivateLayer();
-		msg.layerName = "base";
-		msg.unk = true;
-		SetObjectManager_ProcessMessageF(SetManager, msg, 0);
-	}
+	
 	if (inputPtr->IsTapped(Sonic::eKeyState_B))
 	{
-		Deactivatelayer msg = Deactivatelayer();
-		msg.layerName = "base";
+		MsgDeactivatelayer msg = MsgDeactivatelayer();
+		msg.m_SetLayerName = "base";
 		SetObjectManager_ProcessMessageF(SetManager, msg, 0);
 	}
 	if (GetAsyncKeyState(VK_LEFT) & 1)

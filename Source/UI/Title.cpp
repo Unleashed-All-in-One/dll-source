@@ -100,11 +100,10 @@ void ShowInstallScreen()
 }
 void Title::showTransition(bool enableLoad)
 {
-	bg_transition->SetHideFlag(false);
-	CSDCommon::PlayAnimation(*bg_transition, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+	UnleashedHUD_API::StartFadeout();
 	PlayTitleBGM(TitleStateContextBase, "");
 	if(enableLoad)
-	canLoad = 1;
+		canLoad = 1;
 }
 void __declspec(naked) TitleUI_SetCustomExecFunction()
 {
@@ -527,7 +526,7 @@ HOOK(void*, __fastcall, Title_UpdateApplication, 0xE7BED0, Sonic::CGameObject* T
 	{
 		if (bg_transition)
 		{
-			if (bg_transition->m_MotionDisableFlag)
+			if (UnleashedHUD_API::IsLoadingFadeoutCompleted())
 			{
 				SequenceHelpers::loadStage(StageManager::getStageToLoad());
 				SequenceHelpers::setPlayerType(GENERIC_SONIC);
@@ -714,7 +713,6 @@ HOOK(void, __fastcall, sub_571F80, 0x571F80, int This)
 		originalsub_571F80(This);
 	}
 
-	printf("\nSTATE: %ld", *(DWORD*)(This + 36));
 }
 HOOK(void, __cdecl, DebugDrawTextDraw, 0x750820, void*, float x, float y, void*, uint8_t* color, wchar_t* text, ...)
 {

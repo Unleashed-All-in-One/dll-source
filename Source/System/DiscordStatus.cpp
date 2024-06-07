@@ -39,22 +39,22 @@ void DiscordStatus::update()
 
 void DiscordStatus::UpdateActivityInformation()
 {
-	if (useTimestamp)
-	{
-		currentActivity.GetTimestamps().SetStart(time(0));
-	}
-	currentActivity.SetType(discord::ActivityType::Playing);
-	currentActivity.SetDetails(TopText.c_str());
-	currentActivity.SetState(BottomText.c_str());
-
-	currentActivity.GetAssets().SetLargeImage(Thumbnail.c_str());
-	currentActivity.GetAssets().SetSmallImage(ThumbnailSmall.c_str());
-	currentActivity.GetAssets().SetSmallText(StageTypeText.c_str());
-	core->ActivityManager().UpdateActivity(currentActivity, [](discord::Result result) {
-
-	result == discord::Result::Ok
-		? std::cout << "[DiscordStatus] Activity Update Success!\n"
-		: std::cout << "[DiscordStatus] Activity Update Failed!\n";
-		});
+	//if (useTimestamp)
+	//{
+	//	currentActivity.GetTimestamps().SetStart(time(0));
+	//}
+	//currentActivity.SetType(discord::ActivityType::Playing);
+	//currentActivity.SetDetails(TopText.c_str());
+	//currentActivity.SetState(BottomText.c_str());
+	//
+	//currentActivity.GetAssets().SetLargeImage(Thumbnail.c_str());
+	//currentActivity.GetAssets().SetSmallImage(ThumbnailSmall.c_str());
+	//currentActivity.GetAssets().SetSmallText(StageTypeText.c_str());
+	//core->ActivityManager().UpdateActivity(currentActivity, [](discord::Result result) {
+	//
+	//result == discord::Result::Ok
+	//	? std::cout << "[DiscordStatus] Activity Update Success!\n"
+	//	: std::cout << "[DiscordStatus] Activity Update Failed!\n";
+	//	});
 
 }

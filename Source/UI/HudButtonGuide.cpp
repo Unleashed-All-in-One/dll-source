@@ -186,14 +186,20 @@ class MsgStartCommonButtonSign : public Hedgehog::Universe::MessageTypeSet
 {
 public:
 	HH_FND_MSG_MAKE_TYPE(0x01680730);
-	int value;
+	int32_t m_ButtonType;
+	int32_t m_ButtonType2;
+	int32_t m_Direction;
+	MsgStartCommonButtonSign(const int32_t in_ButtonType, const int32_t in_ButtonType2, const int32_t in_Direction) : m_ButtonType(in_ButtonType), m_ButtonType2(in_ButtonType2), m_Direction(in_Direction) {}
 };
+BB_ASSERT_OFFSETOF(MsgStartCommonButtonSign, m_ButtonType, 0x10);
+BB_ASSERT_OFFSETOF(MsgStartCommonButtonSign, m_ButtonType2, 0x14);
+BB_ASSERT_OFFSETOF(MsgStartCommonButtonSign, m_Direction, 0x18);
+BB_ASSERT_SIZEOF(MsgStartCommonButtonSign, 0x1C);
 
 //void __thiscall ProcMsgStartCommonButtonSign(int this, int a2)
 HOOK(void, __fastcall, ProcMsgStartCommonButtonSign, 0x5289A0, int This, void* Edx, MsgStartCommonButtonSign* a2)
 {
-	int val = a2->value;
-	if (val == -1)
+	if (a2->m_ButtonType == -1 && a2->m_ButtonType2 == 10) //grindrail quickstep
 	{
 		Common::PlaySoundStatic(soundHandle, 3000812983);
 		CallQuickstepGuide();

@@ -43,8 +43,8 @@ public:
             pEntries[i].FileName = animations[i].m_fileName;
             pEntries[i].Speed = animations[i].m_speed;
             pEntries[i].RepeatType = !animations[i].m_isLoop;
-            pEntries[i].Field10 = 0;
-            pEntries[i].Field14 = -1.0f;
+            pEntries[i].StartFrame = 0;
+            pEntries[i].EndFrame = -1.0f;
             pEntries[i].Field18 = -1.0f;
             pEntries[i].Field1C = 0;
             pEntries[i].Field20 = -1;
