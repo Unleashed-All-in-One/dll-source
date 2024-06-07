@@ -88,7 +88,7 @@ public:
         m_spNodeRigidbody->SetParent(m_spModelButtonTransform.get());
 
         m_spNodeEventCollision = boost::make_shared<Sonic::CMatrixNodeTransform>();
-        m_spNodeEventCollision->m_Transform.SetPosition(Hedgehog::Math::CVector(0, 2.4, 0));
+        m_spNodeEventCollision->m_Transform.SetPosition(Hedgehog::Math::CVector(0, 2.45, 0));
         m_spNodeEventCollision->NotifyChanged();
         m_spNodeEventCollision->SetParent(m_spNodeRigidbody.get());
         hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(3, 0.5, 3);
@@ -109,7 +109,12 @@ public:
     void SetPositions(float deltaTime) {
         if (shake_timer > 0) {
             shake_timer -= deltaTime;
-            m_yOffset = Common::Lerp(m_yOffset, Common::RandomFloat(-0.1f, 0.1f), deltaTime * 10.0f);
+            float newOffset = sinf(shake_timer * 4.0f) * 2.0f;
+            Common::ClampFloat(newOffset, -0.5f, 0.5f);
+            m_yOffset = Common::Lerp(m_yOffset, newOffset, deltaTime * 10.0f);
+        }
+        else {
+            m_yOffset = Common::Lerp(m_yOffset, 0.0f, deltaTime * 10.0f);
         }
         m_spModelButtonTransform->m_Transform.SetPosition(Common::Lerp(m_spModelButtonTransform->m_Transform.m_Position, m_ButtonPosition + (Eigen::Vector3f::UnitY() * m_yOffset), deltaTime * 5.0f));
         m_spModelButtonTransform->NotifyChanged();
@@ -123,16 +128,16 @@ public:
         switch (m_phase) {
             case 1:
                 m_ButtonPosition = Eigen::Vector3f(0.0, -0.833, 0.0);
-                shake_timer = 2.5f;
+                shake_timer = 0.35f;
                 break;
             case 2:
                 m_ButtonPosition = Eigen::Vector3f(0.0, -1.666, 0.0);
-                shake_timer = 2.5f;
+                shake_timer = 0.35f;
                 break;
             case 3:
                 m_spModelButton->m_MaterialMap.emplace(m_MaterialInactive.get(), m_MaterialActive);
                 m_ButtonPosition = Eigen::Vector3f(0.0, -2.499, 0.0);
-                shake_timer = 2.5f;
+                shake_timer = 0.35f;
                 break;
         }
     }
