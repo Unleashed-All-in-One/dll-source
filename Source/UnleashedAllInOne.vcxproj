@@ -125,6 +125,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="CustomSetObjects\EvilLiftDoorC.cpp" />
     <ClCompile Include="CustomSetObjects\Hintring.cpp" />
     <ClCompile Include="CustomSetObjects\Holoska\Icicle.cpp" />
+    <ClCompile Include="CustomSetObjects\Holoska\StompingSwitch.cpp" />
     <ClCompile Include="CustomSetObjects\MoonMedal.cpp" />
     <ClCompile Include="CustomSetObjects\Mykonos\IrremovableMobMykonos.cpp" />
     <ClCompile Include="CustomSetObjects\Mykonos\Pelican.cpp" />
@@ -213,6 +214,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="CustomSetObjects\EvilLiftDoor.h" />
     <ClInclude Include="CustomSetObjects\Hintring.h" />
     <ClInclude Include="CustomSetObjects\Holoska\Icicle.h" />
+    <ClInclude Include="CustomSetObjects\Holoska\StompingSwitch.h" />
     <ClInclude Include="CustomSetObjects\MoonMedal.h" />
     <ClInclude Include="CustomSetObjects\Mykonos\IrremovableMobMykonos.h" />
     <ClInclude Include="CustomSetObjects\Mykonos\Pelican.h" />

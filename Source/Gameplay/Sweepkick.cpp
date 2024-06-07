@@ -120,13 +120,19 @@ HOOK(void, __fastcall, SweepkickOnUpdate, 0xE6BF20, void* This, void* Edx, float
 	if (m_SweepkickCollisionTime > 0)
 		m_SweepkickCollisionTime -= *dt;
 
-	if (input.IsTapped(Sonic::eKeyState_B))
+	if (input.IsTapped(Sonic::eKeyState_B) && !Common::GetSonicStateFlags()->OutOfControl)
 		Onm_IsBButtonPressed(sonic, state);
 
 	if ((state == "SquatKick" || m_IsSweepkickActive) && sonic->m_Velocity.norm() == 0.0f)
 		sonic->m_spMatrixNode->m_Transform.SetRotation(m_SquatKickRotation);
 
 	if (m_IsSweepkickActive && (state != "Squat" && state != "Sliding" && state != "Stand" && state != "Walk" && state != "SlidingEnd" && state != "StompingLand" && state != "SquatCharge" && state != "SquatKick")) {
+		Common::fCGlitterEnd(sonic, m_SquatKickParticleHandle, true);
+		m_SweepLight.Stop(true);
+		m_IsSweepkickActive = false;
+	}
+
+	if (m_IsSweepkickActive && state == "Walk" && Common::GetSonicStateFlags()->OutOfControl) {
 		Common::fCGlitterEnd(sonic, m_SquatKickParticleHandle, true);
 		m_SweepLight.Stop(true);
 		m_IsSweepkickActive = false;
