@@ -125,6 +125,7 @@
 #include "CustomSetObjects/EvilEnemyReckless.h"
 #include "CustomSetObjects/EvilLiftDoor.h"
 #include "CustomSetObjects/Holoska/Icicle.h"
+#include "CustomSetObjects/Holoska/StompingSwitch.h"
 #include "CustomSetObjects/Mykonos/Pelican.h"
 #include "CustomSetObjects/Mykonos/IrremovableMobMykonos.h"
 //#include "CustomSetObjects/ObjCamera2D.h"

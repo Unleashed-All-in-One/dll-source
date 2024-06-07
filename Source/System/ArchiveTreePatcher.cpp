@@ -107,6 +107,7 @@ void ArchiveTreePatcher::applyPatches()
     m_archiveDependencies.push_back(ArchiveDependency("TailsEVRoot", { "ev041", "m1_03_1"}));
     m_archiveDependencies.push_back(ArchiveDependency("SonicEVRoot", { "ev041" }));
     m_archiveDependencies.push_back(ArchiveDependency("ObjectPhysicsUnleashed", { "cmn200" }));
+    m_archiveDependencies.push_back(ArchiveDependency("HoloskaStomp", { "cmn200" }));
     m_archiveDependencies.push_back(ArchiveDependency("ObjectPhysicsUnleashed", { "cmn100" }));
 
     if (!m_archiveDependencies.empty())
