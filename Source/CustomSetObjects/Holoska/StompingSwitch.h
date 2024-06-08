@@ -22,8 +22,10 @@ public:
 
     Sonic::Player::CPlayerSpeedContext* sonic;
 
-    bool m_playerInsideCollider = false;
-    bool m_triggered = false;
+    float m_detectionCooldown = 0.0f;
+
+    SharedPtrTypeless m_ButtonSoundHandle;
+    SharedPtrTypeless m_ActivationSoundHandle;
 
     int m_phase = 0;
 
@@ -57,20 +59,12 @@ public:
     {
         if (in_Flag)
         {
-            //OnCollisionEnter
-            if (std::strstr(in_rMsg.GetType(), "MsgHitEventCollision") != nullptr)
-            {
-                if (in_rMsg.m_SenderActorID == sonic->m_pPlayer->m_ActorID)
-                    m_playerInsideCollider = true;
+            if (std::strstr(in_rMsg.GetType(), "MsgDamage") != nullptr) {
+                if (in_rMsg.m_SenderActorID == sonic->m_pPlayer->m_ActorID && m_detectionCooldown <= 0 && sonic->m_pPlayer->m_StateMachine.GetCurrentState()->GetStateName() == "Stomping") {
+                    m_detectionCooldown = 0.25f;
+                    OnLanded();
+                }
                 return true;
-            }
-
-            //OnCollisionExit
-            if (std::strstr(in_rMsg.GetType(), "MsgLeaveEventCollision") != nullptr)
-            {
-                const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-                if (in_rMsg.m_SenderActorID == sonic->m_pPlayer->m_ActorID)
-                    m_playerInsideCollider = false;
             }
         }
         return Sonic::CObjectBase::ProcessMessage(in_rMsg, in_Flag);
@@ -109,14 +103,14 @@ public:
     void SetPositions(float deltaTime) {
         if (shake_timer > 0) {
             shake_timer -= deltaTime;
-            float newOffset = sinf(shake_timer * 4.0f) * 2.0f;
+            float newOffset = sinf(shake_timer * 3.0f) * 2.0f;
             Common::ClampFloat(newOffset, -0.5f, 0.5f);
             m_yOffset = Common::Lerp(m_yOffset, newOffset, deltaTime * 10.0f);
         }
         else {
             m_yOffset = Common::Lerp(m_yOffset, 0.0f, deltaTime * 10.0f);
         }
-        m_spModelButtonTransform->m_Transform.SetPosition(Common::Lerp(m_spModelButtonTransform->m_Transform.m_Position, m_ButtonPosition + (Eigen::Vector3f::UnitY() * m_yOffset), deltaTime * 5.0f));
+        m_spModelButtonTransform->m_Transform.SetPosition(Common::Lerp(m_spModelButtonTransform->m_Transform.m_Position, m_ButtonPosition + (Eigen::Vector3f::UnitY() * m_yOffset), deltaTime * 8.0f));
         m_spModelButtonTransform->NotifyChanged();
         m_spNodeRigidbody->NotifyChanged();
         m_spNodeEventCollision->NotifyChanged();
@@ -128,18 +122,28 @@ public:
         switch (m_phase) {
             case 1:
                 m_ButtonPosition = Eigen::Vector3f(0.0, -0.833, 0.0);
-                shake_timer = 0.35f;
+                shake_timer = 0.25f;
+                Common::PlaySoundStatic(m_ButtonSoundHandle, 4002063);
                 break;
             case 2:
                 m_ButtonPosition = Eigen::Vector3f(0.0, -1.666, 0.0);
-                shake_timer = 0.35f;
+                shake_timer = 0.25f;
+                Common::PlaySoundStatic(m_ButtonSoundHandle, 4002063);
                 break;
             case 3:
                 m_spModelButton->m_MaterialMap.emplace(m_MaterialInactive.get(), m_MaterialActive);
                 m_ButtonPosition = Eigen::Vector3f(0.0, -2.499, 0.0);
-                shake_timer = 0.35f;
+                shake_timer = 0.25f;
+                Common::PlaySoundStatic(m_ButtonSoundHandle, 4002063);
+                Common::PlaySoundStatic(m_ActivationSoundHandle, 4002043);
                 break;
         }
+    }
+
+    void OnReset() {
+        m_phase = 0;
+        m_ButtonPosition = Eigen::Vector3f();
+        shake_timer = 0.0f;
     }
 
     void SetUpdateParallel
@@ -148,13 +152,14 @@ public:
     ) override
     {
         SetPositions(updateInfo.DeltaTime);
-        if (sonic->m_pPlayer->m_StateMachine.GetCurrentState()->GetStateName() == "StompingLand" && m_playerInsideCollider && !m_triggered) {
-            OnLanded();
-            m_triggered = true;
-        }
-        if (sonic->m_pPlayer->m_StateMachine.GetCurrentState()->GetStateName() != "StompingLand" && m_triggered) {
-            m_triggered = false;
-        }
+
+        if (m_detectionCooldown > 0)
+            m_detectionCooldown -= updateInfo.DeltaTime;
+
+        //Sonic::SPadState input = Sonic::CInputState::GetInstance()->GetPadState();
+        //if (input.IsTapped(Sonic::eKeyState_X)) {
+        //    OnReset();
+        //}
     }
     static void registerObject();
 };
