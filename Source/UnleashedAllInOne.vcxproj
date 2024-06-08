@@ -218,6 +218,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="CustomSetObjects\MoonMedal.h" />
     <ClInclude Include="CustomSetObjects\Mykonos\IrremovableMobMykonos.h" />
     <ClInclude Include="CustomSetObjects\Mykonos\Pelican.h" />
+    <ClInclude Include="CustomSetObjects\ObjCamera2D.h" />
     <ClInclude Include="CustomSetObjects\ObjectUtility.h" />
     <ClInclude Include="CustomSetObjects\Paraloop.h" />
     <ClInclude Include="CustomSetObjects\SpeedDownCollision.h" />

@@ -128,6 +128,7 @@
 #include "CustomSetObjects/Holoska/StompingSwitch.h"
 #include "CustomSetObjects/Mykonos/Pelican.h"
 #include "CustomSetObjects/Mykonos/IrremovableMobMykonos.h"
+//#include "CustomSetObjects/ObjCamera2D.h"
 
 //Rest
 #include "Testing/TestingCode.h"

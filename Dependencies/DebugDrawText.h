@@ -77,6 +77,10 @@ public:
         getInstance()->logImpl(text, time, 0, {1, 1, 1, 1});
 #endif
     }
+    static void logRegardless(const char* text, const float time)
+    {
+        getInstance()->logImpl(text, time, 0, { 1, 1, 1, 1 });
+    }
 
     static void log(const char* text)
     {

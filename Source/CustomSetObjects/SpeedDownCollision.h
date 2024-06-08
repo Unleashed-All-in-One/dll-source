@@ -17,6 +17,7 @@ public:
     float m_CollisionLength = 1;
     float m_Speed = 45;
     float m_Range = 10000;
+    bool m_hideUI;
     bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
     {        
         return true;
@@ -31,11 +32,14 @@ public:
 
                 if (in_rMsg.m_SenderActorID == playerContext->m_pPlayer->m_ActorID)
                 {
-                   if(m_ItemBoxUI == nullptr)
-                   {
-                       m_ItemBoxUI = ItemboxUI::Generate(playerContext->m_pPlayer);
-                   }
-                   m_ItemBoxUI->Show(ItemboxType::SpeedDown);
+                    if(!m_hideUI)
+                    {
+                        if (m_ItemBoxUI == nullptr)
+                        {
+                            m_ItemBoxUI = ItemboxUI::Generate(playerContext->m_pPlayer);
+                        }
+                        m_ItemBoxUI->Show(ItemboxType::SpeedDown);	                    
+                    }
                    m_playerInsideCollider = true;
                 }
                 return true;
@@ -46,7 +50,8 @@ public:
 
                 if (in_rMsg.m_SenderActorID == playerContext->m_pPlayer->m_ActorID)
                 {
-                    m_ItemBoxUI->Hide();
+                    if (!m_hideUI)                    
+						m_ItemBoxUI->Hide();
                 }
                 m_playerInsideCollider = false;
                 return true;
@@ -70,13 +75,6 @@ public:
         AddEventCollision("Object", shapeEventTrigger1, *pColID_PlayerEvent, true, m_spNodeEventCollision);
         return true;
     }        
-    void StopParaloop()
-    {
-        const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-        Common::fCGlitterEnd(playerContext, particle, true);
-        particle = nullptr;
-        m_playerInsideCollider = false;
-    }
     void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
     {
         auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
@@ -91,6 +89,7 @@ public:
         in_rEditParam.CreateParamFloat(&m_CollisionLength, "Collision_Length");
         in_rEditParam.CreateParamFloat(&m_CollisionWidth, "Collision_Width");
         in_rEditParam.CreateParamFloat(&m_Speed, "Speed");
+        in_rEditParam.CreateParamBool(&m_hideUI, "IsHideUI");
     }
     static void registerObject();
 };

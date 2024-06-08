@@ -267,12 +267,59 @@ HOOK(void, __fastcall, sub_42A710, 0x0042ABA0, void* This, void* Edx)
 	SequenceHelpers::changeModule(ModuleFlow::Genesis);
 	originalsub_42A710(This, Edx);
 }
+HOOK(int, __fastcall, CHudGateMenuMainIntroInfo, 0x1080110, hh::fnd::CStateMachineBase::CStateBase* This, void* Edx)
+{
+	////Run function first, otherwise scenes won't be gettable
+	auto returne = originalCHudGateMenuMainIntroInfo(This, Edx);
+	auto contextBase = static_cast<int*>(This->GetContextBase());
+	auto stageID = (*(uint8_t*)((int)contextBase + 336));
+	int index = stageID == 0 ? stageID : stageID + 1;
+	auto idArchive = (const char*)((int*)0x015BBA34)[stageID];
+
+	Common::ClampUInt(stageID, 0, Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data.size() - 1);
+	StageManager::NextLevelLoad = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[stageID].levelID.
+		c_str();
+	return returne;
+}
+
+HOOK(char, *_stdcall, StageGate_MoveToOtherStage, 0x107FBC0, int a1)
+{
+	char* returned = originalStageGate_MoveToOtherStage(a1);
+	uint8_t stageID = (*(uint8_t*)(a1 + 336));
+	StageManager::NextLevelLoad = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[stageID].levelID.
+		c_str();
+	return returned;
+}
+
+HOOK(int, __fastcall, CHudGateMenuMainOutro, 0x107B770, hh::fnd::CStateMachineBase::CStateBase* This)
+{
+	StageManager::ActiveReplacement = true;
+	return originalCHudGateMenuMainOutro(This);
+}
+HOOK(int, __cdecl, sub_7C931F, 0x7C931F, int a1, const char* a2)
+{
+	printf("[CRIWARE Audio 1] %s\n", a2);
+	return originalsub_7C931F(a1, a2);
+}
+
+HOOK(int, __fastcall, sub_7E27B0, 0x7E27B0, char* a1, ...)
+{
+	printf("[CRIWARE Audio 2] %s\n", a1);
+	return originalsub_7E27B0(a1);
+}
+HOOK(int, __fastcall, UVAnimStart, 0x007597E0, Sonic::CGameObject* This, void* Edx, int a2,
+	Hedgehog::Base::CSharedString* modelName, int flag)
+{
+	printf("\nLoaded UV-Anim: %s", modelName->c_str());
+	return originalUVAnimStart(This, Edx, a2, modelName, flag);
+}
 void TestingCode::applyPatches()
-{	
-	//Get rid of mission icons and pamsettings permanently (in theory)
-	WRITE_JUMP(0x0107EAF8, 0x0107EB8F);
+{		
+	//INSTALL_HOOK(sub_7C931F);
+	INSTALL_HOOK(sub_7E27B0);
 	INSTALL_HOOK(sub_E8F330);
 	INSTALL_HOOK(A51CD0);
+	INSTALL_HOOK(UVAnimStart);
 	//
 	//INSTALL_HOOK(sub_42A710);
 	//INSTALL_HOOK(OpenStage);

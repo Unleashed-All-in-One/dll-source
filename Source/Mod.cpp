@@ -4,7 +4,7 @@ extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 	Project::load(modInfo->CurrentMod->Path);
 	//Make Gens support 4gb+
 	if(Project::use4gbMode)
-	modInfo->API->SendMessageToLoader(ML_MSG_REQ_LARGE_ADDRESS_AWARE, nullptr);
+		modInfo->API->SendMessageToLoader(ML_MSG_REQ_LARGE_ADDRESS_AWARE, nullptr);
 }
 
 std::string getDirectoryPath(const std::string& path)
@@ -12,27 +12,13 @@ std::string getDirectoryPath(const std::string& path)
 	const size_t pos = path.find_last_of("\\/");
 	return path.substr(0, pos != std::string::npos ? pos : 0);
 }
-void __declspec(naked) ASMTest()
-{
-	static uint32_t retn = 0x011031E4;
-	__asm
-	{
-		mov[esp + 34h + -1Ch], 0
-		jmp[retn]
-	}
-}
 
-//void __thiscall sub_B1F080(_DWORD *this, int *a2, Hedgehog::Base::SSymbolNode *a3, int a4)
-//HOOK(void, __fastcall, moviedisp, 0xB1F080, void* This, void* Edx, void* a2, Hedgehog::Base::SSymbolNode* a3, int a4)
-//{
-//	return;
-//}
-// uint32_t __thiscall sub_EB2A80(_DWORD *this, int a2, int a3, int a4)
 extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 {
 #if _DEBUG
 	MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
 #endif
+
 	// Set random seed
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 	std::string path =  std::string(modInfo->CurrentMod->Path);
@@ -46,7 +32,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	EnemyTrigger::applyPatches();
 	LetterboxHelper::initialize(1280, 720);
 	MiniAudioHelper::initialize(path.c_str());
-	//DiscordStatus::initialize();
+	DiscordStatus::initialize();
 	SequenceHelpers::applyPatches();
 	ImguiInitializer::initialize();
 	Context::setModDirectoryPath(getDirectoryPath(modInfo->CurrentMod->Path));
@@ -81,7 +67,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	Icicle::registerObject();
 	Pelican::registerObject();
 	IrremovableMobMykonos::registerObject();
-	StompingSwitch::registerObject();
+	//CObjCamera2D::registerObject();
 
 	//---------------UI---------------
 	Title::applyPatches();
@@ -96,7 +82,6 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	// Right now, exiting from Options will cause a crash due to the saving/loading in the WorldMap.
 	TitleOption::applyPatches();
 	TestingCode::applyPatches();
-	WRITE_JUMP(0x011031DC, ASMTest);
 }
 
 extern "C" __declspec(dllexport) void PostInit()
@@ -125,7 +110,7 @@ extern "C" void __declspec(dllexport) OnFrame()
 	//---------------System---------------
 	ImguiInitializer::update();
 	CSDCommon::update();
-	//DiscordStatus::update();
+	DiscordStatus::update();
 	StageManager::update();
 	EventViewer::update();
 }

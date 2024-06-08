@@ -41,7 +41,7 @@ public:
 		return dataOut;
 	}
 
-	void UpdateState(std::string in_StageID, int actNumber, int subIndex, int worldIndex)
+	void UpdateState(const std::string& in_StageID, int actNumber, int subIndex, int worldIndex)
 	{
 		auto saveObj = SaveManager::getCurrentSave();
 		int index = saveObj->getStageDataIndexFromID(in_StageID);

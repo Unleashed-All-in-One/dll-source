@@ -10,6 +10,7 @@ float m_timerFade;
 float expProgress = 0.0f; // can u make this saveable :happi:
 float expProgressPrevious = 0.0f; // can u make this saveable :happi:
 int expLevel = 0; // can u make this saveable :happi:
+float maxExpProgress;
 
 void CreateScreenEXP(Sonic::CGameObject* pParentGameObject)
 {
@@ -56,6 +57,7 @@ HOOK(void, __fastcall, CHudSonicStageDelayProcessImpEXP, 0x109A8D0, Sonic::CGame
 	}
 	if (expLevel > 99)
 		expLevel = 99;
+	maxExpProgress = 22 + (11 * expLevel);
 	CreateScreenEXP(This);
 }
 void EXPCollect::addProgress(float progress)
@@ -93,7 +95,15 @@ HOOK(void, __fastcall, HudSonicEXPUpdate, 0x1098A50, Sonic::CGameObject* This, v
 	}
 	else
 	{
-		CSDCommon::PlayAnimation(*exp_count, "size", Chao::CSD::eMotionRepeatType_PlayOnce, 1, Common::LerpFloat(expProgressPrevious, expProgress, m_timerFade <= 2 ? m_timerFade / 2 : 1));
+		float progress = Common::LerpFloat(expProgressPrevious, expProgress, m_timerFade <= 2 ? m_timerFade / 2 : 1);
+		if(progress / maxExpProgress > 1)
+		{
+			expLevel++;
+			expProgressPrevious = 0;
+			expProgress = maxExpProgress - progress;
+			progress = 0;
+		}
+		CSDCommon::PlayAnimation(*exp_count, "size", Chao::CSD::eMotionRepeatType_PlayOnce, 1, (progress / maxExpProgress) * 100);
 		CSDCommon::FreezeMotion(*exp_count, expProgress);
 		CSDCommon::PlayAnimation(*exp_count, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, frameBefore + 1);		
 	}

@@ -611,7 +611,7 @@ HOOK(int*, __fastcall, StartModule, 0x00D77020, DWORD* StorySequence,void* Edx, 
 	}
 	else
 	{
-		if (std::string(exampleRead) == "Stage" || std::string(exampleRead) == "Event")
+		if (std::string(exampleRead) == "Stage" || std::string(exampleRead) == "Event" || std::string(exampleRead) == "StageEvent")
 		{
 			a3 = new LuaStringEntryContainer(_strdup(ModeStrings[2].c_str()));
 		}
@@ -642,7 +642,7 @@ void StageManager::initialize()
 	WRITE_JUMP(0x01080F02, 0x01080FB7);
 	WRITE_JUMP(0xD56CCA, ASM_OverrideStageIDLoading);
 	WRITE_JUMP(0x00B267D0, ASM_SetCorrectStageForCutscene);
-	//WRITE_JUMP(0x00D0E164, ASM_InterceptGameplayFlowLoading);
+	WRITE_JUMP(0x00D0E164, ASM_InterceptGameplayFlowLoading);
 	//INSTALL_HOOK(ModuleStuffTest);
 	INSTALL_HOOK(CStoryImplConstructor);
 	INSTALL_HOOK(CEventSceneStart);
@@ -650,7 +650,7 @@ void StageManager::initialize()
 	INSTALL_HOOK(CGameplayFlowStage_CStateWaitEnd);
 	INSTALL_HOOK(CHudGateMenuMainCStateOutroBegin);
 	INSTALL_HOOK(HudLoading_CHudLoadingCStateOutroBegin);
-	INSTALL_HOOK(StartModule);
+	//INSTALL_HOOK(StartModule);
 
 	//Patch out reading MissionScript to avoid crashes when loading stages without the stgXXX archive name format
 	INSTALL_HOOK(Sonic_Mission_CScriptImpl_SendMissionType);
