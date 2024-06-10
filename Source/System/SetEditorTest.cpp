@@ -108,7 +108,12 @@ HOOK(void*, __fastcall, SetUpdateApplication, 0xE7BED0, void* This, void* Edx, f
 		auto member1 =  Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pSetObjectManager->m_pMember->m_spSetLayerManager;
 		auto paramBank = (uint32_t*)Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pSetObjectManager->m_pMember->m_spParameterBankManager.get();
 		auto a1 = ((uint32_t*)Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pSetObjectManager->m_pMember) + 0x38;
-		FUNCTION_PTR(void, __stdcall, sub_4ECB60, 0x4ECB60, int a1P);
+		auto fo = Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pSetObjectManager->m_pMember->m_spUserIDGroupCategoryManager;
+		auto one =  Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pSetObjectManager->m_pMember->m_spParameterBankManager;
+		auto tw = Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pSetObjectManager->m_pMember->m_spSetLayerManager;
+		auto th = Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pSetObjectManager->m_pMember->m_spSetObjectEventManager;
+
+		/*FUNCTION_PTR(void, __stdcall, sub_4ECB60, 0x4ECB60, int a1P);
 		auto v1 = a1 + 3;
 		sub_4ECB60(*(DWORD*)(a1[4] + 4));
 		*(DWORD*)(v1[1] + 4) = v1[1];
@@ -120,7 +125,7 @@ HOOK(void*, __fastcall, SetUpdateApplication, 0xE7BED0, void* This, void* Edx, f
 		auto a2 = (int)v4;
 		auto fff = *(DWORD*)(v4[4] + 20);
 
-		void* ff2 = *(void**)fff;
+		void* ff2 = *(void**)fff;*/
 		
 
 	}
