@@ -86,6 +86,7 @@
 #include "System/LuaManager.h"
 #include "System/SetEditorTest.h"
 #include "CustomSetObjects/ObjectUtility.h"
+#include "System/CObjCamera.h"
 
 //Debug Menu
 #include "System/DebugMenu/Context.h"
@@ -128,7 +129,7 @@
 #include "CustomSetObjects/Holoska/StompingSwitch.h"
 #include "CustomSetObjects/Mykonos/Pelican.h"
 #include "CustomSetObjects/Mykonos/IrremovableMobMykonos.h"
-//#include "CustomSetObjects/ObjCamera2D.h"
+#include "CustomSetObjects/CObjCamera2D.h"
 
 //Rest
 #include "Testing/TestingCode.h"

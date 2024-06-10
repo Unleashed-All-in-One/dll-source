@@ -1130,7 +1130,6 @@ HOOK(int, __fastcall, Title_GetSelectionIndex, 0x0056FBB0, DWORD* This)
 	return currentTitleIndex;
 }
 
-
 void Title::applyPatches()
 {
 	//Disable loading save at the start

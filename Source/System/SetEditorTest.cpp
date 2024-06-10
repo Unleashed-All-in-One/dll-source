@@ -29,7 +29,7 @@ BB_ASSERT_SIZEOF(MsgDeactivatelayer, 0x14);
 
 
 inline FUNCTION_PTR(char, __thiscall, SetObjectManager_ProcessMessageF, 0x00EB3BE0, DWORD* This, Hedgehog::Universe::Message&, int flag);
-//uint32_t __thiscall sub_EB2A80(_DWORD *this, int a2, int a3, int a4)
+//uint32_t __thiscall sub_EB2A80(DWORD *this, int a2, int a3, int a4)
 HOOK(char, __fastcall, SetObjectManager_ProcessMessage, 0x00EB3BE0, DWORD* This, void* Edx, Hedgehog::Universe::Message& message, int flag)
 {
 	SetManager = This;
@@ -80,6 +80,14 @@ void SetEditorTest::draw()
 	ImGui::End();
 }
 int numb;
+struct CSetLayerManager
+{
+public:
+	Hedgehog::Base::CSharedString* hedgehog__base__csharedstring0;
+	byte gap4[12];
+	Hedgehog::Base::CSharedString* phedgehog__base__csharedstring10;
+};
+
 HOOK(void*, __fastcall, SetUpdateApplication, 0xE7BED0, void* This, void* Edx, float elapsedTime, uint8_t a3)
 {
 	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
@@ -96,10 +104,33 @@ HOOK(void*, __fastcall, SetUpdateApplication, 0xE7BED0, void* This, void* Edx, f
 	}
 	if (GetAsyncKeyState(VK_RIGHT) & 1)
 	{
-		numb++;
+		auto member =  Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pSetObjectManager->m_pMember;
+		auto member1 =  Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pSetObjectManager->m_pMember->m_spSetLayerManager;
+		auto paramBank = (uint32_t*)Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pSetObjectManager->m_pMember->m_spParameterBankManager.get();
+		auto a1 = ((uint32_t*)Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pSetObjectManager->m_pMember) + 0x38;
+		FUNCTION_PTR(void, __stdcall, sub_4ECB60, 0x4ECB60, int a1P);
+		auto v1 = a1 + 3;
+		sub_4ECB60(*(DWORD*)(a1[4] + 4));
+		*(DWORD*)(v1[1] + 4) = v1[1];
+		auto v2 = (DWORD*)a1[4];
+		a1[5] = 0;
+		*(DWORD*)(v1[1] + 8) = v1[1];
+		auto result = (int*)a1[1];
+		auto v4 = (int*)*result;
+		auto a2 = (int)v4;
+		auto fff = *(DWORD*)(v4[4] + 20);
+
+		void* ff2 = *(void**)fff;
+		
+
 	}
 	if (SetManager)
 	{
+		
+
+
+
+		//int* setManagerIntP = 
 		/*auto t = SetManager - 40;
 		auto v2 = *((DWORD*)t + 43);
 		auto v4 = *(DWORD*)(v2 + 80);
@@ -113,6 +144,6 @@ HOOK(void*, __fastcall, SetUpdateApplication, 0xE7BED0, void* This, void* Edx, f
 }
 void SetEditorTest::applyPatches()
 {
-	//INSTALL_HOOK(SetUpdateApplication);
+	INSTALL_HOOK(SetUpdateApplication);
 	INSTALL_HOOK(SetObjectManager_ProcessMessage);
 }

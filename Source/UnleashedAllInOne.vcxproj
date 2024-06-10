@@ -118,6 +118,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CustomSetObjects\CObjCamera2D.cpp" />
     <ClCompile Include="CustomSetObjects\DebugObject.cpp" />
     <ClCompile Include="CustomSetObjects\ETFStageGate.cpp" />
     <ClCompile Include="CustomSetObjects\ETFTimeSwitch.cpp" />
@@ -207,6 +208,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="UI\TitleWorldMapPause.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CustomSetObjects\CObjCamera2D.h" />
     <ClInclude Include="CustomSetObjects\DebugObject.h" />
     <ClInclude Include="CustomSetObjects\ETFStageGate.h" />
     <ClInclude Include="CustomSetObjects\ETFTimeSwitch.h" />
@@ -218,7 +220,6 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="CustomSetObjects\MoonMedal.h" />
     <ClInclude Include="CustomSetObjects\Mykonos\IrremovableMobMykonos.h" />
     <ClInclude Include="CustomSetObjects\Mykonos\Pelican.h" />
-    <ClInclude Include="CustomSetObjects\ObjCamera2D.h" />
     <ClInclude Include="CustomSetObjects\ObjectUtility.h" />
     <ClInclude Include="CustomSetObjects\Paraloop.h" />
     <ClInclude Include="CustomSetObjects\SpeedDownCollision.h" />
@@ -239,6 +240,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="Gameplay\QSSRestore.h" />
     <ClInclude Include="System\AnimationSetPatcher.h" />
     <ClInclude Include="System\ArchiveTreePatcher.h" />
+    <ClInclude Include="System\CObjCamera.h" />
     <ClInclude Include="System\CrashHandler\CrashHandler.h" />
     <ClInclude Include="System\CrashHandler\MemoryStatus.h" />
     <ClInclude Include="System\CrashHandler\StackTrace.h" />

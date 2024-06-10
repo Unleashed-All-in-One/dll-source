@@ -67,7 +67,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	Icicle::registerObject();
 	Pelican::registerObject();
 	IrremovableMobMykonos::registerObject();
-	//CObjCamera2D::registerObject();
+	BB_INSTALL_SET_OBJECT_MAKE_HOOK(CObjCamera2D);
 
 	//---------------UI---------------
 	Title::applyPatches();
@@ -103,10 +103,16 @@ extern "C" __declspec(dllexport) void PostInit()
 		exit(-1);
 	}
 }
-const char* a3 = "Stage";
+std::string assembled = "##";
+std::vector< boost::shared_ptr<Sonic::CGameObject>> list;
 //char __thiscall Sonic::CSetObjectManager::ProcessMessage(char *this, int a1, int a2
 extern "C" void __declspec(dllexport) OnFrame()
 {
+	if(Sonic::CGameDocument::GetInstance())
+	{
+	}
+	DebugDrawText::log(assembled.c_str(), 0);
+	assembled = "";
 	//---------------System---------------
 	ImguiInitializer::update();
 	CSDCommon::update();
