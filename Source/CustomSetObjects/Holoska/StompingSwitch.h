@@ -26,6 +26,8 @@ public:
 
     SharedPtrTypeless m_ButtonSoundHandle;
     SharedPtrTypeless m_ActivationSoundHandle;
+    uint32_t m_Test;
+    uint32_t extra;
 
     int m_phase = 0;
 
@@ -160,6 +162,9 @@ public:
         //if (input.IsTapped(Sonic::eKeyState_X)) {
         //    OnReset();
         //}
+    }
+    void InitializeEditParam(Sonic::CEditParam& in_rEditParam) override
+    {       
     }
     static void registerObject();
 };

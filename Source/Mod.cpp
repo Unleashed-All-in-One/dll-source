@@ -67,6 +67,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	Icicle::registerObject();
 	Pelican::registerObject();
 	IrremovableMobMykonos::registerObject();
+	StompingSwitch::registerObject();
 	BB_INSTALL_SET_OBJECT_MAKE_HOOK(CObjCamera2D);
 
 	//---------------UI---------------

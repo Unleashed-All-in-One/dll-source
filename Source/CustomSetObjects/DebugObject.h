@@ -27,6 +27,7 @@ public:
 	int m_setColliderLength;
 	bool m_setRotation90Snap;
 	int m_setModelType;
+	uint32_t m_Test;
 
 	//## Pole Variables
 	bool m_playerInsideCollider;
@@ -50,6 +51,7 @@ public:
 	bool isLeftStickUpPressed = false;
 	bool isAPressed = false;
 	SharedPtrTypeless soundClimb;
+
 	PoleStyle poleTypes[1] = { PoleStyle("evl_myk_obj_soc_dialopleAaTop_000", "evl_myk_obj_soc_dialopleAaMid5m_000", "evl_myk_obj_soc_dialopleAaBtm_000") };
 	bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
 	{
@@ -321,8 +323,8 @@ public:
 			playerContext->m_spMatrixNode->m_Transform.m_Position = ObjectUtility::MoveAroundPivot(playerContext->m_spMatrixNode->m_Transform.m_Position, m_spMatrixNodeTransform->m_Transform.m_Position, Hedgehog::math::CVector(m_playerPoleRotation, 0, m_playerPoleRotation));
 			
 		}
-
 	}
+
 	void InitializeEditParam(Sonic::CEditParam& in_rEditParam) override
 	{
 		in_rEditParam.CreateParamInt(&m_setColliderLength, "Length");
