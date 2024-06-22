@@ -13,7 +13,7 @@ public:
 	SharedPtrTypeless sound;
 	std::vector<NewAnimationData> animations;
 	float timer;
-	bool isRight;
+	bool isRight = true;
 	bool hasScared = false;
 	bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
 	{

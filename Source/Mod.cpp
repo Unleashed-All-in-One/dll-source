@@ -106,14 +106,11 @@ extern "C" __declspec(dllexport) void PostInit()
 }
 std::string assembled = "##";
 std::vector< boost::shared_ptr<Sonic::CGameObject>> list;
+
 //char __thiscall Sonic::CSetObjectManager::ProcessMessage(char *this, int a1, int a2
 extern "C" void __declspec(dllexport) OnFrame()
 {
-	if(Sonic::CGameDocument::GetInstance())
-	{
-	}
-	DebugDrawText::log(assembled.c_str(), 0);
-	assembled = "";
+	WRITE_MEMORY(0x1E5E438, int, 1);
 	//---------------System---------------
 	ImguiInitializer::update();
 	CSDCommon::update();
