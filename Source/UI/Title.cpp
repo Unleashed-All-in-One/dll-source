@@ -359,8 +359,10 @@ HOOK(void, __fastcall, Title_CMain_CState_SelectMenuBegin, 0x572750, hh::fnd::CS
 	}
 	TitleStateContextBase = This->GetContextBase();
 }
+
 HOOK(int, __fastcall, Title_CMain, 0x0056FBE0, Sonic::CGameObject* This, void* Edx, int a2, int a3, void** a4)
 {
+
 	CTitleRemoveCallback(This, nullptr, nullptr);
 	Title::setScrollDirection(true);
 	Sonic::CCsdDatabaseWrapper wrapper(This->m_pMember->m_pGameDocument->m_pMember->m_spDatabase.get());

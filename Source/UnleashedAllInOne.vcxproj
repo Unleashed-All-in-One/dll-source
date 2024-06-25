@@ -163,6 +163,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="System\DebugMenu\imgui.cpp" />
     <ClCompile Include="System\DebugMenu\ImguiManager.cpp" />
     <ClCompile Include="System\DebugMenu\ImGuiTheme.cpp" />
+    <ClCompile Include="System\DebugMenu\ImGuizmo.cpp" />
     <ClCompile Include="System\DebugMenu\imgui_demo.cpp" />
     <ClCompile Include="System\DebugMenu\imgui_draw.cpp" />
     <ClCompile Include="System\DebugMenu\imgui_impl_dx11.cpp" />
@@ -253,6 +254,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="System\DebugMenu\imgui.h" />
     <ClInclude Include="System\DebugMenu\ImguiManager.h" />
     <ClInclude Include="System\DebugMenu\ImGuiTheme.h" />
+    <ClInclude Include="System\DebugMenu\ImGuizmo.h" />
     <ClInclude Include="System\DebugMenu\imgui_impl_dx11.h" />
     <ClInclude Include="System\DebugMenu\imgui_impl_dx9.h" />
     <ClInclude Include="System\DebugMenu\imgui_impl_win32.h" />

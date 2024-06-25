@@ -147,6 +147,10 @@ void CallBoostGuide()
 }
 void CallQuickstepGuide()
 {
+	if (!spQTE)
+		HudButtonGuide::spawn(Sonic::Player::CPlayerSpeedContext::GetInstance()->m_pPlayer, HudButtonGuide::BUTTON_LEFTBUMPER, HudButtonGuide::QUICKSTEP_BOTH);
+	else
+		HudButtonGuide::configure(HudButtonGuide::BUTTON_LEFTBUMPER, HudButtonGuide::QUICKSTEP_BOTH);
 }
 void __fastcall CHudSonicStageRemoveCallbackQTE(Sonic::CGameObject* This, void*, Sonic::CGameDocument* pGameDocument)
 {

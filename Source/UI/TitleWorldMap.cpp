@@ -71,6 +71,23 @@ bool TitleWorldMap::Active = false;
 float multiplierRotationLight = 0.1f;
 
 hh::math::CQuaternion rotationEarth;
+namespace Sonic
+{
+	class CParticleManager : public Sonic::CGameObject
+	{
+	public:
+		BB_INSERT_PADDING(0x40 + 0xAC) {};
+
+		CParticleManager()
+		{
+			*reinterpret_cast<size_t*>(this) = 0x016CFF90;
+			*reinterpret_cast<size_t*>(static_cast<CMessageActor*>(this)) = 0x016CFFC8;
+		}
+
+		BB_OVERRIDE_FUNCTION_PTR(void, CGameObject, AddCallback, 0xE8F330, (const Hedgehog::Base::THolder<Sonic::CWorld>&, in_rWorldHolder),
+			(Sonic::CGameDocument*, in_pGameDocument), (const boost::shared_ptr<Hedgehog::Database::CDatabase>&, in_spDatabase))
+	};
+}
 
 void CreateParticleController(boost::shared_ptr<Sonic::CGameObject>& a1)
 {
@@ -94,6 +111,8 @@ class CTitleGameObject : public Sonic::CGameObject3D
 	float m_LifeTime;
 	float m_DistTravelled;
 	const char* name;
+	SharedPtrTypeless handle;
+	boost::shared_ptr<Sonic::CParticleManager> m_spParticleManager;
 
 public:
 	CTitleGameObject(const CVector& _Position, const char* _Name)
@@ -112,7 +131,22 @@ public:
 			destructorFunc(m_GlitterPlayer, nullptr, true);
 		}
 	}
+	//void fpAddParticle5(boost::shared_ptr<Sonic::CParticleManager> manager, SharedPtrTypeless& handle, void* node, const hh::base::CSharedString& name, uint32_t flag)
+	//{
+	//	uint32_t func = 0x00E8F8A0;
+	//	__asm
+	//	{
+	//		push flag
+	//		push name
+	//		push node
+	//		push handle
+	//		mov eax, manager
+	//		call func
+	//	};
+	//};
 
+	//_DWORD *__stdcall AddRenderableToWorld(int world, int category, boost::Hedgehog::Mirage::CRenderable *renderable
+	inline static FUNCTION_PTR(DWORD*, __stdcall, AddRenderableToWorld, 0xD4E3C0, int* world, int category, boost::shared_ptr<Hedgehog::Mirage::CRenderable>* renderable);
 	void AddCallback
 	(
 		const Hedgehog::Base::THolder<Sonic::CWorld>& worldHolder,
@@ -138,15 +172,21 @@ public:
 		FUNCTION_PTR(int, __thiscall, UVAnimStartM, 0x007597E0, Sonic::CGameObject * This, void* Edx, int a2,
 			Hedgehog::Base::CSharedString * modelName, int flag);
 
+		m_spParticleManager = boost::make_shared<Sonic::CParticleManager>();
+		Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager = m_spParticleManager;
+		Sonic::CGameDocument::GetInstance()->m_pMember->m_pParticleManager = Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager.get();
+		Sonic::CApplicationDocument::GetInstance()->AddMessageActor("GameObject", m_spParticleManager.get());
+		Sonic::CGameDocument::GetInstance()->AddGameObject(m_spParticleManager);
+
 		Sonic::CApplicationDocument::GetInstance()->AddMessageActor("GameObject", this);
 		pGameDocument->AddUpdateUnit("0", this);
-
+		//AddRenderableToWorld((int*)Sonic::CGameDocument::GetInstance()->GetWorld().get().get(), *(int*)0x01E66C4C, (boost::shared_ptr<Hedgehog::Mirage::CRenderable>*)(m_spParticleManager.get() + 45));
 		m_spModel = boost::make_shared<hh::mr::CSingleElement>(
 			hh::mr::CMirageDatabaseWrapper(spDatabase.get()).GetModelData(name));
 
-
 		AddRenderable("Object", m_spModel, false);
-		Common::ObjectCGlitterPlayerOneShot(this, "worldmap_sun");
+
+		//fpAddParticle5(Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager.get(), handle, nullptr, "worldmap_sun", 0);
 	}
 
 	void UpdateParallel

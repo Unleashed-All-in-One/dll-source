@@ -83,6 +83,12 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	// Right now, exiting from Options will cause a crash due to the saving/loading in the WorldMap.
 	TitleOption::applyPatches();
 	TestingCode::applyPatches();
+
+	
+	WRITE_MEMORY(0x1AD99D0, char*, "shader_debug.ar");
+	WRITE_MEMORY(0x1AD99D4, char*, "shader_debug_add.ar");
+	WRITE_MEMORY(0x1AD99E8, char*, "shader_debug.arl");
+	WRITE_MEMORY(0x1AD99EC, char*, "shader_debug_add.arl");
 }
 
 extern "C" __declspec(dllexport) void PostInit()
@@ -110,7 +116,7 @@ std::vector< boost::shared_ptr<Sonic::CGameObject>> list;
 //char __thiscall Sonic::CSetObjectManager::ProcessMessage(char *this, int a1, int a2
 extern "C" void __declspec(dllexport) OnFrame()
 {
-	WRITE_MEMORY(0x1E5E438, int, 1);
+	//WRITE_MEMORY(0x1E5E438, int, 1);
 	//---------------System---------------
 	ImguiInitializer::update();
 	CSDCommon::update();
