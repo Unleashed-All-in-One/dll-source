@@ -1,5 +1,38 @@
 DWORD* SetManager;
-
+struct MultiSetParam
+{
+	BB_INSERT_PADDING(0x4);
+	BYTE m_Field04;
+	BYTE m_Field05;
+	BYTE m_Field06;
+	BYTE m_Field07;
+	BYTE m_Field08;
+	int m_Field09;
+	void* m_Field16;
+	BYTE gap8[4];
+	hh::map<Hedgehog::Base::CSharedString*, boost::shared_ptr<void*>> map;
+	boost::shared_ptr<void*> m_Unknown; //not a shared ptr, struct of some kind
+};
+BB_ASSERT_OFFSETOF(MultiSetParam, m_Field16, 0x10);
+BB_ASSERT_OFFSETOF(MultiSetParam, map, 0x18);
+struct SSetObjectCreationInfo
+{
+	Eigen::Vector3f m_Position;
+	float m_UnknownFloat; // Always 2.0????
+	Hedgehog::Math::CQuaternion m_Rotation;
+	Hedgehog::Base::CSharedString m_Name;
+	int m_Field024;
+	MultiSetParam* m_MultiSetParam;
+	Sonic::CEditParam* m_EditParam;
+	float m_Range;
+	int m_Field034;
+	int m_Field038;
+	int m_LayerID;
+	int m_Field040;
+	int m_Field044;
+	int m_Field048;
+	int m_Field04C;
+};
 inline FUNCTION_PTR(char, __thiscall, SetObjectManager_ProcessMessageF, 0x00EB3BE0, DWORD* This, Hedgehog::Universe::Message&, int flag);
 //uint32_t __thiscall sub_EB2A80(DWORD *this, int a2, int a3, int a4)
 HOOK(char, __fastcall, SetObjectManager_ProcessMessage, 0x00EB3BE0, DWORD* This, void* Edx, Hedgehog::Universe::Message& message, int flag)
@@ -24,10 +57,6 @@ void SetEditorTest::deactivateLayer(const char* m_SetLayerName)
 }
 bool showSetTest = false;
 std::string nameLayer;
-std::vector<boost::shared_ptr<Sonic::CGameObject>> vec1;
-std::vector<Sonic::CGameObject3D*> vec2;
-int selectedIndex;
-int objectCategory;
 float objectMatrix[1][16] = {
   { 1.f, 0.f, 0.f, 0.f,
 	0.f, 1.f, 0.f, 0.f,
@@ -50,12 +79,16 @@ static const char* getTypeName(const void* object)
 		return "invalid";
 	}
 }
-Sonic::CGameObject3D* go3D;
-bool parsedGOInfo;
-bool inherits3D;
-static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
+
+std::vector<Sonic::CGameObject3D*> m_GameObject3Ds;
+int selectedIndex;
+int objectCategory;
+Sonic::CGameObject3D* m_CurrentObjectSelected;
+bool m_HasParsedObjectInfo;
+bool m_IsSelectedGameObject3D;
+static ImGuizmo::OPERATION m_CurrentGizmoOperation(ImGuizmo::ROTATE);
 static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
-bool shift;
+bool m_IsButtonBeingPressed;
 float previewCubeTranslation[3];
 float previewCubeRotation[3];
 float previewCubeScale[3];
@@ -64,137 +97,123 @@ void DisplayGizmo(boost::shared_ptr<Sonic::CCamera> camera, float* data)
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
 	float* transformMatrixData = data;
-	if (ImGuizmo::Manipulate(camera->m_MyCamera.m_View.data(), camera->m_MyCamera.m_Projection.data(), mCurrentGizmoOperation, mCurrentGizmoMode, transformMatrixData, NULL, NULL, NULL))
+	if (ImGuizmo::Manipulate(camera->m_MyCamera.m_View.data(), camera->m_MyCamera.m_Projection.data(), m_CurrentGizmoOperation, mCurrentGizmoMode, transformMatrixData, NULL, NULL, NULL))
 	{
-		go3D->m_spMatrixNodeTransform->m_Transform.m_Matrix = Eigen::Map<const Eigen::Matrix4f>(transformMatrixData);
-		go3D->m_spMatrixNodeTransform->NotifyChanged();
+		m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Matrix = Eigen::Map<const Eigen::Matrix4f>(transformMatrixData);
+		m_CurrentObjectSelected->m_spMatrixNodeTransform->NotifyChanged();
 
 	}
 }
-
-void SetEditorTest::draw()
+void LayerWindow()
 {
-	ImGui::SetNextWindowBgAlpha(1);
-	ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar;
-	const auto camera = Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera();
-
-	if(showSetTest)
+	if (showSetTest)
 	{
 		auto layerMap = Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pSetObjectManager->m_pMember->m_spSetLayerManager->m_mSetLayers;
-		
 		ImGui::SetNextWindowSize({ 480, 980 }, ImGuiCond_Always);
 		ImGui::SetNextWindowPos({ 20, 2160 - 1000 }, ImGuiCond_Always);
 		if (showSetTest && ImGui::Begin("title###Layermenu", &showSetTest, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse))
 		{
-			/// @separator
-
-			// TODO: Add Draw calls of dependent popup windows here
-
-			/// @begin Text
 			ImGui::Dummy(ImVec2(1, 1));
 			ImGui::Indent(1 * ImGui::GetStyle().IndentSpacing / 2);
 			ImGui::TextUnformatted("Layer Shortcuts");
-			/// @end Text
 
-			/// @begin Text
 			ImGui::Indent(2 * ImGui::GetStyle().IndentSpacing / 2);
 			auto firstValue = layerMap.at(0);
 			ImGui::TextUnformatted(std::format("Current Layer : {}", firstValue->m_LayerName.c_str()).c_str());
-			/// @end Text
-
-			/// @begin Text
+			
 			ImGui::TextUnformatted("---------------------------------------------------------");
-			/// @end Text
 			
 			for (auto it = layerMap.begin(); it != layerMap.end(); ++it)
 			{
 
 				char buffer[4];
 				sprintf(buffer, "%02d", it->first);
-				/// @begin Text
 				ImGui::TextUnformatted(buffer);
-				/// @end Text
-
-				/// @begin Text
 				ImGui::SameLine(0, 5 * ImGui::GetStyle().ItemSpacing.x);
 				ImGui::TextUnformatted("ON");
-				/// @end Text
-
-				/// @begin Text
 				ImGui::SameLine(0, 3 * ImGui::GetStyle().ItemSpacing.x);
 				ImGui::TextUnformatted(it->second->m_LayerName.c_str());
-				/// @end Text
 			}
-
-			/// @separator
 			ImGui::End();
 		}
-		
 	}
-	vec1 = std::vector(Sonic::CGameDocument::GetInstance()->m_pMember->m_GameObjects.begin(), Sonic::CGameDocument::GetInstance()->m_pMember->m_GameObjects.end());
-	for (int i = 0; i < vec1.size(); ++i)
-	{
-		if (dynamic_cast<Sonic::CGameObject3D*>(vec1[i].get()) != nullptr)
-			vec2.push_back(dynamic_cast<Sonic::CGameObject3D*>(vec1[i].get()));
-	}
+}
+hh::math::CVector4 ScreenToWorld(const hh::math::CVector4& screenPos, const boost::shared_ptr<Sonic::CCamera>& camera) {
+	float normalizedX = ((screenPos.x() )  / ImGui::GetIO().DisplaySize.x);
+	float normalizedY = (-screenPos.y() / ImGui::GetIO().DisplaySize.y);
+
+	// Homogeneous coordinates
+	Eigen::Vector4f normalizedScreenPos(normalizedX, normalizedY, 1.0f, 1.0f);
+
+	// Step 2: Inverse Projection Transformation
+	Eigen::Matrix4f inverseProjectionMatrix = camera->m_MyCamera.m_Projection.inverse();
+	Eigen::Vector4f viewPos = inverseProjectionMatrix * normalizedScreenPos;
+
+	// Step 3: De-homogenize (reverse the perspective divide)
+	viewPos /= viewPos.w();
+
+	// Step 4: Inverse View Transformation
+	Eigen::Matrix4f inverseViewMatrix = camera->m_MyCamera.m_View.inverse().matrix();
+	Eigen::Vector4f worldDirection = inverseViewMatrix * viewPos;
+
+	// Normalize direction
+	worldDirection -= CVector4(camera->m_Position.x(), camera->m_Position.y(), camera->m_Position.z(), 1);
+	worldDirection.normalize();
+
+	return worldDirection;
+}
+
+std::vector< SSetObjectCreationInfo*> creationInfos;
+void SetEditorTest::draw()
+{
+	ImGui::SetNextWindowBgAlpha(1);
+	ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar;
+	const boost::shared_ptr<Sonic::CCamera> camera = Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera();
+
+	LayerWindow();
+	
 	if (ImGui::Begin("GameObject List"))
 	{
-
-		ImGui::Text("Index: %d", selectedIndex);
-		if (ImGui::CollapsingHeader("GameObjects (3D)"))
+		if (ImGui::CollapsingHeader("GameObjects", true))
 		{
-			for (int i = 0; i < vec1.size(); ++i)
-			{				
-				ImGui::PushID(i + 100);
-				if (ImGui::Selectable(getTypeName(vec1[i].get()), false, ImGuiSelectableFlags_None))
-				{
-					selectedIndex = i;
-					parsedGOInfo = false;
-					inherits3D = false;
-					objectCategory = 0;
-				}
-				ImGui::PopID();				
-			}
-		}
-		if (ImGui::CollapsingHeader("GameObjects (3D)"))
-		{
-			for (int i = 0; i < vec2.size(); ++i)
+			ImGui::Text("Index: %d", selectedIndex);
+			int index = 0;
+			for (boost::shared_ptr<Sonic::CGameObject> data : Sonic::CGameDocument::GetInstance()->m_pMember->m_GameObjects)
 			{
+				if (dynamic_cast<Sonic::CGameObject3D*>(data.get()) != nullptr)
+					m_GameObject3Ds.push_back(dynamic_cast<Sonic::CGameObject3D*>(data.get()));
 
-				ImGui::PushID(i + 200);
-				if (ImGui::Selectable(getTypeName(vec2[i]), false, ImGuiSelectableFlags_None))
+				index++;
+				ImGui::PushID(index+100);
+				if (ImGui::Selectable(getTypeName(data.get()), false, ImGuiSelectableFlags_None))
 				{
-					selectedIndex = i;
-					parsedGOInfo = false;
-					inherits3D = true;
-					objectCategory = 1;
-				}
-				if (ImGui::IsItemHovered())
-				{
-					previewCubeTranslation[0] = vec2[i]->m_spMatrixNodeTransform->m_Transform.m_Position.x();	
-					previewCubeTranslation[1] = vec2[i]->m_spMatrixNodeTransform->m_Transform.m_Position.y();	
-					previewCubeTranslation[2] = vec2[i]->m_spMatrixNodeTransform->m_Transform.m_Position.z();
-
-					previewCubeRotation[0] = vec2[i]->m_spMatrixNodeTransform->m_Transform.m_Rotation.x();
-					previewCubeRotation[1] = vec2[i]->m_spMatrixNodeTransform->m_Transform.m_Rotation.y();
-					previewCubeRotation[2] = vec2[i]->m_spMatrixNodeTransform->m_Transform.m_Rotation.z();
-
-					previewCubeScale[0] = 1;
-					previewCubeScale[1] = 1;
-					previewCubeScale[2] = 1;
-
-					float matrix = 0;
-					//ImGuizmo::RecomposeMatrixFromComponents(previewCubeTranslation, previewCubeRotation, previewCubeScale,&matrix);
-
-					//ImGuizmo::DrawCubes(camera->m_MyCamera.m_View.data(), camera->m_MyCamera.m_Projection.data(), &matrix, 1);
-					DisplayGizmo(camera, vec2[i]->m_spMatrixNodeTransform->m_Transform.m_Matrix.data());
+					selectedIndex = index;
+					m_HasParsedObjectInfo = false;
+					m_IsSelectedGameObject3D = false;
+					objectCategory = 0;
 				}
 				ImGui::PopID();
 			}
 		}
-	
-
-		/// @separator
+		if (ImGui::CollapsingHeader("GameObjects (3D)", true))
+		{
+			for (int i = 0; i < m_GameObject3Ds.size(); ++i)
+			{
+				ImGui::PushID(i + 200);
+				if (ImGui::Selectable(getTypeName(m_GameObject3Ds[i]), false, ImGuiSelectableFlags_None))
+				{
+					selectedIndex = i;
+					m_HasParsedObjectInfo = false;
+					m_IsSelectedGameObject3D = true;
+					objectCategory = 1;
+				}
+				if (ImGui::IsItemHovered())
+				{
+					DisplayGizmo(camera, m_GameObject3Ds[i]->m_spMatrixNodeTransform->m_Transform.m_Matrix.data());
+				}
+				ImGui::PopID();
+			}
+		}
 		ImGui::End();
 	}
 	if (ImGui::Begin("Inspector"))
@@ -202,55 +221,85 @@ void SetEditorTest::draw()
 
 		ImGui::Text("Index: %d", selectedIndex);
 
-		if(vec1.size() > selectedIndex)
+		if(Sonic::CGameDocument::GetInstance()->m_pMember->m_GameObjects.size() > selectedIndex || m_GameObject3Ds.size() > selectedIndex)
 		{
-			if(!parsedGOInfo)
+			if(!m_HasParsedObjectInfo)
 			{
-				parsedGOInfo = true;
-				if (objectCategory == 0)
+				m_HasParsedObjectInfo = true;
+				if (objectCategory == 0) //non 3d objects
 				{
-					if (dynamic_cast<Sonic::CGameObject3D*>(vec1[selectedIndex].get()) != nullptr)
+					hh::list<boost::shared_ptr<Sonic::CGameObject>>::iterator iterator = Sonic::CGameDocument::GetInstance()->m_pMember->m_GameObjects.begin();
+					std::advance(iterator, selectedIndex);
+					if (dynamic_cast<Sonic::CGameObject3D*>(iterator->get()) != nullptr)
 					{
 						//init tool preview
-						go3D = dynamic_cast<Sonic::CGameObject3D*>(vec1[selectedIndex].get());
-						inherits3D = true;
+						m_CurrentObjectSelected = dynamic_cast<Sonic::CGameObject3D*>(iterator->get());
+						m_IsSelectedGameObject3D = true;
 					}
 					else
-						inherits3D = false;
+						m_IsSelectedGameObject3D = false;
 				}
-				else
+				else //3d objects
 				{
-					inherits3D = true;
-					go3D = vec2[selectedIndex];
-					
+					m_IsSelectedGameObject3D = true;
+					m_CurrentObjectSelected = m_GameObject3Ds[selectedIndex];					
 				}
 				
 			}
-			if(parsedGOInfo && inherits3D)
+			if(m_HasParsedObjectInfo && m_IsSelectedGameObject3D)
 			{
 				if (ImGui::CollapsingHeader("Transform"))
 				{
-					auto& position1 = go3D->m_spMatrixNodeTransform->m_Transform.m_Position;
-					hh::math::CVector4 screenPosition = camera->m_MyCamera.m_View * hh::math::CVector4(position1.x(), position1.y(), position1.z(), 1.0f);
-					screenPosition = camera->m_MyCamera.m_Projection * screenPosition;
-					screenPosition.head<2>() /= screenPosition.w();
-					screenPosition.x() = ((screenPosition.x() * 0.5f) * (LetterboxHelper::OriginalResolution->x()));
-					screenPosition.y() = (screenPosition.y() * -0.5f) * (LetterboxHelper::OriginalResolution->y());
-					if (GetAsyncKeyState(VK_MBUTTON) < 0 && shift == false)
+					
+					if (GetAsyncKeyState(VK_MBUTTON) < 0 && m_IsButtonBeingPressed == false)
 					{
-						shift = true;
-						if (mCurrentGizmoOperation == ImGuizmo::TRANSLATE)
-							mCurrentGizmoOperation = ImGuizmo::ROTATE;
+						m_IsButtonBeingPressed = true;
+						if (m_CurrentGizmoOperation == ImGuizmo::TRANSLATE)
+							m_CurrentGizmoOperation = ImGuizmo::ROTATE;
 						else
-							mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+							m_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
 					}
-					if (GetAsyncKeyState(VK_MBUTTON) == 0 && shift == true)
+					if (GetAsyncKeyState(VK_MBUTTON) == 0 && m_IsButtonBeingPressed == true)
 					{
-						shift = false;
+						m_IsButtonBeingPressed = false;
 					}
-					//if (GetAsyncKeyState(VK_LBUTTON) < 0 && shift == false)
+					if (GetAsyncKeyState(VK_LBUTTON) < 0 && m_IsButtonBeingPressed == false)
+					{
+						m_IsButtonBeingPressed = true;
+						auto e = ScreenToWorld(CVector4(ImGui::GetMousePos().x , ImGui::GetMousePos().y, 0, 1), camera);
+						CVector4 fOut;
+						CVector4 fOut2;
+						const CVector4 startPos = CVector4(camera->m_Position.x() + e.x(), camera->m_Position.y() + e.y(), camera->m_Position.z() + e.z(), 1);
+						//e = e.normalized();
+						CVector rightVector = camera->m_MyCamera.m_View.matrix().block<3, 1>(0, 0).normalized();
+						const CVector4 endPos = CVector4(e.x(), e.y(), e.z(), 1) * 1000;
+						Eigen::Vector4f rayDirection = CVector4(camera->m_MyCamera.m_Direction.normalized().x(), camera->m_MyCamera.m_Direction.normalized().y(), camera->m_MyCamera.m_Direction.normalized().z(), 1);
+
+						// Construct the ray end position
+						//Eigen::Vector4f rayEndPos = (e * rayDirection) * 1000.0f;
+						if(Common::fRaycast(startPos, startPos + rayDirection * 1000.0f, fOut, fOut2, *pColID_BasicTerrain))
+						{
+							m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.SetPosition(CVector(fOut.x(), fOut.y(), fOut.z()));
+							m_CurrentObjectSelected->m_spMatrixNodeTransform->NotifyChanged();
+							DebugDrawText::log(std::format("HIT: {0}, {1}, {2}", fOut.x(), fOut.y(), fOut.z()).c_str(), 0);
+							DebugDrawText::log(std::format("SCREEN TO WORLD POS: {0}, {1}, {2}", e.x(), e.y(), e.z()).c_str(), 0);
+							DebugDrawText::log(std::format("END RAY: {0}, {1}, {2}", endPos.x(), endPos.y(), endPos.z()).c_str(), 0);
+						}
+					}
+					if (GetAsyncKeyState(VK_LBUTTON) == 0 && m_IsButtonBeingPressed == true)
+					{
+						m_IsButtonBeingPressed = false;
+					}
+					//auto& position1 = m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position;
+					//hh::math::CVector4 screenPosition = camera->m_MyCamera.m_View * hh::math::CVector4(position1.x(), position1.y(), position1.z(), 1.0f);
+					//screenPosition = camera->m_MyCamera.m_Projection * screenPosition;
+					//screenPosition.head<2>() /= screenPosition.w();
+					//screenPosition.x() = ((screenPosition.x() * 0.5f) * (LetterboxHelper::OriginalResolution->x()));
+					//screenPosition.y() = (screenPosition.y() * -0.5f) * (LetterboxHelper::OriginalResolution->y());
+					//DebugDrawText::draw("Test", DebugDrawText::Location(screenPosition.x(), screenPosition.y()), 3);
+					//if (GetAsyncKeyState(VK_LBUTTON) < 0 && m_IsButtonBeingPressed == false)
 					//{
-					//	shift = true;
+					//	m_IsButtonBeingPressed = true;
 					//	CVector2 screen_pos = CVector2(ImGui::GetCursorScreenPos().x, ImGui::GetCursorScreenPos().y);
 					//	float distanceBestCanditate = 1000;
 					//	int closestIndex = -1;
@@ -283,40 +332,45 @@ void SetEditorTest::draw()
 					//	
 					//
 					//}
-					//if (GetAsyncKeyState(VK_LBUTTON) == 0 && shift == true)
+					//if (GetAsyncKeyState(VK_LBUTTON) == 0 && m_IsButtonBeingPressed == true)
 					//{
-					//	shift = false;
+					//	m_IsButtonBeingPressed = false;
 					//}
-					DebugDrawText::draw("Test", DebugDrawText::Location(screenPosition.x(), screenPosition.y()), 7);
-					bool result = false;
-					float vectorPosition[3] = { go3D->m_spMatrixNodeTransform->m_Transform.m_Position.x(), go3D->m_spMatrixNodeTransform->m_Transform.m_Position.y(), go3D->m_spMatrixNodeTransform->m_Transform.m_Position.z() };
-					float vectorRotation[3] = { go3D->m_spMatrixNodeTransform->m_Transform.m_Rotation.x(), go3D->m_spMatrixNodeTransform->m_Transform.m_Position.y(), go3D->m_spMatrixNodeTransform->m_Transform.m_Position.z() };
-					DisplayGizmo(camera, go3D->m_spMatrixNodeTransform->m_Transform.m_Matrix.data());
+					float vectorPosition[3] = { m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.x(), m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.y(), m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.z() };
+					float vectorRotation[3] = { m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Rotation.x(), m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.y(), m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.z() };
+					DisplayGizmo(camera, m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Matrix.data());
 					
 					
 					if (ImGui::InputFloat3("Position", vectorPosition))
 					{
-						go3D->m_spMatrixNodeTransform->m_Transform.SetPosition(CVector(vectorPosition[0], vectorPosition[1], vectorPosition[2]));
-						go3D->m_spMatrixNodeTransform->NotifyChanged();
+						m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.SetPosition(CVector(vectorPosition[0], vectorPosition[1], vectorPosition[2]));
+						m_CurrentObjectSelected->m_spMatrixNodeTransform->NotifyChanged();
 					}
 					if (ImGui::InputFloat3("Rotation", vectorRotation))
 					{
-						go3D->m_spMatrixNodeTransform->m_Transform.m_Rotation.x() = vectorRotation[0];
-						go3D->m_spMatrixNodeTransform->m_Transform.m_Rotation.y() = vectorRotation[1];
-						go3D->m_spMatrixNodeTransform->m_Transform.m_Rotation.z() = vectorRotation[2];
-						go3D->m_spMatrixNodeTransform->NotifyChanged();
+						m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Rotation.x() = vectorRotation[0];
+						m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Rotation.y() = vectorRotation[1];
+						m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Rotation.z() = vectorRotation[2];
+						m_CurrentObjectSelected->m_spMatrixNodeTransform->NotifyChanged();
 					}					
 				}
-			}
-			
+			}			
 		}
-
-		/// @separator
 		ImGui::End();
 	}
-	vec1.clear();
-	vec2.clear();
-					
+	if (ImGui::Begin("Test"))
+	{
+		for (size_t i = 0; i < creationInfos.size(); i++)
+		{
+			//for (size_t x = 0; x < creationInfos.at(i)->m_EditParam->m_ParamList.size(); x++)
+			//{
+			//	ImGui::Text(creationInfos.at(i)->m_EditParam->m_ParamList.at(x)->m_Name.c_str());
+			//}
+			ImGui::Separator();
+		}
+		ImGui::End();
+	}
+	m_GameObject3Ds.clear();					
 }
 int numb;
 struct MsgStartSetEditor : public Hedgehog::Universe::MessageTypeSet
@@ -346,37 +400,35 @@ struct ActivationElement
 class CActivationCullingManager
 {
 	void* rangeCullingMethod;
-	void* dword4;
+	void* m_Unknown1; //
 	void* frustrumCullingMethod;
-	void* dwordC;
+	void* m_Unknown2; // These are probably shared ptrs and regular ptr pairs
 	void* changedInvokerCullingMethod;
-	void* dword14;
-	boost::shared_ptr<void> boost__void18;
+	void* m_Unknown3; //
+	boost::shared_ptr<void> m_Unknown4;
 	void* resetFlagCullingMethod;
-	void* dword24;	
+	void* m_Unknown5;
 };
 
 class CActivationManager : public Sonic::CGameObject
 {
 public:
-	BYTE gap1[4];
-	hh::map<int, boost::shared_ptr<ActivationElement>> possiblyAMap1;
-	void* dwordB4;
+	int m_Unknown1;
+	hh::list<Hedgehog::Math::CVector> m_ListUnknown;
+	void* m_Unknown2;
 	CActivationCullingManager* m_pActivationCullingManager;
 	boost::shared_ptr<CActivationCullingManager> m_spActivationCullingManager;
-	Hedgehog::Math::CQuaternion hedgehog__math__cquaternionC0;
-	BYTE gapD0[4];
-	void* dwordD4;
-	void* dwordD8;
-	__declspec(align(8)) void* dwordE0;
-	hh::map<int, boost::shared_ptr<ActivationElement>> possiblyAMap2;
-	Hedgehog::Universe::Message* msgGetCullingBasePosition;
-	BYTE gapF0[8];
-	void* dwordF8;
-	void* dwordFC;
-	BYTE byte100;
-	void* dword104;
+	BB_INSERT_PADDING(36 -8);
+	hh::map<int, boost::shared_ptr<ActivationElement>>* possiblyAMap;
+	Hedgehog::Universe::Message* msgGetCullingBasePosition; //???
+	BB_INSERT_PADDING(0x8);
+	void* m_Unknown7;
+	void* m_Unknown8;
+	BYTE m_Unknown9;
+	void* m_Unknown10;
 };
+BB_ASSERT_OFFSETOF(CActivationManager, m_ListUnknown, 0xAC);
+BB_ASSERT_OFFSETOF(CActivationManager, possiblyAMap, 0xE8 - 0x4);
 class ParameterBankC2
 {
 public:
@@ -476,19 +528,14 @@ HOOK(void*, __fastcall, SetUpdateApplication, 0xE7BED0, void* This, void* Edx, f
 
 			auto testString = (Hedgehog::base::CSharedString*)second;
 		}*/
-		for (auto it = member->m_Field1C.begin(); it != member->m_Field1C.end(); ++it)
-		{
-			auto first = *it;
-			auto test = getTypeName(first);
-			//auto test2 = getTypeName(((boost::shared_ptr<void*>)first).get());
-		}
+		auto appdoc = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spSequenceMain;
 		auto activationmanager = (CActivationManager*)Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pActivationManager;
 		for (auto it = t->m_mSetLayers.begin(); it != t->m_mSetLayers.end(); ++it)
 		{
 			auto one = it->first;
 			auto two = it->second;
 			auto three = it->second.get();//
-			DebugDrawText::log(std::format("LAYER {0}\nName: {1}\nFilename: {2}\nSaving Location: {3}\ndwordC: {4}",one, three->m_LayerName.c_str(), three->m_FileName.c_str(), three->m_SaveLocation.c_str(), three->dwordC.c_str()).c_str());
+			DebugDrawText::log(std::format("LAYER {0}\nName: {1}\nFilename: {2}\nSaving Location: {3}\ndwordC: {4}",one, three->m_LayerName.c_str(), three->m_FileName.c_str(), three->m_SaveLocation.c_str(), three->dwordC.x()).c_str());
 		}
 		for (auto it = paramBank->dword4.begin(); it != paramBank->dword4.end(); ++it)
 		{
@@ -594,11 +641,72 @@ HOOK(char, __fastcall, sub_597E50, 0x597E50, DWORD* This, void* Edx, Hedgehog::M
 	auto four = a4;
 	return originalsub_597E50(This, Edx, a2,a3,a4,a5);
 }
+
+
+struct Activation
+{
+	void* dword4;
+	void* dword8;
+	boost::shared_ptr<SSetObjectCreationInfo> dwordC;
+	SSetObjectCreationInfo* dword10;
+	void* dword14;
+	void* dword18;
+	void* dword1C;
+	
+};
+//int *__stdcall CreateCActivationListenerForSetObject(int a1, int a2, _DWORD *creationInfo, int a4, int a5)
+HOOK(int*, __stdcall, CreateCActivationListenerForSetObject, 0xEA6BD0, int a1, int a2, boost::shared_ptr<SSetObjectCreationInfo>* creationInfo, int a4, int a5)
+{
+	auto e = creationInfo->get();
+	creationInfos.push_back(e);
+	return originalCreateCActivationListenerForSetObject(a1, a2, creationInfo, a4, a5);
+}
+//BOOL __stdcall sub_CEFCD0(int a1)
+HOOK(bool, __stdcall, sub_CEFCD0, 0xCEFCD0, int a1)
+{
+	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
+	auto keyState = (Sonic::EKeyState)a1;
+	if(keyState == Sonic::eKeyState_RightBumper)
+	{
+		if (GetAsyncKeyState(VK_SPACE))
+			return true;
+	}
+	if (keyState == Sonic::eKeyState_LeftBumper)
+	{
+		if (GetAsyncKeyState(VK_CONTROL))
+			return true;
+	}
+	if (keyState == Sonic::eKeyState_X)
+	{
+		if (GetAsyncKeyState(VK_SHIFT))
+			return true;
+	}
+	if (GetAsyncKeyState('W'))
+		inputPtr->LeftStickVertical = 1;
+	if (GetAsyncKeyState('S'))
+		inputPtr->LeftStickVertical = -1;
+	if (GetAsyncKeyState('A'))
+		inputPtr->LeftStickHorizontal = -1;
+	if (GetAsyncKeyState('D'))
+		inputPtr->LeftStickHorizontal = 1;
+
+	if (GetAsyncKeyState(VK_UP))
+		inputPtr->RightStickVertical = 1;
+	if (GetAsyncKeyState(VK_DOWN))
+		inputPtr->RightStickVertical = -1;
+	if (GetAsyncKeyState(VK_RIGHT))
+		inputPtr->RightStickHorizontal = 1;
+	if (GetAsyncKeyState(VK_LEFT))
+		inputPtr->RightStickHorizontal = -1;
+	return originalsub_CEFCD0(a1);
+}
 void SetEditorTest::applyPatches()
 {
 	WRITE_JUMP(0x00FD6AB3, 0x00FD6ABF);
 	//WRITE_JUMP(0x00EB681D, ASMTEST);
 	//INSTALL_HOOK(ADD_SET_OBJECTS_TO_WORLD);
+	INSTALL_HOOK(CreateCActivationListenerForSetObject);
+	INSTALL_HOOK(sub_CEFCD0);
 	INSTALL_HOOK(sub_597E50);
 	INSTALL_HOOK(StartInstanceBrush);
 	INSTALL_HOOK(CInstanceBrushDestructor);
