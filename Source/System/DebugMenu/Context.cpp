@@ -1,4 +1,4 @@
-﻿
+﻿#include "..\SetEditorTest.h"
 
 const uint32_t* const WIDTH = (uint32_t*)0x1DFDDDC;
 const uint32_t* const HEIGHT = (uint32_t*)0x1DFDDE0;

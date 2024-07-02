@@ -1,3 +1,4 @@
+#include "ETFTimeSwitch.h"
 BB_SET_OBJECT_MAKE_HOOK(ETFTimeSwitch);
 
 void __declspec(naked) GetCServiceGameplayMidAsmHook()

@@ -1,3 +1,5 @@
+#include "TestingCode.h"
+
 class CBasicSphere : public Sonic::CGameObject3D
 {
 public:

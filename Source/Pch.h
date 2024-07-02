@@ -72,21 +72,20 @@
 #include "Gameplay/Pole.h"
 
 //System
-#include "System/StageManager.h"
 #include "System/DiscordStatus.h"
 #include "System/AnimationSetPatcher.h"
 #include "System/EnemyTrigger.h"
 #include "System/MiniAudioHelper.h"
 #include "System/LetterboxHelper.h"
-#include "System/CSDCommon.h"
-#include "System/UpdateDirector.h"
-#include "System/SoundController.h"
 #include "System/ImguiInitializer.h"
-#include "System/SaveManager.h"
-#include "System/LuaManager.h"
-#include "System/SetEditorTest.h"
+#include "System/UpdateDirector.h"
 #include "CustomSetObjects/ObjectUtility.h"
+#include "System/SoundController.h"
 #include "System/CObjCamera.h"
+#include "System/LuaManager.h"
+#include "System/CSDCommon.h"
+#include "System/SaveManager.h"
+#include "System/StageManager.h"
 
 //Debug Menu
 #include "System/DebugMenu/Context.h"
@@ -116,21 +115,4 @@
 #include "UI/EvilQTEUI.h"
 #include "UI/HudButtonGuide.h"
 
-//Set objects
-#include "CustomSetObjects/Hintring.h"
-#include "CustomSetObjects/DebugObject.h"
-#include "CustomSetObjects/ETFTimeSwitch.h"
-#include "CustomSetObjects/Paraloop.h"
-#include "CustomSetObjects/SpeedDownCollision.h"
-#include "CustomSetObjects/ETFStageGate.h"
-#include "CustomSetObjects/MoonMedal.h"
-#include "CustomSetObjects/EvilEnemyReckless.h"
-#include "CustomSetObjects/EvilLiftDoor.h"
-#include "CustomSetObjects/Holoska/Icicle.h"
-#include "CustomSetObjects/Holoska/StompingSwitch.h"
-#include "CustomSetObjects/Mykonos/Pelican.h"
-#include "CustomSetObjects/Mykonos/IrremovableMobMykonos.h"
-#include "CustomSetObjects/CObjCamera2D.h"
 
-//Rest
-#include "Testing/TestingCode.h"

@@ -1,3 +1,4 @@
+#include "MoonMedal.h"
 BB_SET_OBJECT_MAKE_HOOK(MoonMedal);
 
 void MoonMedal::registerObject()

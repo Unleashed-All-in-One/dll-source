@@ -1,4 +1,5 @@
 
+#include "SpeedDownCollision.h"
 BB_SET_OBJECT_MAKE_HOOK(SpeedDownCollision);
 
 ItemboxUI* SpeedDownCollision::m_ItemBoxUI;

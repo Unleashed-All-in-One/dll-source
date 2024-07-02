@@ -1,5 +1,6 @@
 
 #define HINTSFILE_NAME_FORMAT "{0}\\disk\\Hints\\hints_{1}.json"
+#include "Hintring.h"
 HintDataList* Hintring::hintData;
 HelpCaptionUIContainer* Hintring::m_HintUI;
 HOOK(void*, __fastcall, InitializePlayer, 0x00D96110, void* This)

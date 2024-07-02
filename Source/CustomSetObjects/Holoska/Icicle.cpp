@@ -1,3 +1,4 @@
+#include "Icicle.h"
 BB_SET_OBJECT_MAKE_HOOK(Icicle);
 
 void Icicle::registerObject()

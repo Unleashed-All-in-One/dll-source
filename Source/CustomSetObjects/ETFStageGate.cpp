@@ -1,3 +1,4 @@
+#include "ETFStageGate.h"
 BB_SET_OBJECT_MAKE_HOOK(ETFStageGate);
 
 

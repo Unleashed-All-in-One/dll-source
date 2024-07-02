@@ -1,4 +1,5 @@
 
+#include "Paraloop.h"
 BB_SET_OBJECT_MAKE_HOOK(Paraloop);
 
 void Paraloop::registerObject()

@@ -1,3 +1,4 @@
+#include "EvilLiftDoor.h"
 BB_SET_OBJECT_MAKE_HOOK(EvilLiftDoor);
 
 EvilQTEUI* EvilLiftDoor::m_ItemBoxUI;

@@ -1,3 +1,23 @@
+
+#include "System/SetEditorTest.h"
+//Set objects
+#include "CustomSetObjects/Hintring.h"
+#include "CustomSetObjects/DebugObject.h"
+#include "CustomSetObjects/ETFTimeSwitch.h"
+#include "CustomSetObjects/Paraloop.h"
+#include "CustomSetObjects/SpeedDownCollision.h"
+#include "CustomSetObjects/ETFStageGate.h"
+#include "CustomSetObjects/MoonMedal.h"
+#include "CustomSetObjects/EvilEnemyReckless.h"
+#include "CustomSetObjects/EvilLiftDoor.h"
+#include "CustomSetObjects/Holoska/Icicle.h"
+#include "CustomSetObjects/Holoska/StompingSwitch.h"
+#include "CustomSetObjects/Mykonos/Pelican.h"
+#include "CustomSetObjects/Mykonos/IrremovableMobMykonos.h"
+#include "CustomSetObjects/CObjCamera2D.h"
+
+//Rest
+#include "Testing/TestingCode.h"
 extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 {
 	// Load configuration

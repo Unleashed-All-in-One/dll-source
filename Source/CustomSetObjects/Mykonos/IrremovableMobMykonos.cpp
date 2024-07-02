@@ -1,3 +1,4 @@
+#include "IrremovableMobMykonos.h"
 BB_SET_OBJECT_MAKE_HOOK(IrremovableMobMykonos);
 void IrremovableMobMykonos::registerObject()
 {

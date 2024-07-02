@@ -1,4 +1,6 @@
+#include "SetEditorTest.h"
 DWORD* SetManager;
+static const int* pColID_BasicTerrain = reinterpret_cast<int*>(0x01E0AFAC);
 struct MultiSetParam
 {
 	BB_INSERT_PADDING(0x4);
@@ -410,25 +412,90 @@ class CActivationCullingManager
 	void* m_Unknown5;
 };
 
-class CActivationManager : public Sonic::CGameObject
+struct Test
+{
+	void* test00;
+	void* test01;
+	void* test02;
+	void* test03;
+	void* test04;
+	void* test05;
+	void* test06;
+	void* test07;
+	void* test08;
+	void* test09;
+	void* test10;
+};
+struct ActivationListenerForSetObject
+{
+	DWORD dword0;
+	DWORD dword4;
+	float range;
+	SSetObjectCreationInfo* creationInfo;
+	DWORD dword10;
+	DWORD dword14;
+	DWORD dword18;
+	DWORD dword1C;
+};
+BB_ASSERT_OFFSETOF(ActivationListenerForSetObject, creationInfo, 0xC);
+struct CActivation
+{
+	BYTE gap[0x8];
+	BYTE byte8;
+	BYTE byte9;
+	BYTE byteA;
+	BYTE byteB;
+	void* dwordC;
+	void* dword10;
+	void* dword14;
+	BYTE m_spListenerForSetObjectFunc1[0x10];
+	BYTE m_spListenerForSetObjectFunc2[0x10];
+	BB_INSERT_PADDING(0x8);
+	boost::shared_ptr<ActivationListenerForSetObject> m_spListenerForSetObject;
+	void* dword44;
+	void* dword48;
+	void* m_spCullingElementID;
+	void* dword50;
+	float m_spListenerForSetObjectFunc3;
+	float m_spListenerForSetObjectFunc4;
+	void* dword5C;
+};
+BB_ASSERT_OFFSETOF(CActivation, dword10, 0x10);
+BB_ASSERT_OFFSETOF(CActivation, m_spListenerForSetObject, 0x40);
+struct SElementSub
+{
+	boost::shared_ptr<CActivation> test;
+	int one, two;
+};
+struct SElement
+{
+	void* field00;
+	hh::vector<SElementSub> field04;
+	void* field12;
+	void* field16;
+	void* field20;
+};
+BB_ASSERT_OFFSETOF(SElement, field04, 4);
+//BB_ASSERT_OFFSETOF(SElement, field12, 12);
+class ActivationManager : public Sonic::CGameObject
 {
 public:
-	int m_Unknown1;
-	hh::list<Hedgehog::Math::CVector> m_ListUnknown;
 	void* m_Unknown2;
+	hh::map<void*, boost::shared_ptr<SElement>> m_ListUnknown; // <-- probably not a list but this is how i found out
 	CActivationCullingManager* m_pActivationCullingManager;
 	boost::shared_ptr<CActivationCullingManager> m_spActivationCullingManager;
-	BB_INSERT_PADDING(36 -8);
-	hh::map<int, boost::shared_ptr<ActivationElement>>* possiblyAMap;
-	Hedgehog::Universe::Message* msgGetCullingBasePosition; //???
-	BB_INSERT_PADDING(0x8);
-	void* m_Unknown7;
-	void* m_Unknown8;
-	BYTE m_Unknown9;
-	void* m_Unknown10;
+	BB_INSERT_PADDING(36-4);
+	hh::list<Test> possiblyAMap;
+	//Hedgehog::Universe::Message* msgGetCullingBasePosition; //???
+	//BB_INSERT_PADDING(0x8);
+	//void* m_Unknown7;
+	//void* m_Unknown8;
+	//BYTE m_Unknown9;
+	//void* m_Unknown10;
 };
-BB_ASSERT_OFFSETOF(CActivationManager, m_ListUnknown, 0xAC);
-BB_ASSERT_OFFSETOF(CActivationManager, possiblyAMap, 0xE8 - 0x4);
+BB_ASSERT_OFFSETOF(ActivationManager, m_ListUnknown, 0xB0-4);
+//BB_ASSERT_OFFSETOF(ActivationManager, possiblyAMap, 0xE8 - 4);
+//BB_ASSERT_OFFSETOF(ActivationManager, possiblyAMap, 0xE8-4);
 class ParameterBankC2
 {
 public:
@@ -529,7 +596,18 @@ HOOK(void*, __fastcall, SetUpdateApplication, 0xE7BED0, void* This, void* Edx, f
 			auto testString = (Hedgehog::base::CSharedString*)second;
 		}*/
 		auto appdoc = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spSequenceMain;
-		auto activationmanager = (CActivationManager*)Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pActivationManager;
+		auto activationmanager = (ActivationManager*)Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pActivationManager;
+		auto map = activationmanager->m_ListUnknown;
+
+		for (auto it = map.begin(); it != map.end(); ++it)
+		{
+			auto one = it->second;
+			for (size_t i = 0; i < one->field04.size(); i++)
+			{
+				auto two = one->field04[i].test;
+			}
+		}
+
 		for (auto it = t->m_mSetLayers.begin(); it != t->m_mSetLayers.end(); ++it)
 		{
 			auto one = it->first;
