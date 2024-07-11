@@ -1,5 +1,6 @@
 #include "SetEditorTest.h"
 DWORD* SetManager;
+bool initSet;
 static const int* pColID_BasicTerrain = reinterpret_cast<int*>(0x01E0AFAC);
 struct MultiSetParam
 {
@@ -31,7 +32,7 @@ struct SSetObjectCreationInfo
 	int m_Field038;
 	int m_LayerID;
 	int m_Field040;
-	int m_Field044;
+	void* m_Field044;
 	int m_Field048;
 	int m_Field04C;
 };
@@ -166,214 +167,7 @@ hh::math::CVector4 ScreenToWorld(const hh::math::CVector4& screenPos, const boos
 }
 
 std::vector< SSetObjectCreationInfo*> creationInfos;
-void SetEditorTest::draw()
-{
-	ImGui::SetNextWindowBgAlpha(1);
-	ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar;
-	const boost::shared_ptr<Sonic::CCamera> camera = Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera();
 
-	LayerWindow();
-	
-	if (ImGui::Begin("GameObject List"))
-	{
-		if (ImGui::CollapsingHeader("GameObjects", true))
-		{
-			ImGui::Text("Index: %d", selectedIndex);
-			int index = 0;
-			for (boost::shared_ptr<Sonic::CGameObject> data : Sonic::CGameDocument::GetInstance()->m_pMember->m_GameObjects)
-			{
-				if (dynamic_cast<Sonic::CGameObject3D*>(data.get()) != nullptr)
-					m_GameObject3Ds.push_back(dynamic_cast<Sonic::CGameObject3D*>(data.get()));
-
-				index++;
-				ImGui::PushID(index+100);
-				if (ImGui::Selectable(getTypeName(data.get()), false, ImGuiSelectableFlags_None))
-				{
-					selectedIndex = index;
-					m_HasParsedObjectInfo = false;
-					m_IsSelectedGameObject3D = false;
-					objectCategory = 0;
-				}
-				ImGui::PopID();
-			}
-		}
-		if (ImGui::CollapsingHeader("GameObjects (3D)", true))
-		{
-			for (int i = 0; i < m_GameObject3Ds.size(); ++i)
-			{
-				ImGui::PushID(i + 200);
-				if (ImGui::Selectable(getTypeName(m_GameObject3Ds[i]), false, ImGuiSelectableFlags_None))
-				{
-					selectedIndex = i;
-					m_HasParsedObjectInfo = false;
-					m_IsSelectedGameObject3D = true;
-					objectCategory = 1;
-				}
-				if (ImGui::IsItemHovered())
-				{
-					DisplayGizmo(camera, m_GameObject3Ds[i]->m_spMatrixNodeTransform->m_Transform.m_Matrix.data());
-				}
-				ImGui::PopID();
-			}
-		}
-		ImGui::End();
-	}
-	if (ImGui::Begin("Inspector"))
-	{
-
-		ImGui::Text("Index: %d", selectedIndex);
-
-		if(Sonic::CGameDocument::GetInstance()->m_pMember->m_GameObjects.size() > selectedIndex || m_GameObject3Ds.size() > selectedIndex)
-		{
-			if(!m_HasParsedObjectInfo)
-			{
-				m_HasParsedObjectInfo = true;
-				if (objectCategory == 0) //non 3d objects
-				{
-					hh::list<boost::shared_ptr<Sonic::CGameObject>>::iterator iterator = Sonic::CGameDocument::GetInstance()->m_pMember->m_GameObjects.begin();
-					std::advance(iterator, selectedIndex);
-					if (dynamic_cast<Sonic::CGameObject3D*>(iterator->get()) != nullptr)
-					{
-						//init tool preview
-						m_CurrentObjectSelected = dynamic_cast<Sonic::CGameObject3D*>(iterator->get());
-						m_IsSelectedGameObject3D = true;
-					}
-					else
-						m_IsSelectedGameObject3D = false;
-				}
-				else //3d objects
-				{
-					m_IsSelectedGameObject3D = true;
-					m_CurrentObjectSelected = m_GameObject3Ds[selectedIndex];					
-				}
-				
-			}
-			if(m_HasParsedObjectInfo && m_IsSelectedGameObject3D)
-			{
-				if (ImGui::CollapsingHeader("Transform"))
-				{
-					
-					if (GetAsyncKeyState(VK_MBUTTON) < 0 && m_IsButtonBeingPressed == false)
-					{
-						m_IsButtonBeingPressed = true;
-						if (m_CurrentGizmoOperation == ImGuizmo::TRANSLATE)
-							m_CurrentGizmoOperation = ImGuizmo::ROTATE;
-						else
-							m_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
-					}
-					if (GetAsyncKeyState(VK_MBUTTON) == 0 && m_IsButtonBeingPressed == true)
-					{
-						m_IsButtonBeingPressed = false;
-					}
-					if (GetAsyncKeyState(VK_LBUTTON) < 0 && m_IsButtonBeingPressed == false)
-					{
-						m_IsButtonBeingPressed = true;
-						auto e = ScreenToWorld(CVector4(ImGui::GetMousePos().x , ImGui::GetMousePos().y, 0, 1), camera);
-						CVector4 fOut;
-						CVector4 fOut2;
-						const CVector4 startPos = CVector4(camera->m_Position.x() + e.x(), camera->m_Position.y() + e.y(), camera->m_Position.z() + e.z(), 1);
-						//e = e.normalized();
-						CVector rightVector = camera->m_MyCamera.m_View.matrix().block<3, 1>(0, 0).normalized();
-						const CVector4 endPos = CVector4(e.x(), e.y(), e.z(), 1) * 1000;
-						Eigen::Vector4f rayDirection = CVector4(camera->m_MyCamera.m_Direction.normalized().x(), camera->m_MyCamera.m_Direction.normalized().y(), camera->m_MyCamera.m_Direction.normalized().z(), 1);
-
-						// Construct the ray end position
-						//Eigen::Vector4f rayEndPos = (e * rayDirection) * 1000.0f;
-						if(Common::fRaycast(startPos, startPos + rayDirection * 1000.0f, fOut, fOut2, *pColID_BasicTerrain))
-						{
-							m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.SetPosition(CVector(fOut.x(), fOut.y(), fOut.z()));
-							m_CurrentObjectSelected->m_spMatrixNodeTransform->NotifyChanged();
-							DebugDrawText::log(std::format("HIT: {0}, {1}, {2}", fOut.x(), fOut.y(), fOut.z()).c_str(), 0);
-							DebugDrawText::log(std::format("SCREEN TO WORLD POS: {0}, {1}, {2}", e.x(), e.y(), e.z()).c_str(), 0);
-							DebugDrawText::log(std::format("END RAY: {0}, {1}, {2}", endPos.x(), endPos.y(), endPos.z()).c_str(), 0);
-						}
-					}
-					if (GetAsyncKeyState(VK_LBUTTON) == 0 && m_IsButtonBeingPressed == true)
-					{
-						m_IsButtonBeingPressed = false;
-					}
-					//auto& position1 = m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position;
-					//hh::math::CVector4 screenPosition = camera->m_MyCamera.m_View * hh::math::CVector4(position1.x(), position1.y(), position1.z(), 1.0f);
-					//screenPosition = camera->m_MyCamera.m_Projection * screenPosition;
-					//screenPosition.head<2>() /= screenPosition.w();
-					//screenPosition.x() = ((screenPosition.x() * 0.5f) * (LetterboxHelper::OriginalResolution->x()));
-					//screenPosition.y() = (screenPosition.y() * -0.5f) * (LetterboxHelper::OriginalResolution->y());
-					//DebugDrawText::draw("Test", DebugDrawText::Location(screenPosition.x(), screenPosition.y()), 3);
-					//if (GetAsyncKeyState(VK_LBUTTON) < 0 && m_IsButtonBeingPressed == false)
-					//{
-					//	m_IsButtonBeingPressed = true;
-					//	CVector2 screen_pos = CVector2(ImGui::GetCursorScreenPos().x, ImGui::GetCursorScreenPos().y);
-					//	float distanceBestCanditate = 1000;
-					//	int closestIndex = -1;
-					//	Sonic::CGameObject3D* target = nullptr;
-					//	for (size_t i = 0; i < vec1.size(); i++)
-					//	{
-					//		if (dynamic_cast<Sonic::CGameObject3D*>(vec1[i].get()) != nullptr)
-					//		{
-					//			//init tool preview
-					//			target = dynamic_cast<Sonic::CGameObject3D*>(vec1[i].get());
-					//			auto& position2 = target->m_spMatrixNodeTransform->m_Transform.m_Position;
-					//			const auto camera = Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera();
-					//			hh::math::CVector4 screenPosition2 = camera->m_MyCamera.m_View * hh::math::CVector4(position2.x(), position2.y(), position2.z(), 1.0f);
-					//			screenPosition2 = camera->m_MyCamera.m_Projection * screenPosition2;
-					//			screenPosition2.head<2>() /= screenPosition2.w();
-					//			screenPosition2.x() = ((screenPosition2.x() * 0.5f + 0.5f) * (LetterboxHelper::OriginalResolution->x()));
-					//			screenPosition2.y() = (screenPosition2.y() * -0.5f + 0.5f) * (LetterboxHelper::OriginalResolution->y());
-					//			CVector2 diff = CVector2(screenPosition2.x(), screenPosition2.y()) - screen_pos;
-					//			float distance = abs(sqrtf(diff.dot(diff)));
-					//			if (distance < distanceBestCanditate)
-					//			{
-					//				distanceBestCanditate = distance;
-					//				closestIndex = i;
-					//			}
-					//		}
-					//		
-					//	}
-					//	DebugDrawText::log(std::format("DISTANCE CANDIDATE: {0}\nINDEX: {1}", distanceBestCanditate, closestIndex).c_str());
-					//	selectedIndex = closestIndex;
-					//	
-					//
-					//}
-					//if (GetAsyncKeyState(VK_LBUTTON) == 0 && m_IsButtonBeingPressed == true)
-					//{
-					//	m_IsButtonBeingPressed = false;
-					//}
-					float vectorPosition[3] = { m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.x(), m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.y(), m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.z() };
-					float vectorRotation[3] = { m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Rotation.x(), m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.y(), m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.z() };
-					DisplayGizmo(camera, m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Matrix.data());
-					
-					
-					if (ImGui::InputFloat3("Position", vectorPosition))
-					{
-						m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.SetPosition(CVector(vectorPosition[0], vectorPosition[1], vectorPosition[2]));
-						m_CurrentObjectSelected->m_spMatrixNodeTransform->NotifyChanged();
-					}
-					if (ImGui::InputFloat3("Rotation", vectorRotation))
-					{
-						m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Rotation.x() = vectorRotation[0];
-						m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Rotation.y() = vectorRotation[1];
-						m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Rotation.z() = vectorRotation[2];
-						m_CurrentObjectSelected->m_spMatrixNodeTransform->NotifyChanged();
-					}					
-				}
-			}			
-		}
-		ImGui::End();
-	}
-	if (ImGui::Begin("Test"))
-	{
-		for (size_t i = 0; i < creationInfos.size(); i++)
-		{
-			//for (size_t x = 0; x < creationInfos.at(i)->m_EditParam->m_ParamList.size(); x++)
-			//{
-			//	ImGui::Text(creationInfos.at(i)->m_EditParam->m_ParamList.at(x)->m_Name.c_str());
-			//}
-			ImGui::Separator();
-		}
-		ImGui::End();
-	}
-	m_GameObject3Ds.clear();					
-}
 int numb;
 struct MsgStartSetEditor : public Hedgehog::Universe::MessageTypeSet
 {
@@ -401,14 +195,15 @@ struct ActivationElement
 
 class CActivationCullingManager
 {
-	void* rangeCullingMethod;
-	void* m_Unknown1; //
-	void* frustrumCullingMethod;
+public:
+	boost::shared_ptr<void*> m_spRangeCullingMethod;
+	//void* m_Unknown1; //
+	boost::shared_ptr<void*> m_spFrustumCullingMethod;
 	void* m_Unknown2; // These are probably shared ptrs and regular ptr pairs
-	void* changedInvokerCullingMethod;
+	boost::shared_ptr<void*> m_spChangedInvokerCullingMethod;
 	void* m_Unknown3; //
-	boost::shared_ptr<void> m_Unknown4;
-	void* resetFlagCullingMethod;
+	//boost::shared_ptr<void*> m_Unknown4;
+	boost::shared_ptr<void*> m_spResetFlagCullingMethod;
 	void* m_Unknown5;
 };
 
@@ -429,18 +224,19 @@ struct Test
 struct ActivationListenerForSetObject
 {
 	DWORD dword0;
-	DWORD dword4;
+	void* dword4;
 	float range;
 	SSetObjectCreationInfo* creationInfo;
-	DWORD dword10;
-	DWORD dword14;
-	DWORD dword18;
-	DWORD dword1C;
+	Hedgehog::math::CVector dword10;
+	void* dword14;
+	void* dword18;
+	void* dword1C;
 };
 BB_ASSERT_OFFSETOF(ActivationListenerForSetObject, creationInfo, 0xC);
-struct CActivation
+class CActivation
 {
-	BYTE gap[0x8];
+public:
+	boost::shared_ptr <void*>gap;
 	BYTE byte8;
 	BYTE byte9;
 	BYTE byteA;
@@ -448,15 +244,12 @@ struct CActivation
 	void* dwordC;
 	void* dword10;
 	void* dword14;
-	BYTE m_spListenerForSetObjectFunc1[0x10];
-	BYTE m_spListenerForSetObjectFunc2[0x10];
-	BB_INSERT_PADDING(0x8);
+	CVector4 m_Position;
+	CVector4 m_Rotation;
 	boost::shared_ptr<ActivationListenerForSetObject> m_spListenerForSetObject;
-	void* dword44;
-	void* dword48;
-	void* m_spCullingElementID;
-	void* dword50;
-	float m_spListenerForSetObjectFunc3;
+	boost::shared_ptr<Sonic::CActivationManager> m_spActivationManager;
+	boost::shared_ptr<void*> m_spCullingElementID;
+	int m_spListenerForSetObjectFunc3;
 	float m_spListenerForSetObjectFunc4;
 	void* dword5C;
 };
@@ -470,18 +263,18 @@ struct SElementSub
 struct SElement
 {
 	void* field00;
-	hh::vector<SElementSub> field04;
+	hh::vector<SElementSub> m_ActivationList;
 	void* field12;
 	void* field16;
 	void* field20;
 };
-BB_ASSERT_OFFSETOF(SElement, field04, 4);
+BB_ASSERT_OFFSETOF(SElement, m_ActivationList, 4);
 //BB_ASSERT_OFFSETOF(SElement, field12, 12);
 class ActivationManager : public Sonic::CGameObject
 {
 public:
 	void* m_Unknown2;
-	hh::map<void*, boost::shared_ptr<SElement>> m_ListUnknown; // <-- probably not a list but this is how i found out
+	hh::map<void*, boost::shared_ptr<SElement>> m_ElementMap;
 	CActivationCullingManager* m_pActivationCullingManager;
 	boost::shared_ptr<CActivationCullingManager> m_spActivationCullingManager;
 	BB_INSERT_PADDING(36-4);
@@ -493,7 +286,7 @@ public:
 	//BYTE m_Unknown9;
 	//void* m_Unknown10;
 };
-BB_ASSERT_OFFSETOF(ActivationManager, m_ListUnknown, 0xB0-4);
+BB_ASSERT_OFFSETOF(ActivationManager, m_ElementMap, 0xB0-4);
 //BB_ASSERT_OFFSETOF(ActivationManager, possiblyAMap, 0xE8 - 4);
 //BB_ASSERT_OFFSETOF(ActivationManager, possiblyAMap, 0xE8-4);
 class ParameterBankC2
@@ -553,6 +346,288 @@ public:
 	hh::map<int, boost::shared_ptr<void*>> dword8;
 	void* dword14;
 };
+class CParamFloat: public Sonic::CParamBase
+{
+public:
+	class FuncData : public Hedgehog::Base::CRefCountObject
+	{
+	public:
+		float* m_pValue;
+		float m_Value;
+		boost::function1<void, float> m_ChangedCallback;
+		Hedgehog::Base::CSharedString m_Description;
+	};
+
+	FuncData* m_pFuncData;
+	float m_DefaultValue;
+};
+Sonic::CEditParam* testParam;
+void SetEditorTest::draw()
+{
+	if (!initSet)
+		return;
+	ImGui::SetNextWindowBgAlpha(1);
+	ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar;
+	const boost::shared_ptr<Sonic::CCamera> camera = Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera();
+
+	LayerWindow();
+
+	if (ImGui::Begin("GameObject List"))
+	{
+		if (ImGui::CollapsingHeader("GameObjects", true))
+		{
+			ImGui::Text("Index: %d", selectedIndex);
+			int index = 0;
+			for (boost::shared_ptr<Sonic::CGameObject> data : Sonic::CGameDocument::GetInstance()->m_pMember->m_GameObjects)
+			{
+				if (dynamic_cast<Sonic::CSetObjectListener*>(data.get()) != nullptr)
+					m_GameObject3Ds.push_back(dynamic_cast<Sonic::CGameObject3D*>(data.get()));
+
+				index++;
+				ImGui::PushID(index + 100);
+				if (ImGui::Selectable(getTypeName(data.get()), false, ImGuiSelectableFlags_None))
+				{
+					selectedIndex = index;
+					m_HasParsedObjectInfo = false;
+					m_IsSelectedGameObject3D = false;
+					objectCategory = 0;
+				}
+				ImGui::PopID();
+			}
+		}
+		if (ImGui::CollapsingHeader("GameObjects (3D)", true))
+		{
+			for (int i = 0; i < m_GameObject3Ds.size(); ++i)
+			{
+				ImGui::PushID(i + 200);
+				if (ImGui::Selectable(getTypeName(m_GameObject3Ds[i]), false, ImGuiSelectableFlags_None))
+				{
+					selectedIndex = i;
+					m_HasParsedObjectInfo = false;
+					m_IsSelectedGameObject3D = true;
+					objectCategory = 1;
+				}
+				if (ImGui::IsItemHovered())
+				{
+					DisplayGizmo(camera, m_GameObject3Ds[i]->m_spMatrixNodeTransform->m_Transform.m_Matrix.data());
+				}
+				ImGui::PopID();
+			}
+		}
+		ImGui::End();
+	}
+	if (ImGui::Begin("Inspector"))
+	{
+
+		ImGui::Text("Index: %d", selectedIndex);
+
+		if (Sonic::CGameDocument::GetInstance()->m_pMember->m_GameObjects.size() > selectedIndex || m_GameObject3Ds.size() > selectedIndex)
+		{
+			if (!m_HasParsedObjectInfo)
+			{
+				m_HasParsedObjectInfo = true;
+				if (objectCategory == 0) //non 3d objects
+				{
+					hh::list<boost::shared_ptr<Sonic::CGameObject>>::iterator iterator = Sonic::CGameDocument::GetInstance()->m_pMember->m_GameObjects.begin();
+					std::advance(iterator, selectedIndex);
+					if (dynamic_cast<Sonic::CGameObject3D*>(iterator->get()) != nullptr)
+					{
+						//init tool preview
+						m_CurrentObjectSelected = dynamic_cast<Sonic::CGameObject3D*>(iterator->get());
+						m_IsSelectedGameObject3D = true;
+					}
+					else
+						m_IsSelectedGameObject3D = false;
+				}
+				else //3d objects
+				{
+					m_IsSelectedGameObject3D = true;
+					m_CurrentObjectSelected = m_GameObject3Ds[selectedIndex];
+					auto activationmanager = (ActivationManager*)Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pActivationManager;
+					auto map = activationmanager->m_ElementMap;
+					FUNCTION_PTR(bool, __thiscall, SetObjectSendMessage, 0x00EB3A60,
+						Hedgehog::Universe::CMessageActor * _messageActor,
+						Sonic::CSetObjectManager * _setObjectManager,
+						uint32_t setObjectID,
+						boost::shared_ptr<Hedgehog::Universe::Message>);
+
+					bool skip = false;
+					
+						for (size_t i = 0; i < creationInfos.size(); i++)
+						{
+							//auto preview = std::string(creationInfos[i]->m_Name.c_str());
+							//if (std::string(getTypeName(m_CurrentObjectSelected)).find(preview) == std::string::npos)
+							//	continue;
+							float distance = abs(ObjectUtility::Distance(creationInfos[i]->m_Position, m_GameObject3Ds[selectedIndex]->m_spMatrixNodeTransform->m_Transform.m_Position));
+							if(distance <= 5)
+							{
+								testParam = creationInfos[i]->m_EditParam;
+								break;
+							}
+						}
+					
+				}
+
+			}
+			if (m_HasParsedObjectInfo && m_IsSelectedGameObject3D)
+			{
+				if (ImGui::CollapsingHeader("Transform"))
+				{
+					
+
+					if (GetAsyncKeyState(VK_MBUTTON) < 0 && m_IsButtonBeingPressed == false)
+					{
+						m_IsButtonBeingPressed = true;
+						if (m_CurrentGizmoOperation == ImGuizmo::TRANSLATE)
+							m_CurrentGizmoOperation = ImGuizmo::ROTATE;
+						else
+							m_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
+					}
+					if (GetAsyncKeyState(VK_MBUTTON) == 0 && m_IsButtonBeingPressed == true)
+					{
+						m_IsButtonBeingPressed = false;
+					}
+					if (GetAsyncKeyState(VK_LBUTTON) < 0 && m_IsButtonBeingPressed == false)
+					{
+						m_IsButtonBeingPressed = true;
+						auto e = ScreenToWorld(CVector4(ImGui::GetMousePos().x, ImGui::GetMousePos().y, 0, 1), camera);
+						CVector4 fOut;
+						CVector4 fOut2;
+						const CVector4 startPos = CVector4(camera->m_Position.x() + e.x(), camera->m_Position.y() + e.y(), camera->m_Position.z() + e.z(), 1);
+						//e = e.normalized();
+						CVector rightVector = camera->m_MyCamera.m_View.matrix().block<3, 1>(0, 0).normalized();
+						const CVector4 endPos = CVector4(e.x(), e.y(), e.z(), 1) * 1000;
+						Eigen::Vector4f rayDirection = CVector4(camera->m_MyCamera.m_Direction.normalized().x(), camera->m_MyCamera.m_Direction.normalized().y(), camera->m_MyCamera.m_Direction.normalized().z(), 1);
+
+						// Construct the ray end position
+						//Eigen::Vector4f rayEndPos = (e * rayDirection) * 1000.0f;
+						//if(Common::fRaycast(startPos, startPos + rayDirection * 1000.0f, fOut, fOut2, *pColID_BasicTerrain))
+						//{
+						//	m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.SetPosition(CVector(fOut.x(), fOut.y(), fOut.z()));
+						//	m_CurrentObjectSelected->m_spMatrixNodeTransform->NotifyChanged();
+						//	DebugDrawText::log(std::format("HIT: {0}, {1}, {2}", fOut.x(), fOut.y(), fOut.z()).c_str(), 0);
+						//	DebugDrawText::log(std::format("SCREEN TO WORLD POS: {0}, {1}, {2}", e.x(), e.y(), e.z()).c_str(), 0);
+						//	DebugDrawText::log(std::format("END RAY: {0}, {1}, {2}", endPos.x(), endPos.y(), endPos.z()).c_str(), 0);
+						//}
+					}
+					if (GetAsyncKeyState(VK_LBUTTON) == 0 && m_IsButtonBeingPressed == true)
+					{
+						m_IsButtonBeingPressed = false;
+					}
+					//auto& position1 = m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position;
+					//hh::math::CVector4 screenPosition = camera->m_MyCamera.m_View * hh::math::CVector4(position1.x(), position1.y(), position1.z(), 1.0f);
+					//screenPosition = camera->m_MyCamera.m_Projection * screenPosition;
+					//screenPosition.head<2>() /= screenPosition.w();
+					//screenPosition.x() = ((screenPosition.x() * 0.5f) * (LetterboxHelper::OriginalResolution->x()));
+					//screenPosition.y() = (screenPosition.y() * -0.5f) * (LetterboxHelper::OriginalResolution->y());
+					//DebugDrawText::draw("Test", DebugDrawText::Location(screenPosition.x(), screenPosition.y()), 3);
+					//if (GetAsyncKeyState(VK_LBUTTON) < 0 && m_IsButtonBeingPressed == false)
+					//{
+					//	m_IsButtonBeingPressed = true;
+					//	CVector2 screen_pos = CVector2(ImGui::GetCursorScreenPos().x, ImGui::GetCursorScreenPos().y);
+					//	float distanceBestCanditate = 1000;
+					//	int closestIndex = -1;
+					//	Sonic::CGameObject3D* target = nullptr;
+					//	for (size_t i = 0; i < vec1.size(); i++)
+					//	{
+					//		if (dynamic_cast<Sonic::CGameObject3D*>(vec1[i].get()) != nullptr)
+					//		{
+					//			//init tool preview
+					//			target = dynamic_cast<Sonic::CGameObject3D*>(vec1[i].get());
+					//			auto& position2 = target->m_spMatrixNodeTransform->m_Transform.m_Position;
+					//			const auto camera = Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera();
+					//			hh::math::CVector4 screenPosition2 = camera->m_MyCamera.m_View * hh::math::CVector4(position2.x(), position2.y(), position2.z(), 1.0f);
+					//			screenPosition2 = camera->m_MyCamera.m_Projection * screenPosition2;
+					//			screenPosition2.head<2>() /= screenPosition2.w();
+					//			screenPosition2.x() = ((screenPosition2.x() * 0.5f + 0.5f) * (LetterboxHelper::OriginalResolution->x()));
+					//			screenPosition2.y() = (screenPosition2.y() * -0.5f + 0.5f) * (LetterboxHelper::OriginalResolution->y());
+					//			CVector2 diff = CVector2(screenPosition2.x(), screenPosition2.y()) - screen_pos;
+					//			float distance = abs(sqrtf(diff.dot(diff)));
+					//			if (distance < distanceBestCanditate)
+					//			{
+					//				distanceBestCanditate = distance;
+					//				closestIndex = i;
+					//			}
+					//		}
+					//		
+					//	}
+					//	DebugDrawText::log(std::format("DISTANCE CANDIDATE: {0}\nINDEX: {1}", distanceBestCanditate, closestIndex).c_str());
+					//	selectedIndex = closestIndex;
+					//	
+					//
+					//}
+					//if (GetAsyncKeyState(VK_LBUTTON) == 0 && m_IsButtonBeingPressed == true)
+					//{
+					//	m_IsButtonBeingPressed = false;
+					//}
+					float vectorPosition[3] = { m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.x(), m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.y(), m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.z() };
+					float vectorRotation[3] = { m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Rotation.x(), m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.y(), m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Position.z() };
+					DisplayGizmo(camera, m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Matrix.data());
+
+
+					if (ImGui::InputFloat3("Position", vectorPosition))
+					{
+						m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.SetPosition(CVector(vectorPosition[0], vectorPosition[1], vectorPosition[2]));
+						m_CurrentObjectSelected->m_spMatrixNodeTransform->NotifyChanged();
+					}
+					if (ImGui::InputFloat3("Rotation", vectorRotation))
+					{
+						m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Rotation.x() = vectorRotation[0];
+						m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Rotation.y() = vectorRotation[1];
+						m_CurrentObjectSelected->m_spMatrixNodeTransform->m_Transform.m_Rotation.z() = vectorRotation[2];
+						m_CurrentObjectSelected->m_spMatrixNodeTransform->NotifyChanged();
+					}
+				}
+				if (ImGui::CollapsingHeader("SetParameter"))
+				{
+					for (size_t i = 0; i < testParam->m_ParamList.size(); i++)
+					{
+						if(dynamic_cast<Sonic::CParamBool*>(testParam->m_ParamList[i]) != nullptr)
+						{
+							Sonic::CParamBool* boole = ((Sonic::CParamBool*)testParam->m_ParamList[i]);
+							//if (boole->m_pFuncData == nullptr)
+							//	continue;
+							ImGui::Checkbox(testParam->m_ParamList[i]->m_Name.c_str(), &boole->m_DefaultValue);
+						}
+						if(dynamic_cast<CParamFloat*>(testParam->m_ParamList[i]) != nullptr)
+						{
+							CParamFloat* boole = ((CParamFloat*)testParam->m_ParamList[i]);
+							//if (boole->m_pFuncData == nullptr)
+							//	continue;
+							ImGui::InputFloat(testParam->m_ParamList[i]->m_Name.c_str(), &boole->m_DefaultValue);
+						}
+						//if (dynamic_cast<Sonic::CParamValue<int>>(testParam->m_ParamList[i]) != nullptr)
+						//{
+						//	Sonic::CParamBool* boole = ((Sonic::CParamBool*)testParam->m_ParamList[i]);
+						//	//if (boole->m_pFuncData == nullptr)
+						//	//	continue;
+						//	ImGui::Checkbox(testParam->m_ParamList[i]->m_Name.c_str(), &boole->m_DefaultValue);
+						//}
+
+						//if (dynamic_cast<Sonic::CParamValue<int>*>(testParam->m_ParamList[i]) != nullptr)
+						//	ImGui::InputInt(testParam->m_ParamList[i]->m_Name.c_str(), ((Sonic::CParamValue<int>*)testParam->m_ParamList[i])->m_pFuncData->m_pValue);
+						//if (dynamic_cast<Sonic::CParamValue<float>*>(testParam->m_ParamList[i]) != nullptr)
+						//	ImGui::InputFloat(testParam->m_ParamList[i]->m_Name.c_str(), ((Sonic::CParamValue<float>*)testParam->m_ParamList[i])->m_pFuncData->m_pValue);
+					}
+				}
+			}
+		}
+		ImGui::End();
+	}
+	if (ImGui::Begin("Test"))
+	{
+		for (size_t i = 0; i < creationInfos.size(); i++)
+		{
+			//for (size_t x = 0; x < creationInfos.at(i)->m_EditParam->m_ParamList.size(); x++)
+			//{
+			//	ImGui::Text(creationInfos.at(i)->m_EditParam->m_ParamList.at(x)->m_Name.c_str());
+			//}
+			ImGui::Separator();
+		}
+		ImGui::End();
+	}
+	m_GameObject3Ds.clear();
+}
 #define  _SILENCE_CXX17_C_HEADER_DEPRECATION_WARNING
 bool init = false;
 HOOK(void*, __fastcall, SetUpdateApplication, 0xE7BED0, void* This, void* Edx, float elapsedTime, uint8_t a3)
@@ -597,14 +672,14 @@ HOOK(void*, __fastcall, SetUpdateApplication, 0xE7BED0, void* This, void* Edx, f
 		}*/
 		auto appdoc = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spSequenceMain;
 		auto activationmanager = (ActivationManager*)Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pActivationManager;
-		auto map = activationmanager->m_ListUnknown;
+		auto map = activationmanager->m_ElementMap;
 
 		for (auto it = map.begin(); it != map.end(); ++it)
 		{
 			auto one = it->second;
-			for (size_t i = 0; i < one->field04.size(); i++)
+			for (size_t i = 0; i < one->m_ActivationList.size(); i++)
 			{
-				auto two = one->field04[i].test;
+				auto two = one->m_ActivationList[i].test;
 			}
 		}
 
@@ -791,4 +866,5 @@ void SetEditorTest::applyPatches()
 	INSTALL_HOOK(sub_EA67D0);
 	INSTALL_HOOK(SetUpdateApplication);
 	INSTALL_HOOK(SetObjectManager_ProcessMessage);
+	initSet = true;
 }

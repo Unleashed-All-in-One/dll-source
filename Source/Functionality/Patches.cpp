@@ -48,6 +48,7 @@ std::string splitStr2(std::string const& s, char separator)
 		return s;
 	}
 }
+const char* latestNameFloor;
 const char* GetNewName(const char* existing)
 {
 	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
@@ -65,7 +66,8 @@ const char* GetNewName(const char* existing)
 	name = replace(name, "euc", stageIDName);
 	name = replace(name, "pla", stageIDName);
 	printf((name + "\n").c_str());
-	return _strdup(name.c_str());
+	latestNameFloor = _strdup(name.c_str());
+	return latestNameFloor;
 }
 void __declspec(naked) ASM_ReplaceGeneralFloorModelName()
 {
@@ -80,8 +82,42 @@ void __declspec(naked) ASM_ReplaceGeneralFloorModelName()
 		jmp[pAddr]
 	}
 }
+
+//FUNCTION_PTR(int, __stdcall, AddEventColWrap,0x00D5E2A0,int a1, const char* symbol, int havokShape, int staticNum, Sonic::CMatrixNodeTransform* a5, volatile signed __int32* a6);
+//void TestFloorFunc(Sonic::CGameObject3D *a1, const char* symbol, hk2010_2_0::hkpShape* havokShape, int staticNum, Sonic::CMatrixNodeTransform* a5, volatile signed __int32* a6)
+//{
+//	if(wrapper2)
+//}
+//void __declspec(naked) ASM_Test1()
+//{
+//	static uint32_t pAddr = 0x01008C9D;
+//	static uint32_t Csharedstring = 0x006621A0;
+//	__asm
+//	{
+//		call    hkpBoxShape; Call Procedure
+//		mov     esi, eax
+//		mov     eax, dword_1E0AFC0
+//		push    eax
+//		lea     ecx, [esp + 14Ch + var_130]; Load Effective Address
+//		push    ecx
+//		lea     edx, [esp + 150h + var_E0]; Load Effective Address
+//		push    edx
+//		push    ebx
+//		mov[esp + 158h + var_130], esi
+//		call    AddEventColWrap
+//	}
+//}
+//
+////int __thiscall sub_100A9B0(int this, _DWORD *a2)
+//HOOK(int, __fastcall, GeneralFloor_InitializeEditParam, 0x100A9B0, int This, void* Edx, Sonic::CEditParam* in_Param)
+//{
+//	
+//	return originalGeneralFloor_InitializeEditParam(This, Edx, in_Param);
+//}
 void Patches::applyPatches()
 {
+	//WRITE_JUMP(0x0100DFC5, ASM_Test1);
+	//INSTALL_HOOK(GeneralFloor_InitializeEditParam);
 	//Make IronPole swingable for the werehog
 	INSTALL_HOOK(Sonic_CObjIronPole_UpdateSerial);
 

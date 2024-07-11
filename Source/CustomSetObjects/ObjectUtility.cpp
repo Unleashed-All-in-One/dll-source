@@ -40,6 +40,7 @@ float ObjectUtility::Distance(const Eigen::Vector3f& v1, const Eigen::Vector3f& 
 	double distanceSquared = diff.dot(diff);
 	return std::sqrt(distanceSquared);
 }
+
 Eigen::Vector3f ObjectUtility::ClampMagnitudeMax(const Eigen::Vector3f& vec, float minMagnitude, float maxMagnitude) {
 	float magnitude = vec.norm();
 	Eigen::Vector3f clampedVec = vec;

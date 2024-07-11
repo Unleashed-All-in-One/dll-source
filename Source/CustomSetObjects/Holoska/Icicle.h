@@ -8,6 +8,7 @@ public:
 	int test1;
 	int test2;
 };
+
 class Icicle :public Sonic::CObjectBase, public Sonic::CSetObjectListener, public Sonic::IAnimationContext, public Sonic::CAnimationStateMachine
 {
 public:
@@ -38,6 +39,8 @@ public:
 		/* returning false if your renderable doesn't exist is recommended, your object simply wont render / will cease construction or w/e. */
 		const char* assetName = "snw_obj_icicleB";
 		hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
+
+			
 		boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
 		m_spSpawnedModel = boost::make_shared<hh::mr::CSingleElement>(spModelData);
 		m_spSpawnedModel->BindMatrixNode(m_spMatrixNodeTransform);

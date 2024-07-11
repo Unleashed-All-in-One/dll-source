@@ -7,9 +7,9 @@ namespace Sonic::Sequence
     class Story : public Hedgehog::Universe::CMessageActor
     {
     public:
-        static Hedgehog::Universe::CMessageActor* GetInstance()
+        static Story* GetInstance()
         {
-            return *((Hedgehog::Universe::CMessageActor**)Sonic::CApplicationDocument::GetInstance()->m_pMember + 45);
+            return *reinterpret_cast<Story**>(*reinterpret_cast<uintptr_t*>(reinterpret_cast<uintptr_t>(Sonic::CApplicationDocument::GetInstance()->m_pMember) + 0x168) + 0x94);
         };
     };
 }

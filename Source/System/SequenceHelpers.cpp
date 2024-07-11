@@ -26,11 +26,17 @@ char* allocateStr(const char* value)
 void SequenceHelpers::changeModule(ModuleFlow in_Flow)
 {
 	FUNCTION_PTR(void, __stdcall, ChangeModuleTest, 0x01107D50, Hedgehog::Universe::CMessageActor * Th, int a2);
-	ChangeModuleTest(Sonic::Sequence::Main::GetInstance(), (int)in_Flow);
-	/*Sonic::Message::MsgRequestChangeModule* message = new Sonic::Message::MsgRequestChangeModule(in_Flow);
-	Sonic::Sequence::Main::ProcessMessage(message)*/;
+	//ChangeModuleTest(Sonic::Sequence::Main::GetInstance(), (int)in_Flow);
+	Sonic::Message::MsgRequestChangeModule* message = new Sonic::Message::MsgRequestChangeModule();
+	message->m_ModuleIndex = (int)in_Flow;
+	message->moduleInfo = Sonic::Message::SRequestChangeModuleInfo();
+	if(in_Flow == StageAct)
+	{
+		message->moduleInfo.m_Field00 = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameters->m_TerrainArchiveName;
+		message->moduleInfo.m_Field04 = "Stage";
+	}
+	Sonic::Sequence::Main::ProcessMessage(message);
 }
-
 void SequenceHelpers::queueEvent(const char* in_EventName)
 {
 	test = true;
@@ -89,13 +95,14 @@ void SequenceHelpers::loadStage(const char* in_StageName, int sequenceEventExtra
 	//int __thiscall Sonic::Sequence::CStoryImpl::LuanneFunctions::BeginStory(int this, int a2, int a3)
 	//void __thiscall Sonic::Sequence::CStoryImpl::LuanneFunctions::StoryLabel(int this, int a2, int stringComparison)
 	auto message = Sonic::Message::MsgSequenceEvent(2, sequenceEventExtra);
-	auto message2 = Sonic::Message::MsgStorySequenceEvent(0, 0);
 	auto test = Sonic::Sequence::Main::GetInstance();
 	//void __thiscall StorySeqProcessStorySequenceEvent(int storySequence, CMsgStorySequenceEvent *storySequenceEvent)
 	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 	char** h = (char**)stageTerrainAddress;
 	const char* terr = *h;
-	strcpy(*(char**)stageTerrainAddress, in_StageName);
+	Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameters->m_TerrainArchiveName = _strdup(in_StageName);
+	Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameters->m_ModeName = _strdup("Stage");
+	//strcpy(*(char**)stageTerrainAddress, in_StageName);
 	if (resetStorySequence)
 	{
 		SequenceHelpers::resetStorySequence();
@@ -103,9 +110,6 @@ void SequenceHelpers::loadStage(const char* in_StageName, int sequenceEventExtra
 	FUNCTION_PTR(int, __thiscall, StartModuleF, 0x00D77020, Sonic::Sequence::Story * StorySequence, int a2, LuaStringEntryContainer * a3);
 	//StartModuleF(storySequenceInstance, 0, new LuaStringEntryContainer(_strdup("Stage")));
 	Sonic::Sequence::Main::ProcessMessage(&message);
-	uint32_t stageIDAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x0 });
-	uint32_t* test2 = &stageIDAddress;
-	*test2 = 0;
 }
 /// <summary>
 /// Uses the SetupPlayer and SetupPlayerForce functions from CStorySequence to change player classes

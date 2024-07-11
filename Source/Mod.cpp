@@ -17,6 +17,7 @@
 #include "CustomSetObjects/CObjCamera2D.h"
 
 //Rest
+#include "CustomSetObjects/Werehog/CObjHangOn.h"
 #include "Testing/TestingCode.h"
 extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 {
@@ -33,6 +34,12 @@ std::string getDirectoryPath(const std::string& path)
 	return path.substr(0, pos != std::string::npos ? pos : 0);
 }
 
+//DWORD *__thiscall ProcMsgRequestChangeModule(void *this, int a2)
+HOOK(DWORD*, __fastcall, ProcMsg, 0xD0B2E0, void* This, void* Edx, Sonic::Message::MsgRequestChangeModule& msg)
+{
+	auto msg2 = msg;
+	return originalProcMsg(This, Edx, msg);
+}
 extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 {
 #if _DEBUG
@@ -58,7 +65,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	Context::setModDirectoryPath(getDirectoryPath(modInfo->CurrentMod->Path));
 	SaveManager::applyPatches();
 	LuaManager::initialize();
-	SetEditorTest::applyPatches();
+	//SetEditorTest::applyPatches();
 
 	//---------------Gameplay---------------
 	QSSRestore::applyPatches();
@@ -88,6 +95,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	Pelican::registerObject();
 	IrremovableMobMykonos::registerObject();
 	StompingSwitch::registerObject();
+	CObjHangOn::registerObject();
 	BB_INSTALL_SET_OBJECT_MAKE_HOOK(CObjCamera2D);
 
 	//---------------UI---------------
@@ -103,13 +111,14 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	// Right now, exiting from Options will cause a crash due to the saving/loading in the WorldMap.
 	TitleOption::applyPatches();
 	TestingCode::applyPatches();
-
+	INSTALL_HOOK(ProcMsg);
 	
 	WRITE_MEMORY(0x1AD99D0, char*, "shader_debug.ar");
 	WRITE_MEMORY(0x1AD99D4, char*, "shader_debug_add.ar");
 	WRITE_MEMORY(0x1AD99E8, char*, "shader_debug.arl");
 	WRITE_MEMORY(0x1AD99EC, char*, "shader_debug_add.arl");
 }
+
 
 extern "C" __declspec(dllexport) void PostInit()
 {
@@ -130,12 +139,12 @@ extern "C" __declspec(dllexport) void PostInit()
 		exit(-1);
 	}
 }
-std::string assembled = "##";
-std::vector< boost::shared_ptr<Sonic::CGameObject>> list;
-
+bool draw;
 //char __thiscall Sonic::CSetObjectManager::ProcessMessage(char *this, int a1, int a2
 extern "C" void __declspec(dllexport) OnFrame()
 {
+	
+	
 	//WRITE_MEMORY(0x1E5E438, int, 1);
 	//---------------System---------------
 	ImguiInitializer::update();
