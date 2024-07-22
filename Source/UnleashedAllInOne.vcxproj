@@ -134,6 +134,8 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="CustomSetObjects\Paraloop.cpp" />
     <ClCompile Include="CustomSetObjects\SpeedDownCollision.cpp" />
     <ClCompile Include="CustomSetObjects\Werehog\CObjHangOn.cpp" />
+    <ClCompile Include="GameObjects\TitleWorldMapGlobe.cpp" />
+    <ClCompile Include="GameObjects\TitleWorldMapSky.cpp" />
     <ClCompile Include="Project.cpp" />
     <ClCompile Include="Functionality\EXP.cpp" />
     <ClCompile Include="Functionality\FallCam.cpp" />
@@ -199,6 +201,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="System\SaveManager.cpp" />
     <ClCompile Include="System\SequenceHelpers.cpp" />
     <ClCompile Include="System\UpdateDirector.cpp" />
+    <ClCompile Include="Testing\MicroSequencer.cpp" />
     <ClCompile Include="Testing\TestingCode.cpp" />
     <ClCompile Include="UI\ETFStageGateUI.cpp" />
     <ClCompile Include="UI\EventViewer.cpp" />
@@ -226,6 +229,9 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="CustomSetObjects\Paraloop.h" />
     <ClInclude Include="CustomSetObjects\SpeedDownCollision.h" />
     <ClInclude Include="CustomSetObjects\Werehog\CObjHangOn.h" />
+    <ClInclude Include="GameObjects\TitleWorldMapCamera.h" />
+    <ClInclude Include="GameObjects\TitleWorldMapGlobe.h" />
+    <ClInclude Include="GameObjects\TitleWorldMapSky.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="CustomSetObjects\DebugEnemy.h" />
     <ClInclude Include="Functionality\EXP.h" />
@@ -299,6 +305,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="System\SoundController.h" />
     <ClInclude Include="System\UpdateDirector.h" />
     <ClInclude Include="Temporary.h" />
+    <ClInclude Include="Testing\MicroSequencer.h" />
     <ClInclude Include="UI\ETFStageGateUI.h" />
     <ClInclude Include="UI\EvilQTEUI.h" />
     <ClInclude Include="UI\HudButtonGuide.h" />

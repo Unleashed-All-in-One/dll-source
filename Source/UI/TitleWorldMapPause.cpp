@@ -1,3 +1,4 @@
+#include "TitleWorldMap.h"
 using namespace hh::math;
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcWMPause;
 boost::shared_ptr<Sonic::CGameObjectCSD> spWMPause;
@@ -163,7 +164,7 @@ void PauseCase(int pos)
 	{
 		DebugDrawText::log("Exit");
 		TitleWorldMap::SetHideEverything(true);
-		TitleWorldMap::Active = false;
+		TitleWorldMap::m_isActive = false;
 		Title::setSubmenu(false);
 		Title::setHideEverything(false);
 		break;
@@ -173,7 +174,7 @@ void PauseCase(int pos)
 		StageManager::ActiveReplacement = false;
 		Title::inInstall = true;
 		StageManager::NextLevelLoad = "pla201";
-		TitleWorldMap::LoadingReplacementEnabled = true;
+		StageManager::LoadingReplacementEnabled = true;
 		SequenceHelpers::loadStage("pla201");
 		break;
 	}
@@ -181,11 +182,11 @@ void PauseCase(int pos)
 }
 HOOK(void*, __fastcall, TitleWorldMapPause_UpdateApplication, 0xE7BED0, Sonic::CGameObject* This, void* Edx, float elapsedTime, uint8_t a3)
 {
-	if(!TitleWorldMap::Active)
+	if(!TitleWorldMap::m_isActive)
 		return originalTitleWorldMapPause_UpdateApplication(This, Edx, elapsedTime, a3);
 
 	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
-	if (inputPtr->IsTapped(Sonic::eKeyState_Start) && TitleWorldMap::Active && !active)
+	if (inputPtr->IsTapped(Sonic::eKeyState_Start) && TitleWorldMap::m_isActive && !active)
 	{
 		HudPause_OpenPauseScreen(false);
 		Common::PlaySoundStatic(m_SoundHandleEnter, 1000000);

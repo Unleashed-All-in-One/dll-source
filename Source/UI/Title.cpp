@@ -1,4 +1,5 @@
-﻿Chao::CSD::RCPtr<Chao::CSD::CProject> rcTitleScreen;
+﻿#include "TitleWorldMap.h"
+Chao::CSD::RCPtr<Chao::CSD::CProject> rcTitleScreen;
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcTitleScreenLogos;
 Chao::CSD::RCPtr<Chao::CSD::CScene> rcTitleLogo_1, rcTitlebg, rcTitleMenu, rcTitleMenuScroll, rcTitleMenuTXT, black_bg, bg_window, fg_window, txt_window, footer_window, bg_transition;
 Chao::CSD::RCPtr<Chao::CSD::CScene> rcTitleProgressbar;
@@ -96,7 +97,7 @@ void ShowInstallScreen()
 	databaseLoader->LoadArchive(database, "#SelectStage.ar", { 0, 0 }, false, false);
 	spDebugMenu = boost::make_shared<Sonic::StageSelectMenu::CDebugStageSelectMenuXml>();
 	Sonic::CGameDocument::GetInstance()->AddGameObject(spDebugMenu);
-	TitleWorldMap::LoadingReplacementEnabled = false;
+	StageManager::LoadingReplacementEnabled = false;
 }
 void Title::showTransition(bool enableLoad)
 {

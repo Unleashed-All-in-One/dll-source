@@ -19,6 +19,8 @@
 //Rest
 #include "CustomSetObjects/Werehog/CObjHangOn.h"
 #include "Testing/TestingCode.h"
+#include "UI/TitleWorldMap.h"
+
 extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 {
 	// Load configuration
@@ -65,7 +67,7 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	Context::setModDirectoryPath(getDirectoryPath(modInfo->CurrentMod->Path));
 	SaveManager::applyPatches();
 	LuaManager::initialize();
-	//SetEditorTest::applyPatches();
+	SetEditorTest::applyPatches();
 
 	//---------------Gameplay---------------
 	QSSRestore::applyPatches();
@@ -140,11 +142,26 @@ extern "C" __declspec(dllexport) void PostInit()
 	}
 }
 bool draw;
+class CGameplayFlowManager : public Hedgehog::Universe::TStateMachine< CGameplayFlowManager>, public Hedgehog::Base::CObject
+{
+public:
+	BB_INSERT_PADDING(32-4);
+	int m_Odd;
+	int m_Odd2;
+};
+BB_ASSERT_OFFSETOF(CGameplayFlowManager, m_Odd2, 128);
+
+//BB_FUNCTION_PTR(void, __cdecl, InitCGameplayFlowStageAct, 0x00D0DEB0, boost::shared_ptr<CGameplayFlowAct> a1, Sonic::Message::SRequestChangeModuleInfo* a2);
+
 //char __thiscall Sonic::CSetObjectManager::ProcessMessage(char *this, int a1, int a2
 extern "C" void __declspec(dllexport) OnFrame()
 {
-	
-	
+	if(GetAsyncKeyState('K'))
+	{
+		auto main = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spSequenceMain;	
+		main.reset();
+	}	
+	*(bool*)0x1E75518 = 1;
 	//WRITE_MEMORY(0x1E5E438, int, 1);
 	//---------------System---------------
 	ImguiInitializer::update();

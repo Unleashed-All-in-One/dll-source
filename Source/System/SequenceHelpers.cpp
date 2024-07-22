@@ -12,6 +12,11 @@ public:
 
 	MsgGetEventQueueState(int in_pPosition) : m_pPosition(in_pPosition) {}
 };
+class MsgRequestEndModule : public Hedgehog::Universe::MessageTypeGet
+{
+public:
+	HH_FND_MSG_MAKE_TYPE(0x01681224);
+};
 char* allocateStr(const char* value)
 {
 	char* allocatedStr = (char*)__HH_ALLOC(strlen(value) + 1);
@@ -26,16 +31,18 @@ char* allocateStr(const char* value)
 void SequenceHelpers::changeModule(ModuleFlow in_Flow)
 {
 	FUNCTION_PTR(void, __stdcall, ChangeModuleTest, 0x01107D50, Hedgehog::Universe::CMessageActor * Th, int a2);
+	auto message = new MsgRequestEndModule();
 	//ChangeModuleTest(Sonic::Sequence::Main::GetInstance(), (int)in_Flow);
-	Sonic::Message::MsgRequestChangeModule* message = new Sonic::Message::MsgRequestChangeModule();
-	message->m_ModuleIndex = (int)in_Flow;
-	message->moduleInfo = Sonic::Message::SRequestChangeModuleInfo();
+	Sonic::Message::MsgRequestChangeModule* message2 = new Sonic::Message::MsgRequestChangeModule();
+	message2->m_ModuleIndex = (int)in_Flow;
+	message2->moduleInfo = Sonic::Message::SRequestChangeModuleInfo();
 	if(in_Flow == StageAct)
 	{
-		message->moduleInfo.m_Field00 = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameters->m_TerrainArchiveName;
-		message->moduleInfo.m_Field04 = "Stage";
+		message2->moduleInfo.m_Field00 = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameter->TerrainArchiveName;
+		message2->moduleInfo.m_Field04 = "Stage";
 	}
 	Sonic::Sequence::Main::ProcessMessage(message);
+	Sonic::Sequence::Main::ProcessMessage(message2);
 }
 void SequenceHelpers::queueEvent(const char* in_EventName)
 {
@@ -91,24 +98,14 @@ void SequenceHelpers::resetStorySequence()
 /// <param name="in_EventName">Stage archive name</param>
 void SequenceHelpers::loadStage(const char* in_StageName, int sequenceEventExtra, bool resetStorySequence) 
 {
-	nextStage = allocateStr(in_StageName);
-	//int __thiscall Sonic::Sequence::CStoryImpl::LuanneFunctions::BeginStory(int this, int a2, int a3)
-	//void __thiscall Sonic::Sequence::CStoryImpl::LuanneFunctions::StoryLabel(int this, int a2, int stringComparison)
-	auto message = Sonic::Message::MsgSequenceEvent(2, sequenceEventExtra);
-	auto test = Sonic::Sequence::Main::GetInstance();
-	//void __thiscall StorySeqProcessStorySequenceEvent(int storySequence, CMsgStorySequenceEvent *storySequenceEvent)
-	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-	char** h = (char**)stageTerrainAddress;
-	const char* terr = *h;
-	Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameters->m_TerrainArchiveName = _strdup(in_StageName);
-	Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameters->m_ModeName = _strdup("Stage");
-	//strcpy(*(char**)stageTerrainAddress, in_StageName);
+	nextStage = allocateStr(in_StageName);	
+	auto message = Sonic::Message::MsgSequenceEvent(2, sequenceEventExtra);	
+	Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameter->TerrainArchiveName = _strdup(in_StageName);
+	Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameter->ModeName = _strdup("Stage");
 	if (resetStorySequence)
 	{
 		SequenceHelpers::resetStorySequence();
 	}
-	FUNCTION_PTR(int, __thiscall, StartModuleF, 0x00D77020, Sonic::Sequence::Story * StorySequence, int a2, LuaStringEntryContainer * a3);
-	//StartModuleF(storySequenceInstance, 0, new LuaStringEntryContainer(_strdup("Stage")));
 	Sonic::Sequence::Main::ProcessMessage(&message);
 }
 /// <summary>

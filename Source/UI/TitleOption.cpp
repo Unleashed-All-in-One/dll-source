@@ -1,3 +1,4 @@
+#include "TitleWorldMap.h"
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcOptions;
 Chao::CSD::RCPtr<Chao::CSD::CScene> headerBG, headerIMG, footerBG,footerIMG, worldmaptext, info1;
 boost::shared_ptr<Sonic::CGameObjectCSD> spOptions;
@@ -41,7 +42,7 @@ HOOK(void, __fastcall, TitleOption_CMain_CStateIntro, 0xD215A0, int a1, int a2, 
 }
 HOOK(void, __fastcall, TitleOption_CMain_CStateOutro, 0xD22A70, boost::shared_ptr<SaveLoadTestStruct>& spSave, void* a2, void* Edx)
 {	
-	if (!TitleWorldMap::Active)
+	if (!TitleWorldMap::m_isActive)
 	{
 		leaving = true;
 		Title::setScrollDirection(true);

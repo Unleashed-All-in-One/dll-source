@@ -362,16 +362,11 @@ public:
 	float m_DefaultValue;
 };
 Sonic::CEditParam* testParam;
-void SetEditorTest::draw()
+
+void GameObjectList()
 {
-	if (!initSet)
-		return;
-	ImGui::SetNextWindowBgAlpha(1);
 	ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar;
 	const boost::shared_ptr<Sonic::CCamera> camera = Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera();
-
-	LayerWindow();
-
 	if (ImGui::Begin("GameObject List"))
 	{
 		if (ImGui::CollapsingHeader("GameObjects", true))
@@ -452,20 +447,20 @@ void SetEditorTest::draw()
 						boost::shared_ptr<Hedgehog::Universe::Message>);
 
 					bool skip = false;
-					
-						for (size_t i = 0; i < creationInfos.size(); i++)
+
+					for (size_t i = 0; i < creationInfos.size(); i++)
+					{
+						//auto preview = std::string(creationInfos[i]->m_Name.c_str());
+						//if (std::string(getTypeName(m_CurrentObjectSelected)).find(preview) == std::string::npos)
+						//	continue;
+						float distance = abs(ObjectUtility::Distance(creationInfos[i]->m_Position, m_GameObject3Ds[selectedIndex]->m_spMatrixNodeTransform->m_Transform.m_Position));
+						if (distance <= 5)
 						{
-							//auto preview = std::string(creationInfos[i]->m_Name.c_str());
-							//if (std::string(getTypeName(m_CurrentObjectSelected)).find(preview) == std::string::npos)
-							//	continue;
-							float distance = abs(ObjectUtility::Distance(creationInfos[i]->m_Position, m_GameObject3Ds[selectedIndex]->m_spMatrixNodeTransform->m_Transform.m_Position));
-							if(distance <= 5)
-							{
-								testParam = creationInfos[i]->m_EditParam;
-								break;
-							}
+							testParam = creationInfos[i]->m_EditParam;
+							break;
 						}
-					
+					}
+
 				}
 
 			}
@@ -473,7 +468,7 @@ void SetEditorTest::draw()
 			{
 				if (ImGui::CollapsingHeader("Transform"))
 				{
-					
+
 
 					if (GetAsyncKeyState(VK_MBUTTON) < 0 && m_IsButtonBeingPressed == false)
 					{
@@ -582,14 +577,14 @@ void SetEditorTest::draw()
 				{
 					for (size_t i = 0; i < testParam->m_ParamList.size(); i++)
 					{
-						if(dynamic_cast<Sonic::CParamBool*>(testParam->m_ParamList[i]) != nullptr)
+						if (dynamic_cast<Sonic::CParamBool*>(testParam->m_ParamList[i]) != nullptr)
 						{
 							Sonic::CParamBool* boole = ((Sonic::CParamBool*)testParam->m_ParamList[i]);
 							//if (boole->m_pFuncData == nullptr)
 							//	continue;
 							ImGui::Checkbox(testParam->m_ParamList[i]->m_Name.c_str(), &boole->m_DefaultValue);
 						}
-						if(dynamic_cast<CParamFloat*>(testParam->m_ParamList[i]) != nullptr)
+						if (dynamic_cast<CParamFloat*>(testParam->m_ParamList[i]) != nullptr)
 						{
 							CParamFloat* boole = ((CParamFloat*)testParam->m_ParamList[i]);
 							//if (boole->m_pFuncData == nullptr)
@@ -614,6 +609,29 @@ void SetEditorTest::draw()
 		}
 		ImGui::End();
 	}
+}boost::shared_ptr<Hedgehog::Mirage::CMaterialData> SetEditorTest::materialData;
+
+void SetEditorTest::draw()
+{
+	if (!initSet)
+		return;
+	ImGui::SetNextWindowBgAlpha(1);
+
+	//LayerWindow();
+	//GameObjectList();
+	if (ImGui::Begin("Material"))
+	{
+		
+		if(materialData != nullptr)
+		{
+			for (size_t i = 0; i < materialData->m_Float4Params.size(); i++)
+			{
+				ImGui::InputFloat4(materialData->m_Float4Params[i]->m_Name.GetValue(), materialData->m_Float4Params[i]->m_spValue.get());				
+			}
+		}
+		ImGui::End();
+	}
+	
 	if (ImGui::Begin("Test"))
 	{
 		for (size_t i = 0; i < creationInfos.size(); i++)
@@ -720,7 +738,7 @@ HOOK(void*, __fastcall, SetUpdateApplication, 0xE7BED0, void* This, void* Edx, f
 			if (dynamic_cast<Sonic::CSetObjectListener*>(vec1.at(i).get()) != nullptr)
 			{
 				//init tool preview
-				dynamic_cast<Sonic::CSetObjectListener*>(vec1.at(i).get())->CSetObjectListener20();
+				dynamic_cast<Sonic::CSetObjectListener*>(vec1.at(i).get())->OnSetEditorEnter();
 			}
 		}
 		//auto t = Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pSetObjectManager->m_pMember->m_spSetLayerManager->test;
@@ -759,7 +777,7 @@ HOOK(void*, __fastcall, SetUpdateApplication, 0xE7BED0, void* This, void* Edx, f
 			if (dynamic_cast<Sonic::CSetObjectListener*>(vec1.at(i).get()) != nullptr)
 			{
 				//kill tool preview
-				dynamic_cast<Sonic::CSetObjectListener*>(vec1.at(i).get())->CSetObjectListener24();
+				dynamic_cast<Sonic::CSetObjectListener*>(vec1.at(i).get())->OnSetEditorLeave();
 			}
 		}
 		

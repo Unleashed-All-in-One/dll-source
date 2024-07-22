@@ -106,6 +106,27 @@ bool ObjectUtility::IsResourceAvailableMODEL(const boost::shared_ptr<Hedgehog::D
 	else
 		return false;
 }
+///Registers a UV Animation (uv-anim) motion to in_spEffectMotionAll. Fun Fact: Gens also has a function that basically just does this!
+void ObjectUtility::AssignUVAnimation(const char* in_animationName,const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase, const boost::shared_ptr<Hedgehog::Mirage::CModelData>& in_spModelData, const boost::shared_ptr<hh::mot::CSingleElementEffectMotionAll>& in_spEffectMotionAll)
+{
+	FUNCTION_PTR(void, __thiscall, fpGetTexCoordAnimData, 0x7597E0,
+		hh::mot::CMotionDatabaseWrapper const& wrapper,
+		boost::shared_ptr<Hedgehog::Motion::CTexcoordAnimationData>&texCoordAnimData,
+		hh::base::CSharedString const& name,
+		uint32_t flag
+	);
+
+	FUNCTION_PTR(void, __thiscall, fpCreateUVAnim, 0x7537E0,
+		Hedgehog::Motion::CSingleElementEffectMotionAll * This,
+		boost::shared_ptr<hh::mr::CModelData> const& modelData,
+		boost::shared_ptr<Hedgehog::Motion::CTexcoordAnimationData> const& texCoordAnimData
+	);
+
+	boost::shared_ptr<Hedgehog::Motion::CTexcoordAnimationData> texCoordAnimData;
+	hh::mot::CMotionDatabaseWrapper motWrapper(in_spDatabase.get());
+	fpGetTexCoordAnimData(motWrapper, texCoordAnimData, in_animationName, 0);
+	fpCreateUVAnim(in_spEffectMotionAll.get(), in_spModelData, texCoordAnimData);
+}
 void ObjectUtility::RegisterAnimations(const boost::shared_ptr<Hedgehog::Animation::CAnimationPose>& animPose, std::vector<NewAnimationData> anims, const boost::shared_ptr<hh::mr::CSingleElement>& model, Sonic::CAnimationStateMachine* stateMachine)
 {
 	Hedgehog::Animation::SMotionInfo* pEntries = new Hedgehog::Animation::SMotionInfo[anims.size()];

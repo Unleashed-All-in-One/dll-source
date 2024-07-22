@@ -1,10 +1,11 @@
-
+#include "..\UI\TitleWorldMap.h"
 const char* StageManager::NextLevelLoad;
 bool StageManager::ActiveReplacement;
 bool StageManager::ReplacingNext;
 const char* lastStageID = "";
 const char* lastStageIDGate = "";
 bool StageManager::WhiteWorldEnabled = false;
+bool StageManager::LoadingReplacementEnabled = false;
 int StageManager::LastSavedQueueIndex = -1;
 uint32_t nextPlayerType = 0;
 std::string StageManager::nextStageID;
@@ -58,7 +59,7 @@ void StageManager::setETFInfo(std::string etfHubStageName)
 void loadCapital(std::string stageName, bool isWerehog)
 {
 	SequenceHelpers::loadStage(stageName.c_str(), 0, false);
-	TitleWorldMap::LoadingReplacementEnabled = true;
+	StageManager::LoadingReplacementEnabled = true;
 	StageManager::WhiteWorldEnabled = true;
 	//SequenceHelpers::changeModule(ModuleFlow::PlayableMenu);
 	SequenceHelpers::setPlayerType(isWerehog ? PlayerType::CLASSIC_SONIC : PlayerType::GENERIC_SONIC);
@@ -68,14 +69,14 @@ const char* StageManager::getStageToLoad()
 {
 	const char* stageToLoad = "ghz200";
 
-	int latestFlag = TitleWorldMap::LastValidFlagSelected;
-	int stageSelected = TitleWorldMap::StageSelectedWindow;
+	int latestFlag = TitleWorldMap::m_lastFlagSelected;
+	int stageSelected = TitleWorldMap::m_stageSelectWindowSelection;
 
-	if (TitleWorldMap::CapitalWindowOpen)
-		stageToLoad = Project::worldData.data[latestFlag].data[Project::getCapital(latestFlag, TitleWorldMap::Flag[latestFlag].night)].levelID.c_str();
+	if (TitleWorldMap::m_isCapitalWindowOpened)
+		stageToLoad = Project::worldData.data[latestFlag].data[Project::getCapital(latestFlag, TitleWorldMap::m_flags[latestFlag].night)].levelID.c_str();
 	else
 	{
-		if (Project::worldData.data[latestFlag].dataNight.size() != 0 && TitleWorldMap::Flag[latestFlag].night)
+		if (Project::worldData.data[latestFlag].dataNight.size() != 0 && TitleWorldMap::m_flags[latestFlag].night)
 		{
 			stageToLoad = Project::worldData.data[latestFlag].dataNight[stageSelected].levelID.c_str();
 			SequenceHelpers::setPlayerType(1);
@@ -231,13 +232,13 @@ void calculateNextStage()
 {
 	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 	char** h = (char**)stageTerrainAddress;
-	TitleWorldMap::CamInitialized = false;
+	TitleWorldMap::m_isWorldMapCameraInit = false;
 
 	//strcpy(*(char**)stageTerrainAddress, StageManager::NextLevelLoad);
 	if (!StageManager::InStory)
 	{		
 		const char* stageToLoad = "ghz200";
-		if (!TitleWorldMap::LoadingReplacementEnabled)
+		if (!StageManager::LoadingReplacementEnabled)
 		{
 			if (Title::inInstall)
 			{
@@ -250,18 +251,18 @@ void calculateNextStage()
 			}
 			return;
 		}
-		if (Project::worldData.data.size() < TitleWorldMap::LastValidFlagSelected)
+		if (Project::worldData.data.size() < TitleWorldMap::m_lastFlagSelected)
 		{
 			//if only cpp had the same ${} system as c#
 			std::string message = "This country has an invalid configuration. Loading " + std::string(stageToLoad) + " instead.";
 			MessageBoxA(NULL, message.c_str(), "Unleashed Title Screen", 0);
-			printf("\n[WorldMap] Missing config for FlagID %d", TitleWorldMap::LastValidFlagSelected);
+			printf("\n[WorldMap] Missing config for FlagID %d", TitleWorldMap::m_lastFlagSelected);
 		}
 		else
 		{
 			stageToLoad = StageManager::getStageToLoad();
 		}
-		TitleWorldMap::Active = false;
+		TitleWorldMap::m_isActive = false;
 		if (StageManager::NextLevelLoad != nullptr)
 		{
 			stageToLoad = StageManager::NextLevelLoad;
@@ -327,11 +328,11 @@ void __declspec(naked) ASM_InterceptGameplayFlowLoading()
 		//Original function
 		mov     esi, eax
 		xor eax, eax
-		cmp TitleWorldMap::LoadingReplacementEnabled, 1
+		cmp StageManager::LoadingReplacementEnabled, 1
 		jne FunctionFinish
 
 
-		cmp TitleWorldMap::ForceLoadToFlowTitle, 1
+		cmp TitleWorldMap::m_ForceLoadToTitle, 1
 		je ChangeToTitle
 			
 		cmp ecx, 6
@@ -616,7 +617,7 @@ HOOK(int*, __fastcall, StartModule, 0x00D77020, DWORD* StorySequence,void* Edx, 
 			a3 = new LuaStringEntryContainer(_strdup(ModeStrings[2].c_str()));
 		}
 	}
-	if (TitleWorldMap::ForceLoadToFlowTitle)
+	if (TitleWorldMap::m_ForceLoadToTitle)
 	{
 		if (std::string(exampleRead) != "Title")
 		{

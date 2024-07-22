@@ -104,7 +104,6 @@
 
 //UI
 #include "UI/Title.h"
-#include "UI/TitleWorldMap.h"
 #include "UI/TitleOption.h"
 #include "UI/TitleWorldMapPause.h"
 #include "UI/EventViewer.h"
@@ -114,5 +113,3 @@
 #include "UI/ETFStageGateUI.h"
 #include "UI/EvilQTEUI.h"
 #include "UI/HudButtonGuide.h"
-
-

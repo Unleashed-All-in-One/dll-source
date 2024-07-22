@@ -9,6 +9,17 @@ public:
 	int test2;
 };
 
+inline void DoSomethingRB(boost::shared_ptr<Sonic::CRigidBody>* rigidbody, int a1)
+{
+	static uint32_t func = 0x011806E0;
+	__asm
+	{
+		mov esi, rigidbody
+		push a1
+		call [func]
+	}
+}
+
 class Icicle :public Sonic::CObjectBase, public Sonic::CSetObjectListener, public Sonic::IAnimationContext, public Sonic::CAnimationStateMachine
 {
 public:
@@ -111,7 +122,15 @@ public:
 		AddEventCollision("Normal", shapeEventTrigger1, *pColID_PlayerEvent, false, m_spNodeEventCollision);
 		m_spRigidBody->m_CollisionCategory = 51;
 		m_spRigidBody2->m_CollisionCategory = 51;
+		auto test = (uint32_t*)m_spRigidBody->m_pHkpRigidBody;
+		auto test2 = (hk2010_2_0::hkpMotion::MotionType)*(test + 232);
+		//to test56 = (hk2010_2_0::hkpMotion::MotionType)test2->m_type;
+		auto gggg = m_spRigidBody2->m_pHkpRigidBody->m_Motion;
+		m_spRigidBody->m_pHkpRigidBody->m_Motion.m_type.m_storage = 1;
+		m_spRigidBody2->m_pHkpRigidBody->m_Motion.m_type.m_storage = 1;
+		//DoSomethingRB(&m_spRigidBody, 0);
 		AddImpulse(m_spRigidBody.get(), CVector(5, 5, 5));
+		//m_spRigidBody2->m_pHkpRigidBody->m_Collideable.m_Motion->m_type = hk2010_2_0::hkEnum<hk2010_2_0::hkpMotion::MotionType, hk2010_2_0::hkUint8>(hk2010_2_0::hkpMotion::MOTION_DYNAMIC);
 		// You don't need to override this if you're not using it, but this would be for setting up event colliders & rigidbodies.
 		// note you can do this in "SetAddRenderables" but sonic team *tends to* do collision stuff here.
 		return true;
@@ -126,7 +145,8 @@ public:
 		float distance = abs(ObjectUtility::Distance(playerContext->m_spMatrixNode->m_Transform.m_Position, m_spMatrixNodeTransform->m_Transform.m_Position));
 
 		auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
-		
+
+		//auto gggg = m_spRigidBody2->m_pHkpRigidBody->m_Collideable.m_Motion;
 	}
 	static void registerObject();
 };

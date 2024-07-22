@@ -190,7 +190,7 @@ public:
                     }
                     StageManager::setETFInfo(SequenceHelpers::getCurrentStageName(false));
                     StageManager::setGameParameters(stageIDN, "");
-                    TitleWorldMap::LoadingReplacementEnabled = true;
+                    StageManager::LoadingReplacementEnabled = true;
                     StageManager::WhiteWorldEnabled = false;
                     SequenceHelpers::loadStage(stageIDN.c_str(), 0);
                     strcpy(*(char**)stageTerrainAddress, stageIDN.c_str());

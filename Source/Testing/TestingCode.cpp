@@ -1,4 +1,5 @@
 #include "TestingCode.h"
+#include "..\UI\TitleWorldMap.h"
 
 class CBasicSphere : public Sonic::CGameObject3D
 {
@@ -278,8 +279,8 @@ HOOK(int, __fastcall, CHudGateMenuMainIntroInfo, 0x1080110, hh::fnd::CStateMachi
 	int index = stageID == 0 ? stageID : stageID + 1;
 	auto idArchive = (const char*)((int*)0x015BBA34)[stageID];
 
-	Common::ClampUInt(stageID, 0, Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data.size() - 1);
-	StageManager::NextLevelLoad = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[stageID].levelID.
+	Common::ClampUInt(stageID, 0, Project::worldData.data[TitleWorldMap::m_lastFlagSelected].data.size() - 1);
+	StageManager::NextLevelLoad = Project::worldData.data[TitleWorldMap::m_lastFlagSelected].data[stageID].levelID.
 		c_str();
 	return returne;
 }
@@ -288,7 +289,7 @@ HOOK(char, *_stdcall, StageGate_MoveToOtherStage, 0x107FBC0, int a1)
 {
 	char* returned = originalStageGate_MoveToOtherStage(a1);
 	uint8_t stageID = (*(uint8_t*)(a1 + 336));
-	StageManager::NextLevelLoad = Project::worldData.data[TitleWorldMap::LastValidFlagSelected].data[stageID].levelID.
+	StageManager::NextLevelLoad = Project::worldData.data[TitleWorldMap::m_lastFlagSelected].data[stageID].levelID.
 		c_str();
 	return returned;
 }

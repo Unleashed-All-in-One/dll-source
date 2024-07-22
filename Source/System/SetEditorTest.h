@@ -2,6 +2,7 @@
 class SetEditorTest
 {
 public:
+	static boost::shared_ptr<Hedgehog::Mirage::CMaterialData> materialData;
 	static void applyPatches();
 	static void remakeAllObjects();
 	static void draw();
