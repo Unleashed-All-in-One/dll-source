@@ -332,7 +332,7 @@ void __declspec(naked) ASM_InterceptGameplayFlowLoading()
 		jne FunctionFinish
 
 
-		cmp TitleWorldMap::m_ForceLoadToTitle, 1
+		cmp TitleWorldMap::m_forceLoadToTitle, 1
 		je ChangeToTitle
 			
 		cmp ecx, 6
@@ -617,7 +617,7 @@ HOOK(int*, __fastcall, StartModule, 0x00D77020, DWORD* StorySequence,void* Edx, 
 			a3 = new LuaStringEntryContainer(_strdup(ModeStrings[2].c_str()));
 		}
 	}
-	if (TitleWorldMap::m_ForceLoadToTitle)
+	if (TitleWorldMap::m_forceLoadToTitle)
 	{
 		if (std::string(exampleRead) != "Title")
 		{

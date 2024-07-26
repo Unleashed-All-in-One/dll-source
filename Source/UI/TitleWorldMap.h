@@ -44,7 +44,7 @@ public:
 	static void EnableInput();
 
 	static bool m_isActive;
-	static bool m_ForceLoadToTitle;
+	static bool m_forceLoadToTitle;
 	static bool m_isStickMovementDisabled;
 	static bool m_isTargetDisabled;
 	static bool m_isCapitalWindowOpened;

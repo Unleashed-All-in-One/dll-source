@@ -1242,7 +1242,20 @@ namespace Common
 			call[pfIsButtonHeld]
 		}
 	}
-
+	inline void ObjectCGlitterPlayerOneShotAlt(void* pObject, Hedgehog::Base::CSharedString const& name)
+	{
+		uint32_t* CGlitterPlayer = *(uint32_t**)((uint32_t)pObject + 0xF8);
+		void* matrixNode = (void*)((uint32_t)pObject + 0xB8);
+		if (CGlitterPlayer && *CGlitterPlayer == 0x16D0514)
+		{
+			FUNCTION_PTR(void, __thiscall, CGlitterPlayerOneShot, 0xE85F00, void* This, void* pMatrixTransformNode, Hedgehog::Base::CSharedString const& name, float a4, int a5);
+			CGlitterPlayerOneShot(CGlitterPlayer, matrixNode, name, 1.0, 1);
+		}
+		else
+		{
+			MessageBox(NULL, L"Object does not contain CGlitterPlayer!", NULL, MB_ICONERROR);
+		}
+	}
 	inline void ObjectCGlitterPlayerOneShot(void* pObject, Hedgehog::Base::CSharedString const& name)
 	{
 		uint32_t* CGlitterPlayer = *(uint32_t**)((uint32_t)pObject + 0xF8);

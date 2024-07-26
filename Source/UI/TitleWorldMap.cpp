@@ -6,7 +6,7 @@
 
 using namespace hh::math;
 
-bool TitleWorldMap::m_ForceLoadToTitle = false;
+bool TitleWorldMap::m_forceLoadToTitle = false;
 bool TitleWorldMap::m_isWorldMapCameraInit = false;
 const CVector TitleWorldMap::m_emblemPosition = CVector(0, 0, -2.34f);
 const TitleWorldMapCamera* TitleWorldMap::m_worldMapCamera;
@@ -446,7 +446,7 @@ void TitleWorldMap::Start()
 	//Init Anims
 	m_isActive = true;
 	StageManager::LoadingReplacementEnabled = true;
-	m_ForceLoadToTitle = false;
+	m_forceLoadToTitle = false;
 	TitleWorldMap_CTitleOptionCStateOutroSaving(m_spSave, nullptr);
 	//Set lives text
 	rcInfoImg1->GetNode("num")->SetText(Common::IntToString(Common::GetLivesCount(), "%02d"));
@@ -1456,21 +1456,22 @@ HOOK(void, __fastcall, TitleWorldMap_CameraUpdate, 0x0058CDA0, TransitionTitleCa
 	s_RotationAngle = WrapAroundFloat(s_RotationAngle, 360.0 * DEG2RAD);
 
 	const CQuaternion lightRotation = TitleWorldMap::QuaternionFromAngleAxis(-s_RotationAngle, CVector(0, 1, 0));
+	if (m_spWorldmapObject)
+	{
+		m_spWorldmapObject->SetRotation(lightRotation);
+		DebugDrawText::log(std::format("ROTATION0: {0}, {1}, {2}", m_spWorldmapObject->m_spMatrixNodeTransform->m_Transform.m_Rotation.x(), m_spWorldmapObject->m_spMatrixNodeTransform->m_Transform.m_Rotation.y(), m_spWorldmapObject->m_spMatrixNodeTransform->m_Transform.m_Rotation.z()).c_str(), 0);
+		//DebugDrawText::log(std::format("ROTATION1: {0}, {1}, {2}", m_spWorldmapObject->m_spModelButtonTransform->m_Transform.m_Rotation.x(), m_spWorldmapObject->m_spModelButtonTransform->m_Transform.m_Rotation.y(), m_spWorldmapObject->m_spModelButtonTransform->m_Transform.m_Rotation.z()).c_str(), 0);
+	}
 	light->m_GlobalLightDirection = lightRotation * (lightPosition - TitleWorldMap::m_emblemPosition) +
 		TitleWorldMap::m_emblemPosition;
 	//Set light properties
 	light->m_GlobalLightDiffuse = CVector(0.02f, 0.02f, 0.02f);
 	//light->m_GlobalLightDirection = CVector(-79.8565f, 0, 4.78983f);
-	light->m_GlobalLightSpecular = CVector(100, 100, 100);
+
+	light->m_GlobalLightSpecular = CVector(5, 5, 5);
 
 
-	if (m_spWorldmapObject)
-	{
-		m_spWorldmapObject->m_spModelButtonTransform->m_Transform.SetRotation(lightRotation);
-		m_spWorldmapObject->m_spMatrixNodeTransform->m_Transform.SetRotation(lightRotation);
-		m_spWorldmapObject->m_spModelButtonTransform->NotifyChanged();
-		m_spWorldmapObject->m_spMatrixNodeTransform->NotifyChanged();
-	}
+	
 	ApplyCameraStuff(This, camera);
 	camera->UpdateParallel(updateInfo);
 }

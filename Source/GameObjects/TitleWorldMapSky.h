@@ -1,6 +1,8 @@
 #pragma once
 class CTitleWorldMapSky : public Sonic::CGameObject3D
 {
+	INSERT_PADDING(0x4);
+	void* m_GlitterPlayer;
 	boost::shared_ptr<hh::mr::CSingleElement> m_spModel;
 	CVector m_Position;
 	CVector m_Velocity;
@@ -20,6 +22,8 @@ public:
 		Sonic::CGameDocument* pGameDocument,
 		const boost::shared_ptr<Hedgehog::Database::CDatabase>& spDatabase
 	) override;
+
+	void SetRotation(const hh::math::CQuaternion& quaternion);
 
 	void UpdateParallel
 	(

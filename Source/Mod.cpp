@@ -142,14 +142,7 @@ extern "C" __declspec(dllexport) void PostInit()
 	}
 }
 bool draw;
-class CGameplayFlowManager : public Hedgehog::Universe::TStateMachine< CGameplayFlowManager>, public Hedgehog::Base::CObject
-{
-public:
-	BB_INSERT_PADDING(32-4);
-	int m_Odd;
-	int m_Odd2;
-};
-BB_ASSERT_OFFSETOF(CGameplayFlowManager, m_Odd2, 128);
+
 
 //BB_FUNCTION_PTR(void, __cdecl, InitCGameplayFlowStageAct, 0x00D0DEB0, boost::shared_ptr<CGameplayFlowAct> a1, Sonic::Message::SRequestChangeModuleInfo* a2);
 
