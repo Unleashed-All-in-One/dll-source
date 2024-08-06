@@ -1,4 +1,5 @@
 #include "SetEditorTest.h"
+class CGameplayFlowStageAct;
 DWORD* SetManager;
 bool initSet;
 static const int* pColID_BasicTerrain = reinterpret_cast<int*>(0x01E0AFAC);
@@ -265,7 +266,7 @@ struct SElement
 	void* field00;
 	hh::vector<SElementSub> m_ActivationList;
 	void* field12;
-	void* field16;
+	hh::vector<void> field16;
 	void* field20;
 };
 BB_ASSERT_OFFSETOF(SElement, m_ActivationList, 4);
@@ -898,7 +899,8 @@ bool init = false;
 HOOK(void*, __fastcall, SetUpdateApplication, 0xE7BED0, void* This, void* Edx, float elapsedTime, uint8_t a3)
 {
 	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
-	if (GetAsyncKeyState(VK_F12) && !init)
+	
+	if (GetAsyncKeyState(VK_F12) && false)
 	{
 		init = true;
 		//auto ptr = (uint32_t*)(Sonic::CGameDocument::GetInstance()->m_pGameActParameter->m_pSetObjectManager->m_pMember);

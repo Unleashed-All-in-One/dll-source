@@ -30,12 +30,11 @@ void customStageLoad()
 	//void __thiscall StorySeqProcessStorySequenceEvent(int storySequence, CMsgStorySequenceEvent *storySequenceEvent)
 	//SequenceHelpers::resetStorySequence();
 
-	FUNCTION_PTR(void, __thiscall, StorySeqProcessStorySequenceEvent, 0x00D76980, Sonic::Sequence::Story * StorySeq, Sonic::Message::MsgStorySequenceEvent * a2);
-	auto message2 = Sonic::Message::MsgStorySequenceEvent(1, 1);
-	StorySeqProcessStorySequenceEvent(Sonic::Sequence::Story::GetInstance(), &message2);
+	//FUNCTION_PTR(void, __thiscall, StorySeqProcessStorySequenceEvent, 0x00D76980, Sonic::Sequence::Story * StorySeq, Sonic::Message::MsgStorySequenceEvent * a2);
+	//auto message2 = Sonic::Message::MsgStorySequenceEvent(1, 1);
+	//StorySeqProcessStorySequenceEvent(Sonic::Sequence::Story::GetInstance(), &message2);
 	//Sonic::Sequence::Main::ProcessMessage(&message);
 	SequenceHelpers::loadStage(_strdup(temp.c_str()), 0, false);
-	SequenceHelpers::changeModule(ModuleFlow::StageAct);
 	//uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 	//char** h = (char**)stageTerrainAddress;
 	//const char* terr = *h;

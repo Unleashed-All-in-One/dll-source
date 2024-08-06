@@ -1,4 +1,5 @@
 #pragma once
+#include "..\..\hk2010_2_0_2.h"
 using namespace hh::math;
 class MsgHit : public Hedgehog::Universe::MessageTypeSet
 {
@@ -123,11 +124,12 @@ public:
 		m_spRigidBody->m_CollisionCategory = 51;
 		m_spRigidBody2->m_CollisionCategory = 51;
 		auto test = (uint32_t*)m_spRigidBody->m_pHkpRigidBody;
-		auto test2 = (hk2010_2_0::hkpMotion::MotionType)*(test + 232);
+
+		auto test2 = (hk2010_2_0_Conv::hkpMotion::MotionType)*(test + 232);
 		//to test56 = (hk2010_2_0::hkpMotion::MotionType)test2->m_type;
-		auto gggg = m_spRigidBody2->m_pHkpRigidBody->m_Motion;
-		m_spRigidBody->m_pHkpRigidBody->m_Motion.m_type.m_storage = 1;
-		m_spRigidBody2->m_pHkpRigidBody->m_Motion.m_type.m_storage = 1;
+		auto gggg = ((hk2010_2_0_Conv::hkpRigidBody*)m_spRigidBody2->m_pHkpRigidBody)->m_Motion;
+		((hk2010_2_0_Conv::hkpRigidBody*)m_spRigidBody->m_pHkpRigidBody)->m_Motion.m_type.m_storage = 1;
+		((hk2010_2_0_Conv::hkpRigidBody*)m_spRigidBody2->m_pHkpRigidBody)->m_Motion.m_type.m_storage = 1;
 		//DoSomethingRB(&m_spRigidBody, 0);
 		AddImpulse(m_spRigidBody.get(), CVector(5, 5, 5));
 		//m_spRigidBody2->m_pHkpRigidBody->m_Collideable.m_Motion->m_type = hk2010_2_0::hkEnum<hk2010_2_0::hkpMotion::MotionType, hk2010_2_0::hkUint8>(hk2010_2_0::hkpMotion::MOTION_DYNAMIC);

@@ -129,24 +129,12 @@ void ObjectUtility::AssignUVAnimation(const char* in_animationName,const boost::
 }
 void ObjectUtility::RegisterAnimations(const boost::shared_ptr<Hedgehog::Animation::CAnimationPose>& animPose, std::vector<NewAnimationData> anims, const boost::shared_ptr<hh::mr::CSingleElement>& model, Sonic::CAnimationStateMachine* stateMachine)
 {
-	Hedgehog::Animation::SMotionInfo* pEntries = new Hedgehog::Animation::SMotionInfo[anims.size()];
+	std::vector<hh::anim::SMotionInfo> pEntries = std::vector<hh::anim::SMotionInfo>(0, {"",""});
 	for (size_t i = 0; i < anims.size(); i++)
 	{
-		pEntries[i].Name = anims[i].m_stateName;
-		pEntries[i].FileName = anims[i].m_fileName;
-		pEntries[i].Speed = anims[i].m_speed;
-		pEntries[i].RepeatType = !anims[i].m_isLoop;
-		pEntries[i].StartFrame = 0;
-		pEntries[i].EndFrame = -1.0f;
-		pEntries[i].Field18 = -1.0f;
-		pEntries[i].Field1C = 0;
-		pEntries[i].Field20 = -1;
-		pEntries[i].Field24 = -1;
-		pEntries[i].Field28 = -1;
-		pEntries[i].Field2C = -1;
+		pEntries.push_back(Hedgehog::Animation::SMotionInfo(anims[i].m_stateName, anims[i].m_fileName, 1, !anims[i].m_isLoop));
 	}
-
-	animPose->AddMotionInfo(pEntries, anims.size());
+	animPose->AddMotionInfo(&pEntries.front(), anims.size());
 	//animationStateMachine = boost::make_shared< Sonic::CAnimationStateMachine>();
 	//auto test = animationStateMachine->GetContext();
 	animPose->CreateAnimationCache();

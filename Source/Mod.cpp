@@ -162,4 +162,5 @@ extern "C" void __declspec(dllexport) OnFrame()
 	DiscordStatus::update();
 	StageManager::update();
 	EventViewer::update();
+	SequenceHelpers::update();
 }

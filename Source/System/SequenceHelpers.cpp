@@ -37,18 +37,22 @@ class CModeCreaterList
 class CGameplayFlow : public Hedgehog::Universe::CStateMachineBase::CStateBase
 {
 public:
+	int m_Field60;
 	int m_Field64;
 	int m_Field68;
 	int m_Field6C;
 	int m_Field70;
 };
-BB_ASSERT_SIZEOF(CGameplayFlow, 0x70);
+BB_ASSERT_OFFSETOF(CGameplayFlow, m_Field60, 0x60);
+BB_ASSERT_OFFSETOF(CGameplayFlow, m_Field64, 0x64);
+BB_ASSERT_OFFSETOF(CGameplayFlow, m_Field68, 0x68);
+BB_ASSERT_OFFSETOF(CGameplayFlow, m_Field6C, 0x6C);
+BB_ASSERT_OFFSETOF(CGameplayFlow, m_Field70, 0x70);
 class CGameplayFlowStage : public CGameplayFlow
 {
 public:
 	//Some of this shit may be IUpdateCoordinator
-	void* m_Field70;
-	void* m_Field74;
+	void* m_UpdateCoordinator;
 	void* m_Field78;
 	void* m_Field7C;
 	void* m_Field80;
@@ -62,7 +66,7 @@ public:
 	char m_FieldB6;
 	char m_FieldB7;
 	char m_FieldB8;
-	Hedgehog::Universe::TStateMachine<CGameplayFlowStage>* m_FieldBC;
+	Hedgehog::Universe::TTinyStateMachine<CGameplayFlowStage>* m_FieldBC;
 	char gapC0[44];
 	void* m_FieldEC;
 	int m_IsPaused;
@@ -81,7 +85,7 @@ public:
 	void* m_Field114;
 	char m_Field118;
 	__declspec(align(4)) void* m_Field11C;
-	void* m_Field120;
+	int m_Field120;
 	char m_Field124;
 	char m_Field125;
 	__declspec(align(4)) void* m_Field128;
@@ -103,102 +107,164 @@ public:
 	void* m_Field17C;
 	BB_INSERT_PADDING(0x10);
 };
-BB_ASSERT_OFFSETOF(CGameplayFlowStage, m_Field74, 0x74);
+BB_ASSERT_OFFSETOF(CGameplayFlowStage, m_UpdateCoordinator, 0x74);
 BB_ASSERT_OFFSETOF(CGameplayFlowStage, m_spSoundDataCueControl, 0x164);
 BB_ASSERT_SIZEOF(CGameplayFlowStage, 0x180 + 0x10);//???
 Sonic::Message::SRequestChangeModuleInfo* info;
 //224
+
+struct StageLoaderXML
+{
+	void* dword0;
+	void* Field4;
+	void* Field8;
+	char FieldC;
+	__declspec(align(4)) Hedgehog::Base::CSharedString* phedgehog__base__csharedstring10;
+	char Field14;
+	char Field15;
+	char Field16;
+	__declspec(align(2)) void* Field18;
+	__declspec(align(8)) char Field20;
+	char gap21[15];
+	BB_INSERT_PADDING(0x10);
+	char gap40[4];
+	void* Field44;
+	void* Field48;
+	__declspec(align(8)) void* Field50;
+	void* Field54;
+	char Field58;
+	__declspec(align(4)) void* Field5C;
+	void* Field60;
+	void* Field64;
+	char gap68[40];
+	char Field90;
+	char Field91;
+	char gap92[14];
+	Hedgehog::Math::CQuaternion FieldA0;
+	Hedgehog::Math::CQuaternion FieldB0;
+	char gapC0;
+	char FieldC1;
+	Hedgehog::base::CSharedString FieldC4;
+	void* FieldC8;
+	void* FieldCC;
+	Hedgehog::base::CSharedString FieldD0;
+	float floatD4;
+};
+BB_ASSERT_OFFSETOF(StageLoaderXML, floatD4, 0xD4);
 class CGameplayFlowStageAct : public CGameplayFlowStage
 {
 public:
-	void* m_pStageLoaderXML;
-	boost::shared_ptr<void*> m_spStageLoaderXML;
+	StageLoaderXML* m_pStageLoaderXML;
+	boost::shared_ptr<StageLoaderXML>* m_spStageLoaderXML;
 	int m_Field198;
 	int m_Field19C;
 	Sonic::CGameActParameter* m_pGameActParameter;
-	Hedgehog::Base::CSharedString* m_Field1A4;
-	Hedgehog::Base::CSharedString* m_Field1A8;
-	Hedgehog::Base::CSharedString* m_Field1AC;
+	Hedgehog::Base::CSharedString m_Field1A4;
+	Hedgehog::Base::CSharedString m_Field1A8;
+	Hedgehog::Base::CSharedString m_Field1AC;
 	int m_Field1B0; //m_Field08 of SRequestModuleInfo
-	BB_INSERT_PADDING(0x8); // ? ? ?
-
-
-	//static inline const char* ms_pStateName = (const char*)0x015B4B6C;
-	//CGameplayFlowStageAct()
-	//{
-	//	*reinterpret_cast<size_t*>(this) = 0x016E4184;
-	//	//Hedgehog::Base::CSharedString *__thiscall Sonic::CGameplayFlowStageAct(void *this, Hedgehog::Base::CSharedString *a1, SMsgRequestChangeModuleInfo *stageID, char **inString, const char *a4)
-	//	FUNCTION_PTR(void, __thiscall, Constructor, 0x00D000D0, CGameplayFlowStageAct* out1, CGameplayFlowStageAct * out, Sonic::Message::SRequestChangeModuleInfo * info2, Hedgehog::base::CSharedString string1, int two);
-	//	Constructor(this, this, info, info->m_Field04, info->m_Field08);
-	//}
-	
+	BB_INSERT_PADDING(0x8); // ? ? ?	
 };
 BB_ASSERT_OFFSETOF(CGameplayFlowStageAct, m_pStageLoaderXML, 400);
+BB_ASSERT_OFFSETOF(CGameplayFlowStageAct, m_Field1A4, 0x1A4);
+BB_ASSERT_OFFSETOF(CGameplayFlowStageAct, m_Field1A8, 0x1A8);
+BB_ASSERT_OFFSETOF(CGameplayFlowStageAct, m_Field1AC, 0x1AC);
 BB_ASSERT_SIZEOF(CGameplayFlowStageAct, 0x1C0);
+class CGameplayFlowStagePlayableMenu : public CGameplayFlowStageAct
+{
+public:
+	int m_Field1C0; /// SERIOUSLY?!
+};
+BB_ASSERT_OFFSETOF(CGameplayFlowStagePlayableMenu, m_Field1C0, 0x1C0);
 class CGameplayFlowTrialMenu : public CGameplayFlow
 {
 	BB_INSERT_PADDING(144 - sizeof(CGameplayFlow));
 public:
-
-	//static inline const char* ms_pStateName = (const char*)0x015B4B6C;
-	//CGameplayFlowStageAct()
-	//{
-	//	*reinterpret_cast<size_t*>(this) = 0x016E4184;
-	//	//Hedgehog::Base::CSharedString *__thiscall Sonic::CGameplayFlowStageAct(void *this, Hedgehog::Base::CSharedString *a1, SMsgRequestChangeModuleInfo *stageID, char **inString, const char *a4)
-	//	FUNCTION_PTR(void, __thiscall, Constructor, 0x00D000D0, CGameplayFlowStageAct* out1, CGameplayFlowStageAct * out, Sonic::Message::SRequestChangeModuleInfo * info2, Hedgehog::base::CSharedString string1, int two);
-	//	Constructor(this, this, info, info->m_Field04, info->m_Field08);
-	//}
+	
 
 };
 BB_ASSERT_SIZEOF(CGameplayFlowTrialMenu, 144);
-struct Odd
-{
-	void* a1;
-	void* a2;
-};
-struct Odd2
-{
-	void* a1;
-	void* a2;
-};
 struct MsgReplyChangeModule : public hh::fnd::MessageTypeSet
 {
 	HH_FND_MSG_MAKE_TYPE(0x01681238);
 };
+struct SRequestChangeModuleInfo2
+{
+public:
+	void* t;
+	Sonic::Message::SRequestChangeModuleInfo* two;
+};
+struct struct_a2_5
+{
+	Hedgehog::Base::CSharedString hedgehog__base__csharedstring0;
+	Hedgehog::Base::CSharedString hedgehog__base__csharedstring4;
+	int dword8;
+	Hedgehog::Base::CSharedString hedgehog__base__csharedstringC;
+	Hedgehog::Base::CSharedString hedgehog__base__csharedstring10;
+	char char14;
+	void* pdword18;
+	__declspec(align(8)) void* dword20;
+	void* dword24;
+	Hedgehog::Base::CSharedString hedgehog__base__csharedstring28;
+	Hedgehog::Base::CSharedString hedgehog__base__csharedstring2C;
+	float float30;
+	float float34;
+};
+
+
 bool init2 = false;
+static constexpr int STAGEACT_CONSTRUCTOR = 0x00D0DEB0;
+static constexpr int STAGEPLAYABLEMENU_CONSTRUCTOR = 0x00D0DE30;
+void ModuleChangeProcessor(const Sonic::Message::SRequestChangeModuleInfo& in_Info, int in_Address, int moduleIndex)
+{
+	FUNCTION_PTR(int, __thiscall, ChangeStateWithoutRegistering, 0x76EE60, void* in_StateMachine, int* out_Data, const boost::shared_ptr<Hedgehog::Universe::CStateMachineBase::CStateBase>&in_StateBase, int a4, float a5, int a6);
+	FUNCTION_PTR(boost::shared_ptr<CGameplayFlowStageAct>, __cdecl, InitCGameplayFlowStageAct, in_Address, const Sonic::Message::SRequestChangeModuleInfo & in_ModuleRequestInfo, void* in_Manager);
+	auto manager = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager;
+	boost::shared_ptr<CGameplayFlowStageAct> m_StateThatHasToBeAdded = boost::make_shared<CGameplayFlowStageAct>();
+
+	m_StateThatHasToBeAdded = InitCGameplayFlowStageAct(in_Info, Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager);
+	auto m_ReplyChangeModule = MsgReplyChangeModule(); //not sure if this is necessary
+	auto m_EndChangeModule = MsgRequestEndModule();
+	auto g = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager;
+	manager->ProcessMessageInStateMachine(m_EndChangeModule, 0);
+	manager->ProcessMessageInStateMachine(m_ReplyChangeModule, 0);
+	if(m_StateThatHasToBeAdded->m_Name == manager->GetCurrentState()->m_Name)
+	{
+		manager->test->m_CurrentModuleIndex = moduleIndex;
+		manager->test->m_pModuleManager->m_ModuleConstructorAddress = (Sonic::CModuleManager::SModuleConstructor*)(8 * moduleIndex + 0x15B8528);
+		manager->test->m_BitmaskWeird44 = 2;
+	}
+	else
+	{
+		int m_Unused[3];
+		ChangeStateWithoutRegistering(Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager, m_Unused, m_StateThatHasToBeAdded, 0, 0, 0);
+		m_StateThatHasToBeAdded.reset();		
+	}
+	//Force the game to end the current mode prematurely
+	//
+	//
+	//
+	//8 * m_ModuleIndex + 0x15B8528
+}
 void SequenceHelpers::changeModule(ModuleFlow in_Flow)
 {
 	FUNCTION_PTR(void, __stdcall, ChangeModuleTest, 0x01107D50, Hedgehog::Universe::CMessageActor * Th, int a2);
-	auto message = new MsgRequestEndModule();
+	
 	//ChangeModuleTest(Sonic::Sequence::Main::GetInstance(), (int)in_Flow);
 	Sonic::Message::MsgRequestChangeModule* message2 = new Sonic::Message::MsgRequestChangeModule();
 	message2->m_ModuleIndex = (int)in_Flow;
 	message2->moduleInfo = Sonic::Message::SRequestChangeModuleInfo();
 	if(in_Flow == StageAct)
 	{
-		message2->moduleInfo.m_Field00 = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameter->TerrainArchiveName;
-		message2->moduleInfo.m_Field04 = "Stage";
+		//message2->moduleInfo.m_Field00 = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameter->TerrainArchiveName;
+		//message2->moduleInfo.m_Field04 = "Stage";
 	}
-	//int __thiscall CModeCreaterListImpl(int this)
-	uint32_t* mode = new uint32_t();
-	//sub_1107E40()
-	if (init2)
-		return;
-	init2 = true;
-	boost::shared_ptr<CGameplayFlowStageAct> m_StateThatHasToBeAdded = boost::make_shared<CGameplayFlowStageAct>();
-	auto odd = new Odd();
-	auto address = 0x00D0DEB0;
-	//void __cdecl InitCGameplayFlowStageAct(boost::Void *a1, SMsgRequestChangeModuleInfo *stageID)
-	FUNCTION_PTR(boost::shared_ptr<CGameplayFlowStageAct>, __cdecl, InitCGameplayFlowStageAct, address, Odd* out2, Sonic::Message::SRequestChangeModuleInfo* INFO);
+	message2->moduleInfo.m_Field00 = "DMykonos_2";
+	message2->moduleInfo.m_Field04 = "Stage";
+	message2->moduleInfo.m_Field20 = hh::list<Hedgehog::base::CSharedString>();
 	
-	m_StateThatHasToBeAdded = InitCGameplayFlowStageAct(odd, &message2->moduleInfo);
-	auto msg122 = MsgReplyChangeModule();
-	Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager->ProcessMessageInStateMachine(msg122, 0);
-	info = &message2->moduleInfo;
-	//int __thiscall sub_76EE60(_DWORD *this, int a2, int a3, int a4, float a5, int a6)
-	FUNCTION_PTR(int, __thiscall, ChangeStateWithoutRegistering, 0x76EE60, void* in_StateMachine, int* out_Data, const boost::shared_ptr<Hedgehog::Universe::CStateMachineBase::CStateBase>& in_StateBase, int a4, float a5, int a6);
-	int v6[3];
-	ChangeStateWithoutRegistering(Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager, v6, m_StateThatHasToBeAdded,0,0,0);
+	init2 = true;
+	ModuleChangeProcessor(message2->moduleInfo, STAGEACT_CONSTRUCTOR, (int)in_Flow);
 	//Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager->RegisterStateFactory();
 
 
@@ -335,6 +401,15 @@ HOOK(Sonic::Sequence::Story*, __cdecl, ConstructStorySequence, 0xD76930)
 {
 	SequenceHelpers::storySequenceInstance = originalConstructStorySequence();
 	return SequenceHelpers::storySequenceInstance;
+}
+void SequenceHelpers::update()
+{
+	if (GetAsyncKeyState(VK_F12))
+	{
+		CGameplayFlowStageAct* act = (CGameplayFlowStageAct*)Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager->GetCurrentState().get();
+		printf("");
+		 
+	}
 }
 void SequenceHelpers::applyPatches()
 {

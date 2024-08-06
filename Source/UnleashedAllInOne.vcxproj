@@ -136,6 +136,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="CustomSetObjects\Werehog\CObjHangOn.cpp" />
     <ClCompile Include="GameObjects\TitleWorldMapGlobe.cpp" />
     <ClCompile Include="GameObjects\TitleWorldMapSky.cpp" />
+    <ClCompile Include="ModuleTable.cpp" />
     <ClCompile Include="Project.cpp" />
     <ClCompile Include="Functionality\EXP.cpp" />
     <ClCompile Include="Functionality\FallCam.cpp" />
@@ -232,6 +233,7 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="GameObjects\TitleWorldMapCamera.h" />
     <ClInclude Include="GameObjects\TitleWorldMapGlobe.h" />
     <ClInclude Include="GameObjects\TitleWorldMapSky.h" />
+    <ClInclude Include="hk2010_2_0_2.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="CustomSetObjects\DebugEnemy.h" />
     <ClInclude Include="Functionality\EXP.h" />

@@ -36,34 +36,9 @@ public:
         animations.push_back(NewAnimationData("Touch", "cmn_obj_sk2_hintring_touch", 1, false, "Idle"));
 
         this->SetContext(this); //why?
-        Hedgehog::Animation::SMotionInfo* pEntries = new Hedgehog::Animation::SMotionInfo[animations.size()];
-        for (size_t i = 0; i < animations.size(); i++)
-        {
-            pEntries[i].Name = animations[i].m_stateName;
-            pEntries[i].FileName = animations[i].m_fileName;
-            pEntries[i].Speed = animations[i].m_speed;
-            pEntries[i].RepeatType = !animations[i].m_isLoop;
-            pEntries[i].StartFrame = 0;
-            pEntries[i].EndFrame = -1.0f;
-            pEntries[i].Field18 = -1.0f;
-            pEntries[i].Field1C = 0;
-            pEntries[i].Field20 = -1;
-            pEntries[i].Field24 = -1;
-            pEntries[i].Field28 = -1;
-            pEntries[i].Field2C = -1;
-        }
-        
-        m_AnimatorPose->AddMotionInfo(pEntries, animations.size());
-        m_AnimatorPose->CreateAnimationCache();
+        ObjectUtility::RegisterAnimations(m_AnimatorPose, animations, m_spSpawnedModel, this);
         m_spSpawnedModel->BindMatrixNode(m_spMatrixNodeTransform);
-        m_spSpawnedModel->BindPose(m_AnimatorPose);
-        this->AddAnimationState("Idle");
-        this->AddAnimationState("Appear");
-        this->AddAnimationState("Touch");
-        //m_spSpawnedModel->BindAnimationPose(animatorTest);
-        //ChangeState("Appear");
         Sonic::CGameObject::AddRenderable("Object", m_spSpawnedModel, true);
-        DebugDrawText::log("I EXIST!!", 10);
 
         this->ChangeState("Idle");
         return true;

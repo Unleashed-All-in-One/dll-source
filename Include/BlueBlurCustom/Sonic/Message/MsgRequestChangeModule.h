@@ -12,7 +12,7 @@ namespace Sonic::Message
         int m_Field08;
         Hedgehog::base::CSharedString m_Field12;
         Hedgehog::base::CSharedString m_Field16;
-        hh::list < Hedgehog::Base::CSharedString> test;
+        hh::list <Hedgehog::Base::CSharedString> m_Field20;
         int m_Field32;
         int m_Field36;
         Hedgehog::base::CSharedString m_Field40;
