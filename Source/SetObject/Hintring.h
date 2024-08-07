@@ -21,7 +21,7 @@ public:
     bool m_NeedInput = true;
     float m_TimerWaitReset;
     bool m_Cooldown = false;
-    std::vector<NewAnimationData> animations;
+    std::vector<SUC::NewAnimationData> animations;
     boost::shared_ptr<Sonic::CAnimationStateMachine> animationStateMachine;
     bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
     {
@@ -30,10 +30,10 @@ public:
         boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
         m_spSpawnedModel = boost::make_shared<hh::mr::CSingleElement>(spModelData);
         m_AnimatorPose = boost::make_shared<Hedgehog::Animation::CAnimationPose>(in_spDatabase, assetName);
-        animations = std::vector<NewAnimationData>();
-        animations.push_back(NewAnimationData("Idle", "cmn_obj_sk2_hintring", 1, true, nullptr));
-        animations.push_back(NewAnimationData("Appear", "cmn_obj_sk2_hintring_appear", 1, false, nullptr));
-        animations.push_back(NewAnimationData("Touch", "cmn_obj_sk2_hintring_touch", 1, false, "Idle"));
+        animations = std::vector<SUC::NewAnimationData>();
+        animations.push_back(SUC::NewAnimationData("Idle", "cmn_obj_sk2_hintring", 1, true, nullptr));
+        animations.push_back(SUC::NewAnimationData("Appear", "cmn_obj_sk2_hintring_appear", 1, false, nullptr));
+        animations.push_back(SUC::NewAnimationData("Touch", "cmn_obj_sk2_hintring_touch", 1, false, "Idle"));
 
         this->SetContext(this); //why?
         ObjectUtility::RegisterAnimations(m_AnimatorPose, animations, m_spSpawnedModel, this);

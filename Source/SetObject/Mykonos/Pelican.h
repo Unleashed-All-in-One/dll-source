@@ -11,7 +11,7 @@ public:
 	boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
 	boost::shared_ptr<Hedgehog::Animation::CAnimationPose> m_AnimatorPose;
 	SharedPtrTypeless sound;
-	std::vector<NewAnimationData> animations;
+	std::vector<SUC::NewAnimationData> animations;
 	float timer;
 	bool isRight = true;
 	bool hasScared = false;
@@ -24,11 +24,11 @@ public:
 		m_spSpawnedModel = boost::make_shared<hh::mr::CSingleElement>(spModelData);
 		m_spSpawnedModel->BindMatrixNode(m_spMatrixNodeTransform);
 		m_AnimatorPose = boost::make_shared<Hedgehog::Animation::CAnimationPose>(in_spDatabase, assetName);
-		animations = std::vector<NewAnimationData>();
-		animations.push_back(NewAnimationData("Surprise", "myk_obj_soc_pelican_surprise", 1, true, nullptr));
-		animations.push_back(NewAnimationData("Stay", "myk_obj_soc_pelican_stay", 1, true, nullptr));
-		animations.push_back(NewAnimationData("TurnL", "myk_obj_soc_pelican_pose_L", 1, false, nullptr));
-		animations.push_back(NewAnimationData("TurnR", "myk_obj_soc_pelican_pose_R", 1, false, nullptr));
+		animations = std::vector<SUC::NewAnimationData>();
+		animations.push_back(SUC::NewAnimationData("Surprise", "myk_obj_soc_pelican_surprise", 1, true, nullptr));
+		animations.push_back(SUC::NewAnimationData("Stay", "myk_obj_soc_pelican_stay", 1, true, nullptr));
+		animations.push_back(SUC::NewAnimationData("TurnL", "myk_obj_soc_pelican_pose_L", 1, false, nullptr));
+		animations.push_back(SUC::NewAnimationData("TurnR", "myk_obj_soc_pelican_pose_R", 1, false, nullptr));
 		this->SetContext(this); //set Context of AnimatorStateMachine to IAnimatorContext
 		ObjectUtility::RegisterAnimations(m_AnimatorPose, animations, m_spSpawnedModel, this);
 		

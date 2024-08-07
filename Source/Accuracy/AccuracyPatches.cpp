@@ -50,31 +50,34 @@ std::string splitStr2(std::string const& s, char separator)
 	}
 }
 const char* latestNameFloor;
-const char* GetNewName(const char* existing)
+const char* GetNewName(const char* in_ModelName)
 {
-	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-	std::string stageIDName = *(char**)stageTerrainAddress;
-	std::string name = std::string(existing);
+	auto gameParameter = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter;
+	std::string stageIDName = std::string(gameParameter->m_pStageParameter->TerrainArchiveName.c_str());
+	std::string modelNameString = std::string(in_ModelName);
+
+	//Get stage name with everything before the underscore
 	stageIDName = splitStr2(stageIDName, '_');
 
-	name = replace(name, "ghz", stageIDName);
-	name = replace(name, "cpz", stageIDName);
-	name = replace(name, "ssz", stageIDName);
-	name = replace(name, "sph", stageIDName);
-	name = replace(name, "cte", stageIDName);
-	name = replace(name, "ssh", stageIDName);
-	name = replace(name, "csc", stageIDName);
-	name = replace(name, "euc", stageIDName);
-	name = replace(name, "pla", stageIDName);
-	printf((name + "\n").c_str());
-	latestNameFloor = _strdup(name.c_str());
+	modelNameString = replace(modelNameString, "ghz", stageIDName);
+	modelNameString = replace(modelNameString, "cpz", stageIDName);
+	modelNameString = replace(modelNameString, "ssz", stageIDName);
+	modelNameString = replace(modelNameString, "sph", stageIDName);
+	modelNameString = replace(modelNameString, "cte", stageIDName);
+	modelNameString = replace(modelNameString, "ssh", stageIDName);
+	modelNameString = replace(modelNameString, "csc", stageIDName);
+	modelNameString = replace(modelNameString, "euc", stageIDName);
+	modelNameString = replace(modelNameString, "pla", stageIDName);
+	printf((modelNameString + "\n").c_str());
+	latestNameFloor = _strdup(modelNameString.c_str());
 	return latestNameFloor;
 }
 void __declspec(naked) ASM_ReplaceGeneralFloorModelName()
 {
 	static uint32_t pAddr = 0x01008C9D;
 	static uint32_t Csharedstring = 0x006621A0;
-	__asm {
+	__asm
+	{
 		push[edi]
 		call GetNewName
 		mov[edi], eax

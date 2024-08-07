@@ -1,127 +1,37 @@
 #pragma once
-#define CLIENT_ID 1248726119402967091
-
-enum class StageType {
-	Day,
-	Night
-};
-
-struct DiscordPresenceData {
-	std::string id;
-	std::string stage; 
-	int act; 
-	int maxAct; 
-	std::string action; 
-	StageType stageType; 
-	std::string thumbnail = "icon";
-};
-
-static std::vector<DiscordPresenceData> presenceData = {
+namespace SUC::System::Discord
+{
+	//Please overhaul this with the newer stage system at some point (07/08/2024)
+	class DiscordStatus
 	{
-		"ghz100", 
-		"Windmill Isle",
-		1,
-		6,
-		"Playing a stage",
-		StageType::Day
-	},
-	{
-		"ghz101",
-		"Windmill Isle",
-		2,
-		6,
-		"Playing a stage",
-		StageType::Day
-	},
-	{
-		"ghz102",
-		"Windmill Isle",
-		3,
-		6,
-		"Playing a stage",
-		StageType::Day
-	},
-	{
-		"ghz103",
-		"Windmill Isle",
-		4,
-		6,
-		"Playing a stage",
-		StageType::Day
-	},
-	{
-		"ghz104",
-		"Windmill Isle [1-2]",
-		5,
-		6,
-		"Playing a stage",
-		StageType::Day
-	},
-	{
-		"ghz105",
-		"Windmill Isle [2-2]",
-		6,
-		6,
-		"Playing a stage",
-		StageType::Day
-	},
-	{
-		"ghz200",
-		"Windmill Isle",
-		1,
-		6,
-		"Playing a stage",
-		StageType::Night
-	}
-};
-
-class DiscordStatus {
-public:
-	static void initialize();
-	static void ChangeInformationFromStageInfo(bool timestamp) {
-		uint8_t stageID = Common::GetCurrentStageID() & 0xFF;
-		static char* stageName = *(char**)(4 * stageID + 0x1E66B48);
-		stageName[5] = '0' + ((Common::GetCurrentStageID() & 0xFF00) >> 8);
-		useTimestamp = timestamp;
-		for (DiscordPresenceData data : presenceData) {
-			if (std::string(stageName) == data.id) {
-				ChangeInformation(data);
-			}
-		}
-	}
-	static void ChangeInformation(DiscordPresenceData data) {
-		switch (data.stageType)
+	public:
+		struct EDiscordPresenceData
 		{
-		case StageType::Day:
-			StageTypeText = "Day";
-			ThumbnailSmall = "day";
-			break;
-		case StageType::Night:
-			StageTypeText = "Night";
-			ThumbnailSmall = "night";
-			break;
-		}
+			enum class EStageType
+			{
+				Day,
+				Night
+			};
+			std::string id;
+			std::string stage;
+			int act;
+			int maxAct;
+			std::string action;
+			EStageType stageType;
+			std::string thumbnail = "icon";
+		};
+		static void Initialize();
+		static void ChangeInformationFromStageInfo(bool timestamp);
+		static void ChangeInformation(EDiscordPresenceData data);
+		static void UpdateActivityInformation();
+		static void Update();
+		static std::vector<EDiscordPresenceData> presenceData;
+		static inline std::string s_StageTypeText = "Day";
+		static inline std::string s_Thumbnail = "icon";
+		static inline std::string s_ThumbnailSmall = "day";
+		static inline bool s_UseTimestamp = false;
 
-		TopText = data.action;
-		char buffer[64];
-		snprintf(buffer,64, "%s %s, Act %d", data.stage.c_str(), StageTypeText.c_str(), data.act);
-		BottomText = buffer;
-
-
-		
-
-		UpdateActivityInformation();
-	}
-	static void UpdateActivityInformation();
-	static void Update();
-
-	static inline std::string StageTypeText = "Day";
-	static inline std::string Thumbnail = "icon";
-	static inline std::string ThumbnailSmall = "day";
-	static inline bool useTimestamp = false;
-	static inline int partySize = 1;
-	static inline int partyMax = 1;
-
-	static inline std::string TopText;
-	static inline std::string BottomText;
-};
+		static inline std::string s_ActivityTopText;
+		static inline std::string s_ActivityBottomText;
+	};
+}

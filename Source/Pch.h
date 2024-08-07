@@ -68,7 +68,7 @@
 #include "System/AnimationSetPatcher.h"
 #include "System/EnemyTrigger.h"
 #include "System/MiniAudioHelper.h"
-#include "System/LetterboxHelper.h"
+#include "System/AspectRatioHelper.h"
 #include "System/ImguiInitializer.h"
 #include "System/UpdateDirector.h"
 #include "SetObject/ObjectUtility.h"

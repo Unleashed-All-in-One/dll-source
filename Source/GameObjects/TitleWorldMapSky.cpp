@@ -50,7 +50,6 @@ HOOK(bool, __fastcall, sub_E8FEF0, 0xE8FEF0, char* This, void* Edx, hh::fnd::Mes
 BB_ASSERT_OFFSETOF(MsgParticlePlayOneShotByMatrix, m_ParticleName, 0x50);
 void CTitleWorldMapSky::AddCallback(const Hedgehog::Base::THolder<Sonic::CWorld>& worldHolder,Sonic::CGameDocument* pGameDocument,const boost::shared_ptr<Hedgehog::Database::CDatabase>& spDatabase)
 {
-	INSTALL_HOOK(sub_E8FEF0);
 	m_spParticleManager = boost::make_shared<Sonic::CParticleManager>();
 	//necessary since its stored in gamedoc, all particle functions seem to reference this
 	Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager = m_spParticleManager;

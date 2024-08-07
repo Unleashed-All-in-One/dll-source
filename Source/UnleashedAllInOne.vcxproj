@@ -298,7 +298,7 @@
     <ClInclude Include="System\DiscordGameSDK\voice_manager.h" />
     <ClInclude Include="System\EnemyTrigger.h" />
     <ClInclude Include="System\ImguiInitializer.h" />
-    <ClInclude Include="System\LetterboxHelper.h" />
+    <ClInclude Include="System\AspectRatioHelper.h" />
     <ClInclude Include="System\StageManager.h" />
     <ClInclude Include="System\Light.h" />
     <ClInclude Include="System\LuaManager.h" />

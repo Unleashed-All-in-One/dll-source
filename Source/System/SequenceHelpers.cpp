@@ -306,9 +306,7 @@ void SequenceHelpers::playEvent(const char* in_EventName, ModuleFlow in_EventMod
 
 std::string SequenceHelpers::getCurrentStageName(bool withoutNumber = false)
 {
-	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-	char** h = (char**)stageTerrainAddress;
-	std::string returnVal = *h;
+	std::string returnVal = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameter->TerrainArchiveName.c_str();
 	if (withoutNumber)
 	{
 		returnVal.erase(returnVal.length() - 3);

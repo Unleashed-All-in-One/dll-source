@@ -39,10 +39,8 @@ HOOK(void*, __fastcall, SaveManager_InitializePlayer, 0x00D96110, void* This)
 HOOK(void, __fastcall, SaveManager_CGameplayFlowStage_CStateGoalBegin, 0xCFD550, void* This)
 {
 	try
-	{
-		uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-		char** pointerTerrainID = (char**)stageTerrainAddress;
-		std::string stageID = std::string(*pointerTerrainID);
+	{		
+		std::string stageID = std::string(Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameter->TerrainArchiveName.c_str());
 		auto saveObj = SaveManager::getCurrentSave();
 		DebugDrawText::log("Saving data for stage...", 10);
 		const size_t liveCountAddr = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x7C, 0x9FDC });

@@ -27,7 +27,7 @@ namespace SUC
 		};
 		struct ArchiveTreeDefinitions
 		{
-			std::vector<ArchiveDependency> data;
+			std::vector<System::ArchiveTreePatcher::ArchiveDependency> data;
 		};
 		struct SequenceData
 		{
@@ -117,6 +117,10 @@ namespace SUC
 		va_end(args);
 
 		return buffer;
+	}
+	inline void LogMessage(const char* in_String)
+	{
+		printf(Format("\n[%s] %s"), MOD_NAME, in_String);
 	}
 
 }

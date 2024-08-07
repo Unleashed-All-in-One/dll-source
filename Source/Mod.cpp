@@ -21,8 +21,8 @@ extern "C" void __declspec(dllexport) OnFrame()
 {	
 	//---------------System---------------
 	SUC::ImGuiMenu::ImguiInitializer::Update();
-	DiscordStatus::Update();
-	StageManager::Update();
+	SUC::System::Discord::DiscordStatus::Update();
+	SUC::System::StageManager::Update();
 	SUC::UI::Event::EventViewer::Update();
 	SequenceHelpers::Update();
 }

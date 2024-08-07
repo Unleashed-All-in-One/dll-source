@@ -129,7 +129,7 @@ void ObjectUtility::AssignUVAnimation(const char* in_animationName,const boost::
 	fpGetTexCoordAnimData(motWrapper, texCoordAnimData, in_animationName, 0);
 	fpCreateUVAnim(in_spEffectMotionAll.get(), in_spModelData, texCoordAnimData);
 }
-void ObjectUtility::RegisterAnimations(const boost::shared_ptr<Hedgehog::Animation::CAnimationPose>& animPose, std::vector<NewAnimationData> anims, const boost::shared_ptr<hh::mr::CSingleElement>& model, Sonic::CAnimationStateMachine* stateMachine)
+void ObjectUtility::RegisterAnimations(const boost::shared_ptr<Hedgehog::Animation::CAnimationPose>& animPose, std::vector<SUC::NewAnimationData> anims, const boost::shared_ptr<hh::mr::CSingleElement>& model, Sonic::CAnimationStateMachine* stateMachine)
 {
 	std::vector<hh::anim::SMotionInfo> pEntries = std::vector<hh::anim::SMotionInfo>(0, {"",""});
 	for (size_t i = 0; i < anims.size(); i++)

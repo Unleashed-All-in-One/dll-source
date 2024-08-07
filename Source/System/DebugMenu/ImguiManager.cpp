@@ -35,11 +35,8 @@ void customStageLoad()
 	//StorySeqProcessStorySequenceEvent(Sonic::Sequence::Story::GetInstance(), &message2);
 	//Sonic::Sequence::Main::ProcessMessage(&message);
 	SequenceHelpers::loadStage(_strdup(temp.c_str()), 0, false);
-	//uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-	//char** h = (char**)stageTerrainAddress;
-	//const char* terr = *h;
-	//*h = _strdup(temp.c_str()); // Use strdup to duplicate the string
-	StageManager::nextStageID = temp;
+	
+	SUC::System::StageManager::s_NextStage = temp;
 }
 void drawStageTreeNode(SUC::Project::DebugStageTree::DebugStageTreeNode node)
 {
@@ -60,7 +57,7 @@ void drawStageTreeNode(SUC::Project::DebugStageTree::DebugStageTreeNode node)
 				ImguiManager::visible = false;
 				customStageLoad();
 				if (!eventIndexToLoad.empty())
-					StageManager::forcePlayCutscene(eventIndexToLoad, sceneIndexToLoad, false, 0);
+					SUC::System::StageManager::ForcePlayCutscene(eventIndexToLoad, sceneIndexToLoad, false, 0);
 			}
 			ImGui::EndGroup();
 		}

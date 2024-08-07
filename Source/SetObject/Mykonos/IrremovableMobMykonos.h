@@ -18,7 +18,7 @@ public:
 	std::string mobNames[9] = { "man01a", "","","", "man02b", "wom01a","", "wom02a", "wom02c" };
 	std::string mobSkels[9] = { "enm_man01@LT", "","","", "manB@LT", "enm_wom01@LT","", "womB@LT", "womB@LT" };
 	std::string animNames[18] = { "idle01L","walk01L", "clash01", "plant01L", "talk01L", "talk02L", "audiance01L","audiance02L","working01L", "window01L", "cafe01L", "sitL01L","newspaper01L", "fishing01L", "spieler01L", "book01L", "legs01L", "wash01L" };
-	std::vector<NewAnimationData> animations;
+	std::vector<SUC::NewAnimationData> animations;
 
 	bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
 	{
@@ -73,11 +73,11 @@ public:
 		std::string motionFilenameClash = animPrefix + "clash01";
 
 		m_AnimatorPose = boost::make_shared<Hedgehog::Animation::CAnimationPose>(in_spDatabase, skelName);
-		animations = std::vector<NewAnimationData>();
+		animations = std::vector<SUC::NewAnimationData>();
 
-		animations.push_back(NewAnimationData(animName, _strdup(motionFilename.c_str()), 1, true, nullptr));
-		//animations.push_back(NewAnimationData("Clash01", _strdup(motionFilenameClash.c_str()), 1, false, nullptr));
-		animations.push_back(NewAnimationData("clash01", _strdup(motionFilenameClash.c_str()), 1, false, nullptr));
+		animations.push_back(SUC::NewAnimationData(animName, _strdup(motionFilename.c_str()), 1, true, nullptr));
+		//animations.push_back(SUC::NewAnimationData("Clash01", _strdup(motionFilenameClash.c_str()), 1, false, nullptr));
+		animations.push_back(SUC::NewAnimationData("clash01", _strdup(motionFilenameClash.c_str()), 1, false, nullptr));
 
 		this->SetContext(this); //set Context of AnimatorStateMachine to IAnimatorContext
 		ObjectUtility::RegisterAnimations(m_AnimatorPose, animations, m_spSpawnedModel, this);

@@ -235,21 +235,21 @@ namespace SUC::UI::TitleScreen
 			MiniAudioHelper::stopSound(cursorMoveHandle);
 			//cursorMoveHandle.reset();
 		}
-		posCursorCenter = pos + *LetterboxHelper::ScreenHalfPoint;
+		posCursorCenter = pos + *System::AspectRatioHelper::ScreenHalfPoint;
 		float sizeBox = 125;
 		auto posL = CVector2(pos.x() - (sizeBox / 2), pos.y());
 		auto posR = CVector2(pos.x() + sizeBox / 2, pos.y());
 		auto posT = CVector2(pos.x(), pos.y() + sizeBox / 2);
 		auto posB = CVector2(pos.x(), pos.y() - (sizeBox / 2));
 
-		rcCursorLeft->SetPosition(posL.x() + LetterboxHelper::ScreenHalfPoint->x(),
-			posL.y() + LetterboxHelper::ScreenHalfPoint->y());
-		rcCursorRight->SetPosition(posR.x() + LetterboxHelper::ScreenHalfPoint->x(),
-			posR.y() + LetterboxHelper::ScreenHalfPoint->y());
-		rcCursorTop->SetPosition(posT.x() + LetterboxHelper::ScreenHalfPoint->x(),
-			posT.y() + LetterboxHelper::ScreenHalfPoint->y());
-		rcCursorBottom->SetPosition(posB.x() + LetterboxHelper::ScreenHalfPoint->x(),
-			posB.y() + LetterboxHelper::ScreenHalfPoint->y());
+		rcCursorLeft->SetPosition(posL.x() + System::AspectRatioHelper::ScreenHalfPoint->x(),
+			posL.y() + System::AspectRatioHelper::ScreenHalfPoint->y());
+		rcCursorRight->SetPosition(posR.x() + System::AspectRatioHelper::ScreenHalfPoint->x(),
+			posR.y() + System::AspectRatioHelper::ScreenHalfPoint->y());
+		rcCursorTop->SetPosition(posT.x() + System::AspectRatioHelper::ScreenHalfPoint->x(),
+			posT.y() + System::AspectRatioHelper::ScreenHalfPoint->y());
+		rcCursorBottom->SetPosition(posB.x() + System::AspectRatioHelper::ScreenHalfPoint->x(),
+			posB.y() + System::AspectRatioHelper::ScreenHalfPoint->y());
 		rcCursorRight->GetNode("arrow_position_9")->SetRotation(180);
 		rcCursorTop->GetNode("arrow_position_9")->SetRotation(90);
 		rcCursorBottom->GetNode("arrow_position_9")->SetRotation(-90);
@@ -434,9 +434,9 @@ namespace SUC::UI::TitleScreen
 		auto screenPosition = camera->m_MyCamera.m_View * CVector4(input.x(), input.y(), input.z(), 1.0f);
 		screenPosition = camera->m_MyCamera.m_Projection * screenPosition;
 		screenPosition.head<2>() /= screenPosition.w();
-		screenPosition.x() = ((screenPosition.x() * 0.5f + 0.5f) * (LetterboxHelper::OriginalResolution->x() + offsetAspect
+		screenPosition.x() = ((screenPosition.x() * 0.5f + 0.5f) * (System::AspectRatioHelper::OriginalResolution->x() + offsetAspect
 			->x()));
-		screenPosition.y() = (screenPosition.y() * -0.5f + 0.5f) * (LetterboxHelper::OriginalResolution->y() + offsetAspect
+		screenPosition.y() = (screenPosition.y() * -0.5f + 0.5f) * (System::AspectRatioHelper::OriginalResolution->y() + offsetAspect
 			->y());
 		return CVector2(screenPosition.x(), screenPosition.y());
 	}
@@ -447,7 +447,7 @@ namespace SUC::UI::TitleScreen
 	{
 		//Init Anims
 		s_IsActive = true;
-		StageManager::LoadingReplacementEnabled = true;
+		System::StageManager::s_LoadingReplacementEnabled = true;
 		s_ForceTitleFlow = false;
 		TitleWorldMap_CTitleOptionCStateOutroSaving(m_spSave, nullptr);
 		//Set lives text
@@ -766,8 +766,8 @@ namespace SUC::UI::TitleScreen
 		rcTextElement[7]->GetNode("Text_blue")->SetText("Go to capital");
 		rcTextElement[8]->GetNode("Text_blue")->SetText("Select stage");
 
-		rcTextElement[7]->SetPosition(LetterboxHelper::ScreenHalfPoint->x(), LetterboxHelper::ScreenHalfPoint->y() - 45);
-		rcTextElement[8]->SetPosition(LetterboxHelper::ScreenHalfPoint->x(), LetterboxHelper::ScreenHalfPoint->y() + 25);
+		rcTextElement[7]->SetPosition(System::AspectRatioHelper::ScreenHalfPoint->x(), System::AspectRatioHelper::ScreenHalfPoint->y() - 45);
+		rcTextElement[8]->SetPosition(System::AspectRatioHelper::ScreenHalfPoint->x(), System::AspectRatioHelper::ScreenHalfPoint->y() + 25);
 		ShowTextAct(false);
 		rcTextElement[7]->SetHideFlag(true);
 		rcTextElement[8]->SetHideFlag(true);
@@ -957,7 +957,7 @@ namespace SUC::UI::TitleScreen
 			if (selectedCapital == 0)
 			{
 				MiniAudioHelper::playSound(stageSelectHandle, 3, "Boot");
-				StageManager::WhiteWorldEnabled = SUC::Project::s_WorldData.data[TitleWorldMap::s_LastFlagSelected].data[
+				System::StageManager::s_HubModeEnabled = SUC::Project::s_WorldData.data[TitleWorldMap::s_LastFlagSelected].data[
 					SUC::Project::GetCapital(TitleWorldMap::s_LastFlagSelected,
 						TitleWorldMap::s_Flags[TitleWorldMap::s_LastFlagSelected].night)].isWhiteWorld;
 
@@ -1015,7 +1015,7 @@ namespace SUC::UI::TitleScreen
 		if (inputPtr->IsTapped(Sonic::eKeyState_A) && timeStageSelectDelay >= 5)
 		{
 			MiniAudioHelper::playSound(stageSelectHandle, 3, "Boot");
-			StageManager::WhiteWorldEnabled = SUC::Project::s_WorldData.data[TitleWorldMap::s_LastFlagSelected].data[
+			System::StageManager::s_HubModeEnabled = SUC::Project::s_WorldData.data[TitleWorldMap::s_LastFlagSelected].data[
 				TitleWorldMap::s_StageSelectWindowSelection].isWhiteWorld;
 
 			Title::ShowLoadingTransition(true);

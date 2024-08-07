@@ -9,12 +9,12 @@ namespace SUC::Hooks
 {
 	static void InstallUIHooks()
 	{
-		UI::TitleScreen::Title::RegisterHooks();
-		UI::TitleScreen::TitleWorldMap::RegisterHooks();
-		UI::TitleScreen::TitleWorldMapPause::RegisterHooks();
-		UI::Event::EventViewer::RegisterHooks();
-		UI::Event::SubtitleUI::RegisterHooks();
-		UI::Event::SubtitleUI::s_CaptionData.Initialize();
-		HudButtonGuide::applyPatches();
+		using namespace SUC::UI;
+		TitleScreen::Title::RegisterHooks();
+		TitleScreen::TitleWorldMap::RegisterHooks();
+		TitleScreen::TitleWorldMapPause::RegisterHooks();
+		Event::EventViewer::RegisterHooks();
+		Event::SubtitleUI::RegisterHooks();
+		HudButtonGuide::RegisterHooks();
 	}
 }

@@ -34,7 +34,7 @@ public:
 	boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody2;
 	boost::shared_ptr<Hedgehog::Animation::CAnimationPose> m_AnimatorPose;
 	SharedPtrTypeless sound;
-	std::vector<NewAnimationData> animations;
+	std::vector<SUC::NewAnimationData> animations;
 	void AddImpulse(Sonic::CRigidBody* f, Hedgehog::math::CVector a1)
 	{
 		static uint32_t add = 0x01180870;
@@ -56,7 +56,7 @@ public:
 		boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(assetName, 0);
 		m_spSpawnedModel = boost::make_shared<hh::mr::CSingleElement>(spModelData);
 		m_spSpawnedModel->BindMatrixNode(m_spMatrixNodeTransform);
-		//animations.push_back(NewAnimationData("Shake", "snw_obj_icicleBmotion01", 1, false, nullptr));
+		//animations.push_back(SUC::NewAnimationData("Shake", "snw_obj_icicleBmotion01", 1, false, nullptr));
 
 		//ObjectUtility::RegisterAnimations(m_AnimatorPose, animations, m_spSpawnedModel, this);
 		

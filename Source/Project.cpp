@@ -309,7 +309,7 @@ namespace SUC
 		Json::Value arrayFlag = root["ArchiveTreeDefinitions"];
 		for (int i = 0; i < arrayFlag.size(); i++)
 		{
-			ArchiveDependency dependency;
+			System::ArchiveTreePatcher::ArchiveDependency dependency;
 			dependency.m_archive = arrayFlag[i]["archiveName"].asCString();
 			Json::Value flagDep = arrayFlag[i]["dependencies"];
 			for (size_t d = 0; d < flagDep.size(); d++)

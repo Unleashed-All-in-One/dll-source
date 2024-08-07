@@ -72,7 +72,7 @@ namespace SUC::UI::Event
 
 	void EventViewer::Update()
 	{
-		DebugDrawText::log(std::to_string(StageManager::LastSavedQueueIndex).c_str(), 0);
+		DebugDrawText::log(std::to_string(System::StageManager::s_LastSavedQueueIndex).c_str(), 0);
 		if (isInEventViewer)
 		{
 			if (isGoingToSkip)
@@ -143,7 +143,7 @@ namespace SUC::UI::Event
 	{
 		frame = 0;
 		doCount = true;
-		auto string = std::format("{0}\\disk\\EventSceneResource\\{1}_voice_English.inspire_resource.xml", SUC::Project::s_ModPath, StageManager::getEventID());
+		auto string = std::format("{0}\\disk\\EventSceneResource\\{1}_voice_English.inspire_resource.xml", SUC::Project::s_ModPath, System::StageManager::GetEventID());
 		if (!std::filesystem::exists(string))
 		{
 			printf("\n[SonicUnleashedConversion] Missing InspireResource file for Voice.");
@@ -153,7 +153,7 @@ namespace SUC::UI::Event
 			resource = new EventViewer::InspireResource(string.c_str());
 		}
 
-		auto string2 = std::format("{0}\\disk\\EventSceneResource\\{1}_bgm.inspire_resource.xml", SUC::Project::s_ModPath, StageManager::getEventID());
+		auto string2 = std::format("{0}\\disk\\EventSceneResource\\{1}_bgm.inspire_resource.xml", SUC::Project::s_ModPath, System::StageManager::GetEventID());
 		if (!std::filesystem::exists(string2))
 		{
 			printf("\n[SonicUnleashedConversion] Missing InspireResource file for BGM.");
@@ -165,7 +165,7 @@ namespace SUC::UI::Event
 			resource->resources.insert(resource->resources.end(), res2->resources.begin(), res2->resources.end());
 			resource->triggers.insert(resource->triggers.end(), res2->triggers.begin(), res2->triggers.end());
 		}
-		auto string3 = std::format("{0}\\disk\\EventSceneResource\\{1}_se.inspire_resource.xml", SUC::Project::s_ModPath, StageManager::getEventID());
+		auto string3 = std::format("{0}\\disk\\EventSceneResource\\{1}_se.inspire_resource.xml", SUC::Project::s_ModPath, System::StageManager::GetEventID());
 		if (!std::filesystem::exists(string3))
 		{
 			printf("\n[SonicUnleashedConversion] Missing InspireResource file for SE.");

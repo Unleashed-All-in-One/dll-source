@@ -179,9 +179,7 @@ namespace SUC::UI::TitleScreen
 		}
 		case 4:
 		{
-			StageManager::ActiveReplacement = false;
-			StageManager::NextLevelLoad = "pla201";
-			StageManager::LoadingReplacementEnabled = true;
+			System::StageManager::s_LoadingReplacementEnabled = true;
 			SequenceHelpers::loadStage("pla201");
 			break;
 		}

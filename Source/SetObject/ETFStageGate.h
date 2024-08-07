@@ -167,21 +167,19 @@ public:
                 {
                     //example: ghz + stageID(200) = ghz200
                     std::string stageToLoadS = (SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID));
-                    uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-                    char** h = (char**)stageTerrainAddress;
-                    const char* stageToLoad = stageToLoadS.c_str();
+                     const char* stageToLoad = stageToLoadS.c_str();
 
                     std::string stageIDN = std::format("{0}{1}_{2}", stageType ? "D" : "N", countryNames[worldIndex], actIndex);
                     if (subStageIndex != -1)
                     {
                         stageIDN = stageIDN + std::format("-{0}", subStageIndex);
                     }
-                    StageManager::setETFInfo(SequenceHelpers::getCurrentStageName(false));
-                    StageManager::setGameParameters(stageIDN, "");
-                    StageManager::LoadingReplacementEnabled = true;
-                    StageManager::WhiteWorldEnabled = false;
+                    SUC::System::StageManager::SetETFInfo(SequenceHelpers::getCurrentStageName(false));
+                    SUC::System::StageManager::SetGameParameters(stageIDN, "");
+                    SUC::System::StageManager::s_LoadingReplacementEnabled = true;
+                    SUC::System::StageManager::s_HubModeEnabled = false;
                     SequenceHelpers::loadStage(stageIDN.c_str(), 0);
-                    strcpy(*(char**)stageTerrainAddress, stageIDN.c_str());
+                    SUC::System::StageManager::SetGameParameters(stageIDN, "Stage");
                 }
                 if (inputPtr->IsTapped(Sonic::eKeyState_B))
                 {

@@ -156,7 +156,7 @@ namespace SUC::UI::Event
 	void SubtitleUI::RegisterHooks()
 	{
 		s_InitSuccess = InitializeFontDatabase();
-
+		s_CaptionData.Initialize();
 		// hooks have moved to CaptionData::init()
 	}
 

@@ -12,7 +12,7 @@ public:
 	boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
 	boost::shared_ptr<Hedgehog::Animation::CAnimationPose> m_AnimatorPose;
 	SharedPtrTypeless sound;
-	std::vector<NewAnimationData> animations;
+	std::vector<SUC::NewAnimationData> animations;
 
 	bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
 	{
@@ -23,12 +23,12 @@ public:
 		m_spSpawnedModel = boost::make_shared<hh::mr::CSingleElement>(spModelData);
 		m_spSpawnedModel->BindMatrixNode(m_spMatrixNodeTransform);
 		m_AnimatorPose = boost::make_shared<Hedgehog::Animation::CAnimationPose>(in_spDatabase, assetName);
-		animations = std::vector<NewAnimationData>();
-		animations.push_back(NewAnimationData("SleepIdle", "recl_sleep_l", 1, true, nullptr));
-		animations.push_back(NewAnimationData("Seek", "recl_seek", 1, true, nullptr));
-		animations.push_back(NewAnimationData("RunL", "recl_run_l", 1, true, nullptr));
-		/*animations.push_back(NewAnimationData("Appear", "cmn_obj_sk2_hintring_appear", 1, false, nullptr));
-		animations.push_back(NewAnimationData("Touch", "cmn_obj_sk2_hintring_touch", 1, false, "Idle"));*/
+		animations = std::vector<SUC::NewAnimationData>();
+		animations.push_back(SUC::NewAnimationData("SleepIdle", "recl_sleep_l", 1, true, nullptr));
+		animations.push_back(SUC::NewAnimationData("Seek", "recl_seek", 1, true, nullptr));
+		animations.push_back(SUC::NewAnimationData("RunL", "recl_run_l", 1, true, nullptr));
+		/*animations.push_back(SUC::NewAnimationData("Appear", "cmn_obj_sk2_hintring_appear", 1, false, nullptr));
+		animations.push_back(SUC::NewAnimationData("Touch", "cmn_obj_sk2_hintring_touch", 1, false, "Idle"));*/
 
 		this->SetContext(this); //set Context of AnimatorStateMachine to IAnimatorContext
 		ObjectUtility::RegisterAnimations(m_AnimatorPose, animations, m_spSpawnedModel, this);

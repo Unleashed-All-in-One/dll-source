@@ -277,8 +277,8 @@ HOOK(int, __fastcall, CHudGateMenuMainIntroInfo, 0x1080110, hh::fnd::CStateMachi
 	auto idArchive = (const char*)((int*)0x015BBA34)[stageID];
 
 	Common::ClampUInt(stageID, 0, SUC::Project::s_WorldData.data[SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected].data.size() - 1);
-	StageManager::NextLevelLoad = SUC::Project::s_WorldData.data[SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected].data[stageID].levelID.
-		c_str();
+	SUC::System::StageManager::s_NextStage = SUC::Project::s_WorldData.data[SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected].data[stageID].levelID.
+	                                                                                                                                                 c_str();
 	return returne;
 }
 
@@ -286,14 +286,13 @@ HOOK(char, *_stdcall, StageGate_MoveToOtherStage, 0x107FBC0, int a1)
 {
 	char* returned = originalStageGate_MoveToOtherStage(a1);
 	uint8_t stageID = (*(uint8_t*)(a1 + 336));
-	StageManager::NextLevelLoad = SUC::Project::s_WorldData.data[SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected].data[stageID].levelID.
-		c_str();
+	SUC::System::StageManager::s_NextStage = SUC::Project::s_WorldData.data[SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected].data[stageID].levelID.
+	                                                                                                                                                 c_str();
 	return returned;
 }
 
 HOOK(int, __fastcall, CHudGateMenuMainOutro, 0x107B770, hh::fnd::CStateMachineBase::CStateBase* This)
 {
-	StageManager::ActiveReplacement = true;
 	return originalCHudGateMenuMainOutro(This);
 }
 HOOK(int, __cdecl, sub_7C931F, 0x7C931F, int a1, const char* a2)

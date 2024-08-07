@@ -99,7 +99,7 @@ namespace SUC::UI::TitleScreen
 		databaseLoader->LoadArchive(database, "#SelectStage.ar", { 0, 0 }, false, false);
 		spDebugMenu = boost::make_shared<Sonic::StageSelectMenu::CDebugStageSelectMenuXml>();
 		Sonic::CGameDocument::GetInstance()->AddGameObject(spDebugMenu);
-		StageManager::LoadingReplacementEnabled = false;
+		System::StageManager::s_LoadingReplacementEnabled = false;
 	}
 	void Title::ShowLoadingTransition(bool enableLoad)
 	{
@@ -158,7 +158,7 @@ namespace SUC::UI::TitleScreen
 	void OnNewGame()
 	{
 		Title::ShowLoadingTransition(false);
-		StageManager::InStory = true;
+		System::StageManager::s_InStoryMode = true;
 		SaveManager::deleteSave();
 		auto save = SaveManager::getCurrentSave();
 		save->lives = 5;
@@ -532,7 +532,7 @@ namespace SUC::UI::TitleScreen
 			{
 				if (UnleashedHUD_API::IsLoadingFadeoutCompleted())
 				{
-					SequenceHelpers::loadStage(StageManager::getStageToLoad());
+					SequenceHelpers::loadStage(System::StageManager::GetStageToLoad());
 					SequenceHelpers::setPlayerType(GENERIC_SONIC);
 					canLoad = 0;
 				}
@@ -1155,7 +1155,9 @@ namespace SUC::UI::TitleScreen
 		INSTALL_HOOK(Title_CMain_CState_WaitStart);
 		INSTALL_HOOK(Title_CMain_CState_SelectMenu);
 
-		scale = new Hedgehog::Math::CVector2(LetterboxHelper::NativeResolution->x() / 1280, (size_t)LetterboxHelper::NativeResolution->y() / 720);
+		scale = new Hedgehog::Math::CVector2
+		(System::AspectRatioHelper::NativeResolution->x() / 1280,
+			(size_t)System::AspectRatioHelper::NativeResolution->y() / 720);
 	}
 
 }

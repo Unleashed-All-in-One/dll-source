@@ -1,20 +1,22 @@
 #pragma once
-struct ArchiveDependency
+namespace SUC::System
 {
-    std::string m_archive;
-    std::vector<std::string> m_dependencies;
+	class ArchiveTreePatcher
+	{
+	public:
+		struct ArchiveDependency
+		{
+			std::string m_archive;
+			std::vector<std::string> m_dependencies;
 
-    ArchiveDependency() {};
-    ArchiveDependency(std::string _archive, std::vector<std::string> _dependencies)
-        : m_archive(_archive)
-        , m_dependencies(_dependencies)
-    {}
-};
-
-class ArchiveTreePatcher
-{
-public:
-    static std::vector<ArchiveDependency> m_archiveDependencies;
-    static std::vector<std::string> m_languageArchives;
-    static void applyPatches();
-};
+			ArchiveDependency() {};
+			ArchiveDependency(std::string _archive, std::vector<std::string> _dependencies)
+				: m_archive(_archive)
+				, m_dependencies(_dependencies)
+			{}
+		};
+		static void RegisterHooks();
+		static std::vector<ArchiveDependency> s_ArchiveDependencies;
+		static std::vector<std::string> s_LanguageArchives;
+	};
+}
