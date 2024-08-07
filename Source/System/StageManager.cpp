@@ -368,7 +368,7 @@ void __declspec(naked) ASM_InterceptGameplayFlowLoading()
 			jmp[loc_D0E170]
 	}
 }
-void StageManager::update()
+void StageManager::Update()
 {
 	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 	char** h = (char**)stageTerrainAddress;

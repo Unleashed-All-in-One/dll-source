@@ -120,5 +120,5 @@ public:
 	static void setPlayerType(int in_PlayerType, bool forced = true);
 	static void applyPatches();
 	static std::string getCurrentStageName(bool withoutNumber);
-	static void update();
+	static void Update();
 };

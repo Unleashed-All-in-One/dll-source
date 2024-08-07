@@ -715,23 +715,6 @@ HOOK(void, __fastcall, sub_571F80, 0x571F80, int This)
 	}
 
 }
-HOOK(void, __cdecl, DebugDrawTextDraw, 0x750820, void*, float x, float y, void*, uint8_t* color, wchar_t* text, ...)
-{
-	va_list va;
-	va_start(va, text);
-
-	wchar_t formatted[1024];
-	_vsnwprintf_s(formatted, _countof(formatted), text, va);
-
-	char formattedMultiByte[1024];
-	WideCharToMultiByte(CP_UTF8, 0, formatted, -1, formattedMultiByte, sizeof(formattedMultiByte), 0, 0);
-
-	size_t resx = (size_t)(LetterboxHelper::Resolution->x() * scale->x());
-	size_t resy = (size_t)(LetterboxHelper::Resolution->y() * scale->y());
-	size_t gg = *(size_t*)0x180C6B0;
-	size_t aspect = (resx / resy) * scale->x();
-	DebugDrawText::draw(formattedMultiByte, { (size_t)(x / *(size_t*)0x180C6B0 * resx) % resx, (size_t)(y / *(size_t*)0x1B24560 * resy) % resy }, aspect);
-}
 #pragma region OptionsSubmenu
 
 
@@ -1167,7 +1150,6 @@ void Title::applyPatches()
 	INSTALL_HOOK(Title_CMain_CState_SelectMenuBegin);
 	INSTALL_HOOK(Title_CMain_CState_WaitStart);
 	INSTALL_HOOK(Title_CMain_CState_SelectMenu);
-	INSTALL_HOOK(DebugDrawTextDraw);
 
 	scale = new Hedgehog::Math::CVector2(LetterboxHelper::NativeResolution->x() / 1280, (size_t)LetterboxHelper::NativeResolution->y() / 720);
 }

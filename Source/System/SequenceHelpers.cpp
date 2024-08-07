@@ -404,7 +404,7 @@ HOOK(Sonic::Sequence::Story*, __cdecl, ConstructStorySequence, 0xD76930)
 	SequenceHelpers::storySequenceInstance = originalConstructStorySequence();
 	return SequenceHelpers::storySequenceInstance;
 }
-void SequenceHelpers::update()
+void SequenceHelpers::Update()
 {
 	if (GetAsyncKeyState(VK_F12))
 	{

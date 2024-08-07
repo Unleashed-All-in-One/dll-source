@@ -36,7 +36,7 @@ public:
 	static int LastSavedQueueIndex;
 	static bool LoadingReplacementEnabled;
 	static void forcePlayCutscene(std::string in_EventName, std::string in_StageName, bool flag, int playerType);
-	static void update();
+	static void Update();
 	static void setETFInfo(std::string etfHubStageName);
 	static void initialize();
 	static std::string getEventID();

@@ -8,7 +8,7 @@ HOOK(LRESULT, __stdcall, WndProc, 0xE7B6C0, HWND hWnd, UINT Msg, WPARAM wParam, 
 	return originalWndProc(hWnd, Msg, wParam, lParam);
 }
 
-void ImguiInitializer::update()
+void ImguiInitializer::Update()
 {
 	//CSDCommon::update();
 	const SynchronizedObject::Lock lock(*APPLICATION_DOCUMENT);

@@ -1,7 +1,10 @@
 #pragma once
-class ImguiInitializer
+namespace SUC::ImGui
 {
-public:
-	static void initialize();
-	static void update();
-};
+	class ImguiInitializer
+	{
+	public:
+		static void Initialize();
+		static void Update();
+	};
+}

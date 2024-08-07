@@ -205,7 +205,7 @@ HOOK(volatile signed int*, __stdcall, CreateBTNSKip, 0x00B21A30, DWORD* This)
 	return returnee;
 }
 
-void EventViewer::update()
+void EventViewer::Update()
 {
 	DebugDrawText::log(std::to_string(StageManager::LastSavedQueueIndex).c_str(), 0);
 	if (isInEventViewer)

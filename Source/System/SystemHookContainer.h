@@ -15,7 +15,7 @@ namespace SUC::Hooks
 		MiniAudioHelper::initialize(path.c_str());
 		DiscordStatus::initialize();
 		SequenceHelpers::applyPatches();
-		ImguiInitializer::initialize();
+		ImguiInitializer::Initialize();
 		Context::setModDirectoryPath(SUC::Project::GetDirectoryPath(Project::s_ModInfoPath));
 		SaveManager::applyPatches();
 		LuaManager::initialize();

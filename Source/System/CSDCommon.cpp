@@ -42,7 +42,7 @@ void CSDCommon::CheckSceneAnimation(int i, Chao::CSD::CScene* scene)
 	}
 }
 std::vector<Chao::CSD::CScene*> CSDCommon::scenesPlayingBack; //idk why i need to do this, symbol errors-
-void CSDCommon::update()
+void CSDCommon::Update()
 {
 	if (CSDCommon::scenesPlayingBack.size() != 0)
 	{
