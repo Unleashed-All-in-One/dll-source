@@ -1,9 +1,5 @@
 #pragma once
-#define MOD_NAME "Sonic Unleashed Conversion"
-#define INI_FILE "UnleashedConversion.ini"
-#define STAGE_LIST_FILE "stage_list.json"
-#define ARCHIVE_LIST_FILE "archivelist.json"
-#define QUEUE_LIST_FILE "sequence.json"
+
 namespace SUC
 {
 	class Project
@@ -86,7 +82,7 @@ namespace SUC
 		static float GetDeltaTime() { return ms_DeltaTime; }
 		static void SetDeltaTime(float dt) { ms_DeltaTime = dt; }
 		static std::string GetDirectoryPath(const std::string& in_Path);
-		static float GetFrameDeltaTime() { return ms_FrameDeltaTime; }
+		static int GetFrameDeltaTime() { return ms_FrameDeltaTime; }
 		static void SetHudDeltaTime(float dt) { ms_HudDeltaTime = dt; }
 		static std::vector<std::string> GetAllLevelIDs(bool onlyCustom);
 		static void SetFrameDeltaTime(int dt) { ms_FrameDeltaTime = dt; }

@@ -38,6 +38,7 @@
 #include "System/DebugMenu/DDSTextureLoader11.h"
 #include "System/DebugMenu/CsdImGui.h"
 
+#include "Macros.h"
 // Other
 #include <tweeny-3.2.0.h>
 #include <INIReader.h>
@@ -50,7 +51,6 @@
 #include "ScoreGenerationsAPI/ScoreGenerationsAPI.h"
 
 // Alternative Audio Backend
-#define WITH_MINIAUDIO
 #include <soloud.h>
 #include <soloud_wav.h>
 

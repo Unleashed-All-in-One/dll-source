@@ -31,15 +31,15 @@ public:
 	}
 	void Dissapear()
 	{
-		CSDCommon::PlayAnimation(*rcBtn, "Effect_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-		CSDCommon::PlayAnimation(*rcTypePress, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(rcBtn, "Effect_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(rcTypePress, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 	}
 	void Show()
 	{
 		Common::PlaySoundStaticCueName(soundEffect, "suc_ui_button_appear_sfx");
 		rcTypePress->SetHideFlag(false);
 		rcBtn->SetHideFlag(false);
-		CSDCommon::PlayAnimation(*rcBtn, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-		CSDCommon::PlayAnimation(*rcTypePress, "Intro_Anim", Chao::CSD::eMotionRepeatType_Loop, 1, 0);
+		CSDCommon::PlayAnimation(rcBtn, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(rcTypePress, "Intro_Anim", Chao::CSD::eMotionRepeatType_Loop, 1, 0);
 	}
 };

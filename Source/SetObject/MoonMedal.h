@@ -20,7 +20,6 @@ public:
         m_spSpawnedModel->BindMatrixNode(m_spMatrixNodeTransform);
         //m_spSpawnedModel->BindAnimationPose(animatorTest);
         Sonic::CGameObject::AddRenderable("Object", m_spSpawnedModel, true);
-        DebugDrawText::log("I EXIST!!", 10);
         return true;
     }
     bool ProcessMessage(Hedgehog::Universe::Message& in_rMsg, bool in_Flag) override

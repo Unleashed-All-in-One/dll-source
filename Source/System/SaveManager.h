@@ -78,7 +78,7 @@ public:
 				return keysBool.at(i)->keyValue;
 			}
 		}
-		return -1;
+		return false;
 	}
 	float getSaveFloatKeyValue(std::string keyName)
 	{

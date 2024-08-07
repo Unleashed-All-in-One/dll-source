@@ -147,7 +147,7 @@ public:
 			}
 			m_TimerLerp += updateInfo.DeltaTime / 0.5f;
 			m_Position = Common::Lerp(m_PositionAtStartHoming, context->m_spMatrixNode->m_Transform.m_Position + (Eigen::Vector3f::UnitY() * 0.5f), m_TimerLerp);
-			DebugDrawText::log(std::format("TIMERLERP: {0}\nLIFETIME: {1}\nANGLE: {2}", m_TimerLerp, m_LifeTime, m_Angle).c_str(),0);
+			DebugDrawText::log(SUC::Format("[EXP] TIMERLERP: %.3f\nLIFETIME: %.3f\nANGLE: %.3f", m_TimerLerp, m_LifeTime, m_Angle),0);
 		}
 		else
 		{

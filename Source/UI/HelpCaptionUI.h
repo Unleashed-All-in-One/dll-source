@@ -32,7 +32,7 @@ public:
 	Chao::CSD::RCPtr<Chao::CSD::CScene> rcText1;
 	Chao::CSD::RCPtr<Chao::CSD::CScene> rcText2;
 	Chao::CSD::RCPtr<Chao::CSD::CScene> rcHelpNametag;
-	int textIndex;
+	size_t textIndex;
 	bool isComplete;
 
 	static HelpCaptionUIContainer* Generate(Sonic::CGameObject* Parent)
@@ -85,7 +85,7 @@ public:
 		if (lines.size() >= 3)
 			rcText2->GetNode("text_0")->SetText(lines.at(2).c_str());
 	}
-	void SetText(int index)
+	void SetText(size_t index)
 	{
 		if (strings == nullptr)
 			SetUIText("HINTDATA DOES NOT EXIST");
@@ -114,9 +114,9 @@ public:
 		rcText->GetNode("text_0")->SetHideFlag(false);
 		rcText1->GetNode("text_0")->SetHideFlag(false);
 		rcText2->GetNode("text_0")->SetHideFlag(false);
-		CSDCommon::PlayAnimation(*rcWindow, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-		CSDCommon::PlayAnimation(*rcHelpNametag, "Intro_chip_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-		CSDCommon::PlayAnimation(*rcHelpChara1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(rcWindow, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(rcHelpNametag, "Intro_chip_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(rcHelpChara1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 		SetText(0);
 	}
 	void Progress()
@@ -137,9 +137,9 @@ public:
 		rcText->GetNode("text_0")->SetHideFlag(true);
 		rcText1->GetNode("text_0")->SetHideFlag(true);
 		rcText2->GetNode("text_0")->SetHideFlag(true);
-		CSDCommon::PlayAnimation(*rcHelpNametag, "Intro_chip_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);
-		CSDCommon::PlayAnimation(*rcHelpChara1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);
-		CSDCommon::PlayAnimation(*rcWindow, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);
+		CSDCommon::PlayAnimation(rcHelpNametag, "Intro_chip_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);
+		CSDCommon::PlayAnimation(rcHelpChara1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);
+		CSDCommon::PlayAnimation(rcWindow, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);
 	}
 	void Kill()
 	{

@@ -1,5 +1,5 @@
 #pragma once
-namespace SUC::ImGui
+namespace SUC::ImGuiMenu
 {
 	class ImguiInitializer
 	{

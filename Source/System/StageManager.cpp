@@ -1,4 +1,4 @@
-#include "..\UI\TitleWorldMap.h"
+#include "../UI/TitleWorldMap.h"
 const char* StageManager::NextLevelLoad;
 bool StageManager::ActiveReplacement;
 bool StageManager::ReplacingNext;
@@ -69,14 +69,14 @@ const char* StageManager::getStageToLoad()
 {
 	const char* stageToLoad = "ghz200";
 
-	int latestFlag = TitleWorldMap::m_lastFlagSelected;
-	int stageSelected = TitleWorldMap::m_stageSelectWindowSelection;
+	int latestFlag = SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected;
+	int stageSelected = SUC::UI::TitleScreen::TitleWorldMap::s_StageSelectWindowSelection;
 
-	if (TitleWorldMap::m_isCapitalWindowOpened)
-		stageToLoad = SUC::Project::s_WorldData.data[latestFlag].data[SUC::Project::GetCapital(latestFlag, TitleWorldMap::m_flags[latestFlag].night)].levelID.c_str();
+	if (SUC::UI::TitleScreen::TitleWorldMap::s_IsCapitalWindowOpened)
+		stageToLoad = SUC::Project::s_WorldData.data[latestFlag].data[SUC::Project::GetCapital(latestFlag, SUC::UI::TitleScreen::TitleWorldMap::s_Flags[latestFlag].night)].levelID.c_str();
 	else
 	{
-		if (SUC::Project::s_WorldData.data[latestFlag].dataNight.size() != 0 && TitleWorldMap::m_flags[latestFlag].night)
+		if (SUC::Project::s_WorldData.data[latestFlag].dataNight.size() != 0 && SUC::UI::TitleScreen::TitleWorldMap::s_Flags[latestFlag].night)
 		{
 			stageToLoad = SUC::Project::s_WorldData.data[latestFlag].dataNight[stageSelected].levelID.c_str();
 			SequenceHelpers::setPlayerType(1);
@@ -232,7 +232,7 @@ void calculateNextStage()
 {
 	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 	char** h = (char**)stageTerrainAddress;
-	TitleWorldMap::m_isWorldMapCameraInit = false;
+	SUC::UI::TitleScreen::TitleWorldMap::s_IsWorldMapCameraInitialized = false;
 
 	//strcpy(*(char**)stageTerrainAddress, StageManager::NextLevelLoad);
 	if (!StageManager::InStory)
@@ -251,18 +251,18 @@ void calculateNextStage()
 			//}
 			return;
 		}
-		if (SUC::Project::s_WorldData.data.size() < TitleWorldMap::m_lastFlagSelected)
+		if (SUC::Project::s_WorldData.data.size() < SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected)
 		{
 			//if only cpp had the same ${} system as c#
 			std::string message = "This country has an invalid configuration. Loading " + std::string(stageToLoad) + " instead.";
 			MessageBoxA(NULL, message.c_str(), "Unleashed Title Screen", 0);
-			printf("\n[WorldMap] Missing config for FlagID %d", TitleWorldMap::m_lastFlagSelected);
+			printf("\n[WorldMap] Missing config for FlagID %d", SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected);
 		}
 		else
 		{
 			stageToLoad = StageManager::getStageToLoad();
 		}
-		TitleWorldMap::m_isActive = false;
+		SUC::UI::TitleScreen::TitleWorldMap::s_IsActive = false;
 		if (StageManager::NextLevelLoad != nullptr)
 		{
 			stageToLoad = StageManager::NextLevelLoad;
@@ -332,7 +332,7 @@ void __declspec(naked) ASM_InterceptGameplayFlowLoading()
 		jne FunctionFinish
 
 
-		cmp TitleWorldMap::m_forceLoadToTitle, 1
+		cmp SUC::UI::TitleScreen::TitleWorldMap::s_ForceTitleFlow, 1
 		je ChangeToTitle
 			
 		cmp ecx, 6
@@ -617,7 +617,7 @@ HOOK(int*, __fastcall, StartModule, 0x00D77020, DWORD* StorySequence,void* Edx, 
 			a3 = new LuaStringEntryContainer(_strdup(ModeStrings[2].c_str()));
 		}
 	}
-	if (TitleWorldMap::m_forceLoadToTitle)
+	if (SUC::UI::TitleScreen::TitleWorldMap::s_ForceTitleFlow)
 	{
 		if (std::string(exampleRead) != "Title")
 		{

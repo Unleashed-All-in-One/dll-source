@@ -50,7 +50,7 @@ HOOK(void, __fastcall, CHudSonicStageDelayProcessImpEXP, 0x109A8D0, Sonic::CGame
 	rcExp = spCsdProjectExp->m_rcProject;
 	exp_count = rcExp->CreateScene("exp_count");
 	exp_count->SetPosition(0, 0);
-	CSDCommon::FreezeMotion(*exp_count);
+	CSDCommon::FreezeMotion(exp_count);
 	if (SaveManager::getCurrentSave() != nullptr)
 	{
 		expProgress = SaveManager::getCurrentSave()->getSaveBoolKeyValue("EXPProgress");
@@ -58,7 +58,7 @@ HOOK(void, __fastcall, CHudSonicStageDelayProcessImpEXP, 0x109A8D0, Sonic::CGame
 	}
 	if (expLevel > 99)
 		expLevel = 99;
-	maxExpProgress = 22 + (11 * expLevel);
+	maxExpProgress = 22.0f + (11.0f * expLevel);
 	CreateScreenEXP(This);
 }
 void EXPCollect::addProgress(float progress)
@@ -88,9 +88,9 @@ HOOK(void, __fastcall, HudSonicEXPUpdate, 0x1098A50, Sonic::CGameObject* This, v
 	float frameBefore = exp_count->m_MotionFrame;
 	if(m_timerFade >= 5)
 	{
-		CSDCommon::PlayAnimation(*exp_count, "size", Chao::CSD::eMotionRepeatType_PlayOnce, 1, expProgress);
-		CSDCommon::FreezeMotion(*exp_count, expProgress);
-		CSDCommon::PlayAnimation(*exp_count, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);		
+		CSDCommon::PlayAnimation(exp_count, "size", Chao::CSD::eMotionRepeatType_PlayOnce, 1, expProgress);
+		CSDCommon::FreezeMotion(exp_count, expProgress);
+		CSDCommon::PlayAnimation(exp_count, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, false, true);		
 		displayedHUD = false;
 		m_timerFade = 0;		
 	}
@@ -104,9 +104,9 @@ HOOK(void, __fastcall, HudSonicEXPUpdate, 0x1098A50, Sonic::CGameObject* This, v
 			expProgress = maxExpProgress - progress;
 			progress = 0;
 		}
-		CSDCommon::PlayAnimation(*exp_count, "size", Chao::CSD::eMotionRepeatType_PlayOnce, 1, (progress / maxExpProgress) * 100);
-		CSDCommon::FreezeMotion(*exp_count, expProgress);
-		CSDCommon::PlayAnimation(*exp_count, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, frameBefore + 1);		
+		CSDCommon::PlayAnimation(exp_count, "size", Chao::CSD::eMotionRepeatType_PlayOnce, 1, (progress / maxExpProgress) * 100);
+		CSDCommon::FreezeMotion(exp_count, expProgress);
+		CSDCommon::PlayAnimation(exp_count, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, frameBefore + 1);		
 	}
 
 	char text[4];

@@ -172,11 +172,11 @@ public:
 	}
 	void Show()
 	{
-		CSDCommon::PlayAnimation(*rcActNumber, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 1, 0);
-		CSDCommon::PlayAnimation(*rcInfo_1, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 1, 0);
-		CSDCommon::PlayAnimation(*rcStageTitle, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-		CSDCommon::PlayAnimation(*rcBg, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-		CSDCommon::PlayAnimation(*rcArea_Tag, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(rcActNumber, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 1, 0);
+		CSDCommon::PlayAnimation(rcInfo_1, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 1, 0);
+		CSDCommon::PlayAnimation(rcStageTitle, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(rcBg, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(rcArea_Tag, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 		rcInfo_1->SetHideFlag(false);
 		rcInfo_2->SetHideFlag(false);
 		rcInfo_4->SetHideFlag(false);
@@ -188,11 +188,11 @@ public:
 	}
 	void Hide()
 	{
-		CSDCommon::PlayAnimation(*rcActNumber, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 1, 0, 0, false, true);
-		CSDCommon::PlayAnimation(*rcInfo_1, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop,1, 0, 0, false, true);
-		CSDCommon::PlayAnimation(*rcStageTitle, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,1, 0, 0, false, true);
-		CSDCommon::PlayAnimation(*rcBg, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,1, 0, 0, false, true);
-		CSDCommon::PlayAnimation(*rcArea_Tag, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,1, 0, 0, false, true);
+		CSDCommon::PlayAnimation(rcActNumber, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 1, 0, 0, false, true);
+		CSDCommon::PlayAnimation(rcInfo_1, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop,1, 0, 0, false, true);
+		CSDCommon::PlayAnimation(rcStageTitle, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,1, 0, 0, false, true);
+		CSDCommon::PlayAnimation(rcBg, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,1, 0, 0, false, true);
+		CSDCommon::PlayAnimation(rcArea_Tag, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,1, 0, 0, false, true);
 		rcInfo_1->SetHideFlag(true);
 		rcInfo_2->SetHideFlag(true);
 		rcInfo_4->SetHideFlag(true);

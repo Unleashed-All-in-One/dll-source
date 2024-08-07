@@ -38,8 +38,15 @@ namespace SUC
 	};
 	HOOK(void*, __fastcall, Project_UpdateApplication, 0xE7BED0, void* This, void* Edx, float elapsedTime, uint8_t a3)
 	{
+		CSDCommon::Update();
+		void* returnVal = originalProject_UpdateApplication(This, Edx, elapsedTime, a3);
+		auto time = std::chrono::high_resolution_clock::now();
+		CSDCommon::Update();
+		double elapsed = std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(std::chrono::high_resolution_clock::now() - time).count();
+		
+		DebugDrawText::log(Format("CSDCOMMON TOOK %.3fms", elapsed),0, 0, TEXT_GREEN);
 		Project::SetDeltaTime(elapsedTime);
-		return originalProject_UpdateApplication(This, Edx, elapsedTime, a3);
+		return returnVal;
 	}
 	HOOK(void, __fastcall, Project_CHudSonicStage_Update, 0x1098A50, void* This, void* Edx, float* dt)
 	{
@@ -76,7 +83,7 @@ namespace SUC
 	void Project::RegisterGlobalHooks()
 	{
 #if _DEBUG
-		MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
+		MessageBox(nullptr, TEXT("Attach Debugger to see hooks."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
 #endif
 
 		Hooks::InstallGameplayHooks();

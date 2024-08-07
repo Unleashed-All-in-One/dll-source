@@ -1,5 +1,5 @@
 
-Chao::CSD::CScene* sceneB;
+const Chao::CSD::CScene* sceneB;
 bool IsAnimDone(Chao::CSD::CScene* scene)
 {
 	if (scene->m_MotionSpeed < 0.0f)
@@ -16,28 +16,22 @@ bool IsAnimDone(Chao::CSD::CScene* scene)
 	return false;
 }
 //this may cause a very very slow memory leak.
-void CSDCommon::CheckSceneAnimation(int i, Chao::CSD::CScene* scene)
+void CSDCommon::CheckSceneAnimation(int i)
 {
 	if (i != -1)
-		sceneB = CSDCommon::scenesPlayingBack[i];
-	else
-		sceneB = scene;
+		sceneB = scenesPlayingBack[i];
 	if (!sceneB)
 	{
-		auto it = std::find(CSDCommon::scenesPlayingBack.begin(), CSDCommon::scenesPlayingBack.end(), scene);
-		if(it != CSDCommon::scenesPlayingBack.end())CSDCommon::scenesPlayingBack.erase(it);
-		return;
+		scenesPlayingBack.erase(scenesPlayingBack.begin() + i);
 	}
 	else
 	{
-		Common::ClampFloat(CSDCommon::scenesPlayingBack[i]->m_MotionFrame, 0, CSDCommon::scenesPlayingBack[i]->m_MotionEndFrame);
+		Common::ClampFloat(scenesPlayingBack[i]->m_MotionFrame, 0, scenesPlayingBack[i]->m_MotionEndFrame);
 
-		if (IsAnimDone(CSDCommon::scenesPlayingBack[i]))
+		if (IsAnimDone(scenesPlayingBack[i]))
 		{
-			CSDCommon::FreezeMotion(CSDCommon::scenesPlayingBack[i], 0);
-			auto it = std::find(CSDCommon::scenesPlayingBack.begin(), CSDCommon::scenesPlayingBack.end(), scene);
-			if (it != CSDCommon::scenesPlayingBack.end())CSDCommon::scenesPlayingBack.erase(it);
-			return;
+			FreezeMotion(*scenesPlayingBack[i], 0);
+			scenesPlayingBack.erase(scenesPlayingBack.begin() + i);
 		}
 	}
 }
@@ -46,7 +40,7 @@ void CSDCommon::Update()
 {
 	if (CSDCommon::scenesPlayingBack.size() != 0)
 	{
-		for (size_t i = 0; i < CSDCommon::scenesPlayingBack.size(); i+=4)
+		for (size_t i = 0; i < CSDCommon::scenesPlayingBack.size(); i +=3)
 		{
 			if (i < CSDCommon::scenesPlayingBack.size())
 				CSDCommon::CheckSceneAnimation(i);

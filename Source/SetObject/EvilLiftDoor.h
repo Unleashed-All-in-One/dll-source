@@ -143,7 +143,7 @@ public:
 		}
 		if (isDoingIt && !complete)
 		{		
-			DebugDrawText::log(std::format("TimerOff {0} | TimerComp {1}", timerForOff, timerForCompletion).c_str(), 0);
+			DebugDrawText::log(SUC::Format("[Door] TimerOff %.3f | TimerComp %.3f", timerForOff, timerForCompletion), 0);
 			if (isDoingIt)
 			{
 				timerForOff -= in_rUpdateInfo.DeltaTime;

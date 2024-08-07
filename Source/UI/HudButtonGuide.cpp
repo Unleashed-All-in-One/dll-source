@@ -107,15 +107,15 @@ void HudButtonGuide::configure(ButtonType in_ButtonType, AnimationType in_AnimTy
 		rcGuideEffect2 = rcQTE->CreateScene(m_animationNames[0].c_str());
 		rcQteBtn->GetNode("position")->SetPosition((1280 / 2) - 200, 720 / 2);
 		rcQteBtn2->GetNode("position")->SetPosition((1280 / 2) + 200, 720 / 2);
-		CSDCommon::PlayAnimation(*rcQteBtn, "L_pattern", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-		CSDCommon::PlayAnimation(*rcQteBtn2, "R_pattern", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(rcQteBtn, "L_pattern", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(rcQteBtn2, "R_pattern", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 	}
-	CSDCommon::PlayAnimation(*rcQteBtn, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-	CSDCommon::PlayAnimation(*rcGuideEffect, "Intro_Anim", Chao::CSD::eMotionRepeatType_Loop, 1, 0);
+	CSDCommon::PlayAnimation(rcQteBtn, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+	CSDCommon::PlayAnimation(rcGuideEffect, "Intro_Anim", Chao::CSD::eMotionRepeatType_Loop, 1, 0);
 	if(rcQteBtn2)
-		CSDCommon::PlayAnimation(*rcQteBtn2, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(rcQteBtn2, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 	if(rcGuideEffect2)
-		CSDCommon::PlayAnimation(*rcGuideEffect2, "Intro_Anim", Chao::CSD::eMotionRepeatType_Loop, 1, 0);
+		CSDCommon::PlayAnimation(rcGuideEffect2, "Intro_Anim", Chao::CSD::eMotionRepeatType_Loop, 1, 0);
 	isShowing = true;
 }
 void HudButtonGuide::spawn(Sonic::CGameObject* in_Parent, ButtonType in_ButtonType, AnimationType in_AnimType)
@@ -131,13 +131,13 @@ void HudButtonGuide::hide()
 	bypassGrindrail = false;
 	isShowing = false;
 	if(rcQteBtn)
-		CSDCommon::PlayAnimation(*rcQteBtn, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, true, true);
+		CSDCommon::PlayAnimation(rcQteBtn, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, true, true);
 	if(rcQteBtn2)
-		CSDCommon::PlayAnimation(*rcQteBtn2, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, true, true);
+		CSDCommon::PlayAnimation(rcQteBtn2, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100, 0, true, true);
 	if(rcGuideEffect)
-		CSDCommon::PlayAnimation(*rcGuideEffect, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(rcGuideEffect, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 	if (rcGuideEffect2)
-		CSDCommon::PlayAnimation(*rcGuideEffect2, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(rcGuideEffect2, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 }
 void CallBoostGuide()
 {

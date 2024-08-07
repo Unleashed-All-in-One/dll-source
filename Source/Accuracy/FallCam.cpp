@@ -46,7 +46,7 @@ public:
 
 		rcFade = spCsdProjectFade->m_rcProject;
 		rect = rcFade->CreateScene("fade");
-		CSDCommon::FreezeMotion(*rect);
+		CSDCommon::FreezeMotion(rect);
 		rect->SetHideFlag(true);
 
 		spFade = boost::make_shared<Sonic::CGameObjectCSD>(rcFade, 0.5f, "HUD_A1", false);
@@ -63,7 +63,7 @@ public:
 			return;
 		
 		rect->SetHideFlag(false);
-		CSDCommon::PlayAnimation(*rect, "Fade_Black", Chao::CSD::eMotionRepeatType_PlayOnce, 1.0f, 0.0f, 0.0f, true);
+		CSDCommon::PlayAnimation(rect, "Fade_Black", Chao::CSD::eMotionRepeatType_PlayOnce, 1.0f, 0.0f, 0.0f, true);
 	}
 
 	void SetVisibility(bool visible) {

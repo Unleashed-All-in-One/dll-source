@@ -69,7 +69,7 @@ public:
         const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
         if (m_playerInsideCollider)
         {
-            DebugDrawText::log(std::format("Paraloop. Speed: {0} | Param: {1}", abs(playerContext->m_Velocity.norm()), playerContext->m_spParameter->Get<float>(Sonic::Player::ePlayerSpeedParameter_ParaloopMinSpeed)).c_str(), 0);
+            DebugDrawText::log(SUC::Format("[Paraloop] Speed: %.3f | Param: %.3f", abs(playerContext->m_Velocity.norm()), playerContext->m_spParameter->Get<float>(Sonic::Player::ePlayerSpeedParameter_ParaloopMinSpeed)), 0);
             if (abs(playerContext->m_Velocity.norm()) < playerContext->m_spParameter->Get<float>(Sonic::Player::ePlayerSpeedParameter_ParaloopMinSpeed)) {
                 StopParaloop();
             }

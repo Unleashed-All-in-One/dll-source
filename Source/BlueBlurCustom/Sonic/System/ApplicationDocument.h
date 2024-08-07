@@ -47,7 +47,7 @@ namespace Sonic2
         SModuleConstructor* m_ModuleConstructorAddress;
     };
     
-    class CGameplayFlowManager : public Hedgehog::Universe::TStateMachine<CGameplayFlowManager>, public Hedgehog::Base::CObject
+    class CGameplayFlowManager : public Hedgehog::Universe::TStateMachine<CGameplayFlowManager>
     {
     public:
         class CMember

@@ -40,16 +40,16 @@ public:
         // This is what SU does, so just copy it over.
 
         m_Params.IsBaseSpacePlayer = 1;
-        m_Params.BaseSpacePathPosition = 24.0;
+        m_Params.BaseSpacePathPosition = 24.0f;
         m_Params.IsPositionBasePlayer = 1;
-        m_Params.DistancceRotationYZ.x() = 8.0;
-        m_Params.DistancceRotationYZ.y() = 0.0;
-        m_Params.DistancceRotationYZ.z() = -0.031399999;
+        m_Params.DistancceRotationYZ.x() = 8.0f;
+        m_Params.DistancceRotationYZ.y() = 0.0f;
+        m_Params.DistancceRotationYZ.z() = -0.031399999f;
         *(m_Params.DistancceRotationYZ.data() + 1) = 0.0; // can probably set this cleaner...
-        m_Params.TargetUpOffset = 2.0;
-        m_Params.TargetFrontOffsetBias = 1.8;
-        m_Params.TargetFrontOffsetSpeedScale = 0.1;
-        m_Params.TargetFrontOffsetMax = 4.0;
+        m_Params.TargetUpOffset = 2.0f;
+        m_Params.TargetFrontOffsetBias = 1.8f;
+        m_Params.TargetFrontOffsetSpeedScale = 0.1f;
+        m_Params.TargetFrontOffsetMax = 4.0f;
 
         m_spMsgGetCameraDefaultFovy = boost::make_shared<Sonic::Message::MsgGetCameraDefaultFovy>();
         m_spMsgGetCameraDefaultFovy->m_DefaultFOV = 45.0f;

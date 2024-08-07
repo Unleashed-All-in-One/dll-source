@@ -34,23 +34,11 @@ public:
             call func
         };
     };
-    DWORD* GetServiceGameplay2(Hedgehog::Base::TSynchronizedPtr<Sonic::CApplicationDocument> doc)
-    {
-        uint32_t func = 0x0040EBD0;
-        DWORD* result;
-        __asm
-        {
-            mov     edi, doc
-            add     edi, 34h
-            call func
-            mov     result, eax
-        };
-    };
     bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
     {
-        if (stageType != GetServiceGameplay2(Sonic::CApplicationDocument::GetInstance())[1])
+        if (stageType != Sonic::CApplicationDocument::GetInstance()->GetService<Sonic::CServiceGamePlay>()->m_PlayerID)
         {
-            DebugDrawText::log(std::format("[SonicUnleashedConversion] StageType doesn't match ServiceGameplay PlayerClass. {0}, {1}", stageType, GetServiceGameplay2(Sonic::CApplicationDocument::GetInstance())[1]).c_str(), 10);
+            DebugDrawText::log(std::format("[SonicUnleashedConversion] StageType doesn't match ServiceGameplay PlayerClass. {0}, {1}", stageType, Sonic::CApplicationDocument::GetInstance()->GetService<Sonic::CServiceGamePlay>()->m_PlayerID).c_str(), 10);
             return false;
         }
         const char* assetName = "cmn_obj_km_etfdoor_NAC";
@@ -74,11 +62,11 @@ public:
             particleName = "stage_night";
             break;
         }
-        case 2:
-        {
-            particleName = "stage1";
-            break;
-        }
+        //case 2:
+        //{
+        //    particleName = "stage1";
+        //    break;
+        //}
         }
         //fpAddParticle2(Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager.get(), handle1, &node, "ef_ch_sng_yh1_spinattack", 1);
         Common::fCGlitterCreate(playerContext, handle1, &node, particleName, 0);
@@ -124,9 +112,9 @@ public:
     };
     bool SetAddColliders(const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
     {
-        if (stageType != GetServiceGameplay2(Sonic::CApplicationDocument::GetInstance())[1])
+        if (stageType != Sonic::CApplicationDocument::GetInstance()->GetService<Sonic::CServiceGamePlay>()->m_PlayerID)
         {
-            DebugDrawText::log(std::format("[SonicUnleashedConversion] StageType doesn't match ServiceGameplay PlayerClass. {0}, {1}", stageType, GetServiceGameplay2(Sonic::CApplicationDocument::GetInstance())[1]).c_str(), 10);
+            DebugDrawText::log(SUC::Format("[StageGate] StageType(%d) doesn't match ServiceGameplay PlayerClass(%d).", stageType, Sonic::CApplicationDocument::GetInstance()->GetService<Sonic::CServiceGamePlay>()->m_PlayerID), 10, 0, TEXT_RED);
             return false;
         }
         m_spNodeEventCollision = boost::make_shared<Sonic::CMatrixNodeTransform>();

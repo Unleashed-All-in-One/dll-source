@@ -49,7 +49,7 @@ public:
 		case SpeedDown:
 		{
 			rcSign_box->SetHideFlag(false);
-			CSDCommon::PlayAnimation(*rcSign_box, "speed_down", Chao::CSD::eMotionRepeatType_Loop, 1, 0);
+			CSDCommon::PlayAnimation(rcSign_box, "speed_down", Chao::CSD::eMotionRepeatType_Loop, 1, 0);
 			break;
 		}
 		}

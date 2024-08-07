@@ -26,9 +26,6 @@ public:
 		Sonic::CGameObject::AddRenderable("Object", m_spRenderable, true);
 	}
 };
-class TestClass1 : public Hedgehog::Universe::TStateMachine<TestClass1>, public Hedgehog::Universe::CStateMachineBase, public Hedgehog::Universe::IStateMachineMessageReceiver, public  Hedgehog::Base::CObject, public Hedgehog::Universe::CMessageActor, public Hedgehog::Universe::IMessageProcess, public Hedgehog::Universe::IParallelJob {
-
-};
 DWORD* GetServiceScriptMan(Hedgehog::Base::TSynchronizedPtr<Sonic::CApplicationDocument> doc)
 {
 	uint32_t func = 0x0041E6F0;
@@ -279,8 +276,8 @@ HOOK(int, __fastcall, CHudGateMenuMainIntroInfo, 0x1080110, hh::fnd::CStateMachi
 	int index = stageID == 0 ? stageID : stageID + 1;
 	auto idArchive = (const char*)((int*)0x015BBA34)[stageID];
 
-	Common::ClampUInt(stageID, 0, SUC::Project::s_WorldData.data[TitleWorldMap::m_lastFlagSelected].data.size() - 1);
-	StageManager::NextLevelLoad = SUC::Project::s_WorldData.data[TitleWorldMap::m_lastFlagSelected].data[stageID].levelID.
+	Common::ClampUInt(stageID, 0, SUC::Project::s_WorldData.data[SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected].data.size() - 1);
+	StageManager::NextLevelLoad = SUC::Project::s_WorldData.data[SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected].data[stageID].levelID.
 		c_str();
 	return returne;
 }
@@ -289,7 +286,7 @@ HOOK(char, *_stdcall, StageGate_MoveToOtherStage, 0x107FBC0, int a1)
 {
 	char* returned = originalStageGate_MoveToOtherStage(a1);
 	uint8_t stageID = (*(uint8_t*)(a1 + 336));
-	StageManager::NextLevelLoad = SUC::Project::s_WorldData.data[TitleWorldMap::m_lastFlagSelected].data[stageID].levelID.
+	StageManager::NextLevelLoad = SUC::Project::s_WorldData.data[SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected].data[stageID].levelID.
 		c_str();
 	return returned;
 }

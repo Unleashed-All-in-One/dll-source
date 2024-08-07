@@ -27,7 +27,7 @@ public:
 		Sonic::CGameDocument* gameDocument = Sonic::CGameDocument::GetInstance().get().get();
 		hh::vector<Sonic::SBGMData>* audioData = &gameDocument->m_pMember->m_AudioData;
 
-		for (int i = 0; i < audioData->size(); ++i)
+		for (size_t i = 0; i < audioData->size(); ++i)
 		{
 			printf(audioData->at(i).Name.c_str());
 			Hedgehog::Sound::CSoundHandleBgm* bgm = audioData->at(i).spSoundHandleBGM.get();

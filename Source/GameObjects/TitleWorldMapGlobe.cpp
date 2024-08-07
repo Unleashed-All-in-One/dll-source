@@ -1,4 +1,4 @@
-#include "TitleWorldMapGlobe.h";
+#include "TitleWorldMapGlobe.h"
 
 void CTitleWorldMapGlobe::AddCallback(const Hedgehog::Base::THolder<Sonic::CWorld>& worldHolder, Sonic::CGameDocument* pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& spDatabase)
 {

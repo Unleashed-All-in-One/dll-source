@@ -208,7 +208,6 @@
     <ClCompile Include="UI\HudButtonGuide.cpp" />
     <ClCompile Include="UI\SubtitleUI.cpp" />
     <ClCompile Include="UI\Title.cpp" />
-    <ClCompile Include="UI\TitleOption.cpp" />
     <ClCompile Include="UI\TitleWorldMap.cpp" />
     <ClCompile Include="UI\TitleWorldMapPause.cpp" />
   </ItemGroup>
@@ -216,6 +215,7 @@
     <ClInclude Include="Accuracy\AccuracyHookContainer.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\System\ApplicationDocument.h" />
     <ClInclude Include="Gameplay\GameplayHookContainer.h" />
+    <ClInclude Include="Macros.h" />
     <ClInclude Include="SetObject\CObjCamera2D.h" />
     <ClInclude Include="SetObject\DebugObject.h" />
     <ClInclude Include="SetObject\ETFStageGate.h" />
@@ -320,7 +320,6 @@
     <ClInclude Include="UI\EventViewer.h" />
     <ClInclude Include="UI\SubtitleUI.h" />
     <ClInclude Include="UI\Title.h" />
-    <ClInclude Include="UI\TitleOption.h" />
     <ClInclude Include="UI\TitleWorldMap.h" />
     <ClInclude Include="UI\TitleWorldMapPause.h" />
     <ClInclude Include="UI\UIHookContainer.h" />

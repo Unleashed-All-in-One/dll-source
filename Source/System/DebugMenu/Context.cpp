@@ -44,11 +44,11 @@ void Context::initialize(HWND window, IUnknown* device)
     ImFontConfig font_cfg;
     font_cfg.GlyphExtraSpacing.x = -2;
     fontSeuratProM = io.Fonts->AddFontFromFileTTF((modDirectoryPath + "/disk/Fonts/SeuratProM.otf").c_str(), max(42, *HEIGHT / 1080.0f * 42), &font_cfg, io.Fonts->GetGlyphRangesDefault());
-    fontDroidSans = io.Fonts->AddFontFromFileTTF((modDirectoryPath + "/disk/Fonts/DroidSans.ttf").c_str(), fontSize, nullptr, io.Fonts->GetGlyphRangesDefault());
+    fontDroidSans = io.Fonts->AddFontFromFileTTF((modDirectoryPath + "/disk/Fonts/InterRegular.ttf").c_str(), fontSize, nullptr, io.Fonts->GetGlyphRangesDefault());
 
     if (fontDroidSans == nullptr)
     {
-        DebugDrawText::log("Failed to load DroidSans.ttf", 1);
+        DebugDrawText::log("Failed to load InterRegular.ttf", 1);
         fontDroidSans = io.Fonts->AddFontDefault();
     }
     if (fontSeuratProM == nullptr)
@@ -65,7 +65,7 @@ void Context::initialize(HWND window, IUnknown* device)
 
     io.Fonts->Build();
 
-    DebugDrawText::log("UnleashedConversion init success", 1);
+    DebugDrawText::log(SUC::Format("UnleashedConversion init success", __DATE__, __TIME__));
     DebugDrawText::log(std::format("UnleashedConversion {0} {1}", __DATE__, __TIME__).c_str(), 10);
 }
 bool Context::loadTextureFromFile(const wchar_t* filename, IUnknown** out_texture, int* out_width, int* out_height)
@@ -168,7 +168,7 @@ void Context::update()
 
     //Draw all elements until the pop with SeuratPro (dialogue font)
     ImGui::PushFont(fontSeuratProM);
-    SubtitleUI::draw();
+    SUC::UI::Event::SubtitleUI::Draw();
     ImGui::PopFont();
     
     //Draw all elements until the pop with DroidSans

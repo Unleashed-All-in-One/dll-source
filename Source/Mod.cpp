@@ -20,10 +20,9 @@ extern "C" __declspec(dllexport) void PostInit()
 extern "C" void __declspec(dllexport) OnFrame()
 {	
 	//---------------System---------------
-	ImguiInitializer::update();
-	CSDCommon::update();
-	DiscordStatus::update();
-	StageManager::update();
-	EventViewer::update();
-	SequenceHelpers::update();
+	SUC::ImGuiMenu::ImguiInitializer::Update();
+	DiscordStatus::Update();
+	StageManager::Update();
+	SUC::UI::Event::EventViewer::Update();
+	SequenceHelpers::Update();
 }
