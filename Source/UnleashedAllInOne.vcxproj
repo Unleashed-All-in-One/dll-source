@@ -79,8 +79,8 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)..\Build\bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\su-conversion" /Y /I /E
-xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Generations\mods\su-conversion" /Y /I /E</Command>
+      <Command>xcopy "$(SolutionDir)..\Build\bin\$(Platform)\$(Configuration)\$(ProjectName).dll" "$(GensModsPath)\su-conversion\"  /Y /D /F
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -113,27 +113,27 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)..\Build\bin\$(Platform)\$(Configuration)\*.*" "G:\Steam\steamapps\common\Sonic Generations\mods\su-conversion" /Y /I /E
-xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Generations\mods\su-conversion" /Y /I /E</Command>
+      <Command>xcopy "$(SolutionDir)..\Build\bin\$(Platform)\$(Configuration)\$(ProjectName).dll" "$(GensModsPath)\su-conversion\"  /Y /D /F
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CustomSetObjects\CObjCamera2D.cpp" />
-    <ClCompile Include="CustomSetObjects\DebugObject.cpp" />
-    <ClCompile Include="CustomSetObjects\ETFStageGate.cpp" />
-    <ClCompile Include="CustomSetObjects\ETFTimeSwitch.cpp" />
-    <ClCompile Include="CustomSetObjects\EvilEnemyRecklessC.cpp" />
-    <ClCompile Include="CustomSetObjects\EvilLiftDoorC.cpp" />
-    <ClCompile Include="CustomSetObjects\Hintring.cpp" />
-    <ClCompile Include="CustomSetObjects\Holoska\Icicle.cpp" />
-    <ClCompile Include="CustomSetObjects\Holoska\StompingSwitch.cpp" />
-    <ClCompile Include="CustomSetObjects\MoonMedal.cpp" />
-    <ClCompile Include="CustomSetObjects\Mykonos\IrremovableMobMykonos.cpp" />
-    <ClCompile Include="CustomSetObjects\Mykonos\Pelican.cpp" />
-    <ClCompile Include="CustomSetObjects\ObjectUtility.cpp" />
-    <ClCompile Include="CustomSetObjects\Paraloop.cpp" />
-    <ClCompile Include="CustomSetObjects\SpeedDownCollision.cpp" />
-    <ClCompile Include="CustomSetObjects\Werehog\CObjHangOn.cpp" />
+    <ClCompile Include="SetObject\CObjCamera2D.cpp" />
+    <ClCompile Include="SetObject\DebugObject.cpp" />
+    <ClCompile Include="SetObject\ETFStageGate.cpp" />
+    <ClCompile Include="SetObject\ETFTimeSwitch.cpp" />
+    <ClCompile Include="SetObject\EvilEnemyRecklessC.cpp" />
+    <ClCompile Include="SetObject\EvilLiftDoorC.cpp" />
+    <ClCompile Include="SetObject\Hintring.cpp" />
+    <ClCompile Include="SetObject\Holoska\Icicle.cpp" />
+    <ClCompile Include="SetObject\Holoska\StompingSwitch.cpp" />
+    <ClCompile Include="SetObject\MoonMedal.cpp" />
+    <ClCompile Include="SetObject\Mykonos\IrremovableMobMykonos.cpp" />
+    <ClCompile Include="SetObject\Mykonos\Pelican.cpp" />
+    <ClCompile Include="SetObject\ObjectUtility.cpp" />
+    <ClCompile Include="SetObject\Paraloop.cpp" />
+    <ClCompile Include="SetObject\SpeedDownCollision.cpp" />
+    <ClCompile Include="SetObject\Werehog\CObjHangOn.cpp" />
     <ClCompile Include="GameObjects\TitleWorldMapGlobe.cpp" />
     <ClCompile Include="GameObjects\TitleWorldMapSky.cpp" />
     <ClCompile Include="ModuleTable.cpp" />
@@ -195,7 +195,6 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="System\EnemyTrigger.cpp" />
     <ClCompile Include="System\ImguiInitializer.cpp" />
     <ClCompile Include="System\LetterboxHelper.cpp" />
-    <ClCompile Include="System\SetEditorTest.cpp" />
     <ClCompile Include="System\StageManager.cpp" />
     <ClCompile Include="System\LuaManager.cpp" />
     <ClCompile Include="System\MiniAudioHelper.cpp" />
@@ -214,22 +213,23 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClCompile Include="UI\TitleWorldMapPause.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CustomSetObjects\CObjCamera2D.h" />
-    <ClInclude Include="CustomSetObjects\DebugObject.h" />
-    <ClInclude Include="CustomSetObjects\ETFStageGate.h" />
-    <ClInclude Include="CustomSetObjects\ETFTimeSwitch.h" />
-    <ClInclude Include="CustomSetObjects\EvilEnemyReckless.h" />
-    <ClInclude Include="CustomSetObjects\EvilLiftDoor.h" />
-    <ClInclude Include="CustomSetObjects\Hintring.h" />
-    <ClInclude Include="CustomSetObjects\Holoska\Icicle.h" />
-    <ClInclude Include="CustomSetObjects\Holoska\StompingSwitch.h" />
-    <ClInclude Include="CustomSetObjects\MoonMedal.h" />
-    <ClInclude Include="CustomSetObjects\Mykonos\IrremovableMobMykonos.h" />
-    <ClInclude Include="CustomSetObjects\Mykonos\Pelican.h" />
-    <ClInclude Include="CustomSetObjects\ObjectUtility.h" />
-    <ClInclude Include="CustomSetObjects\Paraloop.h" />
-    <ClInclude Include="CustomSetObjects\SpeedDownCollision.h" />
-    <ClInclude Include="CustomSetObjects\Werehog\CObjHangOn.h" />
+    <ClInclude Include="BlueBlurCustom\Sonic\System\ApplicationDocument.h" />
+    <ClInclude Include="SetObject\CObjCamera2D.h" />
+    <ClInclude Include="SetObject\DebugObject.h" />
+    <ClInclude Include="SetObject\ETFStageGate.h" />
+    <ClInclude Include="SetObject\ETFTimeSwitch.h" />
+    <ClInclude Include="SetObject\EvilEnemyReckless.h" />
+    <ClInclude Include="SetObject\EvilLiftDoor.h" />
+    <ClInclude Include="SetObject\Hintring.h" />
+    <ClInclude Include="SetObject\Holoska\Icicle.h" />
+    <ClInclude Include="SetObject\Holoska\StompingSwitch.h" />
+    <ClInclude Include="SetObject\MoonMedal.h" />
+    <ClInclude Include="SetObject\Mykonos\IrremovableMobMykonos.h" />
+    <ClInclude Include="SetObject\Mykonos\Pelican.h" />
+    <ClInclude Include="SetObject\ObjectUtility.h" />
+    <ClInclude Include="SetObject\Paraloop.h" />
+    <ClInclude Include="SetObject\SpeedDownCollision.h" />
+    <ClInclude Include="SetObject\Werehog\CObjHangOn.h" />
     <ClInclude Include="GameObjects\TitleWorldMapCamera.h" />
     <ClInclude Include="GameObjects\TitleWorldMapGlobe.h" />
     <ClInclude Include="GameObjects\TitleWorldMapSky.h" />
@@ -296,7 +296,6 @@ xcopy "$(ProjectDir)discord_game_sdk.dll" "G:\Steam\steamapps\common\Sonic Gener
     <ClInclude Include="System\EnemyTrigger.h" />
     <ClInclude Include="System\ImguiInitializer.h" />
     <ClInclude Include="System\LetterboxHelper.h" />
-    <ClInclude Include="System\SetEditorTest.h" />
     <ClInclude Include="System\StageManager.h" />
     <ClInclude Include="System\Light.h" />
     <ClInclude Include="System\LuaManager.h" />

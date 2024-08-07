@@ -28,7 +28,7 @@ HOOK(void, __fastcall, QSSRestore_CSonicStateStompingAdvance, 0x12548C0, int Thi
 
 void QSSRestore::applyPatches()
 {
-	if (!Project::m_bQSS)
+	if (!SUC::Project::m_DoQSS)
 	{
 		return;
 	}

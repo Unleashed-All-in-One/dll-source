@@ -276,7 +276,7 @@ HOOK(long, __fastcall, CEventSceneStart, 0xB1ECF0, int This, void* Edx, int a2, 
 {
 	frame = 0;
 	doCount = true;
-	auto string = std::format("{0}\\disk\\EventSceneResource\\{1}_voice_English.inspire_resource.xml", Project::modPath, StageManager::getEventID());
+	auto string = std::format("{0}\\disk\\EventSceneResource\\{1}_voice_English.inspire_resource.xml", SUC::Project::s_ModPath, StageManager::getEventID());
 	if (!std::filesystem::exists(string))
 	{
 		printf("\n[SonicUnleashedConversion] Missing InspireResource file for Voice.");
@@ -286,7 +286,7 @@ HOOK(long, __fastcall, CEventSceneStart, 0xB1ECF0, int This, void* Edx, int a2, 
 		resource = new InspireResource(string.c_str());
 	}
 
-	auto string2 = std::format("{0}\\disk\\EventSceneResource\\{1}_bgm.inspire_resource.xml", Project::modPath, StageManager::getEventID());
+	auto string2 = std::format("{0}\\disk\\EventSceneResource\\{1}_bgm.inspire_resource.xml", SUC::Project::s_ModPath, StageManager::getEventID());
 	if (!std::filesystem::exists(string2))
 	{
 		printf("\n[SonicUnleashedConversion] Missing InspireResource file for BGM.");
@@ -298,7 +298,7 @@ HOOK(long, __fastcall, CEventSceneStart, 0xB1ECF0, int This, void* Edx, int a2, 
 		resource->resources.insert(resource->resources.end(), res2->resources.begin(), res2->resources.end());
 		resource->triggers.insert(resource->triggers.end(), res2->triggers.begin(), res2->triggers.end());
 	}
-	auto string3 = std::format("{0}\\disk\\EventSceneResource\\{1}_se.inspire_resource.xml", Project::modPath, StageManager::getEventID());
+	auto string3 = std::format("{0}\\disk\\EventSceneResource\\{1}_se.inspire_resource.xml", SUC::Project::s_ModPath, StageManager::getEventID());
 	if (!std::filesystem::exists(string3))
 	{
 		printf("\n[SonicUnleashedConversion] Missing InspireResource file for SE.");

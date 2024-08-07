@@ -2,9 +2,6 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <BlueBlur.h>
-#include "INIReader.h"
-#include "Helpers.h"
-#include "Common.h"
 class CSDCommon
 {
 

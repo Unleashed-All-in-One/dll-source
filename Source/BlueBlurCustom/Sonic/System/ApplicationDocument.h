@@ -103,16 +103,9 @@ namespace Sonic2
 
         static constexpr Hedgehog::Base::TSynchronizedPtr<CApplicationDocument>* ms_pInstance = (Hedgehog::Base::TSynchronizedPtr<CApplicationDocument>*)0x1E66B34;
 
-        static Hedgehog::Base::TSynchronizedPtr<CApplicationDocument> GetInstance();
-
         CMember* m_pMember;
         BB_INSERT_PADDING(0x2C);
         hh::map<uint32_t, boost::shared_ptr<Hedgehog::Universe::CService>> m_ServiceMap;
-
-        void AddMessageActor(const Hedgehog::Base::CSharedString& in_rCategory, Hedgehog::Universe::CMessageActor* in_pMessageActor);
-
-        template<typename T>
-        T* GetService() const;
     };
 
     BB_ASSERT_OFFSETOF(CApplicationDocument::CMember, m_pApplication, 0x14);
@@ -133,5 +126,3 @@ namespace Sonic2
     BB_ASSERT_OFFSETOF(CApplicationDocument, m_ServiceMap, 0x34);
     BB_ASSERT_SIZEOF(CApplicationDocument, 0x40);
 }
-
-#include <Sonic/System/ApplicationDocument.inl>

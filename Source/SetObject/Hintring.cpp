@@ -7,7 +7,7 @@ HOOK(void*, __fastcall, InitializePlayer, 0x00D96110, void* This)
 {
     uint32_t stageIDAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
     char** stageName = (char**)stageIDAddress;
-	std::string path = std::format(HINTSFILE_NAME_FORMAT,  Project::modPath,std::string(*stageName)).c_str();
+	std::string path = std::format(HINTSFILE_NAME_FORMAT,  SUC::Project::s_ModPath,std::string(*stageName)).c_str();
     std::ifstream jsonFile;
 	try {
 		jsonFile.open(path);

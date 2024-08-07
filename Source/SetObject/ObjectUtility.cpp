@@ -80,7 +80,7 @@ bool ObjectUtility::DoWerehogArmHomingIfClose(Hedgehog::Math::CVector target, fl
 	{
 		if (inputPtr->IsTapped(Sonic::eKeyState_B) && playerContext->m_pPlayer->m_StateMachine.GetCurrentState()->GetStateName() != "EvilArmSwing")
 		{
-			Project::nodeForArmswing = target;
+			SUC::Project::s_TempArmswingNode = target;
 			playerContext->ChangeState("EvilArmSwing");
 			return true;
 		}

@@ -79,7 +79,7 @@
 #include "System/LetterboxHelper.h"
 #include "System/ImguiInitializer.h"
 #include "System/UpdateDirector.h"
-#include "CustomSetObjects/ObjectUtility.h"
+#include "SetObject/ObjectUtility.h"
 #include "System/SoundController.h"
 #include "System/CObjCamera.h"
 #include "System/LuaManager.h"

@@ -311,14 +311,14 @@ void SetLevelTextCast(const char* text)
 
 void PopulateStageSelect(int id, int offset = 0)
 {
-	if (Project::worldData.data.size() < id)
+	if (SUC::Project::s_WorldData.data.size() < id)
 	{
 		printf("\n[WorldMap] Missing config for FlagID %d", id);
 		return;
 	}
-	stageSelectedWindowMax = TitleWorldMap::m_flags[id].night && Project::worldData.data[id].dataNight.size() != 0
-		? Project::worldData.data[id].dataNight.size() - 1
-		: Project::worldData.data[id].data.size() - 1;
+	stageSelectedWindowMax = TitleWorldMap::m_flags[id].night && SUC::Project::s_WorldData.data[id].dataNight.size() != 0
+		? SUC::Project::s_WorldData.data[id].dataNight.size() - 1
+		: SUC::Project::s_WorldData.data[id].data.size() - 1;
 	//Common::ClampInt(stageSelectedWindowMax, 0, 6);
 	for (size_t i = 0; i <= WM_STAGELIST_MAXLISTVISIBLE; i++)
 	{
@@ -331,10 +331,10 @@ void PopulateStageSelect(int id, int offset = 0)
 			break;
 
 		const char* optionName;
-		if (TitleWorldMap::m_flags[id].night && Project::worldData.data[id].dataNight.size() != 0)
-			optionName = Project::worldData.data[id].dataNight[i + offset].optionName.c_str();
+		if (TitleWorldMap::m_flags[id].night && SUC::Project::s_WorldData.data[id].dataNight.size() != 0)
+			optionName = SUC::Project::s_WorldData.data[id].dataNight[i + offset].optionName.c_str();
 		else
-			optionName = Project::worldData.data[id].data[i + offset].optionName.c_str();
+			optionName = SUC::Project::s_WorldData.data[id].data[i + offset].optionName.c_str();
 
 		rcTextElement[i]->SetHideFlag(false);
 		rcTextElement[i]->GetNode("Text_blue")->SetText(optionName);
@@ -343,14 +343,14 @@ void PopulateStageSelect(int id, int offset = 0)
 
 TitleWorldMap::SaveStageInfo GetInfoForStage(std::string id)
 {
-	auto it = std::find(Project::gensStages.begin(), Project::gensStages.end(), id);
+	auto it = std::find(SUC::Project::s_GenerationsStages.begin(), SUC::Project::s_GenerationsStages.end(), id);
 	auto returnI = TitleWorldMap::SaveStageInfo();
 	returnI.stageID_string = id;
 	//Return an empty Info struct if the stage isnt a native gens stage. This should be expanded to have custom stage slot save files in the future.
-	if (it == Project::gensStages.end())
+	if (it == SUC::Project::s_GenerationsStages.end())
 		return returnI;
 
-	returnI.stageIDForGens = std::distance(Project::gensStages.begin(), it);
+	returnI.stageIDForGens = std::distance(SUC::Project::s_GenerationsStages.begin(), it);
 	returnI.isStageCompleted = Common::IsStageCompleted(returnI.stageIDForGens);
 	Common::GetStageData(returnI.stageIDForGens, returnI.bestScore, returnI.bestTime, returnI.bestTime2,
 		returnI.bestTime3, returnI.bestRank, returnI.bestRing, returnI.redRingCount);
@@ -359,12 +359,12 @@ TitleWorldMap::SaveStageInfo GetInfoForStage(std::string id)
 
 void PopulateCountryPreviewInfo(int flag)
 {
-	int redRingMax = 5 * Project::worldData.data[flag].data.size();
+	int redRingMax = 5 * SUC::Project::s_WorldData.data[flag].data.size();
 	int redRingCurrent = 0;
 	int stageCompletedAmount = 0;
-	for (size_t i = 0; i < Project::worldData.data[flag].data.size(); i++)
+	for (size_t i = 0; i < SUC::Project::s_WorldData.data[flag].data.size(); i++)
 	{
-		auto e = GetInfoForStage(Project::worldData.data[flag].data[i].levelID);
+		auto e = GetInfoForStage(SUC::Project::s_WorldData.data[flag].data[i].levelID);
 		redRingCurrent += e.redRingCount;
 		stageCompletedAmount += e.isStageCompleted;
 	}
@@ -374,7 +374,7 @@ void PopulateCountryPreviewInfo(int flag)
 	auto stageCount = new char[8];
 	sprintf(redRingsCurrent, "%02d", redRingCurrent);
 	sprintf(redRingsMax, "%02d", redRingMax);
-	sprintf(stageMax, "%02d", Project::worldData.data[flag].data.size());
+	sprintf(stageMax, "%02d", SUC::Project::s_WorldData.data[flag].data.size());
 	sprintf(stageCount, "%02d", stageCompletedAmount);
 
 	rcCtsGuide4Mission->GetNode("num_nume")->SetText(stageCount);
@@ -488,44 +488,45 @@ void TitleWorldMap::EnableInput()
 
 void __fastcall CTitleWRemoveCallback(Sonic::CGameObject* This, void*, Sonic::CGameDocument* pGameDocument)
 {
+	using Chao::CSD::CProject;
 	TitleWorldMap::KillScreen();
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcInfoBg1);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcInfoImg2);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcInfoImg3);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcInfoImg4);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcHeaderBgW);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcHeaderImgW);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcFooterBgW);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcFooterImgW);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcWorldmapFooterImgA);
+	CProject::DestroyScene(rcWorldMap.Get(), rcInfoBg1);
+	CProject::DestroyScene(rcWorldMap.Get(), rcInfoImg2);
+	CProject::DestroyScene(rcWorldMap.Get(), rcInfoImg3);
+	CProject::DestroyScene(rcWorldMap.Get(), rcInfoImg4);
+	CProject::DestroyScene(rcWorldMap.Get(), rcHeaderBgW);
+	CProject::DestroyScene(rcWorldMap.Get(), rcHeaderImgW);
+	CProject::DestroyScene(rcWorldMap.Get(), rcFooterBgW);
+	CProject::DestroyScene(rcWorldMap.Get(), rcFooterImgW);
+	CProject::DestroyScene(rcWorldMap.Get(), rcWorldmapFooterImgA);
 
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCursorLeft);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCursorTop);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCursorBottom);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCursorRight);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCursorLeft);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCursorTop);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCursorBottom);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCursorRight);
 
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsName);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsCursorEffect);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuideScreenshot);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsStageScreenshot);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuideWindow);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuideText);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcTextWorldDescription);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuide4Mission);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuide5Medal);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsName);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsCursorEffect);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuideScreenshot);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsStageScreenshot);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuideWindow);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuideText);
+	CProject::DestroyScene(rcWorldMap.Get(), rcTextWorldDescription);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuide4Mission);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuide5Medal);
 
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsStageWindow);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsStageSelect);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsStageInfoWindow);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuide1Hiscore);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuide2BestTime);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuide3Rank);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsStage4Mission);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsStage5Medal);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsStageWindow);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsStageSelect);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsStageInfoWindow);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuide1Hiscore);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuide2BestTime);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsGuide3Rank);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsStage4Mission);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsStage5Medal);
 
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsChoicesBg);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsChoicesWindow);
-	Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcCtsChoicesSelect);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsChoicesBg);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsChoicesWindow);
+	CProject::DestroyScene(rcWorldMap.Get(), rcCtsChoicesSelect);
 
 	for (size_t i = 0; i < 9; i++)
 	{
@@ -954,8 +955,8 @@ void CapitalWindow_Update()
 		if (selectedCapital == 0)
 		{
 			MiniAudioHelper::playSound(stageSelectHandle, 3, "Boot");
-			StageManager::WhiteWorldEnabled = Project::worldData.data[TitleWorldMap::m_lastFlagSelected].data[
-				Project::getCapital(TitleWorldMap::m_lastFlagSelected,
+			StageManager::WhiteWorldEnabled = SUC::Project::s_WorldData.data[TitleWorldMap::m_lastFlagSelected].data[
+				SUC::Project::GetCapital(TitleWorldMap::m_lastFlagSelected,
 					TitleWorldMap::m_flags[TitleWorldMap::m_lastFlagSelected].night)].isWhiteWorld;
 
 			/*if (StageManager::WhiteWorldEnabled)
@@ -1012,7 +1013,7 @@ void StageWindow_Update(Sonic::CGameObject* This)
 	if (inputPtr->IsTapped(Sonic::eKeyState_A) && timeStageSelectDelay >= 5)
 	{
 		MiniAudioHelper::playSound(stageSelectHandle, 3, "Boot");
-		StageManager::WhiteWorldEnabled = Project::worldData.data[TitleWorldMap::m_lastFlagSelected].data[
+		StageManager::WhiteWorldEnabled = SUC::Project::s_WorldData.data[TitleWorldMap::m_lastFlagSelected].data[
 			TitleWorldMap::m_stageSelectWindowSelection].isWhiteWorld;
 
 		Title::showTransition(true);
@@ -1069,7 +1070,7 @@ void StageWindow_Update(Sonic::CGameObject* This)
 	SetStageSelectionScreenshot();
 	Common::ClampInt(TitleWorldMap::m_stageSelectWindowSelection, 0, stageSelectedWindowMax);
 	PopulateStageWindowInfo(
-		Project::worldData.data[TitleWorldMap::m_lastFlagSelected].data[TitleWorldMap::m_stageSelectWindowSelection].levelID);
+		SUC::Project::s_WorldData.data[TitleWorldMap::m_lastFlagSelected].data[TitleWorldMap::m_stageSelectWindowSelection].levelID);
 }
 
 void LoadTest(Hedgehog::base::CSharedString a1, Sonic::CGameObject* a2)
@@ -1142,7 +1143,7 @@ HOOK(void*, __fastcall, TitleWorldMap_UpdateApplication, 0xE7BED0, Sonic::CGameO
 
 						PopulateCountryPreviewInfo(TitleWorldMap::m_lastFlagSelected);
 						SetLevelTextCast(
-							Project::worldData.data[TitleWorldMap::m_lastFlagSelected].description.c_str());
+							SUC::Project::s_WorldData.data[TitleWorldMap::m_lastFlagSelected].description.c_str());
 					}
 					else
 					{
@@ -1177,7 +1178,7 @@ HOOK(void*, __fastcall, TitleWorldMap_UpdateApplication, 0xE7BED0, Sonic::CGameO
 						rcCtsName_2->GetNode("img_1")->SetPatternIndex(TitleWorldMap::m_lastFlagSelected);
 						rcStageSelectFlag->GetNode("img")->SetPatternIndex(TitleWorldMap::m_lastFlagSelected);
 
-						if (Project::getCapital(TitleWorldMap::m_lastFlagSelected,
+						if (SUC::Project::GetCapital(TitleWorldMap::m_lastFlagSelected,
 							TitleWorldMap::m_flags[TitleWorldMap::m_lastFlagSelected].night) != -1)
 						{
 							TitleWorldMap::m_isCapitalWindowOpened = true;

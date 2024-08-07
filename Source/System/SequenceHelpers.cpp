@@ -1,4 +1,5 @@
 #include <Hedgehog/Universe/Engine/hhStateMachineBase.h>
+#include "..\BlueBlurCustom\Sonic\System\ApplicationDocument.h"
 Sonic::Sequence::Story* SequenceHelpers::storySequenceInstance;
 int nextPlayerType = 0;
 const char* nextStage = nullptr;
@@ -219,25 +220,26 @@ void ModuleChangeProcessor(const Sonic::Message::SRequestChangeModuleInfo& in_In
 {
 	FUNCTION_PTR(int, __thiscall, ChangeStateWithoutRegistering, 0x76EE60, void* in_StateMachine, int* out_Data, const boost::shared_ptr<Hedgehog::Universe::CStateMachineBase::CStateBase>&in_StateBase, int a4, float a5, int a6);
 	FUNCTION_PTR(boost::shared_ptr<CGameplayFlowStageAct>, __cdecl, InitCGameplayFlowStageAct, in_Address, const Sonic::Message::SRequestChangeModuleInfo & in_ModuleRequestInfo, void* in_Manager);
-	auto manager = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager;
+	auto appDocMember = (Sonic2::CApplicationDocument::CMember*)Sonic::CApplicationDocument::GetInstance()->m_pMember;
+	auto manager = appDocMember->m_pGameplayFlowManager;
 	boost::shared_ptr<CGameplayFlowStageAct> m_StateThatHasToBeAdded = boost::make_shared<CGameplayFlowStageAct>();
 
-	m_StateThatHasToBeAdded = InitCGameplayFlowStageAct(in_Info, Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager);
+	m_StateThatHasToBeAdded = InitCGameplayFlowStageAct(in_Info, appDocMember->m_pGameplayFlowManager);
 	auto m_ReplyChangeModule = MsgReplyChangeModule(); //not sure if this is necessary
 	auto m_EndChangeModule = MsgRequestEndModule();
-	auto g = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager;
+	auto g = appDocMember->m_pGameplayFlowManager;
 	manager->ProcessMessageInStateMachine(m_EndChangeModule, 0);
 	manager->ProcessMessageInStateMachine(m_ReplyChangeModule, 0);
 	if(m_StateThatHasToBeAdded->m_Name == manager->GetCurrentState()->m_Name)
 	{
 		manager->test->m_CurrentModuleIndex = moduleIndex;
-		manager->test->m_pModuleManager->m_ModuleConstructorAddress = (Sonic::CModuleManager::SModuleConstructor*)(8 * moduleIndex + 0x15B8528);
+		manager->test->m_pModuleManager->m_ModuleConstructorAddress = (Sonic2::CModuleManager::SModuleConstructor*)(8 * moduleIndex + 0x15B8528);
 		manager->test->m_BitmaskWeird44 = 2;
 	}
 	else
 	{
 		int m_Unused[3];
-		ChangeStateWithoutRegistering(Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager, m_Unused, m_StateThatHasToBeAdded, 0, 0, 0);
+		ChangeStateWithoutRegistering(appDocMember->m_pGameplayFlowManager, m_Unused, m_StateThatHasToBeAdded, 0, 0, 0);
 		m_StateThatHasToBeAdded.reset();		
 	}
 	//Force the game to end the current mode prematurely
@@ -406,7 +408,8 @@ void SequenceHelpers::update()
 {
 	if (GetAsyncKeyState(VK_F12))
 	{
-		CGameplayFlowStageAct* act = (CGameplayFlowStageAct*)Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager->GetCurrentState().get();
+		auto appDocMember = (Sonic2::CApplicationDocument::CMember*)Sonic::CApplicationDocument::GetInstance()->m_pMember;
+		CGameplayFlowStageAct* act = (CGameplayFlowStageAct*)appDocMember->m_pGameplayFlowManager->GetCurrentState().get();
 		printf("");
 		 
 	}

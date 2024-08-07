@@ -1,40 +1,35 @@
 
-#include "System/SetEditorTest.h"
 //Set objects
-#include "CustomSetObjects/Hintring.h"
-#include "CustomSetObjects/DebugObject.h"
-#include "CustomSetObjects/ETFTimeSwitch.h"
-#include "CustomSetObjects/Paraloop.h"
-#include "CustomSetObjects/SpeedDownCollision.h"
-#include "CustomSetObjects/ETFStageGate.h"
-#include "CustomSetObjects/MoonMedal.h"
-#include "CustomSetObjects/EvilEnemyReckless.h"
-#include "CustomSetObjects/EvilLiftDoor.h"
-#include "CustomSetObjects/Holoska/Icicle.h"
-#include "CustomSetObjects/Holoska/StompingSwitch.h"
-#include "CustomSetObjects/Mykonos/Pelican.h"
-#include "CustomSetObjects/Mykonos/IrremovableMobMykonos.h"
-#include "CustomSetObjects/CObjCamera2D.h"
+#include "SetObject/Hintring.h"
+#include "SetObject/DebugObject.h"
+#include "SetObject/ETFTimeSwitch.h"
+#include "SetObject/Paraloop.h"
+#include "SetObject/SpeedDownCollision.h"
+#include "SetObject/ETFStageGate.h"
+#include "SetObject/MoonMedal.h"
+#include "SetObject/EvilEnemyReckless.h"
+#include "SetObject/EvilLiftDoor.h"
+#include "SetObject/Holoska/Icicle.h"
+#include "SetObject/Holoska/StompingSwitch.h"
+#include "SetObject/Mykonos/Pelican.h"
+#include "SetObject/Mykonos/IrremovableMobMykonos.h"
+#include "SetObject/CObjCamera2D.h"
 
 //Rest
-#include "CustomSetObjects/Werehog/CObjHangOn.h"
+#include "SetObject/Werehog/CObjHangOn.h"
 #include "Testing/TestingCode.h"
 #include "UI/TitleWorldMap.h"
 
 extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 {
 	// Load configuration
-	Project::load(modInfo->CurrentMod->Path);
+	SUC::Project::Load(modInfo->CurrentMod->Path);
 	//Make Gens support 4gb+
-	if(Project::use4gbMode)
+	if(SUC::Project::s_LargeAddressAware)
 		modInfo->API->SendMessageToLoader(ML_MSG_REQ_LARGE_ADDRESS_AWARE, nullptr);
 }
 
-std::string getDirectoryPath(const std::string& path)
-{
-	const size_t pos = path.find_last_of("\\/");
-	return path.substr(0, pos != std::string::npos ? pos : 0);
-}
+
 
 //DWORD *__thiscall ProcMsgRequestChangeModule(void *this, int a2)
 HOOK(DWORD*, __fastcall, ProcMsg, 0xD0B2E0, void* This, void* Edx, Sonic::Message::MsgRequestChangeModule& msg)
@@ -64,10 +59,9 @@ extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 	DiscordStatus::initialize();
 	SequenceHelpers::applyPatches();
 	ImguiInitializer::initialize();
-	Context::setModDirectoryPath(getDirectoryPath(modInfo->CurrentMod->Path));
+	Context::setModDirectoryPath(SUC::Project::GetDirectoryPath(modInfo->CurrentMod->Path));
 	SaveManager::applyPatches();
 	LuaManager::initialize();
-	SetEditorTest::applyPatches();
 
 	//---------------Gameplay---------------
 	QSSRestore::applyPatches();

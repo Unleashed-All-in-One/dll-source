@@ -42,7 +42,7 @@ void customStageLoad()
 	StageManager::nextStageID = temp;
 	Title::inInstall = true;
 }
-void drawStageTreeNode(DebugStageTreeNode node)
+void drawStageTreeNode(SUC::Project::DebugStageTree::DebugStageTreeNode node)
 {
 	ImGui::SetNextItemOpen(true, ImGuiCond_Appearing);
 	if (ImGui::TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_None))
@@ -81,7 +81,7 @@ void ImguiManager::update()
 	{
 		scaleFactor = hh::math::CVector2((ImGui::GetIO().DisplaySize.x / 1920), (ImGui::GetIO().DisplaySize.y / 1080));
 		parsedTree = true;
-		Project::getDebugTree();
+		SUC::Project::GetDebugTree();
 	}
 	ImGui::SetNextWindowBgAlpha(1);
 	ImGui::SetNextWindowSize({ 1700 * scaleFactor.x(), 956 * scaleFactor.y()}, ImGuiCond_Always);
@@ -96,9 +96,9 @@ void ImguiManager::update()
 		if (ImGui::TreeNodeEx("StageArchives", ImGuiTreeNodeFlags_None))
 		{
 			
-			for (size_t i = 0; i < Project::debugStageTree.treeNodes.size(); i++)
+			for (size_t i = 0; i < SUC::Project::s_DebugStageTree.treeNodes.size(); i++)
 			{
-				drawStageTreeNode(Project::debugStageTree.treeNodes[i]);
+				drawStageTreeNode(SUC::Project::s_DebugStageTree.treeNodes[i]);
 			}
 			ImGui::Unindent(16);
 			ImGui::TreePop();

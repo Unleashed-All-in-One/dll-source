@@ -6,7 +6,7 @@ struct AudioData {
 SoLoud::Soloud* soloud  ; // Create an instance of the SoLoud engine
 std::vector<AudioData> wavs; // Create a vector to store multiple instances of WAV audio files
 static std::vector<int> handles; // Create a vector to store multiple instances of WAV audio files
-std::string modPath;
+std::string s_ModPath;
 void LoadFile(SoLoud::Wav* source, std::string cueName)
 {
     source->load(cueName.c_str()); // Load the audio file at the specified path
@@ -23,7 +23,7 @@ unsigned int MiniAudioHelper::playAudio(std::string cueName, const bool& sfxOrAu
         cueName.append(".mp3");
     }
     cueName.insert(0, "\\disk\\Audio\\");
-    cueName.insert(0, modPath);
+    cueName.insert(0, s_ModPath);
     std::ifstream file(cueName);
     if (!file)
     {
@@ -68,7 +68,7 @@ void MiniAudioHelper::shutdown()
 
 void MiniAudioHelper::playSound(AudioHandle& handle, int cueCri, std::string cueSoloud, bool loop, bool forceSoloud)
 {
-    if (!Project::compatibilityMode && forceSoloud == false)
+    if (!SUC::Project::s_CpkRedirCompatibilityMode && forceSoloud == false)
     {
         Common::PlaySoundStatic(handle.handleCri, cueCri);
     }
@@ -79,7 +79,7 @@ void MiniAudioHelper::playSound(AudioHandle& handle, int cueCri, std::string cue
 }
 void MiniAudioHelper::stopSound(AudioHandle& handle, bool forceSoloud)
 {
-    if (!Project::compatibilityMode && forceSoloud == false)
+    if (!SUC::Project::s_CpkRedirCompatibilityMode && forceSoloud == false)
     {
         handle.handleCri.reset();
     }
@@ -91,7 +91,7 @@ void MiniAudioHelper::stopSound(AudioHandle& handle, bool forceSoloud)
 }
 void MiniAudioHelper::initialize(const char* path) 
 {
-    modPath = path;
+    s_ModPath = path;
     soloud = new SoLoud::Soloud;
 	soloud->init();
 	//handle = MiniAudioHelper::playAudio("Peaceful_Strangers",0, true);

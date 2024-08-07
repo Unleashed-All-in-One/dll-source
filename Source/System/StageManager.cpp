@@ -73,17 +73,17 @@ const char* StageManager::getStageToLoad()
 	int stageSelected = TitleWorldMap::m_stageSelectWindowSelection;
 
 	if (TitleWorldMap::m_isCapitalWindowOpened)
-		stageToLoad = Project::worldData.data[latestFlag].data[Project::getCapital(latestFlag, TitleWorldMap::m_flags[latestFlag].night)].levelID.c_str();
+		stageToLoad = SUC::Project::s_WorldData.data[latestFlag].data[SUC::Project::GetCapital(latestFlag, TitleWorldMap::m_flags[latestFlag].night)].levelID.c_str();
 	else
 	{
-		if (Project::worldData.data[latestFlag].dataNight.size() != 0 && TitleWorldMap::m_flags[latestFlag].night)
+		if (SUC::Project::s_WorldData.data[latestFlag].dataNight.size() != 0 && TitleWorldMap::m_flags[latestFlag].night)
 		{
-			stageToLoad = Project::worldData.data[latestFlag].dataNight[stageSelected].levelID.c_str();
+			stageToLoad = SUC::Project::s_WorldData.data[latestFlag].dataNight[stageSelected].levelID.c_str();
 			SequenceHelpers::setPlayerType(1);
 		}
 		else
 		{
-			stageToLoad = Project::worldData.data[latestFlag].data[stageSelected].levelID.c_str();
+			stageToLoad = SUC::Project::s_WorldData.data[latestFlag].data[stageSelected].levelID.c_str();
 			SequenceHelpers::setPlayerType(0);
 		}
 	}
@@ -188,10 +188,10 @@ void StageManager::triggerSequenceEvents(int type, bool dontSetPlayerType)
 	}
 	}
 }
-void executeSequenceData(std::vector<QueueData> dataList)
+void executeSequenceData(std::vector <SUC::Project::SequenceData::QueueData> dataList)
 {
 	int index = StageManager::LastSavedQueueIndex;
-	QueueData data = dataList[index];
+	SUC::Project::SequenceData::QueueData data = dataList[index];
 	//if (data.type == 4 && data.immediate)
 	//{
 	//	//EventQueue will play videos in order
@@ -222,8 +222,8 @@ void calculateNextStageFromHub(uint32_t stageIDPam)
 	char** h = (char**)stageTerrainAddress;
 	const char* stageToLoad = "ghz200";
 	//get current flag based on the pam stage loaded
-	int flag = Project::getFlagFromStage(*h);
-	stageToLoad = Project::worldData.data[flag].data[stageIDPam].levelID.c_str();
+	int flag = SUC::Project::GetFlagFromStage(*h);
+	stageToLoad = SUC::Project::s_WorldData.data[flag].data[stageIDPam].levelID.c_str();
 	lastStageID = stageToLoad;
 	SequenceHelpers::loadStage(stageToLoad);
 	strcpy(*(char**)stageTerrainAddress, stageToLoad);
@@ -251,7 +251,7 @@ void calculateNextStage()
 			}
 			return;
 		}
-		if (Project::worldData.data.size() < TitleWorldMap::m_lastFlagSelected)
+		if (SUC::Project::s_WorldData.data.size() < TitleWorldMap::m_lastFlagSelected)
 		{
 			//if only cpp had the same ${} system as c#
 			std::string message = "This country has an invalid configuration. Loading " + std::string(stageToLoad) + " instead.";
@@ -296,10 +296,10 @@ void calculateNextStage()
 		//{
 		//	if (inStoryBefore == StageManager::InStory)
 		//		StageManager::LastSavedQueueIndex++;
-		//	executeSequenceData(Project::queueData.data);
+		//	executeSequenceData(SUC::Project::s_SequenceDataQueue.data);
 		//}
-		//if(Project::queueData.data[StageManager::LastSavedQueueIndex].type != 5)
-		//strcpy(*(char**)stageTerrainAddress, Project::queueData.data[StageManager::LastSavedQueueIndex].dataName.c_str());
+		//if(SUC::Project::s_SequenceDataQueue.data[StageManager::LastSavedQueueIndex].type != 5)
+		//strcpy(*(char**)stageTerrainAddress, SUC::Project::s_SequenceDataQueue.data[StageManager::LastSavedQueueIndex].dataName.c_str());
 		//skipCurrentQueueEvent = false;
 	}
 

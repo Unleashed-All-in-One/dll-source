@@ -1,164 +1,109 @@
 #include "Project.h"
 
-#define INI_FILE "UnleashedConversion.ini"
-#define STAGE_LIST_FILE "stage_list.json"
-#define ARCHIVE_LIST_FILE "archivelist.json"
-#define QUEUE_LIST_FILE "sequence.json"
-
-//---------------Gameplay---------------
-bool Project::m_bQSS = true;
-
-//---------------UI---------------
-std::vector<std::string> Project::gensStages;
-bool Project::ignoreWarnings = false;
-bool Project::use4gbMode = false;
-bool Project::compatibilityMode = false;
-int Project::logoType = 0;
-Project::TitleType Project::menuType = (TitleType)0;
-WorldData Project::worldData;
-ArchiveTreeDefinitions Project::archiveTree;
-SequenceData Project::queueData;
-DebugStageTree Project::debugStageTree;
-std::string Project::modPath;
-float Project::m_deltaTime = 0.0f;
-float Project::m_hudDeltaTime = 0.0f;
-int Project::m_frameDeltaTime = 0;
-Hedgehog::Math::CVector Project::nodeForArmswing;
-
-//didnt know where else to put this
-extern "C" __declspec(dllexport) Hedgehog::Math::CVector API_GetClosestSetObjectForArmswing()
+namespace SUC
 {
-	return Project::nodeForArmswing;
-}
-HOOK(void*, __fastcall, UpdateApplication, 0xE7BED0, void* This, void* Edx, float elapsedTime, uint8_t a3)
-{
-	Project::setDeltaTime(elapsedTime);
-	return originalUpdateApplication(This, Edx, elapsedTime, a3);
-}
-
-HOOK(void, __fastcall, CHudSonicStageUpdate, 0x1098A50, void* This, void* Edx, float* dt)
-{
-	Project::setHudDeltaTime(*dt);
-	originalCHudSonicStageUpdate(This, Edx, dt);
-}
-void Project::load(const char* path)
-{
-	INIReader reader(INI_FILE);
-	if (reader.ParseError() != 0)
-	{
-		MessageBox(NULL, L"Failed to parse mod configuration", NULL, MB_ICONERROR);
-		exit(-1);
-		return;
-	}
-
-	INSTALL_HOOK(CHudSonicStageUpdate);
-	INSTALL_HOOK(UpdateApplication);
-	std::filesystem::path modP = path;
-	Project::modPath = modP.parent_path().string();
-
 	//---------------Gameplay---------------
-	m_bQSS = reader.GetBoolean("Gameplay", "bQSS", m_bQSS);
+	bool							Project::m_DoQSS;
+	int								Project::s_LogoType;
+	Project::ETitleType				Project::menuType;
+	std::string						Project::s_ModPath;
+	bool							Project::s_IgnoreWarnings;
+	Project::WorldData				Project::s_WorldData;
+	bool							Project::s_LargeAddressAware;
+	Project::DebugStageTree			Project::s_DebugStageTree;
+	bool							Project::s_CpkRedirCompatibilityMode;
+	Project::SequenceData			Project::s_SequenceDataQueue;
+	Hedgehog::Math::CVector			Project::s_TempArmswingNode;
+	std::vector<std::string>		Project::s_GenerationsStages;
+	Project::ArchiveTreeDefinitions Project::s_AdditionalArchiveTree;
 
 
-	//---------------UI---------------
-	logoType = reader.GetInteger("Appearance", "LogoType", logoType);
-	menuType = (TitleType)reader.GetInteger("Appearance", "MenuType", menuType);
-	use4gbMode = reader.GetBoolean("Main", "Use4GB", use4gbMode);
-	compatibilityMode = reader.Get("Main", "IncludeDir1", "disk_sounds") == "";
-	gensStages = { "ghz100","ghz200","cpz100","cpz200","ssz100","ssz200","sph100","sph200","cte100", "cte200","ssh100","ssh200","csc100","csc200","euc100","euc200","pla100","pla200" };
-	getStageList();
-	getLevelQueue();
-	getTempCustomArchiveTree();
-}
-void parseStageTree(const Json::Value& jsonTree, DebugStageTreeNode& stageTree)
-{
-	stageTree.name = jsonTree["name"].asString();
-	stageTree.children = std::vector<DebugStageTreeNode>();
-	const Json::Value& treeEntries = jsonTree["TreeEntry"];
-	if (!treeEntries.isArray())
+	float Project::ms_DeltaTime = 0.0f;
+	float Project::ms_HudDeltaTime = 0.0f;
+	int Project::ms_FrameDeltaTime = 0.0f;
+
+	//bool SUC::Project::m_DoQSS = true;
+	//int SUC::Project::s_LogoType = 0;
+	//std::string SUC::Project::s_ModPath;
+	//bool SUC::Project::s_IgnoreWarnings = false;
+	//bool SUC::Project::s_LargeAddressAware = false;
+	//SUC::Project::WorldData SUC::Project::s_WorldData;
+	//bool SUC::Project::s_CpkRedirCompatibilityMode = false;
+	//Hedgehog::Math::CVector SUC::Project::s_TempArmswingNode;
+	//std::vector<std::string> SUC::Project::s_GenerationsStages;
+	//SUC::Project::DebugStageTree SUC::Project::s_DebugStageTree;
+	//SUC::Project::SequenceData SUC::Project::s_SequenceDataQueue;
+	//SUC::Project::ETitleType SUC::Project::menuType = (ETitleType)0;
+	//SUC::Project::ArchiveTreeDefinitions SUC::Project::s_AdditionalArchiveTree;
+
+	//Move elsewhere
+	extern "C" __declspec(dllexport) Hedgehog::Math::CVector API_GetClosestSetObjectForArmswing()
 	{
-		printf("StageTreeEntry is not a valid array.\n");
-		return;
+		return SUC::Project::s_TempArmswingNode;
 	}
-	if (jsonTree["children"])
+	HOOK(void*, __fastcall, Project_UpdateApplication, 0xE7BED0, void* This, void* Edx, float elapsedTime, uint8_t a3)
 	{
-		for (const auto& tree : jsonTree["children"])
+		Project::SetDeltaTime(elapsedTime);
+		return originalProject_UpdateApplication(This, Edx, elapsedTime, a3);
+	}
+	HOOK(void, __fastcall, Project_CHudSonicStage_Update, 0x1098A50, void* This, void* Edx, float* dt)
+	{
+		Project::SetHudDeltaTime(*dt);
+		originalProject_CHudSonicStage_Update(This, Edx, dt);
+	}
+	void Project::Load(const char* path)
+	{
+		INIReader reader(INI_FILE);
+		if (reader.ParseError() != 0)
 		{
-			DebugStageTreeNode stageTreeC;
-			parseStageTree(tree, stageTreeC);
-			stageTree.children.push_back(stageTreeC);
+			MessageBox(NULL, L"Failed to parse mod configuration", NULL, MB_ICONERROR);
+			exit(-1);
 		}
+
+		std::filesystem::path modP = path;
+		s_ModPath = modP.parent_path().string();
+
+		//---------------Gameplay---------------
+		m_DoQSS = reader.GetBoolean("Gameplay", "bQSS", m_DoQSS);
+
+
+		//---------------UI---------------
+		s_LogoType = reader.GetInteger("Appearance", "s_LogoType", s_LogoType);
+		menuType = (ETitleType)reader.GetInteger("Appearance", "MenuType", menuType);
+		s_LargeAddressAware = reader.GetBoolean("Main", "Use4GB", s_LargeAddressAware);
+		s_CpkRedirCompatibilityMode = reader.Get("Main", "IncludeDir1", "disk_sounds") == "";
+		s_GenerationsStages = { "ghz100","ghz200","cpz100","cpz200","ssz100","ssz200","sph100","sph200","cte100", "cte200","ssh100","ssh200","csc100","csc200","euc100","euc200","pla100","pla200" };
+		GetStageList();
+		GetLevelQueue();
+		GetTempCustomArchiveTree();
 	}
-	std::vector< DebugStageTreeNodeEntry> entries;
-	for (const auto& entry : treeEntries)
+	void parseStageTree(const Json::Value& jsonTree, SUC::Project::DebugStageTree::DebugStageTreeNode& stageTree)
 	{
-		DebugStageTreeNodeEntry treeEntry;
-		treeEntry.stage = entry["stage"].asString();
-		if (entry["cutsceneID"])
-			treeEntry.cutsceneID = entry["cutsceneID"].asString();
-		
-		if (entry["displayName"])
-		{
-			treeEntry.displayName = entry["displayName"].asString();
-		}
-		else
-		{
-			if (!treeEntry.cutsceneID.empty())
-				treeEntry.displayName = std::format("{0} @{1}", treeEntry.cutsceneID, treeEntry.stage);
-			else
-				treeEntry.displayName = treeEntry.stage;
-		}
-		entries.push_back(treeEntry);
-	}
-	stageTree.treeEntries = entries;
-}
-void Project::getDebugTree()
-{
-	std::string path = Project::modPath + "\\debuglist.json";
-	std::ifstream jsonFile(path.c_str());
-
-	debugStageTree = DebugStageTree();
-
-	if (!jsonFile)
-	{		
-		return;
-	}
-
-	Json::Value root;
-	jsonFile >> root;
-
-	const Json::Value& stageTreeT = root["StageTree"];
-	if (!stageTreeT.isArray())
-	{
-		printf("StageTree is not a valid array.\n");
-		return;
-	}
-
-	std::vector<DebugStageTreeNode> stageTrees;
-	for (const auto& tree : stageTreeT) {
-		DebugStageTreeNode stageTree;
-		parseStageTree(tree, stageTree);
-		stageTrees.push_back(stageTree);
-	}
-
-	/*for (const auto& tree : stageTreeT)
-	{
-		DebugStageTreeNode stageTreeObj;
-		stageTreeObj.name = tree["name"].asString();
-
-		const Json::Value& treeEntries = tree["TreeEntry"];
+		stageTree.name = jsonTree["name"].asString();
+		stageTree.children = std::vector<SUC::Project::DebugStageTree::DebugStageTreeNode>();
+		const Json::Value& treeEntries = jsonTree["TreeEntry"];
 		if (!treeEntries.isArray())
 		{
 			printf("StageTreeEntry is not a valid array.\n");
 			return;
 		}
-
+		if (jsonTree["children"])
+		{
+			for (const auto& tree : jsonTree["children"])
+			{
+				SUC::Project::DebugStageTree::DebugStageTreeNode stageTreeC;
+				parseStageTree(tree, stageTreeC);
+				stageTree.children.push_back(stageTreeC);
+			}
+		}
+		std::vector<SUC::Project::DebugStageTree::DebugStageTreeNode::DebugStageTreeNodeEntry> entries;
 		for (const auto& entry : treeEntries)
 		{
-			DebugStageTreeNodeEntry treeEntry;
+			SUC::Project::DebugStageTree::DebugStageTreeNode::DebugStageTreeNodeEntry treeEntry;
 			treeEntry.stage = entry["stage"].asString();
-			if(entry["cutsceneID"])
+			if (entry["cutsceneID"])
 				treeEntry.cutsceneID = entry["cutsceneID"].asString();
+
 			if (entry["displayName"])
 			{
 				treeEntry.displayName = entry["displayName"].asString();
@@ -170,217 +115,287 @@ void Project::getDebugTree()
 				else
 					treeEntry.displayName = treeEntry.stage;
 			}
-			stageTreeObj.treeEntries.push_back(treeEntry);
+			entries.push_back(treeEntry);
 		}
-
-		stageTrees.push_back(stageTreeObj);
-	}*/
-	debugStageTree.treeNodes = stageTrees;
-
-}
-void Project::getLevelQueue()
-{
-	std::ifstream jsonFile(QUEUE_LIST_FILE);
-
-	queueData = SequenceData();
-
-	std::vector<std::string> modList;
-	Common::GetModIniList(modList);
-	modList.insert(modList.end(), ""); //Unleashed title's own stage_list
-
-	//Parse stage_list
-	for (size_t a = 0; a < modList.size(); a++)
+		stageTree.treeEntries = entries;
+	}
+	void SUC::Project::GetDebugTree()
 	{
-		size_t pos = modList.at(a).find_last_of("\\/");
-		if (pos != std::string::npos)
-		{
-			modList.at(a).erase(pos + 1);
-		}
-		std::ifstream jsonFile(modList.at(a) + QUEUE_LIST_FILE);
+		std::string path = SUC::Project::s_ModPath + "\\debuglist.json";
+		std::ifstream jsonFile(path.c_str());
+
+		s_DebugStageTree = DebugStageTree();
 
 		if (!jsonFile)
-			continue;
+		{
+			return;
+		}
 
 		Json::Value root;
 		jsonFile >> root;
-		auto wd = root["CustomStorySequence"];
-		Json::Value arrayFlag = wd["SequenceData"];
-		for (int i = 0; i < arrayFlag.size(); i++)
-		{
-			queueData.data.push_back(QueueData());
-			queueData.data[i].type = arrayFlag[i]["type"].asInt();
-			queueData.data[i].immediate = arrayFlag[i]["immediate"].asInt();
-			if (arrayFlag[i]["playerTypeOverride"])
-				queueData.data[i].playerTypeOverride = arrayFlag[i]["playerTypeOverride"].asInt();
-			else
-				queueData.data[i].playerTypeOverride = -1;
-			queueData.data[i].dataName = std::string(arrayFlag[i]["dataName"].asCString());
 
-			if (arrayFlag[i]["eventStageName"])
+		const Json::Value& stageTreeT = root["StageTree"];
+		if (!stageTreeT.isArray())
+		{
+			printf("StageTree is not a valid array.\n");
+			return;
+		}
+
+		std::vector<SUC::Project::DebugStageTree::DebugStageTreeNode> stageTrees;
+		for (const auto& tree : stageTreeT) 
+		{
+			SUC::Project::DebugStageTree::DebugStageTreeNode stageTree;
+			parseStageTree(tree, stageTree);
+			stageTrees.push_back(stageTree);
+		}
+
+		/*for (const auto& tree : stageTreeT)
+		{
+			DebugStageTreeNode stageTreeObj;
+			stageTreeObj.name = tree["name"].asString();
+
+			const Json::Value& treeEntries = tree["TreeEntry"];
+			if (!treeEntries.isArray())
 			{
-				queueData.data[i].stageEventName = std::string(arrayFlag[i]["eventStageName"].asCString());
+				printf("StageTreeEntry is not a valid array.\n");
+				return;
 			}
-		}
-		break;
-	}
-}
-int Project::getFlagFromStage(const char* stage)
-{
-	std::string stageString = stage;
-	//if only c++ had linq
-	for (size_t i = 0; i < worldData.data.size(); i++)
-	{
-		for (size_t a = 0; a < worldData.data[i].data.size(); a++)
-		{
-			if (worldData.data[i].data[a].levelID == stageString)
+
+			for (const auto& entry : treeEntries)
 			{
-				return i;
-			}
-		}
-		for (size_t a = 0; a < worldData.data[i].dataNight.size(); a++)
-		{
-			if (worldData.data[i].dataNight[a].levelID == stageString)
-			{
-				return i;
-			}
-		}
-		
-	}
-	return -1;
-}
-void Project::getTempCustomArchiveTree()
-{
-	std::ifstream jsonFile(ARCHIVE_LIST_FILE);
-
-	archiveTree = ArchiveTreeDefinitions();
-
-	if (!jsonFile)
-	{
-		MessageBox(NULL, L"Failed to parse ArchiveTree", NULL, MB_ICONERROR);
-		exit(-1);
-		return;
-	}
-
-	Json::Value root;
-	jsonFile >> root;
-	Json::Value arrayFlag = root["ArchiveTreeDefinitions"];
-	for (int i = 0; i < arrayFlag.size(); i++)
-	{
-		ArchiveDependency dependency;
-		dependency.m_archive = arrayFlag[i]["archiveName"].asCString();
-		Json::Value flagDep = arrayFlag[i]["dependencies"];
-		for (size_t d = 0; d < flagDep.size(); d++)
-		{
-			dependency.m_dependencies.push_back(flagDep[d]["archiveName"].asCString());
-		}
-		archiveTree.data.push_back(dependency);
-	}
-
-}
-void Project::getStageList()
-{
-	std::ifstream jsonFile(STAGE_LIST_FILE);
-
-	worldData = WorldData();
-
-	std::vector<std::string> modList;
-	Common::GetModIniList(modList);
-	modList.insert(modList.end(), ""); //Unleashed title's own stage_list
-
-	//Parse stage_list
-	for (size_t a = 0; a < modList.size(); a++)
-	{
-		size_t pos = modList.at(a).find_last_of("\\/");
-		if (pos != std::string::npos)
-		{
-			modList.at(a).erase(pos + 1);
-		}
-		std::ifstream jsonFile(modList.at(a) + STAGE_LIST_FILE);
-
-		if (!jsonFile)
-			continue;
-
-		Json::Value root;
-		jsonFile >> root;
-		auto wd = root["WorldData"];
-		Json::Value arrayFlag = wd["FlagData"];
-		for (int i = 0; i < arrayFlag.size(); i++)
-		{
-			worldData.data.push_back(FlagData());
-			worldData.data[i].description = std::string(arrayFlag[i]["Description"].asCString());
-			Json::Value element = arrayFlag[i]["LevelData"];
-			for (int x = 0; x < element.size(); x++)
-			{
-				worldData.data[i].data.push_back(LevelData());
-				worldData.data[i].data[x].levelID = std::string(element[x]["levelID"].asCString());
-				worldData.data[i].data[x].optionName = std::string(element[x]["optionName"].asCString());
-				worldData.data[i].data[x].isWhiteWorld = element[x]["isWhiteWorld"].asBool();
-				worldData.data[i].data[x].isCapital = element[x]["isCapital"].asBool();
-			}
-			if (arrayFlag[i]["NightLevelData"] != NULL)
-			{
-				element = arrayFlag[i]["NightLevelData"];
-				for (int x = 0; x < element.size(); x++)
+				DebugStageTreeNodeEntry treeEntry;
+				treeEntry.stage = entry["stage"].asString();
+				if(entry["cutsceneID"])
+					treeEntry.cutsceneID = entry["cutsceneID"].asString();
+				if (entry["displayName"])
 				{
-					worldData.data[i].dataNight.push_back(LevelData());
-					worldData.data[i].dataNight[x].levelID = std::string(element[x]["levelID"].asCString());
-					worldData.data[i].dataNight[x].optionName = std::string(element[x]["optionName"].asCString());
-					worldData.data[i].dataNight[x].isWhiteWorld = element[x]["isWhiteWorld"].asBool();
-					worldData.data[i].dataNight[x].isCapital = element[x]["isCapital"].asBool();
+					treeEntry.displayName = entry["displayName"].asString();
+				}
+				else
+				{
+					if (!treeEntry.cutsceneID.empty())
+						treeEntry.displayName = std::format("{0} @{1}", treeEntry.cutsceneID, treeEntry.stage);
+					else
+						treeEntry.displayName = treeEntry.stage;
+				}
+				stageTreeObj.treeEntries.push_back(treeEntry);
+			}
+
+			stageTrees.push_back(stageTreeObj);
+		}*/
+		s_DebugStageTree.treeNodes = stageTrees;
+
+	}
+	void SUC::Project::GetLevelQueue()
+	{
+		std::ifstream jsonFile(QUEUE_LIST_FILE);
+
+		s_SequenceDataQueue = SequenceData();
+
+		std::vector<std::string> modList;
+		Common::GetModIniList(modList);
+		modList.insert(modList.end(), ""); //Unleashed title's own stage_list
+
+		//Parse stage_list
+		for (size_t a = 0; a < modList.size(); a++)
+		{
+			size_t pos = modList.at(a).find_last_of("\\/");
+			if (pos != std::string::npos)
+			{
+				modList.at(a).erase(pos + 1);
+			}
+			std::ifstream jsonFile(modList.at(a) + QUEUE_LIST_FILE);
+
+			if (!jsonFile)
+				continue;
+
+			Json::Value root;
+			jsonFile >> root;
+			auto wd = root["CustomStorySequence"];
+			Json::Value arrayFlag = wd["SequenceData"];
+			for (int i = 0; i < arrayFlag.size(); i++)
+			{
+				s_SequenceDataQueue.data.push_back(SUC::Project::SequenceData::QueueData());
+				s_SequenceDataQueue.data[i].type = arrayFlag[i]["type"].asInt();
+				s_SequenceDataQueue.data[i].immediate = arrayFlag[i]["immediate"].asInt();
+				if (arrayFlag[i]["playerTypeOverride"])
+					s_SequenceDataQueue.data[i].playerTypeOverride = arrayFlag[i]["playerTypeOverride"].asInt();
+				else
+					s_SequenceDataQueue.data[i].playerTypeOverride = -1;
+				s_SequenceDataQueue.data[i].dataName = std::string(arrayFlag[i]["dataName"].asCString());
+
+				if (arrayFlag[i]["eventStageName"])
+				{
+					s_SequenceDataQueue.data[i].stageEventName = std::string(arrayFlag[i]["eventStageName"].asCString());
 				}
 			}
+			break;
 		}
-		break;
 	}
-}
-std::vector<std::string> Project::getAllLevelIDs(bool onlyCustom)
-{
-	std::vector<std::string> returned;
-	for (size_t i = 0; i < Project::worldData.data.size(); i++)
+	int SUC::Project::GetFlagFromStage(const char* stage)
 	{
-		for (size_t x = 0; x < Project::worldData.data[i].data.size(); x++)
+		std::string stageString = stage;
+		//if only c++ had linq
+		for (size_t i = 0; i < s_WorldData.data.size(); i++)
 		{
-			if (onlyCustom)
+			for (size_t a = 0; a < s_WorldData.data[i].data.size(); a++)
 			{
-				if (std::find(gensStages.begin(), gensStages.end(), Project::worldData.data[i].data[x].levelID) == gensStages.end())
+				if (s_WorldData.data[i].data[a].levelID == stageString)
 				{
-					returned.push_back(Project::worldData.data[i].data[x].levelID);
+					return i;
+				}
+			}
+			for (size_t a = 0; a < s_WorldData.data[i].dataNight.size(); a++)
+			{
+				if (s_WorldData.data[i].dataNight[a].levelID == stageString)
+				{
+					return i;
+				}
+			}
+
+		}
+		return -1;
+	}
+	void SUC::Project::GetTempCustomArchiveTree()
+	{
+		std::ifstream jsonFile(ARCHIVE_LIST_FILE);
+
+		s_AdditionalArchiveTree = ArchiveTreeDefinitions();
+
+		if (!jsonFile)
+		{
+			MessageBox(NULL, L"Failed to parse ArchiveTree", NULL, MB_ICONERROR);
+			exit(-1);
+			return;
+		}
+
+		Json::Value root;
+		jsonFile >> root;
+		Json::Value arrayFlag = root["ArchiveTreeDefinitions"];
+		for (int i = 0; i < arrayFlag.size(); i++)
+		{
+			ArchiveDependency dependency;
+			dependency.m_archive = arrayFlag[i]["archiveName"].asCString();
+			Json::Value flagDep = arrayFlag[i]["dependencies"];
+			for (size_t d = 0; d < flagDep.size(); d++)
+			{
+				dependency.m_dependencies.push_back(flagDep[d]["archiveName"].asCString());
+			}
+			s_AdditionalArchiveTree.data.push_back(dependency);
+		}
+
+	}
+	void SUC::Project::GetStageList()
+	{
+		std::ifstream jsonFile(STAGE_LIST_FILE);
+
+		s_WorldData = WorldData();
+
+		std::vector<std::string> modList;
+		Common::GetModIniList(modList);
+		modList.insert(modList.end(), ""); //Unleashed title's own stage_list
+
+		//Parse stage_list
+		for (size_t a = 0; a < modList.size(); a++)
+		{
+			size_t pos = modList.at(a).find_last_of("\\/");
+			if (pos != std::string::npos)
+			{
+				modList.at(a).erase(pos + 1);
+			}
+			std::ifstream jsonFile(modList.at(a) + STAGE_LIST_FILE);
+
+			if (!jsonFile)
+				continue;
+
+			Json::Value root;
+			jsonFile >> root;
+			auto wd = root["WorldData"];
+			Json::Value arrayFlag = wd["FlagData"];
+			for (int i = 0; i < arrayFlag.size(); i++)
+			{
+				s_WorldData.data.push_back(SUC::Project::WorldData::FlagData());
+				s_WorldData.data[i].description = std::string(arrayFlag[i]["Description"].asCString());
+				Json::Value element = arrayFlag[i]["LevelData"];
+				for (int x = 0; x < element.size(); x++)
+				{
+					s_WorldData.data[i].data.push_back(SUC::Project::WorldData::FlagData::LevelData());
+					s_WorldData.data[i].data[x].levelID = std::string(element[x]["levelID"].asCString());
+					s_WorldData.data[i].data[x].optionName = std::string(element[x]["optionName"].asCString());
+					s_WorldData.data[i].data[x].isWhiteWorld = element[x]["isWhiteWorld"].asBool();
+					s_WorldData.data[i].data[x].isCapital = element[x]["isCapital"].asBool();
+				}
+				if (arrayFlag[i]["NightLevelData"] != NULL)
+				{
+					element = arrayFlag[i]["NightLevelData"];
+					for (int x = 0; x < element.size(); x++)
+					{
+						s_WorldData.data[i].dataNight.push_back(SUC::Project::WorldData::FlagData::LevelData());
+						s_WorldData.data[i].dataNight[x].levelID = std::string(element[x]["levelID"].asCString());
+						s_WorldData.data[i].dataNight[x].optionName = std::string(element[x]["optionName"].asCString());
+						s_WorldData.data[i].dataNight[x].isWhiteWorld = element[x]["isWhiteWorld"].asBool();
+						s_WorldData.data[i].dataNight[x].isCapital = element[x]["isCapital"].asBool();
+					}
+				}
+			}
+			break;
+		}
+	}
+	std::vector<std::string> SUC::Project::GetAllLevelIDs(bool onlyCustom)
+	{
+		std::vector<std::string> returned;
+		for (size_t i = 0; i < SUC::Project::s_WorldData.data.size(); i++)
+		{
+			for (size_t x = 0; x < SUC::Project::s_WorldData.data[i].data.size(); x++)
+			{
+				if (onlyCustom)
+				{
+					if (std::find(s_GenerationsStages.begin(), s_GenerationsStages.end(), SUC::Project::s_WorldData.data[i].data[x].levelID) == s_GenerationsStages.end())
+					{
+						returned.push_back(SUC::Project::s_WorldData.data[i].data[x].levelID);
+						continue;
+					}
+				}
+				else
+					returned.push_back(SUC::Project::s_WorldData.data[i].data[x].levelID);
+			}
+		}
+		return returned;
+	}
+	std::vector<std::string> SUC::Project::GetAllWhiteWorld()
+	{
+		std::vector<std::string> returned;
+		for (size_t i = 0; i < SUC::Project::s_WorldData.data.size(); i++)
+		{
+			for (size_t x = 0; x < SUC::Project::s_WorldData.data[i].data.size(); x++)
+			{
+				if (SUC::Project::s_WorldData.data[i].data[x].isWhiteWorld)
+				{
+					returned.push_back(SUC::Project::s_WorldData.data[i].data[x].levelID);
 					continue;
 				}
 			}
-			else
-				returned.push_back(Project::worldData.data[i].data[x].levelID);
 		}
+		return returned;
 	}
-	return returned;
-}
-std::vector<std::string> Project::getAllWhiteWorld()
-{
-	std::vector<std::string> returned;
-	for (size_t i = 0; i < Project::worldData.data.size(); i++)
+	int SUC::Project::GetCapital(int flagID, bool isNight)
 	{
-		for (size_t x = 0; x < Project::worldData.data[i].data.size(); x++)
+		int returned = -1;
+		std::vector<SUC::Project::WorldData::FlagData::LevelData> levels = isNight ? SUC::Project::s_WorldData.data[flagID].dataNight : SUC::Project::s_WorldData.data[flagID].data;
+		for (size_t i = 0; i < levels.size(); i++)
 		{
-			if (Project::worldData.data[i].data[x].isWhiteWorld)
+			if (levels[i].isCapital)
 			{
-				returned.push_back(Project::worldData.data[i].data[x].levelID);
-				continue;
+				returned = i;
+				return returned;
 			}
 		}
+		return returned;
 	}
-	return returned;
-}
-int Project::getCapital(int flagID, bool isNight)
-{
-	int returned = -1;
-	std::vector<LevelData> levels = isNight ? Project::worldData.data[flagID].dataNight : Project::worldData.data[flagID].data;
-	for (size_t i = 0; i < levels.size(); i++)
+	std::string Project::GetDirectoryPath(const std::string& path)
 	{
-		if (levels[i].isCapital)
-		{
-			returned = i;
-			return returned;
-		}
+		const size_t pos = path.find_last_of("\\/");
+		return path.substr(0, pos != std::string::npos ? pos : 0);
 	}
-	return returned;
+	
 }
