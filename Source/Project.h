@@ -1,4 +1,5 @@
 #pragma once
+#define MOD_NAME "Sonic Unleashed Conversion"
 #define INI_FILE "UnleashedConversion.ini"
 #define STAGE_LIST_FILE "stage_list.json"
 #define ARCHIVE_LIST_FILE "archivelist.json"
@@ -69,20 +70,22 @@ namespace SUC
 			Preview,
 			E3
 		};
+		//-------------Mod Initialization--------
+		static void Load(ModInfo_t* in_ModInfo);
+		static void RegisterGlobalHooks();
+		static void CheckIncompatibleMods();
 
 		//---------------Functions---------------
-		static void Load(const char* path);
 		static void GetStageList();
 		static void GetDebugTree();
-		static void RegisterGlobalHooks();
 		static void GetLevelQueue();
 		static void GetTempCustomArchiveTree();
-		static int GetFlagFromStage(const char* stage);
-		static int GetCapital(int flagID, bool isNight);
+		static int GetFlagFromStage(const char* in_Stage);
+		static int GetCapital(int in_FlagID, bool in_IsNight);
 		static std::vector<std::string> GetAllWhiteWorld();
 		static float GetDeltaTime() { return ms_DeltaTime; }
 		static void SetDeltaTime(float dt) { ms_DeltaTime = dt; }
-		static std::string GetDirectoryPath(const std::string& path);
+		static std::string GetDirectoryPath(const std::string& in_Path);
 		static float GetFrameDeltaTime() { return ms_FrameDeltaTime; }
 		static void SetHudDeltaTime(float dt) { ms_HudDeltaTime = dt; }
 		static std::vector<std::string> GetAllLevelIDs(bool onlyCustom);
@@ -95,6 +98,7 @@ namespace SUC
 		static ETitleType menuType;
 		static std::string s_ModPath;
 		static std::string s_ModInfoPath;
+		static ModInfo_t* s_ModInfo;
 		static bool s_IgnoreWarnings;
 		static WorldData s_WorldData;
 		static bool s_LargeAddressAware;
@@ -104,5 +108,20 @@ namespace SUC
 		static Hedgehog::Math::CVector s_TempArmswingNode;
 		static std::vector<std::string> s_GenerationsStages;
 		static ArchiveTreeDefinitions s_AdditionalArchiveTree;
+
+		static std::map<const char*, const char*> s_IncompatibleMods;
 	};
+	inline char* Format(const char* fmt, ...)
+	{
+		thread_local char buffer[1024];
+
+		va_list args;
+		va_start(args, fmt);
+		(void)vsprintf(buffer, fmt, args);
+		va_end(args);
+
+		return buffer;
+	}
+
 }
+

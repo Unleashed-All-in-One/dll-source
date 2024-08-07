@@ -14,6 +14,7 @@ namespace SUC
 	Project::ETitleType				Project::menuType;
 	std::string						Project::s_ModPath;
 	std::string						Project::s_ModInfoPath;
+	ModInfo_t* Project::s_ModInfo;
 	bool							Project::s_IgnoreWarnings;
 	Project::WorldData				Project::s_WorldData;
 	bool							Project::s_LargeAddressAware;
@@ -29,11 +30,12 @@ namespace SUC
 	float Project::ms_HudDeltaTime = 0.0f;
 	int Project::ms_FrameDeltaTime = 0.0f;
 
-	//Move elsewhere
-	extern "C" __declspec(dllexport) Hedgehog::Math::CVector API_GetClosestSetObjectForArmswing()
+	std::map<const char*, const char*> Project::s_IncompatibleMods =
 	{
-		return SUC::Project::s_TempArmswingNode;
-	}
+		{"EnemyTrigger", "EnemyTrigger.dll"},
+		{"QSS Restoration", "QSSRestoration.dll" },
+		{"SWA Titlescreen", "UnleashedTitlescreen.dll"}
+	};
 	HOOK(void*, __fastcall, Project_UpdateApplication, 0xE7BED0, void* This, void* Edx, float elapsedTime, uint8_t a3)
 	{
 		Project::SetDeltaTime(elapsedTime);
@@ -43,23 +45,8 @@ namespace SUC
 	{
 		Project::SetHudDeltaTime(*dt);
 		originalProject_CHudSonicStage_Update(This, Edx, dt);
-	}
-
-	void Project::RegisterGlobalHooks()
-	{
-		Hooks::InstallGameplayHooks();
-		Hooks::InstallAccuracyHooks();
-		Hooks::InstallSetObjectHooks();
-		Hooks::InstallSystemHooks();
-		Hooks::InstallUIHooks();		
-		TestingCode::applyPatches();
-
-		WRITE_MEMORY(0x1AD99D0, char*, "shader_debug.ar");
-		WRITE_MEMORY(0x1AD99D4, char*, "shader_debug_add.ar");
-		WRITE_MEMORY(0x1AD99E8, char*, "shader_debug.arl");
-		WRITE_MEMORY(0x1AD99EC, char*, "shader_debug_add.arl");
-	}
-	void Project::Load(const char* path)
+	}	
+	void Project::Load(ModInfo_t* in_ModInfo)
 	{
 		INIReader reader(INI_FILE);
 		if (reader.ParseError() != 0)
@@ -68,10 +55,10 @@ namespace SUC
 			exit(-1);
 		}
 
-		std::filesystem::path modP = path;
+		std::filesystem::path modP = in_ModInfo->CurrentMod->Path;
 		s_ModPath = modP.parent_path().string();
-		s_ModInfoPath = std::string(path);
-
+		s_ModInfoPath = std::string(in_ModInfo->CurrentMod->Path);
+		s_ModInfo = in_ModInfo;
 		//---------------Gameplay---------------
 		m_DoQSS = reader.GetBoolean("Gameplay", "bQSS", m_DoQSS);
 
@@ -86,23 +73,55 @@ namespace SUC
 		GetLevelQueue();
 		GetTempCustomArchiveTree();
 	}
-	void parseStageTree(const Json::Value& jsonTree, SUC::Project::DebugStageTree::DebugStageTreeNode& stageTree)
+	void Project::RegisterGlobalHooks()
 	{
-		stageTree.name = jsonTree["name"].asString();
-		stageTree.children = std::vector<SUC::Project::DebugStageTree::DebugStageTreeNode>();
-		const Json::Value& treeEntries = jsonTree["TreeEntry"];
+#if _DEBUG
+		MessageBox(nullptr, TEXT("Attach Debugger and press OK."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
+#endif
+
+		Hooks::InstallGameplayHooks();
+		Hooks::InstallAccuracyHooks();
+		Hooks::InstallSetObjectHooks();
+		Hooks::InstallSystemHooks();
+		Hooks::InstallUIHooks();
+		TestingCode::applyPatches();
+		INSTALL_HOOK(Project_UpdateApplication);
+		INSTALL_HOOK(Project_CHudSonicStage_Update);
+
+		WRITE_MEMORY(0x1AD99D0, char*, "shader_debug.ar");
+		WRITE_MEMORY(0x1AD99D4, char*, "shader_debug_add.ar");
+		WRITE_MEMORY(0x1AD99E8, char*, "shader_debug.arl");
+		WRITE_MEMORY(0x1AD99EC, char*, "shader_debug_add.arl");
+	}
+	void Project::CheckIncompatibleMods()
+	{
+		for (auto const& incompatibleModAssembly : s_IncompatibleMods)
+		{
+			if (GetModuleHandleA(incompatibleModAssembly.second))
+			{
+				;
+				MessageBoxA(nullptr, SUC::Format("\"%s\" should not be enabled with %s.", incompatibleModAssembly.first, MOD_NAME), MOD_NAME, MB_ICONERROR);
+				exit(-1);
+			}
+		}
+	}
+	void ParseStageTree(const Json::Value& in_JsonValue, SUC::Project::DebugStageTree::DebugStageTreeNode& in_StageTree)
+	{
+		in_StageTree.name = in_JsonValue["name"].asString();
+		in_StageTree.children = std::vector<SUC::Project::DebugStageTree::DebugStageTreeNode>();
+		const Json::Value& treeEntries = in_JsonValue["TreeEntry"];
 		if (!treeEntries.isArray())
 		{
 			printf("StageTreeEntry is not a valid array.\n");
 			return;
 		}
-		if (jsonTree["children"])
+		if (in_JsonValue["children"])
 		{
-			for (const auto& tree : jsonTree["children"])
+			for (const auto& tree : in_JsonValue["children"])
 			{
 				SUC::Project::DebugStageTree::DebugStageTreeNode stageTreeC;
-				parseStageTree(tree, stageTreeC);
-				stageTree.children.push_back(stageTreeC);
+				ParseStageTree(tree, stageTreeC);
+				in_StageTree.children.push_back(stageTreeC);
 			}
 		}
 		std::vector<SUC::Project::DebugStageTree::DebugStageTreeNode::DebugStageTreeNodeEntry> entries;
@@ -126,7 +145,7 @@ namespace SUC
 			}
 			entries.push_back(treeEntry);
 		}
-		stageTree.treeEntries = entries;
+		in_StageTree.treeEntries = entries;
 	}
 	void SUC::Project::GetDebugTree()
 	{
@@ -151,10 +170,10 @@ namespace SUC
 		}
 
 		std::vector<SUC::Project::DebugStageTree::DebugStageTreeNode> stageTrees;
-		for (const auto& tree : stageTreeT) 
+		for (const auto& tree : stageTreeT)
 		{
 			SUC::Project::DebugStageTree::DebugStageTreeNode stageTree;
-			parseStageTree(tree, stageTree);
+			ParseStageTree(tree, stageTree);
 			stageTrees.push_back(stageTree);
 		}
 
@@ -241,9 +260,9 @@ namespace SUC
 			break;
 		}
 	}
-	int SUC::Project::GetFlagFromStage(const char* stage)
+	int SUC::Project::GetFlagFromStage(const char* in_Stage)
 	{
-		std::string stageString = stage;
+		std::string stageString = in_Stage;
 		//if only c++ had linq
 		for (size_t i = 0; i < s_WorldData.data.size(); i++)
 		{
@@ -387,10 +406,10 @@ namespace SUC
 		}
 		return returned;
 	}
-	int SUC::Project::GetCapital(int flagID, bool isNight)
+	int SUC::Project::GetCapital(int in_FlagID, bool in_IsNight)
 	{
 		int returned = -1;
-		std::vector<SUC::Project::WorldData::FlagData::LevelData> levels = isNight ? SUC::Project::s_WorldData.data[flagID].dataNight : SUC::Project::s_WorldData.data[flagID].data;
+		std::vector<SUC::Project::WorldData::FlagData::LevelData> levels = in_IsNight ? SUC::Project::s_WorldData.data[in_FlagID].dataNight : SUC::Project::s_WorldData.data[in_FlagID].data;
 		for (size_t i = 0; i < levels.size(); i++)
 		{
 			if (levels[i].isCapital)
@@ -401,10 +420,16 @@ namespace SUC
 		}
 		return returned;
 	}
-	std::string Project::GetDirectoryPath(const std::string& path)
+	std::string Project::GetDirectoryPath(const std::string& in_Path)
 	{
-		const size_t pos = path.find_last_of("\\/");
-		return path.substr(0, pos != std::string::npos ? pos : 0);
+		const size_t pos = in_Path.find_last_of("\\/");
+		return in_Path.substr(0, pos != std::string::npos ? pos : 0);
 	}
-	
+
+	//Move elsewhere
+	extern "C" __declspec(dllexport) Hedgehog::Math::CVector API_GetClosestSetObjectForArmswing()
+	{
+		return SUC::Project::s_TempArmswingNode;
+	}
+
 }
