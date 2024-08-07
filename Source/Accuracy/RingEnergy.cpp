@@ -1,3 +1,5 @@
+#include "RingEnergy.h"
+
 void OnRing(hh::fnd::Message& msg, bool superRing = false) {
 	if (!*pModernSonicContext)
 		return;

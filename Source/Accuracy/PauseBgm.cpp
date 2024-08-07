@@ -1,5 +1,4 @@
-//
-
+#include "PauseBgm.h"
 HOOK(void, __stdcall, _HudPreparePause, 0x10A1140, void* in_Hud)
 {
 	PauseBgm::s_StartingVolume = SoundController::GetBGMVolume(0);
@@ -12,8 +11,6 @@ HOOK(void, __stdcall, _HudPrepareUnPause, 0x010A1480, void* in_Hud)
 	SoundController::SetBGMVolume(PauseBgm::s_StartingVolume);
 	original_HudPrepareUnPause(in_Hud);
 }
-
-
 void PauseBgm::applyPatches()
 {
 	INSTALL_HOOK(_HudPreparePause);

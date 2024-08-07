@@ -4,6 +4,9 @@
 //  Make all things related to title custom renderables instead of title renderables
 #include "TitleWorldMap.h"
 
+#include "Title.h"
+#include "TitleWorldMapPause.h"
+
 using namespace hh::math;
 
 bool TitleWorldMap::m_forceLoadToTitle = false;

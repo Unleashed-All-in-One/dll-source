@@ -1,3 +1,4 @@
+struct SaveLoadTestStruct;
 SaveObject* SaveManager::save;
 
 boost::shared_ptr<SaveLoadTestStruct> m_spSaveT;

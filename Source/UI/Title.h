@@ -21,7 +21,6 @@ public:
 	static void update();
 	static void showTransition(bool enableLoad);
 	static bool inWorldMap;
-	static bool inInstall;
 
 	static enum TitleIndexState {
 		New_Game,

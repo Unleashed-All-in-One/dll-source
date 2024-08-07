@@ -4,14 +4,14 @@ class CTitleWorldMapSky : public Sonic::CGameObject3D
 	INSERT_PADDING(0x4);
 	void* m_GlitterPlayer;
 	boost::shared_ptr<hh::mr::CSingleElement> m_spModel;
-	CVector m_Position;
-	CVector m_Velocity;
+	Hedgehog::Math::CVector m_Position;
+	Hedgehog::Math::CVector m_Velocity;
 	SharedPtrTypeless handle;
 	boost::shared_ptr<Sonic::CParticleManager> m_spParticleManager;
 	boost::shared_ptr<Hedgehog::Mirage::CMatrixNodeSingleElementNode> m_Node;
 public:
 	boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spModelButtonTransform;
-	CTitleWorldMapSky(const CVector& _Position)
+	CTitleWorldMapSky(const Hedgehog::Math::CVector& _Position)
 		: m_Position(_Position)
 	{
 	}

@@ -7,7 +7,7 @@ class MiniAudioHelper
 {
 
 public:
-	static void initialize(const char* path);
+	static void initialize(const std::string& path);
 	static void shutdown();
 	static void stopAudio(unsigned int& index);
 	static unsigned int playAudio(std::string cueName, const bool& sfxOrAudio, bool loop);

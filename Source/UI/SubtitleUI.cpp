@@ -1,4 +1,5 @@
-﻿CaptionData SubtitleUI::m_captionData;
+﻿#include "SubtitleUI.h"
+CaptionData SubtitleUI::m_captionData;
 void __declspec(naked) addCaption_COmochaoFollow()
 {
     static uint32_t sub_6B02B0 = 0x6B02B0;

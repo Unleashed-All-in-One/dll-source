@@ -1,3 +1,6 @@
+#include "TitleWorldMapPause.h"
+
+#include "Title.h"
 #include "TitleWorldMap.h"
 using namespace hh::math;
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcWMPause;
@@ -172,7 +175,6 @@ void PauseCase(int pos)
 	case 4:
 	{
 		StageManager::ActiveReplacement = false;
-		Title::inInstall = true;
 		StageManager::NextLevelLoad = "pla201";
 		StageManager::LoadingReplacementEnabled = true;
 		SequenceHelpers::loadStage("pla201");

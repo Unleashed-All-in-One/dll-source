@@ -1,3 +1,4 @@
+#include "Ramp.h"
 SharedPtrTypeless rampParticleHandle;
 
 void CreateRampParticle() {

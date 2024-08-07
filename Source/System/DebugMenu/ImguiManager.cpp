@@ -40,7 +40,6 @@ void customStageLoad()
 	//const char* terr = *h;
 	//*h = _strdup(temp.c_str()); // Use strdup to duplicate the string
 	StageManager::nextStageID = temp;
-	Title::inInstall = true;
 }
 void drawStageTreeNode(SUC::Project::DebugStageTree::DebugStageTreeNode node)
 {

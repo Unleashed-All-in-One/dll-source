@@ -1,3 +1,6 @@
+#include "TitleOption.h"
+
+#include "Title.h"
 #include "TitleWorldMap.h"
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcOptions;
 Chao::CSD::RCPtr<Chao::CSD::CScene> headerBG, headerIMG, footerBG,footerIMG, worldmaptext, info1;

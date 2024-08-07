@@ -1,4 +1,5 @@
 #pragma region UI
+#include "EXP.h"
 
 boost::shared_ptr<Sonic::CGameObjectCSD> spExp;
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcExp;

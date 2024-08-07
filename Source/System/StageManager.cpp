@@ -240,15 +240,15 @@ void calculateNextStage()
 		const char* stageToLoad = "ghz200";
 		if (!StageManager::LoadingReplacementEnabled)
 		{
-			if (Title::inInstall)
-			{
-				uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-				char** h = (char**)stageTerrainAddress;
-				const char* terr = *h;
-
-				if (terr != lastStageID && lastStageID[0] != '\0')
-					strcpy(*(char**)stageTerrainAddress, lastStageID);
-			}
+			//if (Title::inInstall)
+			//{
+			//	uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
+			//	char** h = (char**)stageTerrainAddress;
+			//	const char* terr = *h;
+			//
+			//	if (terr != lastStageID && lastStageID[0] != '\0')
+			//		strcpy(*(char**)stageTerrainAddress, lastStageID);
+			//}
 			return;
 		}
 		if (SUC::Project::s_WorldData.data.size() < TitleWorldMap::m_lastFlagSelected)

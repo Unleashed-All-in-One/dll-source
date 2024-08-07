@@ -138,11 +138,11 @@
     <ClCompile Include="GameObjects\TitleWorldMapSky.cpp" />
     <ClCompile Include="ModuleTable.cpp" />
     <ClCompile Include="Project.cpp" />
-    <ClCompile Include="Functionality\EXP.cpp" />
-    <ClCompile Include="Functionality\FallCam.cpp" />
-    <ClCompile Include="Functionality\Patches.cpp" />
-    <ClCompile Include="Functionality\PauseBgm.cpp" />
-    <ClCompile Include="Functionality\RingEnergy.cpp" />
+    <ClCompile Include="Accuracy\EXP.cpp" />
+    <ClCompile Include="Accuracy\FallCam.cpp" />
+    <ClCompile Include="Accuracy\AccuracyPatches.cpp" />
+    <ClCompile Include="Accuracy\PauseBgm.cpp" />
+    <ClCompile Include="Accuracy\RingEnergy.cpp" />
     <ClCompile Include="Gameplay\Drift.cpp" />
     <ClCompile Include="Gameplay\EnemyMotoraTemp.cpp" />
     <ClCompile Include="Gameplay\Pole.cpp" />
@@ -213,7 +213,9 @@
     <ClCompile Include="UI\TitleWorldMapPause.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Accuracy\AccuracyHookContainer.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\System\ApplicationDocument.h" />
+    <ClInclude Include="Gameplay\GameplayHookContainer.h" />
     <ClInclude Include="SetObject\CObjCamera2D.h" />
     <ClInclude Include="SetObject\DebugObject.h" />
     <ClInclude Include="SetObject\ETFStageGate.h" />
@@ -228,6 +230,7 @@
     <ClInclude Include="SetObject\Mykonos\Pelican.h" />
     <ClInclude Include="SetObject\ObjectUtility.h" />
     <ClInclude Include="SetObject\Paraloop.h" />
+    <ClInclude Include="SetObject\SetObjectHookContainer.h" />
     <ClInclude Include="SetObject\SpeedDownCollision.h" />
     <ClInclude Include="SetObject\Werehog\CObjHangOn.h" />
     <ClInclude Include="GameObjects\TitleWorldMapCamera.h" />
@@ -236,11 +239,11 @@
     <ClInclude Include="hk2010_2_0_2.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="CustomSetObjects\DebugEnemy.h" />
-    <ClInclude Include="Functionality\EXP.h" />
-    <ClInclude Include="Functionality\FallCam.h" />
-    <ClInclude Include="Functionality\Patches.h" />
-    <ClInclude Include="Functionality\PauseBgm.h" />
-    <ClInclude Include="Functionality\RingEnergy.h" />
+    <ClInclude Include="Accuracy\EXP.h" />
+    <ClInclude Include="Accuracy\FallCam.h" />
+    <ClInclude Include="Accuracy\AccuracyPatches.h" />
+    <ClInclude Include="Accuracy\PauseBgm.h" />
+    <ClInclude Include="Accuracy\RingEnergy.h" />
     <ClInclude Include="Gameplay\Drift.h" />
     <ClInclude Include="Gameplay\EnemyMotoraTemp.h" />
     <ClInclude Include="Gameplay\Pole.h" />
@@ -304,6 +307,7 @@
     <ClInclude Include="System\SaveManager.h" />
     <ClInclude Include="System\SequenceHelpers.h" />
     <ClInclude Include="System\SoundController.h" />
+    <ClInclude Include="System\SystemHookContainer.h" />
     <ClInclude Include="System\UpdateDirector.h" />
     <ClInclude Include="Temporary.h" />
     <ClInclude Include="Testing\MicroSequencer.h" />
@@ -319,6 +323,7 @@
     <ClInclude Include="UI\TitleOption.h" />
     <ClInclude Include="UI\TitleWorldMap.h" />
     <ClInclude Include="UI\TitleWorldMapPause.h" />
+    <ClInclude Include="UI\UIHookContainer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -89,7 +89,7 @@ void MiniAudioHelper::stopSound(AudioHandle& handle, bool forceSoloud)
     }
 
 }
-void MiniAudioHelper::initialize(const char* path) 
+void MiniAudioHelper::initialize(const std::string& path) 
 {
     s_ModPath = path;
     soloud = new SoLoud::Soloud;

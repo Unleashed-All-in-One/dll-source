@@ -1,4 +1,5 @@
 
+#include "FallCam.h"
 const float FADE_INTRO = 3.0f;
 const float DEAD_TO_RESTART = 0.15f;
 

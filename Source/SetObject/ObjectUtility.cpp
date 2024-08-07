@@ -23,9 +23,10 @@ Hedgehog::Math::CVector ObjectUtility::MoveAroundPivot(Hedgehog::Math::CVector& 
 	player.z() = y;
 	return Hedgehog::Math::CVector(x, player.y(), y);
 }
-CQuaternion ObjectUtility::QuaternionFromAngleAxisUtil(float angle, const CVector& axis)
+
+Hedgehog::Math::CQuaternion ObjectUtility::QuaternionFromAngleAxisUtil(float angle, const Hedgehog::Math::CVector& axis)
 {
-	CQuaternion q;
+	Hedgehog::Math::CQuaternion q;
 	float m = sqrt(axis.x() * axis.x() + axis.y() * axis.y() + axis.z() * axis.z());
 	float s = sinf(angle / 2) / m;
 	q.x() = axis.x() * s;
@@ -53,7 +54,8 @@ Eigen::Vector3f ObjectUtility::ClampMagnitudeMax(const Eigen::Vector3f& vec, flo
 
 	return clampedVec;
 }
-CQuaternion ObjectUtility::QuaternionFaceTowards(const Eigen::Vector3f& targetPoint, const Eigen::Vector3f& position, CQuaternion rotation) 
+
+Hedgehog::Math::CQuaternion ObjectUtility::QuaternionFaceTowards(const Eigen::Vector3f& targetPoint, const Eigen::Vector3f& position, Hedgehog::Math::CQuaternion rotation) 
 {
 	Eigen::Vector3f currentForward = rotation * Eigen::Vector3f::UnitZ();
 	Eigen::Vector3f targetDirection = (targetPoint - position).normalized();
@@ -74,7 +76,7 @@ bool ObjectUtility::DoWerehogArmHomingIfClose(Hedgehog::Math::CVector target, fl
 {
 	Sonic::Player::CPlayerSpeedContext* playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
 	auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
-	CVector front = playerContext->m_spMatrixNode->m_Transform.m_Rotation * CVector(0, 0, -1);
+	Hedgehog::Math::CVector front = playerContext->m_spMatrixNode->m_Transform.m_Rotation * Hedgehog::Math::CVector(0, 0, -1);
 	float distance = abs(ObjectUtility::Distance(playerContext->m_spMatrixNode->m_Transform.m_Position + front, target));
 	if (distance < maxDistance)
 	{

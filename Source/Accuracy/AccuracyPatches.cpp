@@ -1,3 +1,4 @@
+#include "AccuracyPatches.h"
 HOOK(void, __fastcall, ObjectPhysics_SetDamageType, 0xE9FD10, char* This, void* Edx, int a2, int a3, int a4)
 {
 	originalObjectPhysics_SetDamageType(This, Edx, a2, a3, a4);
@@ -114,7 +115,7 @@ void __declspec(naked) ASM_ReplaceGeneralFloorModelName()
 //	
 //	return originalGeneralFloor_InitializeEditParam(This, Edx, in_Param);
 //}
-void Patches::applyPatches()
+void AccuracyPatches::applyPatches()
 {
 	//WRITE_JUMP(0x0100DFC5, ASM_Test1);
 	//INSTALL_HOOK(GeneralFloor_InitializeEditParam);

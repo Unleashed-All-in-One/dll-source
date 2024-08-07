@@ -1,3 +1,5 @@
+#include "EventViewer.h"
+
 #include <rapidxml/rapidxml_utils.hpp>
 
 using namespace rapidxml;

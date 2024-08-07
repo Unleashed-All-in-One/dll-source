@@ -1,4 +1,10 @@
 #include "Project.h"
+#include "Gameplay\GameplayHookContainer.h"
+#include "Accuracy\AccuracyHookContainer.h"
+#include "SetObject\SetObjectHookContainer.h"
+#include "System\SystemHookContainer.h"
+#include "Testing/TestingCode.h"
+#include "UI/UIHookContainer.h"
 
 namespace SUC
 {
@@ -7,6 +13,7 @@ namespace SUC
 	int								Project::s_LogoType;
 	Project::ETitleType				Project::menuType;
 	std::string						Project::s_ModPath;
+	std::string						Project::s_ModInfoPath;
 	bool							Project::s_IgnoreWarnings;
 	Project::WorldData				Project::s_WorldData;
 	bool							Project::s_LargeAddressAware;
@@ -21,20 +28,6 @@ namespace SUC
 	float Project::ms_DeltaTime = 0.0f;
 	float Project::ms_HudDeltaTime = 0.0f;
 	int Project::ms_FrameDeltaTime = 0.0f;
-
-	//bool SUC::Project::m_DoQSS = true;
-	//int SUC::Project::s_LogoType = 0;
-	//std::string SUC::Project::s_ModPath;
-	//bool SUC::Project::s_IgnoreWarnings = false;
-	//bool SUC::Project::s_LargeAddressAware = false;
-	//SUC::Project::WorldData SUC::Project::s_WorldData;
-	//bool SUC::Project::s_CpkRedirCompatibilityMode = false;
-	//Hedgehog::Math::CVector SUC::Project::s_TempArmswingNode;
-	//std::vector<std::string> SUC::Project::s_GenerationsStages;
-	//SUC::Project::DebugStageTree SUC::Project::s_DebugStageTree;
-	//SUC::Project::SequenceData SUC::Project::s_SequenceDataQueue;
-	//SUC::Project::ETitleType SUC::Project::menuType = (ETitleType)0;
-	//SUC::Project::ArchiveTreeDefinitions SUC::Project::s_AdditionalArchiveTree;
 
 	//Move elsewhere
 	extern "C" __declspec(dllexport) Hedgehog::Math::CVector API_GetClosestSetObjectForArmswing()
@@ -51,6 +44,21 @@ namespace SUC
 		Project::SetHudDeltaTime(*dt);
 		originalProject_CHudSonicStage_Update(This, Edx, dt);
 	}
+
+	void Project::RegisterGlobalHooks()
+	{
+		Hooks::InstallGameplayHooks();
+		Hooks::InstallAccuracyHooks();
+		Hooks::InstallSetObjectHooks();
+		Hooks::InstallSystemHooks();
+		Hooks::InstallUIHooks();		
+		TestingCode::applyPatches();
+
+		WRITE_MEMORY(0x1AD99D0, char*, "shader_debug.ar");
+		WRITE_MEMORY(0x1AD99D4, char*, "shader_debug_add.ar");
+		WRITE_MEMORY(0x1AD99E8, char*, "shader_debug.arl");
+		WRITE_MEMORY(0x1AD99EC, char*, "shader_debug_add.arl");
+	}
 	void Project::Load(const char* path)
 	{
 		INIReader reader(INI_FILE);
@@ -62,6 +70,7 @@ namespace SUC
 
 		std::filesystem::path modP = path;
 		s_ModPath = modP.parent_path().string();
+		s_ModInfoPath = std::string(path);
 
 		//---------------Gameplay---------------
 		m_DoQSS = reader.GetBoolean("Gameplay", "bQSS", m_DoQSS);

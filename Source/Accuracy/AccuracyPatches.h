@@ -1,5 +1,5 @@
 #pragma once
-class Patches
+class AccuracyPatches
 {
 
 public:

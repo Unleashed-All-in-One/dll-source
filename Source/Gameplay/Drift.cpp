@@ -1,4 +1,6 @@
-HOOK(void, __fastcall, BDriftUpdate, 0xE6BF20, void* This, void* Edx, float* dt) {
+#include "Drift.h"
+HOOK(void, __fastcall, BDriftUpdate, 0xE6BF20, void* This, void* Edx, float* dt)
+{
 	originalBDriftUpdate(This, Edx, dt);
 
 	if (!*pModernSonicContext)

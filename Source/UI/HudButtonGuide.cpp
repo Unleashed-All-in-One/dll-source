@@ -1,3 +1,4 @@
+#include "HudButtonGuide.h"
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcQTE; //ui_qte
 boost::shared_ptr<Sonic::CGameObjectCSD> spQTE;
 

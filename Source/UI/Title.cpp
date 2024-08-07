@@ -1,4 +1,6 @@
-﻿#include "TitleWorldMap.h"
+﻿#include "Title.h"
+
+#include "TitleWorldMap.h"
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcTitleScreen;
 Chao::CSD::RCPtr<Chao::CSD::CProject> rcTitleScreenLogos;
 Chao::CSD::RCPtr<Chao::CSD::CScene> rcTitleLogo_1, rcTitlebg, rcTitleMenu, rcTitleMenuScroll, rcTitleMenuTXT, black_bg, bg_window, fg_window, txt_window, footer_window, bg_transition;
@@ -14,7 +16,6 @@ bool enteredStart, isInSubmenu, moved, hasSavefile, playingStartAnim, reversedAn
 bool Title::inWorldMap = false;
 bool inTitle, scrollHorizontally = true;
 int canLoad = 0;
-bool Title::inInstall = 0;
 int maxTitleIndex = 3;
 int holdTimer = 0;
 bool inOptions = false;
@@ -85,9 +86,7 @@ void ContinueToWM()
 }
 void ShowInstallScreen()
 {
-
 	PlayTitleBGM(TitleStateContextBase, "");
-	Title::inInstall = true;
 	black_bg->SetHideFlag(false);
 	static boost::shared_ptr<hh::db::CRawData> rawData;
 	auto database = hh::db::CDatabase::CreateDatabase();
@@ -371,7 +370,6 @@ HOOK(int, __fastcall, Title_CMain, 0x0056FBE0, Sonic::CGameObject* This, void* E
 	auto spCsdProjectLogos = wrapper.GetCsdProject("ui_title_logos");
 	rcTitleScreen = spCsdProject->m_rcProject;
 	rcTitleScreenLogos = spCsdProjectLogos->m_rcProject;
-	Title::inInstall = false;
 	char buffer[8];
 	//s_LogoType
 	//0: Conversion

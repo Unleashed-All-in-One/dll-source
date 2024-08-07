@@ -1,3 +1,4 @@
+#include "ShortJump.h"
 int m_LastHurdleIndex = 0;
 int m_currentHurdleIndex = 1;
 

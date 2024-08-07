@@ -74,7 +74,7 @@ namespace SUC
 		static void Load(const char* path);
 		static void GetStageList();
 		static void GetDebugTree();
-		static void RegisterHooks();
+		static void RegisterGlobalHooks();
 		static void GetLevelQueue();
 		static void GetTempCustomArchiveTree();
 		static int GetFlagFromStage(const char* stage);
@@ -94,6 +94,7 @@ namespace SUC
 		static int s_LogoType;
 		static ETitleType menuType;
 		static std::string s_ModPath;
+		static std::string s_ModInfoPath;
 		static bool s_IgnoreWarnings;
 		static WorldData s_WorldData;
 		static bool s_LargeAddressAware;

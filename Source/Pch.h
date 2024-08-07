@@ -63,14 +63,6 @@
 #include "Project.h"
 #include "Temporary.h"
 
-//Gameplay
-#include "Gameplay/QSSRestore.h"
-#include "Gameplay/Sweepkick.h"
-#include "Gameplay/Ramp.h"
-#include "Gameplay/ShortJump.h"
-#include "Gameplay/Drift.h"
-#include "Gameplay/Pole.h"
-
 //System
 #include "System/DiscordStatus.h"
 #include "System/AnimationSetPatcher.h"
@@ -95,21 +87,7 @@
 #include "System/DebugMenu/TypesParamRemove.h"
 #include "System/DebugMenu/ImGuizmo.h"
 
-//Functionality
-#include "Functionality/Patches.h"
-#include "Functionality/PauseBgm.h"
-#include "Functionality/FallCam.h"
-#include "Functionality/RingEnergy.h"
-#include "Functionality/EXP.h"
-
-//UI
-#include "UI/Title.h"
-#include "UI/TitleOption.h"
-#include "UI/TitleWorldMapPause.h"
-#include "UI/EventViewer.h"
 #include "UI/HelpCaptionUI.h"
-#include "UI/SubtitleUI.h"
 #include "UI/ItemboxUI.h"
 #include "UI/ETFStageGateUI.h"
 #include "UI/EvilQTEUI.h"
-#include "UI/HudButtonGuide.h"
