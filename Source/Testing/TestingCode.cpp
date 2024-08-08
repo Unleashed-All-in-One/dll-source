@@ -254,7 +254,7 @@ HOOK(void, __fastcall, sub_42A710, 0x0042ABA0, void* This, void* Edx)
 	//int *__thiscall Sonic::Sequence::CSequenceMainImpl::LuanneFunctions::StartModule(DWORD *this, int a2, Luanne_IntegerMessageContainer *a3)
 	/*FUNCTION_PTR(int*, __thiscall, StartModule, 0x00D77020, Hedgehog::Universe::CMessageActor* This, int a2, LuaStringEntryContainer * a3);
 	StartModule(Sonic::Sequence::Main::GetInstance(), 0, new LuaStringEntryContainer("Title"));*/
-	//SequenceHelpers::changeModule(ModuleFlow::Title);
+	//SequenceHelpers::ChangeModule(ModuleFlow::Title);
 	DWORD* test = (DWORD*)Sonic::CApplicationDocument::GetInstance()->m_pMember;
 	//DWORD *__thiscall ProcMsgRequestChangeModule(Hedgehog::Universe::MessageTypeSet *this, DWORD *a2)
 	FUNCTION_PTR(DWORD*, __thiscall, ProcMsg, 0x00D0B2E0, DWORD* T5his, boost::shared_ptr<MsgRequestChangeModule> a2);
@@ -264,7 +264,7 @@ HOOK(void, __fastcall, sub_42A710, 0x0042ABA0, void* This, void* Edx)
 	//void __thiscall sub_D0AE90(Sonic::CAnimationStateMachine *this, int a2
 	FUNCTION_PTR(DWORD*, __thiscall, ProcMsg2, 0xD0AE90, DWORD * T5his, MsgRequestEndModule * a2);
 	//ProcMsg2(test2, new MsgRequestEndModule());
-	SequenceHelpers::changeModule(ModuleFlow::Genesis);
+	SUC::System::SequenceHelpers::ChangeModule(ModuleFlow::Genesis);
 	originalsub_42A710(This, Edx);
 }
 HOOK(int, __fastcall, CHudGateMenuMainIntroInfo, 0x1080110, hh::fnd::CStateMachineBase::CStateBase* This, void* Edx)

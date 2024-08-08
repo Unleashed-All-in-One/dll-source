@@ -1,6 +1,6 @@
 #include "UI/EventViewer.h"
 extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
-{
+{	
 	// Load configuration
 	SUC::Project::Load(modInfo);
 	//Make Gens support 4gb+
@@ -20,9 +20,9 @@ extern "C" __declspec(dllexport) void PostInit()
 extern "C" void __declspec(dllexport) OnFrame()
 {	
 	//---------------System---------------
-	SUC::ImGuiMenu::ImguiInitializer::Update();
+	SUC::ImGuiMenu::ImGuiContextManager::Update();
 	SUC::System::Discord::DiscordStatus::Update();
 	SUC::System::StageManager::Update();
 	SUC::UI::Event::EventViewer::Update();
-	SequenceHelpers::Update();
+	SUC::System::SequenceHelpers::Update();
 }

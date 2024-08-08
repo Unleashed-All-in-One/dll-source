@@ -166,7 +166,7 @@ public:
                 if (inputPtr->IsTapped(Sonic::eKeyState_A))
                 {
                     //example: ghz + stageID(200) = ghz200
-                    std::string stageToLoadS = (SequenceHelpers::getCurrentStageName(true) + std::to_string(stageID));
+                    std::string stageToLoadS = (SUC::System::SequenceHelpers::GetCurrentStageName(true) + std::to_string(stageID));
                      const char* stageToLoad = stageToLoadS.c_str();
 
                     std::string stageIDN = std::format("{0}{1}_{2}", stageType ? "D" : "N", countryNames[worldIndex], actIndex);
@@ -174,11 +174,11 @@ public:
                     {
                         stageIDN = stageIDN + std::format("-{0}", subStageIndex);
                     }
-                    SUC::System::StageManager::SetETFInfo(SequenceHelpers::getCurrentStageName(false));
+                    SUC::System::StageManager::SetETFInfo(SUC::System::SequenceHelpers::GetCurrentStageName(false));
                     SUC::System::StageManager::SetGameParameters(stageIDN, "");
                     SUC::System::StageManager::s_LoadingReplacementEnabled = true;
                     SUC::System::StageManager::s_HubModeEnabled = false;
-                    SequenceHelpers::loadStage(stageIDN.c_str(), 0);
+                    SUC::System::SequenceHelpers::LoadStage(stageIDN.c_str(), 0);
                     SUC::System::StageManager::SetGameParameters(stageIDN, "Stage");
                 }
                 if (inputPtr->IsTapped(Sonic::eKeyState_B))

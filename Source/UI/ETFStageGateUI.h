@@ -43,17 +43,17 @@ public:
 
 	void UpdateState(const std::string& in_StageID, int actNumber, int subIndex, int worldIndex)
 	{
-		auto saveObj = SaveManager::getCurrentSave();
-		int index = saveObj->getStageDataIndexFromID(in_StageID);
-		StageSaveData* stageData;
-		if (index > saveObj->stageData.size() || index == -1)
+		auto saveObj = SUC::System::SaveManager::GetCurrentSave();
+		int index = saveObj->GetStageDataIndexFromID(in_StageID);
+		SUC::System::StageSaveData* stageData;
+		if (index > saveObj->m_StageData.size() || index == -1)
 		{
-			stageData = new StageSaveData();			
-			stageData->rank = (StageRank)(-1);
+			stageData = new SUC::System::StageSaveData();			
+			stageData->rank = (SUC::System::StageRank)(-1);
 		}
 		else
 		{
-			stageData = saveObj->stageData[index];
+			stageData = saveObj->m_StageData[index];
 		}
 
 		uint32_t minutes, seconds, milliseconds, bestScore, bestMoonMedal, bestSunMedal;
@@ -112,6 +112,7 @@ public:
 		}
 		if (rcInfo_6)
 		{
+			using namespace SUC::System;
 			int indexMotion = 5;
 			switch (stageData->rank)
 			{

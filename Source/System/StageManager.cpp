@@ -59,11 +59,11 @@ namespace SUC::System
 	}
 	void loadCapital(std::string stageName, bool isWerehog)
 	{
-		SequenceHelpers::loadStage(stageName.c_str(), 0, false);
+		SequenceHelpers::LoadStage(stageName.c_str(), 0, false);
 		StageManager::s_LoadingReplacementEnabled = true;
 		StageManager::s_HubModeEnabled = true;
-		//SequenceHelpers::changeModule(ModuleFlow::PlayableMenu);
-		SequenceHelpers::setPlayerType(isWerehog ? PlayerType::CLASSIC_SONIC : PlayerType::GENERIC_SONIC);
+		//SequenceHelpers::ChangeModule(ModuleFlow::PlayableMenu);
+		SequenceHelpers::SetPlayerType(isWerehog ? PlayerType::CLASSIC_SONIC : PlayerType::GENERIC_SONIC);
 		DebugDrawText::log(std::format("[LLM] Loading Capital (Day) \"{}\" as {}", stageName, isWerehog ? "Werehog" : "Modern").c_str(), 5);
 	}
 	const char* StageManager::GetStageToLoad()
@@ -80,12 +80,12 @@ namespace SUC::System
 			if (SUC::Project::s_WorldData.data[latestFlag].dataNight.size() != 0 && SUC::UI::TitleScreen::TitleWorldMap::s_Flags[latestFlag].night)
 			{
 				stageToLoad = SUC::Project::s_WorldData.data[latestFlag].dataNight[stageSelected].levelID.c_str();
-				SequenceHelpers::setPlayerType(1);
+				SequenceHelpers::SetPlayerType(1);
 			}
 			else
 			{
 				stageToLoad = SUC::Project::s_WorldData.data[latestFlag].data[stageSelected].levelID.c_str();
-				SequenceHelpers::setPlayerType(0);
+				SequenceHelpers::SetPlayerType(0);
 			}
 		}
 		return stageToLoad;
@@ -103,7 +103,7 @@ namespace SUC::System
 		s_NextEventScene = in_EventName.c_str();
 		s_NextStage = in_StageName.c_str();
 		isMovieCutscene = true;
-		SequenceHelpers::setPlayerType(playerType);
+		SequenceHelpers::SetPlayerType(playerType);
 		auto message1 = Sonic::Message::MsgSequenceEvent(0, 7);
 		Sonic::Sequence::Main::ProcessMessage(&message1);
 	}
@@ -114,9 +114,9 @@ namespace SUC::System
 		case 0:
 		{
 			//Play stage (day)
-			SequenceHelpers::loadStage(s_NextStage.c_str(), 0, false);
+			SequenceHelpers::LoadStage(s_NextStage.c_str(), 0, false);
 			if (!dontSetPlayerType)
-				SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
+				SequenceHelpers::SetPlayerType(PlayerType::GENERIC_SONIC);
 			s_HubModeEnabled = 0;
 			DebugDrawText::log(std::format("[LLM] Loading Stage (Day) \"{}\" as {}", s_NextStage, (int)PlayerType::GENERIC_SONIC).c_str(), 5);
 			break;
@@ -124,9 +124,9 @@ namespace SUC::System
 		case 1:
 		{
 			//Play stage (night)
-			SequenceHelpers::loadStage(s_NextStage.c_str(), 0, false);
+			SequenceHelpers::LoadStage(s_NextStage.c_str(), 0, false);
 			if (!dontSetPlayerType)
-				SequenceHelpers::setPlayerType(PlayerType::CLASSIC_SONIC);
+				SequenceHelpers::SetPlayerType(PlayerType::CLASSIC_SONIC);
 			s_HubModeEnabled = 0;
 			DebugDrawText::log(std::format("[LLM] Loading Stage (Night) \"{}\" as {}", s_NextStage, (int)PlayerType::CLASSIC_SONIC).c_str(), 5);
 			break;
@@ -136,7 +136,7 @@ namespace SUC::System
 			//Go to capital (day)
 			loadCapital(s_NextStage, 0);
 			if (!dontSetPlayerType)
-				SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
+				SequenceHelpers::SetPlayerType(PlayerType::GENERIC_SONIC);
 			break;
 		}
 		case 3:
@@ -144,14 +144,14 @@ namespace SUC::System
 			//Go to capital (day)
 			loadCapital(s_NextStage, 1);
 			if (!dontSetPlayerType)
-				SequenceHelpers::setPlayerType(PlayerType::CLASSIC_SONIC);
+				SequenceHelpers::SetPlayerType(PlayerType::CLASSIC_SONIC);
 			break;
 		}
 		case 4:
 		{
-			SequenceHelpers::playEvent(s_NextEventScene.c_str(), ModuleFlow::Event);
+			SequenceHelpers::PlayEvent(s_NextEventScene.c_str(), ModuleFlow::Event);
 			if (!dontSetPlayerType)
-				SequenceHelpers::setPlayerType(PlayerType::GENERIC_SONIC);
+				SequenceHelpers::SetPlayerType(PlayerType::GENERIC_SONIC);
 			auto message = Sonic::Message::MsgSequenceEvent(5, 0);
 			Sonic::Sequence::Main::ProcessMessage(&message);
 			isMovieCutscene = false;
@@ -171,11 +171,11 @@ namespace SUC::System
 			PlayEventLuanne(SequenceHelpers::storySequenceInstance, 0, playEventRequest);
 
 			isMovieCutscene = true;
-			//SequenceHelpers::resetStorySequence();
+			//SequenceHelpers::ResetStorySequence();
 			auto message1 = Sonic::Message::MsgSequenceEvent(0, 7);
-			SequenceHelpers::changeModule(ModuleFlow::Event);
+			SequenceHelpers::ChangeModule(ModuleFlow::Event);
 			Sonic::Sequence::Main::ProcessMessage(&message1);
-			//SequenceHelpers::setPlayerType(0);
+			//SequenceHelpers::SetPlayerType(0);
 			SetGameParameters(s_NextStage, s_NextEventScene);
 			break;
 		}
@@ -190,14 +190,14 @@ namespace SUC::System
 		//	//EventQueue will play videos in order
 		//	TriggerSequenceEvents(data);
 		//	if(data.playerTypeOverride != -1)
-		//		SequenceHelpers::setPlayerType(data.playerTypeOverride);
+		//		SequenceHelpers::SetPlayerType(data.playerTypeOverride);
 		//	for (size_t i = index + 1; i < dataList.size(); i++)
 		//	{
 		//		if (dataList[i].type == 4 && dataList[i].immediate == false)
 		//		{
 		//			StageManager::LastSavedQueueIndex++;
 		//			DebugDrawText::log(std::format("[LLM] Queueing event \"{}\"", dataList[i].dataName).c_str(), 5);
-		//			SequenceHelpers::queueEvent(dataList[i].dataName.c_str());
+		//			SequenceHelpers::QueueEvent(dataList[i].dataName.c_str());
 		//		}
 		//		else
 		//			break;
@@ -218,7 +218,7 @@ namespace SUC::System
 		int flag = SUC::Project::GetFlagFromStage(*h);
 		stageToLoad = SUC::Project::s_WorldData.data[flag].data[stageIDPam].levelID.c_str();
 		lastStageID = stageToLoad;
-		SequenceHelpers::loadStage(stageToLoad);
+		SequenceHelpers::LoadStage(stageToLoad);
 		strcpy(*(char**)stageTerrainAddress, stageToLoad);
 	}
 	void CalculateNextStage()
@@ -259,7 +259,7 @@ namespace SUC::System
 			}
 			if (!skipCurrentQueueEvent)
 			{
-				LuaManager::onStageLoad();
+				LuaManager::OnStageLoad();
 			}
 			else
 			{
@@ -413,7 +413,7 @@ namespace SUC::System
 		{
 			std::string stageBef = StageManager::s_NextStage.c_str();
 			std::string evsBef = StageManager::s_NextEventScene.c_str();
-			LuaManager::onStageEnd();
+			LuaManager::OnStageEnd();
 			if (StageManager::s_NextStage == stageBef && StageManager::s_NextEventScene == evsBef)
 			{
 				loadCapital(etfHubName, 0);
@@ -437,7 +437,7 @@ namespace SUC::System
 		{
 			if (!stageEnded)
 			{
-				//SequenceHelpers::resetStorySequence();
+				//SequenceHelpers::ResetStorySequence();
 			}
 			stageEnded = true;
 			return;

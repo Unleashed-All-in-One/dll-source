@@ -69,7 +69,7 @@
 #include "System/EnemyTrigger.h"
 #include "System/MiniAudioHelper.h"
 #include "System/AspectRatioHelper.h"
-#include "System/ImguiInitializer.h"
+#include "System/ImGuiContextManager.h"
 #include "System/UpdateDirector.h"
 #include "SetObject/ObjectUtility.h"
 #include "System/SoundController.h"
@@ -80,7 +80,7 @@
 #include "System/StageManager.h"
 
 //Debug Menu
-#include "System/DebugMenu/Context.h"
+#include "System/DebugMenu/DebugMenuRenderer.h"
 #include "System/DebugMenu/ImguiManager.h"
 #include "System/DebugMenu/ImGuiTheme.h"
 #include "System/DebugMenu/SynchronizedObject.h"

@@ -1,7 +1,7 @@
 #pragma once
 namespace SUC::ImGuiMenu
 {
-	class ImguiInitializer
+	class ImGuiContextManager
 	{
 	public:
 		static void Initialize();

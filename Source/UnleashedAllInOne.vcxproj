@@ -160,7 +160,7 @@
     <ClCompile Include="System\AnimationSetPatcher.cpp" />
     <ClCompile Include="System\ArchiveTreePatcher.cpp" />
     <ClCompile Include="System\CSDCommon.cpp" />
-    <ClCompile Include="System\DebugMenu\Context.cpp" />
+    <ClCompile Include="System\DebugMenu\DebugMenuRenderer.cpp" />
     <ClCompile Include="System\DebugMenu\CsdImGui.cpp" />
     <ClCompile Include="System\DebugMenu\DDSTextureLoader11.cpp" />
     <ClCompile Include="System\DebugMenu\DDSTextureLoader9.cpp" />
@@ -193,7 +193,7 @@
     <ClCompile Include="System\DiscordGameSDK\user_manager.cpp" />
     <ClCompile Include="System\DiscordGameSDK\voice_manager.cpp" />
     <ClCompile Include="System\EnemyTrigger.cpp" />
-    <ClCompile Include="System\ImguiInitializer.cpp" />
+    <ClCompile Include="System\ImGuiContextManager.cpp" />
     <ClCompile Include="System\LetterboxHelper.cpp" />
     <ClCompile Include="System\StageManager.cpp" />
     <ClCompile Include="System\LuaManager.cpp" />
@@ -260,7 +260,7 @@
     <ClInclude Include="System\CrashHandler\MemoryStatus.h" />
     <ClInclude Include="System\CrashHandler\StackTrace.h" />
     <ClInclude Include="System\CSDCommon.h" />
-    <ClInclude Include="System\DebugMenu\Context.h" />
+    <ClInclude Include="System\DebugMenu\DebugMenuRenderer.h" />
     <ClInclude Include="System\DebugMenu\CsdImGui.h" />
     <ClInclude Include="System\DebugMenu\DDSTextureLoader11.h" />
     <ClInclude Include="System\DebugMenu\DDSTextureLoader9.h" />
@@ -297,7 +297,7 @@
     <ClInclude Include="System\DiscordGameSDK\user_manager.h" />
     <ClInclude Include="System\DiscordGameSDK\voice_manager.h" />
     <ClInclude Include="System\EnemyTrigger.h" />
-    <ClInclude Include="System\ImguiInitializer.h" />
+    <ClInclude Include="System\ImGuiContextManager.h" />
     <ClInclude Include="System\AspectRatioHelper.h" />
     <ClInclude Include="System\StageManager.h" />
     <ClInclude Include="System\Light.h" />

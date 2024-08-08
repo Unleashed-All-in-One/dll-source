@@ -7,6 +7,8 @@
 #define STAGE_LIST_FILE		"stage_list.json"
 #define ARCHIVE_LIST_FILE	"archivelist.json"
 #define QUEUE_LIST_FILE		"sequence.json"
+#define SAVE_FILE_NAME		"save.swa"
+#define LUA_FILE			"main.lua"
 #define CLIENT_ID			1248726119402967091
 
 //=========================================================

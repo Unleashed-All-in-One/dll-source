@@ -5,7 +5,7 @@ enum PlayerType : int
 	CLASSIC_SONIC = 1,
 	SUPER_SONIC = 2
 };
-enum ModuleFlow	
+enum ModuleFlow
 {
 	Unknown,
 	Boot,
@@ -25,100 +25,103 @@ enum ModuleFlow
 	DebugInit, //Used at game launch, if you draw debug text, it'll display the "Thank you for patience" message
 	Save
 };
-
-class LuaStringEntry {
-	BYTE gap0[4];
-public:
-	const char* content;
-	//thanks skyth
-	char* allocateStr(const char* value)
-	{
-		char* allocatedStr = (char*)__HH_ALLOC(strlen(value) + 1);
-		strcpy(allocatedStr, value);
-		return allocatedStr;
-	}
-	LuaStringEntry(const char* integer, bool allocate = true)
-	{
-		content = allocate ? allocateStr(integer) : integer;
-	}
-};
-
-class LuaStringEntryContainer
+namespace SUC::System
 {
-public:
-	void* unknown;
-	LuaStringEntry* entry;
-	LuaStringEntryContainer(const char* content, bool allocate = true)
+	class LuaStringEntry {
+		BYTE gap0[4];
+	public:
+		const char* content;
+		//thanks skyth
+		char* allocateStr(const char* value)
+		{
+			char* allocatedStr = (char*)__HH_ALLOC(strlen(value) + 1);
+			strcpy(allocatedStr, value);
+			return allocatedStr;
+		}
+		LuaStringEntry(const char* integer, bool allocate = true)
+		{
+			content = allocate ? allocateStr(integer) : integer;
+		}
+	};
+
+	class LuaStringEntryContainer
 	{
-		LuaStringEntry* newEntry = new LuaStringEntry(content, allocate);
-		entry = newEntry;
-	}
-};
+	public:
+		void* unknown;
+		LuaStringEntry* entry;
+		LuaStringEntryContainer(const char* content, bool allocate = true)
+		{
+			LuaStringEntry* newEntry = new LuaStringEntry(content, allocate);
+			entry = newEntry;
+		}
+	};
 
 
-class LuaIntegerEntry {
-	BYTE gap0[4];
-public:
-	uint32_t content;
-	LuaIntegerEntry(uint32_t integer)
+	class LuaIntegerEntry {
+		BYTE gap0[4];
+	public:
+		uint32_t content;
+		LuaIntegerEntry(uint32_t integer)
+		{
+			content = integer;
+		}
+	};
+	class LuaIntegerEntryContainer
 	{
-		content = integer;
-	}
-};
-class LuaIntegerEntryContainer
-{
-public:
-	void* unknown;
-	LuaIntegerEntry* entry;
+	public:
+		void* unknown;
+		LuaIntegerEntry* entry;
 
-	LuaIntegerEntryContainer(uint32_t integerContent)
+		LuaIntegerEntryContainer(uint32_t integerContent)
+		{
+			LuaIntegerEntry newEntry = LuaIntegerEntry(integerContent);
+			entry = &newEntry;
+		}
+	};
+	class LuaStringIntegerEntryContainer
 	{
-		LuaIntegerEntry newEntry = LuaIntegerEntry(integerContent);
-		entry = &newEntry;
-	}
-};
-class LuaStringIntegerEntry {
-	BYTE gap0[4];
-public:
-	Hedgehog::Base::CSharedString content;
-	LuaIntegerEntry* content2;
-	//thanks skyth
-	/*char* allocateStr(const char* value)
-	{
-		char* allocatedStr = (char*)__HH_ALLOC(strlen(value) + 1);
-		strcpy(allocatedStr, value);
-		return allocatedStr;
-	}*/
-	LuaStringIntegerEntry(Hedgehog::Base::CSharedString const& integer, int integer2)
-	{
-		content = integer;
-		content2 = new LuaIntegerEntry(integer2);
-	}
-};
-class LuaStringIntegerEntryContainer
-{
-public:
-	BYTE gap0[4];
-	LuaStringIntegerEntry* entry;
+	public:
+		class LuaStringIntegerEntry
+		{
+			BYTE gap0[4];
+		public:
+			Hedgehog::Base::CSharedString content;
+			LuaIntegerEntry* content2;
+			//thanks skyth
+			/*char* allocateStr(const char* value)
+			{
+				char* allocatedStr = (char*)__HH_ALLOC(strlen(value) + 1);
+				strcpy(allocatedStr, value);
+				return allocatedStr;
+			}*/
+			LuaStringIntegerEntry(Hedgehog::Base::CSharedString const& integer, int integer2)
+			{
+				content = integer;
+				content2 = new LuaIntegerEntry(integer2);
+			}
+		};
+		BYTE gap0[4];
+		LuaStringIntegerEntry* entry;
 
-	LuaStringIntegerEntryContainer(const char* stringContent, int integerContent)
+		LuaStringIntegerEntryContainer(const char* stringContent, int integerContent)
+		{
+			LuaStringIntegerEntry newEntry1 = LuaStringIntegerEntry(stringContent, integerContent);
+			entry = &newEntry1;
+		}
+	};
+	class SequenceHelpers
 	{
-		LuaStringIntegerEntry newEntry1 = LuaStringIntegerEntry(stringContent, integerContent);
-		entry = &newEntry1;
-	}
-};
-class SequenceHelpers
-{
-public:
+	public:
+		static void ResetStorySequence();
+		static void ChangeModule(ModuleFlow in_Flow);
+		static void PlayEvent(const char* in_EventName, ModuleFlow in_EventModule);
+		static void QueueEvent(const char* in_EventName);
+		static void LoadStage(const char* in_StageName, int sequenceEventExtra = 0, bool resetStorySequence = true);
+		static void SetPlayerType(int in_PlayerType, bool forced = true);
+		static void RegisterHooks();
+		static void Update();
+		static std::string GetCurrentStageName(bool withoutNumber);
 
-	static Sonic::Sequence::Story* storySequenceInstance;
-	static void resetStorySequence();
-	static void changeModule(ModuleFlow in_Flow);
-	static void playEvent(const char* in_EventName, ModuleFlow in_EventModule);
-	static void queueEvent(const char* in_EventName);
-	static void loadStage(const char* in_StageName, int sequenceEventExtra = 0, bool resetStorySequence = true);
-	static void setPlayerType(int in_PlayerType, bool forced = true);
-	static void applyPatches();
-	static std::string getCurrentStageName(bool withoutNumber);
-	static void Update();
-};
+		static Sonic::Sequence::Story* storySequenceInstance;
+	};
+}

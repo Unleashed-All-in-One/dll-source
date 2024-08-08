@@ -180,7 +180,7 @@ namespace SUC::UI::TitleScreen
 		case 4:
 		{
 			System::StageManager::s_LoadingReplacementEnabled = true;
-			SequenceHelpers::loadStage("pla201");
+			System::SequenceHelpers::LoadStage("pla201");
 			break;
 		}
 		}

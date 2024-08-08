@@ -159,11 +159,11 @@ namespace SUC::UI::TitleScreen
 	{
 		Title::ShowLoadingTransition(false);
 		System::StageManager::s_InStoryMode = true;
-		SaveManager::deleteSave();
-		auto save = SaveManager::getCurrentSave();
-		save->lives = 5;
+		System::SaveManager::DeleteSave();
+		auto save = System::SaveManager::GetCurrentSave();
+		save->m_Lives = 5;
 		UnleashedHUD_API::StartFadeout();
-		//SaveManager::saveToDisk();
+		//SaveManager::SaveToDisk();
 	}
 	//void __declspec(naked) TitleUI_SetCustomExecFunctionAdvance()
 	//{
@@ -354,7 +354,7 @@ namespace SUC::UI::TitleScreen
 		isInSubmenu = false;
 		if (!parsedSave)
 		{
-			auto saveObject = SaveManager::getCurrentSave(false);
+			auto saveObject = System::SaveManager::GetCurrentSave(false);
 			hasSavefile = saveObject != nullptr;
 			currentTitleIndex = hasSavefile ? Title::ETitleIndexState::Continue : Title::ETitleIndexState::New_Game;
 			UpdateTitleText();
@@ -532,8 +532,8 @@ namespace SUC::UI::TitleScreen
 			{
 				if (UnleashedHUD_API::IsLoadingFadeoutCompleted())
 				{
-					SequenceHelpers::loadStage(System::StageManager::GetStageToLoad());
-					SequenceHelpers::setPlayerType(GENERIC_SONIC);
+					System::SequenceHelpers::LoadStage(System::StageManager::GetStageToLoad());
+					System::SequenceHelpers::SetPlayerType(GENERIC_SONIC);
 					canLoad = 0;
 				}
 			}
@@ -1017,7 +1017,7 @@ namespace SUC::UI::TitleScreen
 				CSDCommon::PlayAnimation(rcTitleMenuTXT, "Intro_Anim_3", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, true);
 				rcTitleProgressbar->SetHideFlag(true);
 				TitleUI_TinyChangeState(TitleState, spOutState, "SelectMenu");
-				SaveManager::GenerationsSave();
+				System::SaveManager::GenerationsSave();
 
 				Common::PlaySoundStaticCueName(optionsHandle, "sys_worldmap_cansel");
 				return;

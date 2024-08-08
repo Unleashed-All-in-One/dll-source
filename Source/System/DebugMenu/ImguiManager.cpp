@@ -28,13 +28,13 @@ void customStageLoad()
 	//auto message2 = Sonic::Message::MsgStorySequenceEvent(0, 0);
 	//auto test = Sonic::Sequence::Main::GetInstance();
 	//void __thiscall StorySeqProcessStorySequenceEvent(int storySequence, CMsgStorySequenceEvent *storySequenceEvent)
-	//SequenceHelpers::resetStorySequence();
+	//SequenceHelpers::ResetStorySequence();
 
 	//FUNCTION_PTR(void, __thiscall, StorySeqProcessStorySequenceEvent, 0x00D76980, Sonic::Sequence::Story * StorySeq, Sonic::Message::MsgStorySequenceEvent * a2);
 	//auto message2 = Sonic::Message::MsgStorySequenceEvent(1, 1);
 	//StorySeqProcessStorySequenceEvent(Sonic::Sequence::Story::GetInstance(), &message2);
 	//Sonic::Sequence::Main::ProcessMessage(&message);
-	SequenceHelpers::loadStage(_strdup(temp.c_str()), 0, false);
+	SUC::System::SequenceHelpers::LoadStage(_strdup(temp.c_str()), 0, false);
 	
 	SUC::System::StageManager::s_NextStage = temp;
 }

@@ -51,10 +51,10 @@ HOOK(void, __fastcall, CHudSonicStageDelayProcessImpEXP, 0x109A8D0, Sonic::CGame
 	exp_count = rcExp->CreateScene("exp_count");
 	exp_count->SetPosition(0, 0);
 	CSDCommon::FreezeMotion(exp_count);
-	if (SaveManager::getCurrentSave() != nullptr)
+	if (SUC::System::SaveManager::GetCurrentSave() != nullptr)
 	{
-		expProgress = SaveManager::getCurrentSave()->getSaveBoolKeyValue("EXPProgress");
-		expLevel = SaveManager::getCurrentSave()->getSaveBoolKeyValue("EXPLevel");
+		expProgress = SUC::System::SaveManager::GetCurrentSave()->GetSaveBoolKeyValue("EXPProgress");
+		expLevel = SUC::System::SaveManager::GetCurrentSave()->GetSaveBoolKeyValue("EXPLevel");
 	}
 	if (expLevel > 99)
 		expLevel = 99;
@@ -182,10 +182,10 @@ void EXPCollect::removeEXPCollect(Sonic::CGameObject* exp)
 {
 	expCache.erase(std::find(expCache.begin(), expCache.end(), exp));
 }
-//if (SaveManager::getCurrentSave() != nullptr)
+//if (SaveManager::GetCurrentSave() != nullptr)
 //{
-//	SaveManager::getCurrentSave()->keysFloat.push_back(new KeyFloat("EXPProgress", expProgress));
-//	SaveManager::getCurrentSave()->keysFloat.push_back(new KeyFloat("EXPLevel", expLevel));
+//	SaveManager::GetCurrentSave()->keysFloat.push_back(new KeyFloat("EXPProgress", expProgress));
+//	SaveManager::GetCurrentSave()->keysFloat.push_back(new KeyFloat("EXPLevel", expLevel));
 //}
 #pragma endregion
 void EXPCollect::applyPatches()
