@@ -1,11 +1,14 @@
 
 #include "SpeedDownCollision.h"
-BB_SET_OBJECT_MAKE_HOOK(SpeedDownCollision);
-
-ItemboxUI* SpeedDownCollision::m_ItemBoxUI;
-
-void SpeedDownCollision::registerObject()
+namespace SUC::SetObject
 {
-    WRITE_STRING(0x01610E10, "GensSpeedDown");
-    BB_INSTALL_SET_OBJECT_MAKE_HOOK(SpeedDownCollision)
+    BB_SET_OBJECT_MAKE_HOOK(SpeedDownCollision);
+
+    ItemboxUI* SpeedDownCollision::m_ItemBoxUI;
+
+    void SpeedDownCollision::RegisterObject()
+    {
+        WRITE_STRING(0x01610E10, "GensSpeedDown");
+        BB_INSTALL_SET_OBJECT_MAKE_HOOK(SpeedDownCollision)
+    }
 }

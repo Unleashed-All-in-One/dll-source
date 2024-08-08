@@ -244,10 +244,10 @@ namespace SUC::System
 				stageToLoad = StageManager::GetStageToLoad();
 			}
 			SUC::UI::TitleScreen::TitleWorldMap::s_IsActive = false;
-			if (!StageManager::s_NextStage.empty())
+			/*if (!StageManager::s_NextStage.empty())
 			{
 				stageToLoad = _strdup(StageManager::s_NextStage.c_str());
-			}
+			}*/
 			StageManager::SetGameParameters(stageToLoad, "Stage");
 		}
 		else

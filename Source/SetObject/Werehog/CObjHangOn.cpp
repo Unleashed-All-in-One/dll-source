@@ -1,8 +1,11 @@
 #include "CObjHangOn.h"
-BB_SET_OBJECT_MAKE_HOOK(CObjHangOn);
-
-
-void CObjHangOn::registerObject()
+namespace SUC::SetObject
 {
-    BB_INSTALL_SET_OBJECT_MAKE_HOOK(CObjHangOn)
+    BB_SET_OBJECT_MAKE_HOOK(CObjHangOn);
+
+
+    void CObjHangOn::RegisterObject()
+    {
+        BB_INSTALL_SET_OBJECT_MAKE_HOOK(CObjHangOn)
+    }
 }

@@ -1,7 +1,10 @@
 #include "Icicle.h"
-BB_SET_OBJECT_MAKE_HOOK(Icicle);
-
-void Icicle::registerObject()
+namespace SUC::SetObject
 {
-    BB_INSTALL_SET_OBJECT_MAKE_HOOK(Icicle)
+    BB_SET_OBJECT_MAKE_HOOK(Icicle);
+
+    void Icicle::RegisterObject()
+    {
+        BB_INSTALL_SET_OBJECT_MAKE_HOOK(Icicle)
+    }
 }

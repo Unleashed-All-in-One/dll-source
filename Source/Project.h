@@ -104,6 +104,7 @@ namespace SUC
 		static Hedgehog::Math::CVector s_TempArmswingNode;
 		static std::vector<std::string> s_GenerationsStages;
 		static ArchiveTreeDefinitions s_AdditionalArchiveTree;
+		static float s_DeltaTo60;
 
 		static std::map<const char*, const char*> s_IncompatibleMods;
 	};

@@ -1,9 +1,10 @@
 #pragma once
 namespace SUC::Gameplay
 {
-	class QSSRestore
+	class DriftOnB
 	{
 	public:
 		static void RegisterHooks();
+		static bool CheckForBDrift();
 	};
 }

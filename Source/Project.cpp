@@ -2,9 +2,9 @@
 #include "Gameplay\GameplayHookContainer.h"
 #include "Accuracy\AccuracyHookContainer.h"
 #include "SetObject\SetObjectHookContainer.h"
+#include "UI/UIHookContainer.h"
 #include "System\SystemHookContainer.h"
 #include "Testing/TestingCode.h"
-#include "UI/UIHookContainer.h"
 
 namespace SUC
 {
@@ -24,6 +24,7 @@ namespace SUC
 	Hedgehog::Math::CVector			Project::s_TempArmswingNode;
 	std::vector<std::string>		Project::s_GenerationsStages;
 	Project::ArchiveTreeDefinitions Project::s_AdditionalArchiveTree;
+	float							Project::s_DeltaTo60;
 
 
 	float Project::ms_DeltaTime = 0.0f;
@@ -38,6 +39,7 @@ namespace SUC
 	};
 	HOOK(void*, __fastcall, Project_UpdateApplication, 0xE7BED0, void* This, void* Edx, float elapsedTime, uint8_t a3)
 	{
+		Project::s_DeltaTo60 = elapsedTime / (1.0f / 60.0f);
 		CSDCommon::Update();
 		void* returnVal = originalProject_UpdateApplication(This, Edx, elapsedTime, a3);
 		auto time = std::chrono::high_resolution_clock::now();

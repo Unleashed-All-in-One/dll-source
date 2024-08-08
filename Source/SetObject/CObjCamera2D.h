@@ -61,7 +61,7 @@ public:
     int m_Field138;
     boost::shared_ptr<Sonic::Message::MsgGetCameraDefaultFovy> m_spMsgGetCameraDefaultFovy;
     SCamParams2D m_Params;
-    static void registerObject();
+    static void RegisterObject();
 };
 BB_SET_OBJECT_MAKE_HOOK(CObjCamera2D)
 BB_ASSERT_OFFSETOF(CObjCamera2D, m_Params, 0x150);

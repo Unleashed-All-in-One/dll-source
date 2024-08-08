@@ -1,18 +1,20 @@
 #pragma once
 #include "AccuracyPatches.h"
-#include "EXP.h"
+#include "ExperienceObject.h"
 #include "FallCam.h"
 #include "PauseBgm.h"
-#include "RingEnergy.h"
+#include "RampParticle.h"
+#include "SwingPole.h"
 
 namespace SUC::Hooks
 {
 	static void InstallAccuracyHooks()
 	{
-		AccuracyPatches::applyPatches();
-		PauseBgm::applyPatches();
-		FallCam::applyPatches();
-		RingEnergy::applyPatches();
-		EXPCollect::applyPatches();
+		Accuracy::AccuracyPatches::RegisterHooks();
+		Accuracy::PauseBgm::RegisterHooks();
+		Accuracy::FallCam::RegisterHooks();
+		Accuracy::ExperienceObject::RegisterHooks();
+		Accuracy::RampParticle::RegisterHooks();
+		Accuracy::SwingPole::RegisterHooks();
 	}
 }

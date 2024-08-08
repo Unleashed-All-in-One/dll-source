@@ -1,7 +1,7 @@
 #pragma once
-namespace SUC::Gameplay
+namespace SUC::Accuracy
 {
-	class QSSRestore
+	class RampParticle
 	{
 	public:
 		static void RegisterHooks();

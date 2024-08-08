@@ -19,20 +19,20 @@ namespace SUC::Hooks
 {
 	static void InstallSetObjectHooks()
 	{
-		WerehogPole::registerObject();
-		ETFTimeSwitch::registerObject();
-		Hintring::registerObject();
-		Paraloop::registerObject();
-		SpeedDownCollision::registerObject();
-		ETFStageGate::registerObject();
-		MoonMedal::registerObject();
-		EvilEnemyReckless::registerObject();
-		EvilLiftDoor::registerObject();
-		Icicle::registerObject();
-		Pelican::registerObject();
-		IrremovableMobMykonos::registerObject();
-		StompingSwitch::registerObject();
-		CObjHangOn::registerObject();
+		SetObject::WerehogPole::RegisterObject();
+		SetObject::ETFTimeSwitch::RegisterObject();
+		SetObject::Hintring::RegisterObject();
+		SetObject::Paraloop::RegisterObject();
+		SetObject::SpeedDownCollision::RegisterObject();
+		SetObject::ETFStageGate::RegisterObject();
+		SetObject::MoonMedal::RegisterObject();
+		SetObject::EvilEnemyReckless::RegisterObject();
+		SetObject::EvilLiftDoor::RegisterObject();
+		SetObject::Icicle::RegisterObject();
+		SetObject::Pelican::RegisterObject();
+		SetObject::IrremovableMobMykonos::RegisterObject();
+		SetObject::StompingSwitch::RegisterObject();
+		SetObject::CObjHangOn::RegisterObject();
 		BB_INSTALL_SET_OBJECT_MAKE_HOOK(CObjCamera2D);
 	}
 }

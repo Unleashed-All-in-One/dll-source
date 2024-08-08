@@ -1,6 +1,9 @@
 #include "EvilEnemyReckless.h"
-BB_SET_OBJECT_MAKE_HOOK(EvilEnemyReckless);
-void EvilEnemyReckless::registerObject()
+namespace SUC::SetObject
 {
-    BB_INSTALL_SET_OBJECT_MAKE_HOOK(EvilEnemyReckless)
+    BB_SET_OBJECT_MAKE_HOOK(EvilEnemyReckless);
+    void EvilEnemyReckless::RegisterObject()
+    {
+        BB_INSTALL_SET_OBJECT_MAKE_HOOK(EvilEnemyReckless)
+    }
 }

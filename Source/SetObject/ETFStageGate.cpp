@@ -1,9 +1,12 @@
 #include "ETFStageGate.h"
-BB_SET_OBJECT_MAKE_HOOK(ETFStageGate);
-
-
-ETFStageGateUIContainer* ETFStageGate::containerUI;
-void ETFStageGate::registerObject()
+namespace SUC::SetObject
 {
-    BB_INSTALL_SET_OBJECT_MAKE_HOOK(ETFStageGate)
+    BB_SET_OBJECT_MAKE_HOOK(ETFStageGate);
+
+
+    ETFStageGateUIContainer* ETFStageGate::containerUI;
+    void ETFStageGate::RegisterObject()
+    {
+        BB_INSTALL_SET_OBJECT_MAKE_HOOK(ETFStageGate)
+    }
 }

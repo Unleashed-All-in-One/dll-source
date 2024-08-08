@@ -1,8 +1,9 @@
 #pragma once
-class AccuracyPatches
+namespace SUC::Accuracy
 {
-
-public:
-	static void applyPatches();
-	
-};
+	class AccuracyPatches
+	{
+	public:
+		static void RegisterHooks();
+	};
+}

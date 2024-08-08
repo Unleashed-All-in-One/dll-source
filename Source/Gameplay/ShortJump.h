@@ -1,9 +1,12 @@
 #pragma once
-class ShortJump
+namespace SUC::Gameplay
 {
-public:
-    static void applyPatches();
+	class ShortJump
+	{
+	public:
+		static void RegisterHooks();
 
-    static inline float hurdleTime = 0.75f;
-    static inline float jumpTime = 0.15f;
-};
+		static inline float s_HurdleTime = 0.75f;
+		static inline float s_JumpTime = 0.15f;
+	};
+}

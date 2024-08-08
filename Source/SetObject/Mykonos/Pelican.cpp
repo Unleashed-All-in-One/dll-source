@@ -1,6 +1,9 @@
 #include "Pelican.h"
-BB_SET_OBJECT_MAKE_HOOK(Pelican);
-void Pelican::registerObject()
+namespace SUC::SetObject
 {
-    BB_INSTALL_SET_OBJECT_MAKE_HOOK(Pelican)
+    BB_SET_OBJECT_MAKE_HOOK(Pelican);
+    void Pelican::RegisterObject()
+    {
+        BB_INSTALL_SET_OBJECT_MAKE_HOOK(Pelican)
+    }
 }

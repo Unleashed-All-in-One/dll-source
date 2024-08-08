@@ -1,6 +1,9 @@
 #include "IrremovableMobMykonos.h"
-BB_SET_OBJECT_MAKE_HOOK(IrremovableMobMykonos);
-void IrremovableMobMykonos::registerObject()
+namespace SUC::SetObject
 {
-    BB_INSTALL_SET_OBJECT_MAKE_HOOK(IrremovableMobMykonos)
+    BB_SET_OBJECT_MAKE_HOOK(IrremovableMobMykonos);
+    void IrremovableMobMykonos::RegisterObject()
+    {
+        BB_INSTALL_SET_OBJECT_MAKE_HOOK(IrremovableMobMykonos)
+    }
 }
