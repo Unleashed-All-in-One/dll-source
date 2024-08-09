@@ -5,6 +5,7 @@
 #include "PauseBgm.h"
 #include "RampParticle.h"
 #include "SwingPole.h"
+#include "Whip.h"
 
 namespace SUC::Hooks
 {
@@ -16,5 +17,6 @@ namespace SUC::Hooks
 		Accuracy::ExperienceObject::RegisterHooks();
 		Accuracy::RampParticle::RegisterHooks();
 		Accuracy::SwingPole::RegisterHooks();
+		Accuracy::Whip::RegisterHooks();
 	}
 }

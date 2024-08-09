@@ -152,7 +152,6 @@ namespace SUC::Accuracy
 			float durationOfStep1 = 1;
 			float duration1 = 2;
 			float duration2 = 2.5f;
-			Sonic::CParamTypeList
 			float distance = abs((m_Position - context->m_spMatrixNode->m_Transform.m_Position).norm());
 			m_Angle += 0.15f * deltaTimeFixed;
 			m_Rotation = ObjectUtility::QuaternionFromAngleAxisUtil(m_Angle, CVector(0, 1, 0));

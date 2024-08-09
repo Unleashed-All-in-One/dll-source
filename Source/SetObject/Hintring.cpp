@@ -1,5 +1,4 @@
 
-#define HINTSFILE_NAME_FORMAT "{0}\\disk\\Hints\\hints_{1}.json"
 #include "Hintring.h"
 namespace SUC::SetObject
 {

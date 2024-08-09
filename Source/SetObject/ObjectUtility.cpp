@@ -129,6 +129,12 @@ void ObjectUtility::AssignUVAnimation(const char* in_animationName,const boost::
 	fpGetTexCoordAnimData(motWrapper, texCoordAnimData, in_animationName, 0);
 	fpCreateUVAnim(in_spEffectMotionAll.get(), in_spModelData, texCoordAnimData);
 }
+void ObjectUtility::CreateModel(const std::string& in_ModelName, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase, boost::shared_ptr<hh::mr::CSingleElement>& in_spModelResult)
+{
+	hh::mr::CMirageDatabaseWrapper wrapper(in_spDatabase.get());
+	boost::shared_ptr<hh::mr::CModelData> spModelData = wrapper.GetModelData(in_ModelName.c_str(), 0);
+	in_spModelResult = boost::make_shared<hh::mr::CSingleElement>(spModelData);
+}
 void ObjectUtility::RegisterAnimations(const boost::shared_ptr<Hedgehog::Animation::CAnimationPose>& animPose, std::vector<SUC::NewAnimationData> anims, const boost::shared_ptr<hh::mr::CSingleElement>& model, Sonic::CAnimationStateMachine* stateMachine)
 {
 	std::vector<hh::anim::SMotionInfo> pEntries = std::vector<hh::anim::SMotionInfo>(0, {"",""});
@@ -156,4 +162,9 @@ void ObjectUtility::SetTransformScale(Hedgehog::Mirage::CTransform& in_Transform
 	rMatrix.col(0) /= (scale / in_Scale.x());
 	rMatrix.col(1) /= (scale / in_Scale.y());
 	rMatrix.col(2) /= (scale / in_Scale.z());
+}
+float ObjectUtility::GetAnimTime(Sonic::CAnimationStateMachine* in_AnimStateMachine)
+{
+	in_AnimStateMachine->Update(Hedgehog::Universe::SUpdateInfo(0,0, ""));
+	return in_AnimStateMachine->GetAnimationState(in_AnimStateMachine->GetCurrentState()->m_Name)->GetLocalTime();
 }

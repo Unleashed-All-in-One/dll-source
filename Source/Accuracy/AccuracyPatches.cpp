@@ -1,6 +1,9 @@
 #include "AccuracyPatches.h"
 namespace SUC::Accuracy
 {
+	const char* m_LastFloorName; //This simply exists to make the string stay alive for long enough to get used for the model
+
+
 	HOOK(void, __fastcall, ObjectPhysics_SetDamageType, 0xE9FD10, char* This, void* Edx, int a2, int a3, int a4)
 	{
 		originalObjectPhysics_SetDamageType(This, Edx, a2, a3, a4);
@@ -22,6 +25,11 @@ namespace SUC::Accuracy
 		}
 		ObjectUtility::DoWerehogArmHomingIfClose(This->m_spMatrixNodeTransform->m_Transform.m_Position, 5, a2->DeltaTime);
 		originalSonic_CObjIronPole_UpdateSerial(This, Edx, a2);
+	}
+	HOOK(void, __fastcall, CGameplayFlowStage_StateGoalFadeBefore_Update, 0xCFA5D0, uint32_t* This, void* Edx)
+	{
+		STAGEACT_FADEWAIT = 0.2f;
+		originalCGameplayFlowStage_StateGoalFadeBefore_Update(This, Edx);
 	}
 	std::string replace(const std::string& original, const std::string& from, const std::string& to) {
 		if (from.empty()) {
@@ -51,7 +59,6 @@ namespace SUC::Accuracy
 			return s;
 		}
 	}
-	const char* latestNameFloor;
 	const char* GetNewName(const char* in_ModelName)
 	{
 		auto gameParameter = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter;
@@ -71,8 +78,8 @@ namespace SUC::Accuracy
 		modelNameString = replace(modelNameString, "euc", stageIDName);
 		modelNameString = replace(modelNameString, "pla", stageIDName);
 		printf((modelNameString + "\n").c_str());
-		latestNameFloor = _strdup(modelNameString.c_str());
-		return latestNameFloor;
+		m_LastFloorName = _strdup(modelNameString.c_str());
+		return m_LastFloorName;
 	}
 	void __declspec(naked) ASM_ReplaceGeneralFloorModelName()
 	{
@@ -88,47 +95,16 @@ namespace SUC::Accuracy
 			jmp[pAddr]
 		}
 	}
-
-	//FUNCTION_PTR(int, __stdcall, AddEventColWrap,0x00D5E2A0,int a1, const char* symbol, int havokShape, int staticNum, Sonic::CMatrixNodeTransform* a5, volatile signed __int32* a6);
-	//void TestFloorFunc(Sonic::CGameObject3D *a1, const char* symbol, hk2010_2_0::hkpShape* havokShape, int staticNum, Sonic::CMatrixNodeTransform* a5, volatile signed __int32* a6)
-	//{
-	//	if(wrapper2)
-	//}
-	//void __declspec(naked) ASM_Test1()
-	//{
-	//	static uint32_t pAddr = 0x01008C9D;
-	//	static uint32_t Csharedstring = 0x006621A0;
-	//	__asm
-	//	{
-	//		call    hkpBoxShape; Call Procedure
-	//		mov     esi, eax
-	//		mov     eax, dword_1E0AFC0
-	//		push    eax
-	//		lea     ecx, [esp + 14Ch + var_130]; Load Effective Address
-	//		push    ecx
-	//		lea     edx, [esp + 150h + var_E0]; Load Effective Address
-	//		push    edx
-	//		push    ebx
-	//		mov[esp + 158h + var_130], esi
-	//		call    AddEventColWrap
-	//	}
-	//}
-	//
-	////int __thiscall sub_100A9B0(int this, _DWORD *a2)
-	//HOOK(int, __fastcall, GeneralFloor_InitializeEditParam, 0x100A9B0, int This, void* Edx, Sonic::CEditParam* in_Param)
-	//{
-	//	
-	//	return originalGeneralFloor_InitializeEditParam(This, Edx, in_Param);
-	//}
 	void AccuracyPatches::RegisterHooks()
 	{
-		//WRITE_JUMP(0x0100DFC5, ASM_Test1);
-		//INSTALL_HOOK(GeneralFloor_InitializeEditParam);
 		//Make IronPole swingable for the werehog
 		INSTALL_HOOK(Sonic_CObjIronPole_UpdateSerial);
 
 		//Set all ObjectPhysics to be the same type for the Werehog
 		INSTALL_HOOK(ObjectPhysics_SetDamageType);
+
+		//Make Result screen's white fade in the same way as Unleashed
+		INSTALL_HOOK(CGameplayFlowStage_StateGoalFadeBefore_Update);
 
 		//Makes Sonic's result animations work again for modern
 		WRITE_JUMP(0X00CFDBD5, 0x00CFD840);

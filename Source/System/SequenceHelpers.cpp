@@ -167,14 +167,14 @@ namespace SUC::System
 		Sonic::CGameActParameter* m_pGameActParameter;
 		Hedgehog::Base::CSharedString m_Field1A4;
 		Hedgehog::Base::CSharedString m_Field1A8;
-		Hedgehog::Base::CSharedString m_Field1AC;
+		Hedgehog::Base::CSharedString m_StageXmlData;
 		int m_Field1B0; //m_Field08 of SRequestModuleInfo
 		BB_INSERT_PADDING(0x8); // ? ? ?	
 	};
 	BB_ASSERT_OFFSETOF(CGameplayFlowStageAct, m_pStageLoaderXML, 400);
 	BB_ASSERT_OFFSETOF(CGameplayFlowStageAct, m_Field1A4, 0x1A4);
 	BB_ASSERT_OFFSETOF(CGameplayFlowStageAct, m_Field1A8, 0x1A8);
-	BB_ASSERT_OFFSETOF(CGameplayFlowStageAct, m_Field1AC, 0x1AC);
+	BB_ASSERT_OFFSETOF(CGameplayFlowStageAct, m_StageXmlData, 0x1AC);
 	BB_ASSERT_SIZEOF(CGameplayFlowStageAct, 0x1C0);
 	class CGameplayFlowStagePlayableMenu : public CGameplayFlowStageAct
 	{

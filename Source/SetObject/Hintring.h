@@ -24,6 +24,8 @@ namespace SUC::SetObject
         bool m_Cooldown = false;
         std::vector<SUC::NewAnimationData> animations;
         boost::shared_ptr<Sonic::CAnimationStateMachine> animationStateMachine;
+
+        Sonic::CParamTypeList* test;
         bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
         {
             const char* assetName = "cmn_obj_sk2_hintring";
@@ -157,6 +159,16 @@ namespace SUC::SetObject
                     }
                 }
             }
+        }
+        uint32_t temp;
+        Sonic::CParamTypeList* CreateParamString(uint32_t* pValue, const Hedgehog::Base::CSharedString& in_rName,
+                                                                      const Hedgehog::Base::CSharedString& in_rDescription, Sonic::CEditParam& editParam)
+        {
+	        Sonic::CParamTypeList* pParamTypeList = Sonic::CParamTypeList::Create(pValue, in_rDescription);
+            pParamTypeList->AddRef();
+            fCEditParamAddParamTypeList(&in_rName, &editParam, pParamTypeList);
+
+            return pParamTypeList;
         }
         void InitializeEditParam(Sonic::CEditParam& in_rEditParam) override
         {

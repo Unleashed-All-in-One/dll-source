@@ -106,6 +106,7 @@ namespace SUC::System
             s_ArchiveDependencies.push_back(ArchiveDependency("StageGate", { hubs[i] }));
         }
 
+        s_ArchiveDependencies.push_back(ArchiveDependency("Chip", { "SystemCommon" }));
         s_ArchiveDependencies.push_back(ArchiveDependency("UIFade", { "SystemCommon" }));
         s_ArchiveDependencies.push_back(ArchiveDependency("TailsEVRoot", { "ev041", "m1_03_1" }));
         s_ArchiveDependencies.push_back(ArchiveDependency("SonicEVRoot", { "ev041" }));

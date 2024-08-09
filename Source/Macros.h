@@ -11,6 +11,9 @@
 #define LUA_FILE			"main.lua"
 #define CLIENT_ID			1248726119402967091
 
+
+#define HINTSFILE_NAME_FORMAT "{0}\\disk\\Hints\\hints_{1}.json"
+
 //=========================================================
 // DebugDrawText (Parameter Editor) Colors
 //=========================================================
@@ -32,3 +35,8 @@
 	DebugDrawText::Color(1,0,0,1)
 #define TEXT_YELLOW \
 	DebugDrawText::Color(1,0.9f,0.016f,1)
+//=========================================================
+// DebugDrawText (Parameter Editor) Colors
+//=========================================================
+#define STAGEACT_FADEWAIT *(float*)0x01A426B4
+#define GOALCAMERA_OFFSET_RIGHT *(float*)0x01A48C7C

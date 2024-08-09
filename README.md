@@ -17,3 +17,5 @@ Mod that tries to recreate Sonic Unleashed on PC using Sonic Generations and Blu
 **Arguments:** any name but preferably `in_ArgumentName`
 
 If possible, organize functions so that exports are all in one place, hooks are all in one place, etc.
+If you need to access a variable from Generations or you need to add a constant for the mod, please define it as a macro in the Macros header
+Try to name your classes according to what they are in Unleashed (not mandatory)

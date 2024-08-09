@@ -20,4 +20,7 @@ public:
 	static void AssignUVAnimation(const char* in_animationName, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase, const boost::shared_ptr<Hedgehog::Mirage::CModelData>& in_spModelData, const boost::shared_ptr<hh::mot::CSingleElementEffectMotionAll>& in_spEffectMotionAll);
 	static bool IsResourceAvailableHKX(const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase, std::string in_assetName);
 	static bool IsResourceAvailableMODEL(const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase, std::string in_assetName);
+	static void CreateModel(const std::string& in_ModelName, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase, boost::shared_ptr<hh::mr::CSingleElement>& in_spModelResult);
+	static float GetAnimTime(Sonic::CAnimationStateMachine* in_AnimStateMachine);
+
 };
