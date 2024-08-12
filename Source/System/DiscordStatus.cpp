@@ -1,3 +1,5 @@
+#include "DiscordStatus.h"
+
 namespace SUC::System::Discord
 {
 	std::vector<DiscordStatus::EDiscordPresenceData> DiscordStatus::presenceData;

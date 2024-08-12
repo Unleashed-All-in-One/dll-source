@@ -206,6 +206,7 @@
     <ClCompile Include="UI\ETFStageGateUI.cpp" />
     <ClCompile Include="UI\EventViewer.cpp" />
     <ClCompile Include="UI\HudButtonGuide.cpp" />
+    <ClCompile Include="UI\HudStatus.cpp" />
     <ClCompile Include="UI\SubtitleUI.cpp" />
     <ClCompile Include="UI\Title.cpp" />
     <ClCompile Include="UI\TitleWorldMap.cpp" />
@@ -314,6 +315,7 @@
     <ClInclude Include="UI\ETFStageGateUI.h" />
     <ClInclude Include="UI\EvilQTEUI.h" />
     <ClInclude Include="UI\HudButtonGuide.h" />
+    <ClInclude Include="UI\HudStatus.h" />
     <ClInclude Include="UI\ItemboxUI.h" />
     <ClInclude Include="UI\HelpCaptionUI.h" />
     <ClInclude Include="Testing\TestingCode.h" />

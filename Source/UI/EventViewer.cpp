@@ -1,5 +1,5 @@
 #include "EventViewer.h"
-
+#include "../System/MiniAudioHelper.h"
 #include <rapidxml/rapidxml_utils.hpp>
 
 using namespace rapidxml;

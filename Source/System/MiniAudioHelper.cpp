@@ -1,3 +1,5 @@
+#include "MiniAudioHelper.h"
+
 struct AudioData {
     std::string cueName;
     SoLoud::Wav* source;

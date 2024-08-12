@@ -93,8 +93,7 @@ namespace SUC::Accuracy
 		m_AnimatorPose->Update(in_rUpdateInfo.DeltaTime);
         FUNCTION_PTR(void, __thiscall, fpUpdateMotionAll, 0x752F00, Hedgehog::Motion::CSingleElementEffectMotionAll * This, float dt);
 
-        fpUpdateMotionAll(m_spEffectMotionAll.get(), in_rUpdateInfo.DeltaTime);
-		float m_AnimTime = ObjectUtility::GetAnimTime(this);
+       float m_AnimTime = ObjectUtility::GetAnimTime(this);
 		DebugDrawText::log(SUC::Format("CHIP: %.3f", m_AnimTime), 0);
         if(m_ExecutingStartAnim)
         {
@@ -109,7 +108,8 @@ namespace SUC::Accuracy
             m_spMatrixNodeTransform->m_Transform.SetRotation(Sonic::Player::CPlayerSpeedContext::GetInstance()->m_spMatrixNode->m_Transform.m_Rotation);
         	m_spMatrixNodeTransform->m_Transform.SetPosition(Sonic::Player::CPlayerSpeedContext::GetInstance()->m_spMatrixNode->m_Transform.m_Position);
             m_spMatrixNodeTransform->NotifyChanged();
-            
+            fpUpdateMotionAll(m_spEffectMotionAll.get(), in_rUpdateInfo.DeltaTime);
+
             if (m_AnimTime >= 3) // 100 frames
             {
                 ObjectUtility::AssignUVAnimation(SUC::Format("%s_eyeL", m_RankUVAnim.c_str()), m_Database, m_ModelData, Whip::m_spEffectMotionAll);
@@ -226,7 +226,6 @@ namespace SUC::Accuracy
             Whip::s_StartMode = Whip::Invalid;
             DebugDrawText::log("ERROR reading Sonic's position");
         }
-
         return originalParseStageStgXml(a1, a2, in_XmlData, in_XmlDataSize);
     }
     void Whip::RegisterHooks()
@@ -242,6 +241,4 @@ namespace SUC::Accuracy
         INSTALL_HOOK(MsgChangeResultState);
         INSTALL_HOOK(Whip_CGameplayFlowStage_CStateGoalBegin);
     }
-
-
 }

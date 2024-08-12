@@ -541,11 +541,15 @@ namespace SUC::System
 
 		return originalModuleStuffTest(a1, Edx, a2);
 	}
-	extern "C" __declspec(dllexport) int API_GetLoadingScreenMotionIndex()
+	struct SConversionLoadingInfo
 	{
-		uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
-		char** h = (char**)stageTerrainAddress;
-		std::string stageIDName = *h;
+		int LoadingType;
+		int MotionIndex;
+	};
+	extern "C" __declspec(dllexport) SConversionLoadingInfo API_GetLoadingScreenInfo()
+	{
+		SConversionLoadingInfo* returnedInfo = new SConversionLoadingInfo();
+		std::string stageIDName = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameter->TerrainArchiveName.c_str();
 		std::unordered_map<std::string, int> stageMap = {
 			{"Mykonos", 0}, {"Africa", 2}, {"Europe", 4}, {"China", 6},
 			{"Snow", 8}, {"Petra", 10}, {"NewYork", 12}, {"Beach", 14},
@@ -554,14 +558,21 @@ namespace SUC::System
 		std::string splitName = SplitString(stageIDName, '_').erase(0, 1);
 
 		// if the stage id is not any of the stages, return the mono pic
-		if (stageMap.find(splitName) == stageMap.end()) {
-			return 18;
+		if (stageMap.find(splitName) == stageMap.end()) 
+		{
+			returnedInfo->LoadingType = 2;
+			returnedInfo->MotionIndex = 18;
 		}
+		else
+		{
+			int indexOffset = (stageIDName[0] == 'N') ? 1 : 0; // add 1 if its werehog
+			std::string numberPart = stageIDName.substr(3 + indexOffset, 3);
 
-		int indexOffset = (stageIDName[0] == 'N') ? 1 : 0; // add 1 if its werehog
-		std::string numberPart = stageIDName.substr(3 + indexOffset, 3);
-
-		return stageMap[splitName] + indexOffset;
+			//Change with sequence
+			returnedInfo->LoadingType = 2;
+			returnedInfo->MotionIndex = stageMap[splitName] + indexOffset;			
+		}		
+		return *returnedInfo;
 	}
 	extern "C" __declspec(dllexport) bool API_IsEvent()
 	{

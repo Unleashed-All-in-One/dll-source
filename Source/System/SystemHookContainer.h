@@ -1,8 +1,10 @@
 #pragma once
-#include "AnimationSetPatcher.h"
 #include "ArchiveTreePatcher.h"
+#include "AspectRatioHelper.h"
 #include "EnemyTrigger.h"
 #include "SequenceHelpers.h"
+#include "UpdateDirector.h"
+#include "DiscordStatus.h"
 
 namespace SUC::Hooks
 {
@@ -17,7 +19,7 @@ namespace SUC::Hooks
 		ArchiveTreePatcher::RegisterHooks();
 		AnimationSetPatcher::RegisterHooks();
 		EnemyTrigger::RegisterHooks();
-		AspectRatioHelper::Initialize(1280, 720);
+		AspectRatioHelper::Initialize(1280, 720);		
 		//MiniAudioHelper::initialize(path.c_str());
 		Discord::DiscordStatus::Initialize();
 		SequenceHelpers::RegisterHooks();

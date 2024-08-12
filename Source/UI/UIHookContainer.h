@@ -5,6 +5,8 @@
 #include "EventViewer.h"
 #include "SubtitleUI.h"
 #include "HudButtonGuide.h"
+#include "HudStatus.h"
+
 namespace SUC::Hooks
 {
 	static void InstallUIHooks()
@@ -16,5 +18,6 @@ namespace SUC::Hooks
 		Event::EventViewer::RegisterHooks();
 		Event::SubtitleUI::RegisterHooks();
 		HudButtonGuide::RegisterHooks();
+		HudStatus::RegisterHooks();
 	}
 }

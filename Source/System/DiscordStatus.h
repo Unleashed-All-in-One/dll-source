@@ -20,11 +20,11 @@ namespace SUC::System::Discord
 			EStageType stageType;
 			std::string thumbnail = "icon";
 		};
-		static void Initialize();
 		static void ChangeInformationFromStageInfo(bool timestamp);
 		static void ChangeInformation(EDiscordPresenceData data);
 		static void UpdateActivityInformation();
 		static void Update();
+		static void Initialize();
 		static std::vector<EDiscordPresenceData> presenceData;
 		static inline std::string s_StageTypeText = "Day";
 		static inline std::string s_Thumbnail = "icon";

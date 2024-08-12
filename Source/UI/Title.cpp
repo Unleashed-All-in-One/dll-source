@@ -1,4 +1,6 @@
 ﻿#include "Title.h"
+#include "../System/MiniAudioHelper.h"
+#include "../System/AspectRatioHelper.h"
 
 #include "TitleWorldMap.h"
 

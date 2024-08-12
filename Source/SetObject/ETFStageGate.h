@@ -1,4 +1,5 @@
 #pragma once
+#include "../UI/ETFStageGateUI.h"
 using namespace hh::math;
 namespace SUC::SetObject
 {

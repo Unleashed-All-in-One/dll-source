@@ -95,6 +95,24 @@ namespace SUC::Accuracy
 			jmp[pAddr]
 		}
 	}
+	HOOK(void*, __fastcall, hhSoundHandleCtor, 0x762030, hh::Sound::CSoundHandle* This, void* Edx, float a2)
+	{
+		auto ret = originalhhSoundHandleCtor(This, Edx, a2);
+		//Add 15% more echo
+		This->SetEcho(This->GetEcho() + 0.05f);
+		return ret;
+	}
+	HOOK(bool, __stdcall, IsStageCompleted, 0x107ADC0, uint32_t stageID)
+	{
+		//TODO: Implement checking the save file.
+		return true;
+	}
+	//Used by HUDs
+	//Returns a ratio of how big the boost bar is. 0 is equal to the beginning of the game, 1 is the full Generations boost bar.
+	extern "C" __declspec(dllexport) float API_GetBoostSize()
+	{		
+		return 0.2f;
+	}
 	void AccuracyPatches::RegisterHooks()
 	{
 		//Make IronPole swingable for the werehog
@@ -105,6 +123,12 @@ namespace SUC::Accuracy
 
 		//Make Result screen's white fade in the same way as Unleashed
 		INSTALL_HOOK(CGameplayFlowStage_StateGoalFadeBefore_Update);
+
+		//Patch calls so that stages always appear as completed according to the SUC save file
+		INSTALL_HOOK(IsStageCompleted);
+
+		//Restores Unleashed's reverb/echo for sounds.
+		INSTALL_HOOK(hhSoundHandleCtor);
 
 		//Makes Sonic's result animations work again for modern
 		WRITE_JUMP(0X00CFDBD5, 0x00CFD840);

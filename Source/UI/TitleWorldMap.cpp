@@ -4,6 +4,8 @@
 //  Make all things related to title custom renderables instead of title renderables
 
 #include "TitleWorldMap.h"
+#include "../System/AspectRatioHelper.h"
+#include "../System/MiniAudioHelper.h"
 using namespace hh::math;
 
 namespace SUC::UI::TitleScreen

@@ -1,4 +1,5 @@
-﻿#include "UI/EventViewer.h"
+﻿#include "System/DiscordStatus.h"
+#include "UI/EventViewer.h"
 extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 {	
 	// Load configuration

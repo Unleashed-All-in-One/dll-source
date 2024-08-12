@@ -1,3 +1,5 @@
+#include "AspectRatioHelper.h"
+
 namespace SUC::System
 {
 	Hedgehog::Math::CVector2* AspectRatioHelper::Resolution;

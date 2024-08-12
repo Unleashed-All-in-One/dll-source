@@ -64,13 +64,8 @@
 #include "Temporary.h"
 
 //System
-#include "System/DiscordStatus.h"
 #include "System/AnimationSetPatcher.h"
-#include "System/EnemyTrigger.h"
-#include "System/MiniAudioHelper.h"
-#include "System/AspectRatioHelper.h"
 #include "System/ImGuiContextManager.h"
-#include "System/UpdateDirector.h"
 #include "SetObject/ObjectUtility.h"
 #include "System/SoundController.h"
 #include "System/CObjCamera.h"
@@ -86,8 +81,3 @@
 #include "System/DebugMenu/SynchronizedObject.h"
 #include "System/DebugMenu/TypesParamRemove.h"
 #include "System/DebugMenu/ImGuizmo.h"
-
-#include "UI/HelpCaptionUI.h"
-#include "UI/ItemboxUI.h"
-#include "UI/ETFStageGateUI.h"
-#include "UI/EvilQTEUI.h"
