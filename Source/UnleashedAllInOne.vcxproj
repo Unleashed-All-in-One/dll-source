@@ -118,6 +118,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Accuracy\GenericSonic.cpp" />
     <ClCompile Include="Accuracy\Whip.cpp" />
     <ClCompile Include="SetObject\CObjCamera2D.cpp" />
     <ClCompile Include="SetObject\DebugObject.cpp" />
@@ -165,7 +166,7 @@
     <ClCompile Include="System\DebugMenu\DDSTextureLoader11.cpp" />
     <ClCompile Include="System\DebugMenu\DDSTextureLoader9.cpp" />
     <ClCompile Include="System\DebugMenu\imgui.cpp" />
-    <ClCompile Include="System\DebugMenu\ImguiManager.cpp" />
+    <ClCompile Include="System\DebugMenu\DebugMenu.cpp" />
     <ClCompile Include="System\DebugMenu\ImGuiTheme.cpp" />
     <ClCompile Include="System\DebugMenu\ImGuizmo.cpp" />
     <ClCompile Include="System\DebugMenu\imgui_demo.cpp" />
@@ -214,6 +215,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Accuracy\AccuracyHookContainer.h" />
+    <ClInclude Include="Accuracy\GenericSonic.h" />
     <ClInclude Include="Accuracy\Whip.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\System\ApplicationDocument.h" />
     <ClInclude Include="Gameplay\GameplayHookContainer.h" />
@@ -267,7 +269,7 @@
     <ClInclude Include="System\DebugMenu\DDSTextureLoader9.h" />
     <ClInclude Include="System\DebugMenu\imconfig.h" />
     <ClInclude Include="System\DebugMenu\imgui.h" />
-    <ClInclude Include="System\DebugMenu\ImguiManager.h" />
+    <ClInclude Include="System\DebugMenu\DebugMenu.h" />
     <ClInclude Include="System\DebugMenu\ImGuiTheme.h" />
     <ClInclude Include="System\DebugMenu\ImGuizmo.h" />
     <ClInclude Include="System\DebugMenu\imgui_impl_dx11.h" />

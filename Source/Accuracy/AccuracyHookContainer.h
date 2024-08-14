@@ -2,6 +2,7 @@
 #include "AccuracyPatches.h"
 #include "ExperienceObject.h"
 #include "FallCam.h"
+#include "GenericSonic.h"
 #include "PauseBgm.h"
 #include "RampParticle.h"
 #include "SwingPole.h"
@@ -18,5 +19,6 @@ namespace SUC::Hooks
 		Accuracy::RampParticle::RegisterHooks();
 		Accuracy::SwingPole::RegisterHooks();
 		Accuracy::Whip::RegisterHooks();
+		Accuracy::GenericSonic::RegisterHooks();
 	}
 }

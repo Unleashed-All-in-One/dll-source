@@ -10,57 +10,49 @@ public:
 		{
 			struct Stat
 			{
-				const char* name = "";
-				int level = 0;
-				int maxLevel = 0;
+				enum EStatType
+				{
+					SPEED,
+					RING_ENAGY,
+					COMBAT,
+					STRENGTH,
+					LIFE,
+					UNLEASH,
+					SHIELD
+
+				};
+				EStatType m_Type;
+				int m_StatLevel = 0;
+				int m_MaximumLevel = 0;
 				int txt_num = 0;
-				int count = 0;
-				float levelProgress = 0.0f;
+				int m_EXPLevelsNeeded = 0;
+				float m_StatProgress = 0.0f;
 
-				Chao::CSD::RCPtr<Chao::CSD::CScene> m_tag_bg_2;
-				Chao::CSD::RCPtr<Chao::CSD::CScene> m_tag_txt_2;
-				Chao::CSD::RCPtr<Chao::CSD::CScene> m_prgs_bg_2;
-				Chao::CSD::RCPtr<Chao::CSD::CScene> m_prgs_bar_2;
-				Chao::CSD::RCPtr<Chao::CSD::CScene> m_prgs_num_2;
+				Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcBackgroundSlide;
+				Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcStatName;
+				Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcProgressBarBackground;
+				Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcProgressBar;
+				Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcLevelRequired;
 
-				void GenerateScenes(const Chao::CSD::RCPtr<Chao::CSD::CProject>& in_Project)
+				void Toggle(bool in_IsVisible)
 				{
-					m_tag_bg_2	=		in_Project->CreateScene("tag_bg_2");
-					m_tag_txt_2 =		in_Project->CreateScene("tag_txt_2");
-					m_prgs_bg_2 =		in_Project->CreateScene("prgs_bg_2");
-					m_prgs_num_2=		in_Project->CreateScene("prgs_num_2");
-					m_prgs_bar_2=		in_Project->CreateScene("prgs_bar_2");
-
-					m_tag_bg_2->SetHideFlag(true);
-					m_tag_txt_2->SetHideFlag(true);
-					m_prgs_bg_2->SetHideFlag(true);
-					m_prgs_num_2->SetHideFlag(true);
-					m_prgs_bar_2->SetHideFlag(true);
+					m_rcBackgroundSlide->SetHideFlag(!in_IsVisible);
+					m_rcStatName->SetHideFlag(!in_IsVisible);
+					m_rcProgressBarBackground->SetHideFlag(!in_IsVisible);
+					m_rcLevelRequired->SetHideFlag(!in_IsVisible);
+					m_rcProgressBar->SetHideFlag(!in_IsVisible);
 				}
-
-				const char* TextNumIntToString()
+				void GenerateScenes(const Chao::CSD::RCPtr<Chao::CSD::CProject>& in_Project, int index)
 				{
-					switch (txt_num)
-					{
-					case 1:
-						return "tag_txt_2";
-						break;
-					case 2:
-						return "tag_txt_3";
-						break;
-					case 3:
-						return "tag_txt_4";
-						break;
-					case 4:
-						return "tag_txt_5";
-						break;
-					case 5:
-						return "tag_txt_6";
-						break;
-					default:
-						return "tag_txt_2";
-						break;
-					}
+					char m_Scene[100];
+					sprintf(m_Scene, "tag_txt_%d", index);
+					m_rcBackgroundSlide = in_Project->CreateScene("tag_bg_2");
+					m_rcStatName = in_Project->CreateScene(m_Scene);
+					m_rcProgressBarBackground = in_Project->CreateScene("prgs_bg_2");
+					m_rcLevelRequired = in_Project->CreateScene("prgs_num_2");
+					m_rcProgressBar = in_Project->CreateScene("prgs_bar_2");
+
+					Toggle(false);
 				}
 			};
 			std::vector<Stat*> stats;
@@ -75,80 +67,94 @@ public:
 			Exit,
 		};
 
-		
 		EStatusState m_CurrentState;
-		SharedPtrTypeless wooshHandle;
-		SharedPtrTypeless selectHandle;
-		SharedPtrTypeless switchHandle;
-		Chao::CSD::RCPtr<Chao::CSD::CProject> m_rcStatus;
-		boost::shared_ptr<Sonic::CGameObjectCSD> m_spStatus;
-		Chao::CSD::RCPtr<Chao::CSD::CScene> m_status_title;
-		Chao::CSD::RCPtr<Chao::CSD::CScene> m_logo;
-		Chao::CSD::RCPtr<Chao::CSD::CScene> m_medal_info;
-		Chao::CSD::RCPtr<Chao::CSD::CScene> m_medal_s_gauge;
-		Chao::CSD::RCPtr<Chao::CSD::CScene> m_medal_m_gauge;
-		Chao::CSD::RCPtr<Chao::CSD::CScene> m_tag_bg_1;
-		Chao::CSD::RCPtr<Chao::CSD::CScene> m_tag_txt_1;
-		Chao::CSD::RCPtr<Chao::CSD::CScene> m_prgs_bg_1;
-		Chao::CSD::RCPtr<Chao::CSD::CScene> m_prgs_bar_1;
-		Chao::CSD::RCPtr<Chao::CSD::CScene> m_prgs_num_1;
-		Chao::CSD::RCPtr<Chao::CSD::CScene> m_decide_bg;
-		Chao::CSD::RCPtr<Chao::CSD::CScene> m_status_footer;
-		float timeFooter = 0.0f;
-		bool footerVisible = false;
-		float m_StatCreationDelay = 0.17f;
-		float y = 0.0f;
-		float m_DelayForStart = 0.0f;
-		float switchCooldown = 0.0f;
-		float EndDelay;
-		bool m_IsGoingToNextStage = false;
-		float m_DelayFirstSelect = -1;
-		float quitSoundTimer = 0.0f;
-		float medalSubImage = 0.0f;
-		SharedPtrTypeless soundEffect;
-		bool isWerehog = false;
-		int currentStatIndex = 0;
-		int previousStatIndex = 0;
-		int statusIndex = 0;
+
 		StatManager* statsDay;
 		StatManager* statsNight;
+
+		SharedPtrTypeless m_WooshSound;
+		SharedPtrTypeless m_SelectHandle;
+		SharedPtrTypeless m_SwitchHandle;
+		SharedPtrTypeless m_EndHandle;
+
+		boost::shared_ptr<Sonic::CGameObjectCSD> m_spStatus;
+		Chao::CSD::RCPtr<Chao::CSD::CProject> m_rcStatus;
+		Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcStatusTitle;
+		Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcCharacterBanner;
+		Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcMedalInfo;
+		Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcSunMedalGauge;
+		Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcMoonMedalGauge;
+		Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcTagBg1;
+		Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcTagTxt1;
+		Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcPrgsBg1;
+		Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcPrgsBar1;
+		Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcPrgsNum1;
+		Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcQuit;
+		Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcFooter;
+
+		float m_TimerFooter = 0.0f;
+		float m_TimerStatCreationDelay = 0.17f;
+		float m_TimerCharSwitchCooldown = 0.0f;
+		float m_TimerQuitSoundDelay = 0.0f;
+		float m_TimerDelayFirstSelect = -1;
+		float m_TimerDelayForStart = 0.0f;
+		float m_TimerEndDelay;
+
+		bool m_IsFooterActive = false;
+		bool m_IsGoingToNextStage = false;
+		bool m_IsWerehog = false;
+		bool m_IsSwitchingChara;
+
+		float m_YOffset = 0.0f;
+		float m_SwitchCooldownMax = 0.5f;
+
+		int medalSubImage = 0;
+		int m_CreatedStatIndex = 0;
+		int m_PreviousStatSelection = 0;
+		int m_CurrentStatSelection = 0;
+		bool m_PlayedFadeout;
+
 		const char* m_AnimIntro;
+
 		const char* GetStringWithPrefix(const char* format)
 		{
 			char buffer[100];
-			if (isWerehog)
+			if (m_IsWerehog)
 				sprintf(buffer, format, "ev");
 			else
 				sprintf(buffer, format, "so");
 			return buffer;
 		}
-		void Intro()
+		void Intro(bool in_isReset = true)
 		{
-			auto statsManager = isWerehog ? statsNight : statsDay;
+			auto statsManager = m_IsWerehog ? statsNight : statsDay;
 			m_AnimIntro = GetStringWithPrefix("Intro_%s_Anim");
-			m_prgs_num_1->GetNode("num")->SetText(std::to_string(statsManager->expLevel).c_str());
-			CSDCommon::PlayAnimation(m_tag_bg_1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
-			CSDCommon::PlayAnimation(m_tag_txt_1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
-			CSDCommon::PlayAnimation(m_prgs_bg_1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
-			CSDCommon::PlayAnimation(m_prgs_bar_1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
-			CSDCommon::PlayAnimation(m_prgs_num_1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
-			CSDCommon::PlayAnimation(m_decide_bg, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
-			CSDCommon::PlayAnimation(m_status_footer, "Usual_Anim_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
-			CSDCommon::PlayAnimation(m_status_title, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
-			CSDCommon::PlayAnimation(m_logo, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
-			CSDCommon::PlayAnimation(m_medal_info, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
-			CSDCommon::PlayAnimation(m_medal_s_gauge, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
-			CSDCommon::PlayAnimation(m_medal_m_gauge, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
+			m_rcPrgsNum1->GetNode("num")->SetText(std::to_string(statsManager->expLevel).c_str());
+			CSDCommon::PlayAnimation(m_rcTagBg1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 10.0);
+			CSDCommon::PlayAnimation(m_rcTagTxt1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 10.0);
+			CSDCommon::PlayAnimation(m_rcPrgsBg1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 10);
+			CSDCommon::PlayAnimation(m_rcPrgsBar1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 10.0);
+			CSDCommon::PlayAnimation(m_rcPrgsNum1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 10);
+			CSDCommon::PlayAnimation(m_rcQuit, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
+			CSDCommon::PlayAnimation(m_rcFooter, "Usual_Anim_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
+			CSDCommon::PlayAnimation(m_rcStatusTitle, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 2, 0.0);
+			CSDCommon::PlayAnimation(m_rcCharacterBanner, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
+			CSDCommon::PlayAnimation(m_rcMedalInfo, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
+			CSDCommon::PlayAnimation(m_rcSunMedalGauge, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
+			CSDCommon::PlayAnimation(m_rcMoonMedalGauge, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0.0);
 
-			medalSubImage = 0.0f;
-			timeFooter = 0.0f;
-			footerVisible = false;
-			m_DelayForStart = 0.75f;
-			currentStatIndex = 0;
-			statusIndex = 0;
-			y = 0.0f;
-			quitSoundTimer = 0.0f;
-			m_IsGoingToNextStage = false;
+			if (in_isReset)
+			{
+				medalSubImage = 0.0f;
+				m_TimerFooter = 0.0f;
+				m_IsFooterActive = false;
+				m_TimerDelayForStart = 0.75f;
+				m_CreatedStatIndex = 0;
+				m_CurrentStatSelection = 0;
+				m_YOffset = 0.0f;
+				m_TimerQuitSoundDelay = 0.0f;
+				m_IsGoingToNextStage = false;
+			}
 		}
 		static StatusNew* Generate(Sonic::CGameObject* Parent, bool isChainPr, int btnty)
 		{
@@ -160,44 +166,45 @@ public:
 			dataOut->Hide();
 			Parent->m_pMember->m_pGameDocument->AddGameObject(dataOut->m_spStatus = boost::make_shared<Sonic::CGameObjectCSD>(dataOut->m_rcStatus, 0.5f, "HUD", false), "main", Parent);
 			// Exp Bar
-			dataOut->m_tag_bg_1 = dataOut->m_rcStatus->CreateScene("tag_bg_1");
-			dataOut->m_tag_txt_1 = dataOut->m_rcStatus->CreateScene("tag_txt_1");
-			dataOut->m_prgs_bg_1 = dataOut->m_rcStatus->CreateScene("prgs_bg_1");
-			dataOut->m_prgs_bar_1 = dataOut->m_rcStatus->CreateScene("prgs_bar_1");
-			dataOut->m_prgs_num_1 = dataOut->m_rcStatus->CreateScene("prgs_num_1");
+			dataOut->m_rcTagBg1 = dataOut->m_rcStatus->CreateScene("tag_bg_1");
+			dataOut->m_rcTagTxt1 = dataOut->m_rcStatus->CreateScene("tag_txt_1");
+			dataOut->m_rcPrgsBg1 = dataOut->m_rcStatus->CreateScene("prgs_bg_1");
+			dataOut->m_rcPrgsBar1 = dataOut->m_rcStatus->CreateScene("prgs_bar_1");
+			dataOut->m_rcPrgsNum1 = dataOut->m_rcStatus->CreateScene("prgs_num_1");
 			// Quit Button               
-			dataOut->m_decide_bg = dataOut->m_rcStatus->CreateScene("decide_bg");
+			dataOut->m_rcQuit = dataOut->m_rcStatus->CreateScene("decide_bg");
 			// Bottom Buttons            
-			dataOut->m_status_footer = dataOut->m_rcStatus->CreateScene("status_footer");
+			dataOut->m_rcFooter = dataOut->m_rcStatus->CreateScene("status_footer");
 			// Header                    
-			dataOut->m_status_title = dataOut->m_rcStatus->CreateScene("status_title");
+			dataOut->m_rcStatusTitle = dataOut->m_rcStatus->CreateScene("status_title");
 			// Character Portrait       
-			dataOut->m_logo = dataOut->m_rcStatus->CreateScene("logo");
+			dataOut->m_rcCharacterBanner = dataOut->m_rcStatus->CreateScene("logo");
 			//Medals (Top Right)         
-			dataOut->m_medal_info = dataOut->m_rcStatus->CreateScene("medal_info");
-			dataOut->m_medal_s_gauge = dataOut->m_rcStatus->CreateScene("medal_s_gauge");
-			dataOut->m_medal_m_gauge = dataOut->m_rcStatus->CreateScene("medal_m_gauge");
-
-			StatManager::Stat* speed = new StatManager::Stat{ "speed", 9, 11, 1, 10 };
-			StatManager::Stat* ring_energy = new StatManager::Stat{ "ring_energy", 6, 6, 2, 0 };
-			StatManager::Stat* combat = new StatManager::Stat{ "combat", 0, 31, 1, 0 };
-			StatManager::Stat* strength = new StatManager::Stat{ "strength", 0, 11, 2, 0 };
-			StatManager::Stat* life = new StatManager::Stat{ "life", 0, 11, 3, 0 };
-			StatManager::Stat* unleash = new StatManager::Stat{ "unleash", 0, 11, 4, 0 };
-			StatManager::Stat* shield = new StatManager::Stat{ "shield", 0, 11, 5, 0 };
+			dataOut->m_rcMedalInfo = dataOut->m_rcStatus->CreateScene("medal_info");
+			dataOut->m_rcSunMedalGauge = dataOut->m_rcStatus->CreateScene("medal_s_gauge");
+			dataOut->m_rcMoonMedalGauge = dataOut->m_rcStatus->CreateScene("medal_m_gauge");
+			
+			StatManager::Stat* speed = new StatManager::Stat{ StatManager::Stat::SPEED, 9, 11, 1, 10 };
+			StatManager::Stat* ring_energy = new StatManager::Stat{ StatManager::Stat::RING_ENAGY, 6, 6, 2, 0 };
+			StatManager::Stat* combat = new StatManager::Stat{ StatManager::Stat::COMBAT, 0, 31, 1, 0 };
+			StatManager::Stat* strength = new StatManager::Stat{ StatManager::Stat::STRENGTH, 0, 11, 2, 0 };
+			StatManager::Stat* life = new StatManager::Stat{ StatManager::Stat::LIFE, 0, 11, 3, 0 };
+			StatManager::Stat* unleash = new StatManager::Stat{ StatManager::Stat::UNLEASH, 0, 11, 4, 0 };
+			StatManager::Stat* shield = new StatManager::Stat{ StatManager::Stat::SHIELD, 0, 11, 5, 0 };
 			dataOut->statsDay = new StatManager();
 			dataOut->statsNight = new StatManager();
 			dataOut->statsDay->stats = { speed, ring_energy };
 			dataOut->statsNight->stats = { combat, strength, life, unleash, shield };
-			for (auto stat : dataOut->statsDay->stats)
+			for (int i = 0; i < dataOut->statsDay->stats.size(); ++i)
 			{
-				stat->GenerateScenes(dataOut->m_rcStatus);
+				dataOut->statsDay->stats[i]->GenerateScenes(dataOut->m_rcStatus, i + 2);
 			}
-			for (auto stat : dataOut->statsNight->stats)
+			for (int i = 0; i < dataOut->statsNight->stats.size(); ++i)
 			{
-				stat->GenerateScenes(dataOut->m_rcStatus);
+				dataOut->statsNight->stats[i]->GenerateScenes(dataOut->m_rcStatus, i + 2);
 			}
 			dataOut->statsNight->expLevel = 1;
+			dataOut->m_rcFooter->SetHideFlag(true);
 			return dataOut;
 		}
 		void Hide()
@@ -207,133 +214,190 @@ public:
 		void Dissapear()
 		{
 		}
-		void CreateAndAnimateScene(Chao::CSD::RCPtr<Chao::CSD::CScene> scene, const char* animation, float positionY)
+		void ShowAndAnimate(Chao::CSD::RCPtr<Chao::CSD::CScene> scene, const char* animation, float positionY)
 		{
 			scene->SetHideFlag(false);
 			scene->SetPosition(0.0f, positionY);
 			CSDCommon::PlayAnimation(scene, animation, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0f, 0.0f);
 		}
-		void AddStat(bool woosh = true)
+		void AddStatGauge(bool woosh = true)
 		{
-			auto statsManager = isWerehog ? statsNight : statsDay;
+			auto statsManager = m_IsWerehog ? statsNight : statsDay;
 			auto m_AnimIntro2 = GetStringWithPrefix("Intro_%s_Anim_2");
 
+			const auto& currentStat = statsManager->stats[m_CreatedStatIndex];
 			// Create and animate scenes
-			CreateAndAnimateScene(statsManager->stats[currentStatIndex]->m_prgs_bar_2, m_AnimIntro2, y);
-			CreateAndAnimateScene(statsManager->stats[currentStatIndex]->m_prgs_bg_2, m_AnimIntro2, y);
-			CreateAndAnimateScene(statsManager->stats[currentStatIndex]->m_prgs_num_2, m_AnimIntro2, y);
-			CreateAndAnimateScene(statsManager->stats[currentStatIndex]->m_tag_bg_2, m_AnimIntro2, y);
-			CreateAndAnimateScene(statsManager->stats[currentStatIndex]->m_tag_txt_2, m_AnimIntro2, y);
+			ShowAndAnimate(currentStat->m_rcProgressBar, m_AnimIntro2, m_YOffset);
+			ShowAndAnimate(currentStat->m_rcProgressBarBackground, m_AnimIntro2, m_YOffset);
+			ShowAndAnimate(currentStat->m_rcLevelRequired, m_AnimIntro2, m_YOffset);
+			ShowAndAnimate(currentStat->m_rcBackgroundSlide, m_AnimIntro2, m_YOffset);
+			ShowAndAnimate(currentStat->m_rcStatName, m_AnimIntro2, 0);
 			// Set text for tag
-			statsManager->stats[currentStatIndex]->m_tag_txt_2->SetHideFlag(false);
-			auto txtAnim = (statsManager->stats[currentStatIndex]->txt_num < 3) ? m_AnimIntro2 : "Intro_ev_Anim_2";
-			CSDCommon::PlayAnimation(statsManager->stats[currentStatIndex]->m_tag_txt_2, txtAnim, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0f, 0.0f);
+			currentStat->m_rcStatName->SetHideFlag(false);
+			CSDCommon::PlayAnimation(currentStat->m_rcStatName, m_AnimIntro2, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0f, 0.0f);
 
 			// Handle progress number visibility
-			if (statsManager->stats[currentStatIndex]->level >= statsManager->stats[currentStatIndex]->maxLevel)
-			{										
-				statsManager->stats[currentStatIndex]->m_prgs_num_2->GetNode("num")->SetHideFlag(true);
-				statsManager->stats[currentStatIndex]->m_prgs_num_2->GetNode("img")->SetHideFlag(true);
-				statsManager->stats[currentStatIndex]->m_prgs_num_2->GetNode("txt")->SetHideFlag(false);
+			if (currentStat->m_StatLevel >= currentStat->m_MaximumLevel)
+			{
+				currentStat->m_rcLevelRequired->GetNode("num")->SetHideFlag(true);
+				currentStat->m_rcLevelRequired->GetNode("img")->SetHideFlag(true);
+				currentStat->m_rcLevelRequired->GetNode("txt")->SetHideFlag(false);
 			}
 			else
 			{
-				statsManager->stats[currentStatIndex]->m_prgs_num_2->GetNode("num")->SetText(std::to_string(statsManager->stats[currentStatIndex]->level).c_str());
+				currentStat->m_rcLevelRequired->GetNode("num")->SetText(std::to_string(currentStat->m_StatLevel).c_str());
 			}
 
-			if (statsManager->stats[currentStatIndex]->count == 0)
+			if (currentStat->m_EXPLevelsNeeded == 0)
 			{
-				statsManager->stats[currentStatIndex]->m_prgs_num_2->GetNode("num_2")->SetHideFlag(true);
-				statsManager->stats[currentStatIndex]->m_prgs_num_2->GetNode("img_2")->SetHideFlag(true);
+				currentStat->m_rcLevelRequired->GetNode("num_2")->SetHideFlag(true);
+				currentStat->m_rcLevelRequired->GetNode("img_2")->SetHideFlag(true);
 			}
 			else
 			{
-				statsManager->stats[currentStatIndex]->m_prgs_num_2->GetNode("num_2")->SetText(std::to_string(statsManager->stats[currentStatIndex]->count).c_str());
+				currentStat->m_rcLevelRequired->GetNode("num_2")->SetText(std::to_string(currentStat->m_EXPLevelsNeeded).c_str());
 			}
 
 			// Update position for next stat
-			y += (isWerehog ? 64.0f : 73.0f);
-			currentStatIndex++;
+			m_YOffset += (m_IsWerehog ? 64.0f : 73.0f);
+			m_CreatedStatIndex++;
 
-			if (woosh)			
-				Common::PlaySoundStatic(wooshHandle, 1000029);
-			
+			if (woosh)
+
+				Common::PlaySoundStaticCueName(m_WooshSound, "sys_actstg_stateslrslide");
+
 		}
 		void PlayAnimationForStat(StatManager::Stat* stat, const char* animation, bool isReverse = true)
 		{
-			CSDCommon::PlayAnimation(stat->m_tag_bg_2, animation, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, isReverse);
-			CSDCommon::PlayAnimation(stat->m_prgs_bg_2, animation, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, isReverse);
-			CSDCommon::PlayAnimation(stat->m_prgs_num_2, animation, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, isReverse);
-			CSDCommon::PlayAnimation(stat->m_prgs_bar_2, animation, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, isReverse);
+			CSDCommon::PlayAnimation(stat->m_rcBackgroundSlide, animation, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, isReverse);
+			CSDCommon::PlayAnimation(stat->m_rcProgressBarBackground, animation, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, isReverse);
+			CSDCommon::PlayAnimation(stat->m_rcLevelRequired, animation, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, isReverse);
+			CSDCommon::PlayAnimation(stat->m_rcProgressBar, animation, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, isReverse);
 		}
-		void Select(int index, bool up, bool reverse, bool quit = false)
+		void Select(int index, bool up, bool reverse, int previousIndex)
 		{
-			auto statsManager = isWerehog ? statsNight : statsDay;
+			auto statsManager = m_IsWerehog ? statsNight : statsDay;
 			auto m_SelectAnim = GetStringWithPrefix("select_%s_Anim");
 			int m_MaxSize = statsManager->stats.size() - 1;
-			for (auto stat : statsManager->stats)
+
+			if (previousIndex != -1)
 			{
-				PlayAnimationForStat(stat, m_SelectAnim, true);
+				if (previousIndex == statsManager->stats.size())
+					CSDCommon::PlayAnimation(m_rcQuit, m_SelectAnim, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, true);
+				else
+					PlayAnimationForStat(statsManager->stats[previousIndex], m_SelectAnim, true);
 			}
 			if (index == statsManager->stats.size())
 			{
 				PlayAnimationForStat(statsManager->stats[index - 1], m_SelectAnim, true);
-				CSDCommon::PlayAnimation(m_decide_bg, m_SelectAnim, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0);
+				CSDCommon::PlayAnimation(m_rcQuit, m_SelectAnim, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0);
 				return;
 			}
+
+			//for (auto stat : statsManager->stats)
+			//{
+			//	PlayAnimationForStat(stat, m_SelectAnim, true);
+			//}
 			//PlayAnimationForStat(statsManager->stats[index], m_SelectAnim, false);
 
 			PlayAnimationForStat(statsManager->stats[index], m_SelectAnim, reverse);
 
-			//if (reverse)
-			//{
-			//	if (up)
-			//	{
-			//		if (index == m_MaxSize)
-			//		{
-			//			CSDCommon::PlayAnimation(m_decide_bg, m_SelectAnim, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, false, true);
-			//		}
-			//		else
-			//		{
-			//			PlayAnimationForStat(statsManager->stats[std::clamp(index + 1, 0, m_MaxSize)], m_SelectAnim, false);
-			//		}
-			//	}
-			//	else
-			//	{
-			//		PlayAnimationForStat(statsManager->stats[std::clamp(index - 1, 0, m_MaxSize)], m_SelectAnim, true);
-			//	}
-			//}
+
 		}
 		void FooterTimer(const Hedgehog::Universe::SUpdateInfo& updateInfo)
 		{
-			if (footerVisible)
+			if (m_IsFooterActive)
 				return;
-
+		}
+		void HideStats()
+		{
+			auto statsManager = m_IsWerehog ? statsNight : statsDay;
+			auto m_AnimIntro2 = GetStringWithPrefix("Intro_%s_Anim_2");
+			m_AnimIntro = GetStringWithPrefix("Intro_%s_Anim");
+			CSDCommon::PlayAnimation(m_rcTagBg1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0, 0, false, true);
+			CSDCommon::PlayAnimation(m_rcTagTxt1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0, 0, false, true);
+			CSDCommon::PlayAnimation(m_rcPrgsBg1, m_AnimIntro2, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0, 0, false, true);
+			CSDCommon::PlayAnimation(m_rcPrgsBar1, m_AnimIntro2, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0, false, true);
+			CSDCommon::PlayAnimation(m_rcPrgsNum1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 100, false, true);
+			CSDCommon::PlayAnimation(m_rcQuit, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 0.0, 0, 0, false, true);
+			CSDCommon::PlayAnimation(m_rcStatusTitle, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 0.0, 100.0f, 101.0f, false, true);
+			for (auto stat : statsManager->stats)
+			{
+				PlayAnimationForStat(stat, m_AnimIntro, true);
+				stat->m_rcStatName->SetHideFlag(true);
+			}
 			
+		}
+		void ToggleStats()
+		{
+			char prevAnim[100];
+			sprintf(prevAnim, "Intro_%s_Anim", m_IsWerehog ? "ev" : "so");
+			char prevAnimQuit[100];
+			sprintf(prevAnimQuit, "select_%s_Anim", m_IsWerehog ? "ev" : "so");
+			m_IsWerehog = !m_IsWerehog;
+
+			auto statsManager = m_IsWerehog ? statsNight : statsDay;
+			m_AnimIntro = GetStringWithPrefix("Intro_%s_Anim");
+			auto m_AnimIntro2 = GetStringWithPrefix("Intro_%s_Anim_2");
+
+			m_rcPrgsNum1->GetNode("num")->SetText(SUC::Format("%d", statsManager->expLevel));
+			//Exp Bar
+			m_rcTagBg1->SetHideFlag(false);
+			m_rcTagTxt1->SetHideFlag(false);
+			m_rcPrgsBg1->SetHideFlag(false);
+			m_rcPrgsBar1->SetHideFlag(false);
+			m_rcPrgsNum1->SetHideFlag(false);
+			m_rcQuit->SetHideFlag(false);
+			m_rcStatusTitle->SetHideFlag(false);
+			m_rcCharacterBanner->SetHideFlag(false);
+			CSDCommon::PlayAnimation(m_rcTagBg1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 10.0);
+			CSDCommon::PlayAnimation(m_rcTagTxt1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 10.0);
+			CSDCommon::PlayAnimation(m_rcPrgsBg1, m_AnimIntro2, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 10);
+			CSDCommon::PlayAnimation(m_rcPrgsBar1, m_AnimIntro2, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 10.0);
+			CSDCommon::PlayAnimation(m_rcPrgsNum1, m_AnimIntro, Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 10);
+			CSDCommon::PlayAnimation(m_rcQuit, prevAnimQuit, Chao::CSD::eMotionRepeatType_PlayOnce, 0.0, 100.0f, 101.0f);
+			CSDCommon::PlayAnimation(m_rcCharacterBanner, "Switch_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1.0, 0, 20.0, false, !m_IsWerehog);
+
+			m_CreatedStatIndex = 0;
+			m_CurrentStatSelection = 0;
+			m_YOffset = 0.0f;
+
+			auto previousStats = !m_IsWerehog ? statsNight : statsDay;
+			for (auto stats : previousStats->stats)
+			{
+				stats->Toggle(false);
+			}
+
+			m_CreatedStatIndex = 0;
+			for (auto stats : statsManager->stats)
+			{
+				stats->Toggle(true);
+				AddStatGauge(false);
+			}
 		}
 		void Update(float deltaTime)
 		{
-			DebugDrawText::log(SUC::Format("STATE: %d\nFOOTER: %d\nSTATUSINDEX: %d", m_CurrentState, footerVisible, statusIndex),0, 100, TEXT_CYAN);
-			auto statsManager = isWerehog ? statsNight : statsDay;
+			DebugDrawText::log(SUC::Format("STATE: %d\nFOOTER: %d\nSTATUSINDEX: %d", m_CurrentState, m_IsFooterActive, m_CurrentStatSelection), 0, 100, TEXT_CYAN);
+			auto statsManager = m_IsWerehog ? statsNight : statsDay;
 			switch (m_CurrentState)
 			{
 			case StartAdd:
 			{
-				m_StatCreationDelay -= deltaTime;
+				m_TimerStatCreationDelay -= deltaTime;
 
 				//Add all stats
-				if (m_StatCreationDelay <= 0 && currentStatIndex != statsManager->stats.size())
-				{					
-					AddStat();
-					m_StatCreationDelay = 0.17f;
+				if (m_TimerStatCreationDelay <= 0 && m_CreatedStatIndex != statsManager->stats.size())
+				{
+					AddStatGauge();
+					m_TimerStatCreationDelay = 0.17f;
 				}
 				//Wait half a second before selecting first element
-				if (m_DelayFirstSelect != -1)
+				if (m_TimerDelayFirstSelect != -1)
 				{
-					m_DelayFirstSelect -= deltaTime;
-					if (m_DelayFirstSelect <= 0)
+					m_TimerDelayFirstSelect -= deltaTime;
+					if (m_TimerDelayFirstSelect <= 0)
 					{
-						Select(statusIndex, true, false);
+						Select(m_CurrentStatSelection, true, false, -1);
 						m_CurrentState = Idle;
 					}
 				}
@@ -341,67 +405,112 @@ public:
 			}
 			case Start:
 			{
-				m_DelayForStart -= deltaTime;
-				if(m_DelayForStart <= 0)
+				m_TimerDelayForStart -= deltaTime;
+				if (m_TimerDelayForStart <= 0)
 				{
 					m_CurrentState = StartAdd;
-					m_DelayFirstSelect = 0.65f;
-					m_DelayForStart = -1;
-					m_StatCreationDelay = 0.17f;
+					m_TimerDelayFirstSelect = 0.65f;
+					m_TimerDelayForStart = -1;
+					m_TimerStatCreationDelay = 0.17f;
 				}
 				break;
 			}
 			case Idle:
+			{
+				//Show footer with a delay
+				if (!m_IsFooterActive)
 				{
-					//Show footer
-					if(!footerVisible)
-					{
-						bool finished = timeFooter >= 1.06f;
+					bool finished = m_TimerFooter >= 1.06f;
 
-						m_status_footer->SetHideFlag(!finished);
-						footerVisible = finished;
+					m_rcFooter->SetHideFlag(!finished);
+					m_IsFooterActive = finished;
 
-						if (!finished)
-							timeFooter += deltaTime;
-					}
-
-					Sonic::SPadState const* padState = &Sonic::CInputState::GetInstance()->GetPadState();
-
-					bool isUp = padState->IsTapped(Sonic::eKeyState_LeftStickUp) || padState->IsTapped(Sonic::eKeyState_DpadUp);
-					bool isDown = padState->IsTapped(Sonic::eKeyState_LeftStickDown) || padState->IsTapped(Sonic::eKeyState_DpadDown);
-					previousStatIndex = statusIndex;
-					if (isUp)
-					{
-						statusIndex--;						
-					}
-					if (isDown)
-					{
-						statusIndex++;
-					}
-					if(isUp || isDown)
-					{
-						statusIndex = std::clamp(statusIndex, 0, (int)statsManager->stats.size());
-						if(previousStatIndex != statusIndex)
-						Select(statusIndex, isUp, false);
-						Common::PlaySoundStatic(selectHandle, 1000039);
-					}
-
-				break;
+					if (!finished)
+						m_TimerFooter += deltaTime;
 				}
+				//Stat selection
+				Sonic::SPadState const* padState = &Sonic::CInputState::GetInstance()->GetPadState();
+
+				bool isUp = padState->IsTapped(Sonic::eKeyState_LeftStickUp) || padState->IsTapped(Sonic::eKeyState_DpadUp);
+				bool isDown = padState->IsTapped(Sonic::eKeyState_LeftStickDown) || padState->IsTapped(Sonic::eKeyState_DpadDown);
+				m_PreviousStatSelection = m_CurrentStatSelection;
+				if (isUp)
+				{
+					m_CurrentStatSelection--;
+				}
+				if (isDown)
+				{
+					m_CurrentStatSelection++;
+				}
+				if (isUp || isDown)
+				{
+					m_CurrentStatSelection = std::clamp(m_CurrentStatSelection, 0, (int)statsManager->stats.size());
+					if (m_PreviousStatSelection != m_CurrentStatSelection)
+						Select(m_CurrentStatSelection, isUp, false, m_PreviousStatSelection);
+					Common::PlaySoundStaticCueName(m_SelectHandle, "sys_actstg_statescursor");
+				}
+				//Character switching
+				if (m_TimerDelayFirstSelect <= 0)
+				{
+					if (m_TimerCharSwitchCooldown >= 0)
+					{
+						m_TimerCharSwitchCooldown -= deltaTime;
+					}
+					else
+					{
+						if (padState->IsTapped(Sonic::eKeyState_LeftBumper) || padState->IsTapped(Sonic::eKeyState_RightBumper))
+						{
+							m_IsSwitchingChara = true;
+							m_TimerCharSwitchCooldown = m_SwitchCooldownMax;
+							ToggleStats();
+							Common::PlaySoundStaticCueName(m_SwitchHandle, "sys_actstg_statescharachange");
+						}
+					}
+				}
+				if (m_IsSwitchingChara)
+				{
+					if (m_TimerCharSwitchCooldown <= m_SwitchCooldownMax / 2)
+					{
+						Select(0, isUp, false, 0);
+						m_IsSwitchingChara = false;
+						CSDCommon::PlayAnimation(m_rcStatusTitle, GetStringWithPrefix("Intro_%s_Anim"), Chao::CSD::eMotionRepeatType_PlayOnce, 1, 100);
+					}
+				}
+				if (padState->IsTapped(Sonic::eKeyState_B))
+				{
+					m_CurrentStatSelection = statsManager->stats.size();
+					Select(m_CurrentStatSelection, false, false, m_PreviousStatSelection);					
+				}
+				if(m_CurrentStatSelection == statsManager->stats.size() && padState->IsTapped(Sonic::eKeyState_A))
+				{
+					m_CurrentState = Exit;
+					HideStats();
+				}
+				break;
+			}
 			case Exit:
 			{
-				EndDelay -= deltaTime;
-				return;
-			}
-			}
+				m_TimerEndDelay -= deltaTime;
+				m_TimerQuitSoundDelay += deltaTime;
+				SoundController::SetBGMVolume(Common::LerpFloat(0.63f, 0.0f, m_TimerQuitSoundDelay / 2));
 
-
-			if (quitSoundTimer >= 1.06f) {
-				Common::PlaySoundStatic(wooshHandle, 1000029);
-				quitSoundTimer = -1;
+				if(!m_PlayedFadeout)
+				{
+					m_PlayedFadeout = true;
+					Common::PlaySoundStaticCueName(m_EndHandle, "sys_actstg_finaldecide");
+					UnleashedHUD_API::StartFadeout();
+					if (SUC::System::StageManager::s_InStoryMode)
+						SUC::System::SaveManager::SaveToDisk();
+				}
+				
+				if (m_TimerQuitSoundDelay >= 1.06f)
+				{
+					WRITE_JUMP(0x10B96E6, (void*)0x10B974B);
+					WRITE_NOP(0x10B9976, 5);
+				}
+				break;
 			}
-			else if (quitSoundTimer != -1)
-				quitSoundTimer += deltaTime;
+			}
 
 			//MedalUpdate(updateInfo);
 			//

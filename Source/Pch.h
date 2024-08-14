@@ -76,7 +76,7 @@
 
 //Debug Menu
 #include "System/DebugMenu/DebugMenuRenderer.h"
-#include "System/DebugMenu/ImguiManager.h"
+#include "System/DebugMenu/DebugMenu.h"
 #include "System/DebugMenu/ImGuiTheme.h"
 #include "System/DebugMenu/SynchronizedObject.h"
 #include "System/DebugMenu/TypesParamRemove.h"

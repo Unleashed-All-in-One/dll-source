@@ -22,5 +22,5 @@ public:
 	static bool IsResourceAvailableMODEL(const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase, std::string in_assetName);
 	static void CreateModel(const std::string& in_ModelName, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase, boost::shared_ptr<hh::mr::CSingleElement>& in_spModelResult);
 	static float GetAnimTime(Sonic::CAnimationStateMachine* in_AnimStateMachine);
-
+	static bool SendCategoryMessage(const char* in_Category, const boost::shared_ptr<Hedgehog::Universe::Message>& in_spMessage);
 };

@@ -166,7 +166,7 @@ namespace SUC::ImGuiMenu
 		ImGuizmo::BeginFrame();
 
 		if (GetAsyncKeyState(VK_F1) & 1)
-			ImguiManager::visible ^= true;
+			DebugMenu::s_Visible ^= true;
 
 
 		//Draw all elements until the pop with SeuratPro (dialogue font)
@@ -176,7 +176,7 @@ namespace SUC::ImGuiMenu
 
 		//Draw all elements until the pop with DroidSans
 		ImGui::PushFont(ms_PrimaryFont);
-		ImguiManager::update();
+		DebugMenu::Draw();
 		ImGui::PopFont();
 
 

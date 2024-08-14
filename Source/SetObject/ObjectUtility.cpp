@@ -168,3 +168,12 @@ float ObjectUtility::GetAnimTime(Sonic::CAnimationStateMachine* in_AnimStateMach
 	in_AnimStateMachine->Update(Hedgehog::Universe::SUpdateInfo(0,0, ""));
 	return in_AnimStateMachine->GetAnimationState(in_AnimStateMachine->GetCurrentState()->m_Name)->GetLocalTime();
 }
+bool ObjectUtility::SendCategoryMessage(const char* in_Category, const boost::shared_ptr<Hedgehog::Universe::Message>& in_spMessage)
+{
+	const auto gameDoc = Sonic::CGameDocument::GetInstance();
+	if (gameDoc && gameDoc->GetWorld())
+	{
+		return gameDoc->GetWorld()->SendMessage(in_Category, in_spMessage, 0);
+	}
+	return false;
+}

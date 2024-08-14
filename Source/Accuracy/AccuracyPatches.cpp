@@ -110,8 +110,11 @@ namespace SUC::Accuracy
 	//Used by HUDs
 	//Returns a ratio of how big the boost bar is. 0 is equal to the beginning of the game, 1 is the full Generations boost bar.
 	extern "C" __declspec(dllexport) float API_GetBoostSize()
-	{		
-		return 0.2f;
+	{
+		//if(System::StageManager::s_InStoryMode)		
+			return System::SaveManager::GetCurrentSave(true)->GetSaveFloatKeyValue("RingEnergyRatio");		
+
+		return 1;
 	}
 	void AccuracyPatches::RegisterHooks()
 	{

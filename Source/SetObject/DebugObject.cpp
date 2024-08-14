@@ -29,7 +29,8 @@ namespace SUC::SetObject
 	{
 		void* result = original_InitializePlayer(This);
 		auto context = Sonic::Player::CPlayerSpeedContext::GetInstance();    // Hack: there's a better way to do this but whatever. This writes to the singleton anyway.
-
+		
+		
 		context->m_pPlayer->m_PostureStateMachine.RegisterStateFactory<OnPolePosture>();
 		return result;
 	}
