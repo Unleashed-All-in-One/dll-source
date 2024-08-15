@@ -1228,7 +1228,7 @@ namespace SUC::UI::TitleScreen
 		}
 		return originalTitleWorldMap_UpdateApplication(This, Edx, elapsedTime, a3);
 	}
-#pragma region Ceramics/Ahremic Title Camera
+#pragma region BBExts/Ahremic Title Camera
 
 	class TransitionTitleCamera : public Sonic::CGameObject3D
 	{

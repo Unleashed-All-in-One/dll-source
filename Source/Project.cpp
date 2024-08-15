@@ -1,9 +1,10 @@
 #include "Project.h"
-#include "Gameplay\GameplayHookContainer.h"
-#include "Accuracy\AccuracyHookContainer.h"
-#include "SetObject\SetObjectHookContainer.h"
+#include "Gameplay/GameplayHookContainer.h"
+#include "Accuracy/AccuracyHookContainer.h"
+#include "Player/PlayerHookContainer.h"
+#include "SetObject/SetObjectHookContainer.h"
 #include "UI/UIHookContainer.h"
-#include "System\SystemHookContainer.h"
+#include "System/SystemHookContainer.h"
 #include "Testing/TestingCode.h"
 
 namespace SUC
@@ -93,6 +94,7 @@ namespace SUC
 		Hooks::InstallSetObjectHooks();
 		Hooks::InstallSystemHooks();
 		Hooks::InstallUIHooks();
+		Hooks::InstallPlayerHooks();
 		TestingCode::applyPatches();
 		INSTALL_HOOK(Project_UpdateApplication);
 		INSTALL_HOOK(Project_CHudSonicStage_Update);
@@ -434,11 +436,4 @@ namespace SUC
 		const size_t pos = in_Path.find_last_of("\\/");
 		return in_Path.substr(0, pos != std::string::npos ? pos : 0);
 	}
-
-	//Move elsewhere
-	extern "C" __declspec(dllexport) Hedgehog::Math::CVector API_GetClosestSetObjectForArmswing()
-	{
-		return SUC::Project::s_TempArmswingNode;
-	}
-
 }

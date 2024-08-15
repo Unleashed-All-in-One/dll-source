@@ -2,6 +2,7 @@
 
 namespace SUC::System
 {
+	int GetClassicAnimCount() { return AnimationSetPatcher::s_ClassicCustomAnimations.size(); }
 	FUNCTION_PTR(void*, __stdcall, fpCreateAnimationState, 0xCDFA20, void* This, boost::shared_ptr<void>& spAnimationState, const Hedgehog::Base::CSharedString& name, const Hedgehog::Base::CSharedString& name2);
 	FUNCTION_PTR(uint32_t*, __stdcall, fpGetAnimationTransitionData, 0xCDFB40, void* A2, const Hedgehog::Base::CSharedString& name);
 
@@ -26,7 +27,59 @@ namespace SUC::System
 		printf("[SonicUnleashedConversion] Animation change: %s\n", name.c_str());
 		originalCSonicContextChangeAnimation(This, a2, name);
 	}
+	//---------------------------------------------------
+	// CSonicClassic
+	//---------------------------------------------------
+	HOOK(void*, __cdecl, InitializeClassicSonicAnimationList, 0x01281D50)
+	{
+		void* result = originalInitializeClassicSonicAnimationList();
+		{
+			int animCount = GetClassicAnimCount();
+			AnimationSetPatcher::CAnimationStateSet* m_AnimationContainer = (AnimationSetPatcher::CAnimationStateSet*)0x15DCE60;
+			AnimationSetPatcher::CAnimationStateInfo* m_AnimEntries = new AnimationSetPatcher::CAnimationStateInfo[m_AnimationContainer->m_Count + 2 * animCount];
 
+			std::copy(m_AnimationContainer->m_pEntries, m_AnimationContainer->m_pEntries + m_AnimationContainer->m_Count, m_AnimEntries);
+
+			for (size_t i = 0; i < 2 * animCount; i++)
+			{
+				const size_t animIndex = i % animCount;
+
+				AnimationSetPatcher::CAnimationStateInfo& entry = m_AnimEntries[m_AnimationContainer->m_Count + i];
+
+				entry.m_Name = AnimationSetPatcher::s_ClassicCustomAnimations[animIndex].m_stateName;
+				entry.m_FileName = AnimationSetPatcher::s_ClassicCustomAnimations[animIndex].m_fileName;
+				entry.m_Speed = AnimationSetPatcher::s_ClassicCustomAnimations[animIndex].m_speed;
+				entry.m_PlaybackType = !AnimationSetPatcher::s_ClassicCustomAnimations[animIndex].m_isLoop;
+				entry.field10 = 0;
+				entry.field14 = -1.0f;
+				entry.field18 = -1.0f;
+				entry.field1C = 0;
+				entry.field20 = -1;
+				entry.field24 = -1;
+				entry.field28 = -1;
+				entry.field2C = -1;
+			}
+			WRITE_MEMORY(&m_AnimationContainer->m_pEntries, void*, m_AnimEntries);
+			WRITE_MEMORY(&m_AnimationContainer->m_Count, size_t, m_AnimationContainer->m_Count + 2 * GetClassicAnimCount());
+		}
+		return result;
+	}
+	HOOK(void, __fastcall, CSonicClassicCreateAnimationStates, 0x00DDF1C0, void* This, void* Edx, void* A2, void* A3)
+	{
+		originalCSonicClassicCreateAnimationStates(This, Edx, A2, A3);
+
+		FUNCTION_PTR(void*, __stdcall, createAnimationState, 0xCDFA20,
+			void* This, boost::shared_ptr<void>&spAnimationState, const hh::base::CSharedString & name, const hh::base::CSharedString & alsoName);
+
+		for (size_t i = 0; i < 2 * GetClassicAnimCount(); i++)
+		{
+			const size_t animIndex = i % GetClassicAnimCount();
+			const hh::base::CSharedString animName = AnimationSetPatcher::s_ClassicCustomAnimations[animIndex].m_stateName;
+
+			boost::shared_ptr<void> animationState;
+			createAnimationState(A2, animationState, animName, animName);
+		}
+	}
 	//---------------------------------------------------
 	// CSonic
 	//---------------------------------------------------
@@ -161,7 +214,11 @@ namespace SUC::System
 			}
 		}
 	}
-
+	void AnimationSetPatcher::RegisterClassicAnimation(std::string stateName, std::string fileName, float speed, bool doLoop)
+	{		
+		s_ClassicCustomAnimations.push_back(NewAnimationData(_strdup(stateName.c_str()), _strdup(fileName.c_str()), speed, doLoop, nullptr));
+		SUC::LogMessage(std::format("Registered animation for Classic (%s, %s)", stateName, fileName).c_str());
+	}
 	void AnimationSetPatcher::RegisterHooks()
 	{
 		//INSTALL_HOOK(CSonic_AnimationBlending);
@@ -176,9 +233,10 @@ namespace SUC::System
 	   // m_newAnimationDataSuper.emplace_back("CrawlLoop", "ssn_crawl_loop", 1.75f, true, nullptr);
 
 		s_NewAnimationDataSuper.emplace_back("SquatKick", "ssn_squat_kick", 1.0f, false, nullptr);
-
+		
 		//INSTALL_HOOK(CAnimationControlSingle_Debug);
-
+		INSTALL_HOOK(InitializeClassicSonicAnimationList);
+		INSTALL_HOOK(CSonicClassicCreateAnimationStates);
 		if (!s_NewAnimationDataGeneric.empty())
 		{
 			INSTALL_HOOK(InitializeSonicAnimationList);

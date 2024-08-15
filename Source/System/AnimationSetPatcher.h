@@ -53,13 +53,20 @@ namespace SUC::System
 			size_t m_Count;
 		};
 
-		
+		struct CAnimationStateSet2
+		{
+			hh::anim::SMotionInfo* m_pEntries;
+			size_t m_Count;
+		};
+
 		typedef std::vector<SUC::NewAnimationData> NewAnimationDataList;
 		static void RegisterHooks();
 		static void InitializeAnimationList(CAnimationStateInfo* pEntries, size_t const count, NewAnimationDataList const& dataList);
 		static void CreateAnimationState(void* A2, NewAnimationDataList const& dataList);
+		static void RegisterClassicAnimation(std::string stateName, std::string fileName, float speed = 1, bool doLoop = false);
 
 		static NewAnimationDataList s_NewAnimationDataGeneric;
 		static NewAnimationDataList s_NewAnimationDataSuper;
+		static inline std::vector<NewAnimationData> s_ClassicCustomAnimations;
 	};
 }

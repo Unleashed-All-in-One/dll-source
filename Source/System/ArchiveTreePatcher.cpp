@@ -113,6 +113,7 @@ namespace SUC::System
         s_ArchiveDependencies.push_back(ArchiveDependency("ObjectPhysicsUnleashed", { "cmn200" }));
         s_ArchiveDependencies.push_back(ArchiveDependency("HoloskaStomp", { "cmn200" }));
         s_ArchiveDependencies.push_back(ArchiveDependency("ObjectPhysicsUnleashed", { "cmn100" }));
+        s_ArchiveDependencies.push_back(ArchiveDependency("EvilSonic", { "SonicClassic" }));
 
         if (!s_ArchiveDependencies.empty())
         {

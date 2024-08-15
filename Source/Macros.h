@@ -40,3 +40,19 @@
 //=========================================================
 #define STAGEACT_FADEWAIT *(float*)0x01A426B4
 #define GOALCAMERA_OFFSET_RIGHT *(float*)0x01A48C7C
+
+#define SONIC_GENERAL_CONTEXT \
+	Sonic::Player::CPlayerSpeedContext::GetInstance()
+#define SONIC_MODERN_CONTEXT  \
+	Sonic::Player::CSonicContext::GetInstance()
+#define SONIC_CLASSIC_CONTEXT \
+	Sonic::Player::CSonicClassicContext::GetInstance()
+#define SONIC_SUPER_CONTEXT   \
+	Sonic::Player::CSonicSpContext::GetInstance()
+
+#define IS_SUPER_SONIC \
+	Sonic::CApplicationDocument::GetInstance()->GetService<Sonic::CServiceGamePlay>()->m_PlayerID == 2
+#define IS_CLASSIC_SONIC \
+	Sonic::CApplicationDocument::GetInstance()->GetService<Sonic::CServiceGamePlay>()->m_PlayerID == 1
+#define IS_MODERN_SONIC \
+	Sonic::CApplicationDocument::GetInstance()->GetService<Sonic::CServiceGamePlay>()->m_PlayerID == 0
