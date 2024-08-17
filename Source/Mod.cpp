@@ -1,7 +1,10 @@
-﻿#include "System/DiscordStatus.h"
+﻿
+#include "System/DiscordStatus.h"
 #include "UI/EventViewer.h"
+
 extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
-{	
+{
+
 	// Load configuration
 	SUC::Project::Load(modInfo);
 	//Make Gens support 4gb+

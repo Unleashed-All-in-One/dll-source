@@ -1,5 +1,5 @@
 #pragma once
-namespace Evil
+namespace SUC::Player::Evil
 {
 	class CRunningJumpPosture : public Sonic::Player::CPlayerSpeedPosture3DCommon
 	{

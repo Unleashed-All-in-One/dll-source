@@ -6,7 +6,6 @@
 #include "UI/UIHookContainer.h"
 #include "System/SystemHookContainer.h"
 #include "Testing/TestingCode.h"
-
 namespace SUC
 {
 	//---------------Gameplay---------------

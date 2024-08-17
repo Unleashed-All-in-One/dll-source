@@ -1,5 +1,5 @@
 #pragma once
-namespace Evil
+namespace SUC::Player::Evil
 {
 	class CStateDamageNormal : public Sonic::Player::CPlayerSpeedContext::CStateSpeedBase
 	{

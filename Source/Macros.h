@@ -56,3 +56,5 @@
 	Sonic::CApplicationDocument::GetInstance()->GetService<Sonic::CServiceGamePlay>()->m_PlayerID == 1
 #define IS_MODERN_SONIC \
 	Sonic::CApplicationDocument::GetInstance()->GetService<Sonic::CServiceGamePlay>()->m_PlayerID == 0
+
+#define PARTICLE_CLAW "slash"

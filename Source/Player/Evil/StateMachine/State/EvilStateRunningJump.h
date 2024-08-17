@@ -1,5 +1,5 @@
 #pragma once
-namespace Evil
+namespace SUC::Player::Evil
 {
 	class CStateRunningJump : public Sonic::Player::CPlayerSpeedContext::CStateSpeedBase
 	{

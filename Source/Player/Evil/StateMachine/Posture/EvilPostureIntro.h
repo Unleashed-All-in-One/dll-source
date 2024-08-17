@@ -1,7 +1,7 @@
 #pragma once
 #include "../../AnimationExtension/CameraMotion.h"
 #include "EvilGlobal.h"
-namespace Evil
+namespace SUC::Player::Evil
 {
 	class CStartWerehogPosture : public Sonic::Player::CPlayerSpeedPosture3DCommon
 	{

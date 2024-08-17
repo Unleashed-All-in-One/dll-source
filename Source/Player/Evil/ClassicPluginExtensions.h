@@ -1,8 +1,10 @@
 #pragma once
-
-class ClassicPluginExtensions
+namespace SUC::Player::Evil
 {
+	class ClassicPluginExtensions
+	{
 
-public:
-	static void registerPatches();
-};
+	public:
+		static void registerPatches();
+	};
+}

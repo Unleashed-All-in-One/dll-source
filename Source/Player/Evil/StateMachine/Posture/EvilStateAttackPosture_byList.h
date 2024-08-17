@@ -1,7 +1,7 @@
 #pragma once
 #include "EvilGlobal.h";
 using namespace hh::math;
-namespace Evil
+namespace SUC::Player::Evil
 {
 	class CStateAttackAction_byList_Posture : public Sonic::Player::CPlayerSpeedPosture3DCommon
 	{

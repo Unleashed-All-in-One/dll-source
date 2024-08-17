@@ -306,19 +306,13 @@ HOOK(int, __fastcall, sub_7E27B0, 0x7E27B0, char* a1, ...)
 	printf("[CRIWARE Audio 2] %s\n", a1);
 	return originalsub_7E27B0(a1);
 }
-HOOK(int, __fastcall, UVAnimStart, 0x007597E0, Sonic::CGameObject* This, void* Edx, int a2,
-	Hedgehog::Base::CSharedString* modelName, int flag)
-{
-	printf("\nLoaded UV-Anim: %s", modelName->c_str());
-	return originalUVAnimStart(This, Edx, a2, modelName, flag);
-}
+
 void TestingCode::applyPatches()
 {		
 	//INSTALL_HOOK(sub_7C931F);
 	INSTALL_HOOK(sub_7E27B0);
 	INSTALL_HOOK(sub_E8F330);
 	INSTALL_HOOK(A51CD0);
-	INSTALL_HOOK(UVAnimStart);
 	//
 	//INSTALL_HOOK(sub_42A710);
 	//INSTALL_HOOK(OpenStage);

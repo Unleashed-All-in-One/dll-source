@@ -1,5 +1,19 @@
 #pragma once
 
+//namespace mod = SUC;
+//namespace SUC
+//{
+//	namespace acc = Accuracy;
+//	namespace ui = UI;
+//	namespace set = SetObject;
+//	namespace sys = System;
+//	namespace game = Gameplay;
+//	namespace ply = Player;
+//	namespace Player
+//	{
+//		namespace ev = Evil;
+//	}
+//}
 namespace SUC
 {
 	class Project

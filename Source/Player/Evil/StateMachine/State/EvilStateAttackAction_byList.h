@@ -1,7 +1,7 @@
 #pragma once
 #include "../Posture/EvilStateAttackPosture_byList.h"
 #include "../../GameObjects/AttackHitbox.h"
-namespace Evil
+namespace SUC::Player::Evil
 {
 	class CStateAttackAction_byList : public Sonic::Player::CPlayerSpeedContext::CStateSpeedBase
 	{
