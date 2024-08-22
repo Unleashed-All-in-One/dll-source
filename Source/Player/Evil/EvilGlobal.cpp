@@ -31,19 +31,19 @@ namespace SUC::Player::Evil
 	}
 	WerehogAttackNew EvilGlobal::GetAttackFromName()
 	{
-		auto motion = GetMotionFromName(EvilGlobal::lastAttackName);
+		auto motion = GetMotionFromName(EvilGlobal::s_LatestAttackName);
 		for (size_t i = 0; i < EvilAttackConfiguration::s_Attacks.size(); i++)
 		{
 			if (EvilAttackConfiguration::s_Attacks[i].MotionName == motion.MotionName)
 				return EvilAttackConfiguration::s_Attacks[i];
 		}
 	}
-	void EvilGlobal::initializeValues()
+	void EvilGlobal::Initialize()
 	{
 		EvilParameters* params = new EvilParameters();
 		params->attackVelocityDivider = 1.5f;
 		params->lifeMaxAmount = 15;
 		params->timerDamageMax = 2;
-		parameters = params;
+		s_Param = params;
 	}
 }

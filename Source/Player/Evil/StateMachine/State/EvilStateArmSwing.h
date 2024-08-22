@@ -20,14 +20,13 @@ namespace SUC::Player::Evil
 		}
 		void EnterState() override
 		{
-			EvilGlobal::disableAnimations = true;
 			auto context = GetContext();
 			context->m_Velocity = Hedgehog::math::CVector(0, 0, 0);
 			Common::PlaySoundStaticCueName(soundArmStretch, "es_armstretch");
 			posStartArm = context->m_spMatrixNode->m_Transform.m_Position;
 			werehogArmHoming_timer = 0;
 			target = SUC::Project::s_TempArmswingNode;
-			EvilGlobal::allowFreemoveArmRight = true;
+			EvilGlobal::s_AllowArmMovR = true;
 		}
 		void UpdateState() override
 		{
@@ -52,12 +51,12 @@ namespace SUC::Player::Evil
 				)
 			);
 			//auto pose = (boost::shared_ptr<Hedgehog::Animation::CAnimationPose>)(context + 0x244);
-			EvilGlobal::freemovePositionRight = target;
+			EvilGlobal::s_ArmPosR = target;
 			context->m_Velocity = Hedgehog::math::CVector(0, 0, 0);
 		}
 		void LeaveState()
 		{
-			EvilGlobal::allowFreemoveArmRight = false;
+			EvilGlobal::s_AllowArmMovR = false;
 		}
 	};
 }

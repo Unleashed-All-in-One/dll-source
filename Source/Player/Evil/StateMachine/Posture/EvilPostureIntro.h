@@ -61,25 +61,25 @@ namespace SUC::Player::Evil
 					hh::mot::CMotionDatabaseWrapper wrapper(database.get());
 					motion = wrapper.GetCameraMotionData("evil_camera");
 
-					EvilGlobal::m_spMotionCameraController = boost::make_shared<Sonic::CMotionCameraController>(motion, 0.65f);
-					EvilGlobal::m_spMotionCameraController->m_TransformMatrix = Sonic::Player::CPlayerSpeedContext::GetInstance()->m_StartTransform.m_Matrix.matrix();
-					auto message1 = boost::make_shared<Sonic::Message::MsgPushCameraController>(EvilGlobal::m_spMotionCameraController, 1005);
+					EvilGlobal::s_spMotionCameraController = boost::make_shared<Sonic::CMotionCameraController>(motion, 0.65f);
+					EvilGlobal::s_spMotionCameraController->m_TransformMatrix = Sonic::Player::CPlayerSpeedContext::GetInstance()->m_StartTransform.m_Matrix.matrix();
+					auto message1 = boost::make_shared<Sonic::Message::MsgPushCameraController>(EvilGlobal::s_spMotionCameraController, 3005);
 					Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera()->SendMessage(Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera()->m_ActorID, message1);
 					return;
 				}
-				if (EvilGlobal::m_spMotionCameraController != nullptr)
+				if (EvilGlobal::s_spMotionCameraController != nullptr)
 				{
 					DebugDrawText::log("###CAM_ANIM_START###\n", 0);
 
-					DebugDrawText::log(std::format("PlaybackSpeed: {0}", EvilGlobal::m_spMotionCameraController->m_PlaybackSpeed).c_str(), 0);
-					DebugDrawText::log(std::format("m_FloatFromMotionData1: {0}", EvilGlobal::m_spMotionCameraController->m_FloatFromMotionData1).c_str(), 0);
-					DebugDrawText::log(std::format("m_MaxFrameCount: {0}", EvilGlobal::m_spMotionCameraController->m_MaxFrameCount).c_str(), 0);
-					DebugDrawText::log(std::format("m_ElapsedFrameCount: {0}", EvilGlobal::m_spMotionCameraController->m_ElapsedFrameCount).c_str(), 0);
-					DebugDrawText::log(std::format("m_ElapsedTime: {0}", EvilGlobal::m_spMotionCameraController->m_ElapsedTime).c_str(), 0);
-					DebugDrawText::log(std::format("m_Int3: {0}", EvilGlobal::m_spMotionCameraController->m_Int3).c_str(), 0);
-					DebugDrawText::log(std::format("m_AnimationFramerate: {0}", EvilGlobal::m_spMotionCameraController->m_AnimationFramerate).c_str(), 0);
-					DebugDrawText::log(std::format("m_Field236: {0}", EvilGlobal::m_spMotionCameraController->m_Field236).c_str(), 0);
-					DebugDrawText::log(std::format("\n", EvilGlobal::m_spMotionCameraController->m_AnimationFramerate).c_str(), 0);
+					DebugDrawText::log(std::format("PlaybackSpeed: {0}", EvilGlobal::s_spMotionCameraController->m_PlaybackSpeed).c_str(), 0);
+					DebugDrawText::log(std::format("m_FloatFromMotionData1: {0}", EvilGlobal::s_spMotionCameraController->m_FloatFromMotionData1).c_str(), 0);
+					DebugDrawText::log(std::format("m_MaxFrameCount: {0}", EvilGlobal::s_spMotionCameraController->m_MaxFrameCount).c_str(), 0);
+					DebugDrawText::log(std::format("m_ElapsedFrameCount: {0}", EvilGlobal::s_spMotionCameraController->m_ElapsedFrameCount).c_str(), 0);
+					DebugDrawText::log(std::format("m_ElapsedTime: {0}", EvilGlobal::s_spMotionCameraController->m_ElapsedTime).c_str(), 0);
+					DebugDrawText::log(std::format("m_Int3: {0}", EvilGlobal::s_spMotionCameraController->m_Int3).c_str(), 0);
+					DebugDrawText::log(std::format("m_AnimationFramerate: {0}", EvilGlobal::s_spMotionCameraController->m_AnimationFramerate).c_str(), 0);
+					DebugDrawText::log(std::format("m_Field236: {0}", EvilGlobal::s_spMotionCameraController->m_Field236).c_str(), 0);
+					DebugDrawText::log(std::format("\n", EvilGlobal::s_spMotionCameraController->m_AnimationFramerate).c_str(), 0);
 
 					//m_spMotionCameraController->m_PlaybackSpeed = 1;
 					//m_spMotionCameraController->UpdateState();			
@@ -90,16 +90,16 @@ namespace SUC::Player::Evil
 					if (!m_SoundHandle)
 					{
 						Common::PlaySoundStaticCueName(m_SoundHandle, "V_WHG_012");
-						EvilGlobal::m_spMotionCameraController->m_PlaybackSpeed = 0.5f;
+						EvilGlobal::s_spMotionCameraController->m_PlaybackSpeed = 0.5f;
 					}
 				}
 				//Unleashed seems to kill the cam anim a little bit before the actual anim ends
 				if (spAnimInfo->m_Frame >= 118 && spAnimInfo->m_Frame < 120)
 				{
-					if (EvilGlobal::m_spMotionCameraController.get() != nullptr)
+					if (EvilGlobal::s_spMotionCameraController.get() != nullptr)
 					{
 						auto message = boost::make_shared<Sonic::Message::MsgPopCameraController>();
-						message->m_pCameraController = EvilGlobal::m_spMotionCameraController.get();
+						message->m_pCameraController = EvilGlobal::s_spMotionCameraController.get();
 						message->m_CameraName = (Hedgehog::base::CSharedString*)(0x013E0DC0);
 						message->m_TransitionTime = 2;
 						Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera()->SendMessage(Sonic::CGameDocument::GetInstance()->GetWorld()->GetCamera()->m_ActorID, message);

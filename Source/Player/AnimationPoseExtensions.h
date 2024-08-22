@@ -1,9 +1,8 @@
 #pragma once
-namespace SUC::Player::Evil
+namespace SUC::Player
 {
-	class ClassicPluginExtensions
+	class AnimationPoseExtensions
 	{
-
 	public:
 		static void RegisterHooks();
 	};

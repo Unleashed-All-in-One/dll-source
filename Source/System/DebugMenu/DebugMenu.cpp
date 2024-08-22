@@ -22,9 +22,14 @@ namespace SUC::ImGuiMenu
 	bool parsedTree = false;
 	std::string nameTemp;
 	hh::math::CVector2 scaleFactor;
+	std::string GetSceneToLoad()
+	{
+		return sceneIndexToLoad;
+	}
 	void customStageLoad()
 	{
 		std::string temp = sceneIndexToLoad.c_str();
+		System::StageManager::SetOverrideStageIDProcessor(GetSceneToLoad, true, __FILENAME__);
 		//auto message = Sonic::Message::MsgSequenceEvent(2, 0);
 		//auto message2 = Sonic::Message::MsgStorySequenceEvent(0, 0);
 		//auto test = Sonic::Sequence::Main::GetInstance();
@@ -35,9 +40,6 @@ namespace SUC::ImGuiMenu
 		//auto message2 = Sonic::Message::MsgStorySequenceEvent(1, 1);
 		//StorySeqProcessStorySequenceEvent(Sonic::Sequence::Story::GetInstance(), &message2);
 		//Sonic::Sequence::Main::ProcessMessage(&message);
-		SUC::System::SequenceHelpers::LoadStage(_strdup(temp.c_str()), 0, false);
-
-		SUC::System::StageManager::s_NextStage = temp;
 	}
 	void drawStageTreeNode(SUC::Project::DebugStageTree::DebugStageTreeNode node)
 	{
@@ -57,8 +59,8 @@ namespace SUC::ImGuiMenu
 					eventIndexToLoad = node.treeEntries[x].cutsceneID;
 					DebugMenu::s_Visible = false;
 					customStageLoad();
-					if (!eventIndexToLoad.empty())
-						SUC::System::StageManager::ForcePlayCutscene(eventIndexToLoad, sceneIndexToLoad, false, 0);
+					//if (!eventIndexToLoad.empty())
+					//	SUC::System::StageManager::ForcePlayCutscene(eventIndexToLoad, sceneIndexToLoad, false, 0);
 				}
 				ImGui::EndGroup();
 			}

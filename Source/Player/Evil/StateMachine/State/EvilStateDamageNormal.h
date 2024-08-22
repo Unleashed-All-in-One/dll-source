@@ -12,13 +12,13 @@ namespace SUC::Player::Evil
 			Common::PlaySoundStaticCueName(soundHandle, "V_WHG_014");
 			GetContext()->m_pPlayer->m_PostureStateMachine.ChangeState("Standard");
 			GetContext()->ChangeAnimation("Evilsonic_damageMB");
-			EvilGlobal::canExecuteAttacks = false;
+			EvilGlobal::s_CanAttack = false;
 			lastFrame = -1;
 			GetContext()->SetStateFlag(Sonic::Player::CPlayerSpeedContext::eStateFlag_IgnorePadInput, true);
 		}
 		void ForceExit()
 		{
-			EvilGlobal::canExecuteAttacks = true;
+			EvilGlobal::s_CanAttack = true;
 			GetContext()->m_pPlayer->m_StateMachine.ChangeState("Stand");
 			GetContext()->SetStateFlag(Sonic::Player::CPlayerSpeedContext::eStateFlag_IgnorePadInput, false);
 		}
@@ -40,7 +40,7 @@ namespace SUC::Player::Evil
 		}
 		void LeaveState()
 		{
-			EvilGlobal::canExecuteAttacks = true;
+			EvilGlobal::s_CanAttack = true;
 			GetContext()->SetStateFlag(Sonic::Player::CPlayerSpeedContext::eStateFlag_IgnorePadInput, false);
 		}
 	};

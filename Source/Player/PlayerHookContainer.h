@@ -8,9 +8,9 @@ namespace SUC::Hooks
 	static void InstallPlayerHooks()
 	{
 		/// Werehog
+		Player::Evil::ClassicPluginExtensions::RegisterHooks();
+		Player::Evil::EvilGlobal::Initialize();
+		Player::Evil::EvilSonic::RegisterPatches();
 		Player::Evil::EvilAttackConfiguration::RegisterHooks(Project::s_ModInfo->CurrentMod->Path);
-		Player::Evil::EvilGlobal::initializeValues();
-		Player::Evil::EvilSonic::registerPatches();
-		Player::Evil::ClassicPluginExtensions::registerPatches();
 	}
 }

@@ -67,7 +67,7 @@ namespace SUC::Player::Evil
 	//Head,
 	//Hips,
 	//MiddleLeg
-	std::vector<std::string> collisionBoneNames = { "RHand", "LHand", "RLeg", "LLeg", "MiddleHand", "Head", "Hips", "MiddleLeg" };
+	std::vector<std::string> collisionBoneNames = { "None","RHand", "LHand", "RLeg", "LLeg", "MiddleHand", "Head", "Hips", "MiddleLeg" };
 	WerehogAttackNew ParseActionNode(rapidxml::xml_node<>* node, rapidxml::xml_node<>* parent)
 	{
 		WerehogAttackNew attack = WerehogAttackNew();
@@ -103,7 +103,7 @@ namespace SUC::Player::Evil
 	Motion ParseMotionNode(rapidxml::xml_node<>* in_MotionNode)
 	{
 		Motion returned = Motion();
-		returned.MotionMoveSpeedRatio_H = std::vector<MoveRatioHelper>(21);
+		returned.MotionMoveSpeedRatio_H = std::vector<MoveRatioHelper>(0);
 		returned.Collision.BoneInfo = std::vector<CollisionParam>(12);
 
 		returned.MotionName				= in_MotionNode->first_node("MotionName")->value();
@@ -115,18 +115,25 @@ namespace SUC::Player::Evil
 		returned.MotionMoveSpeedRatio_Y = std::stof(in_MotionNode->first_node("MotionMoveSpeedRatio_Y")->value());
 
 		returned.MotionFirstSpeed = std::stof(in_MotionNode->first_node("MotionFirstSpeed")->value());
+		returned.MiddleSpeed = std::stof(in_MotionNode->first_node("MiddleSpeed")->value());
+		returned.EndSpeed = std::stof(in_MotionNode->first_node("EndSpeed")->value());
 		returned.MotionSpeed_FirstFrame = std::stof(in_MotionNode->first_node("MotionSpeed_FirstFrame")->value());
 		returned.MotionSpeed_MiddleFrame = std::stof(in_MotionNode->first_node("MotionSpeed_MiddleFrame")->value());
 
+		returned.MoveType = in_MotionNode->first_node("MoveType")->value();
 		//Maximum is 21 since in Unleashed the maximum is 21, for whatever reason
-		for (size_t i = 1; i < 21; i++)
+		for (size_t i = 0; i < 20; i++)
 		{
-			//This is a custom struct, it stores the StartFrame, the value, and the Y value for every MotionMoveSpeedRatio
-			if (returned.MotionMoveSpeedRatio_H.size() <= i) returned.MotionMoveSpeedRatio_H.push_back({});
+			int m_IndexOffset = i + 1;
 
-			auto m_NodeFrameStart = in_MotionNode->first_node(std::format("MotionMoveSpeedRatioFrameStart_{0}", i).c_str());
-			auto m_NodeFrame = in_MotionNode->first_node(std::format("MotionMoveSpeedRatioFrame_{0}", i).c_str());
-			auto m_NodeFrameY = in_MotionNode->first_node(std::format("MotionMoveSpeedRatioFrameY_{0}", i).c_str());
+			auto m_NodeFrameStart = in_MotionNode->first_node(SUC::Format("MotionMoveSpeedRatioFrameStart_%d", m_IndexOffset));
+			auto m_NodeFrame = in_MotionNode->first_node(std::format("MotionMoveSpeedRatioFrame_{0}", m_IndexOffset).c_str());
+			auto m_NodeFrameY = in_MotionNode->first_node(std::format("MotionMoveSpeedRatioFrameY_{0}", m_IndexOffset).c_str());
+
+			//This is a custom struct, it stores the StartFrame, the value, and the Y value for every MotionMoveSpeedRatio
+			if (!m_NodeFrameStart && !m_NodeFrame && !m_NodeFrameY)
+				break;
+			if (returned.MotionMoveSpeedRatio_H.size() <= i) returned.MotionMoveSpeedRatio_H.push_back({});
 
 			if (m_NodeFrameStart) returned.MotionMoveSpeedRatio_H.at(i).FrameStart = std::stof(m_NodeFrameStart->value());
 			if (m_NodeFrame)      returned.MotionMoveSpeedRatio_H.at(i).FrameValue = std::stof(m_NodeFrame->value());
@@ -190,9 +197,6 @@ namespace SUC::Player::Evil
 				}
 			}			
 		}
-		//Eliminate first element in list as its always going to be empty, since they start at 1.
-		returned.MotionMoveSpeedRatio_H.erase(returned.MotionMoveSpeedRatio_H.begin());
-		returned.Collision.BoneInfo.erase(returned.Collision.BoneInfo.begin());
 		return returned;
 	}
 	void RegisterAnims(std::vector<Motion>& vec, rapidxml::xml_node<>* nodeMotion)
@@ -414,20 +418,20 @@ namespace SUC::Player::Evil
 	void Test()
 	{
 		m_Initialized = true;
-		auto m_spAttackActionXml = database->GetRawData("EvilAttackAction1.xml");
-		auto m_spAttackMotionXml = database->GetRawData("EvilAttackMotionFile.xml");
-
-		unsigned char* m_ActionData = m_spAttackActionXml->m_spData.get();
-		unsigned char* m_MotionData = m_spAttackMotionXml->m_spData.get();
-
-		std::string m_Action(m_ActionData, m_ActionData + m_spAttackActionXml->m_DataSize / sizeof m_ActionData[0]);
-		std::string m_Motion(m_MotionData, m_MotionData + m_spAttackMotionXml->m_DataSize / sizeof m_MotionData[0]);
-		//There seems to be garbage in the first 3 letters
+		//auto m_spAttackActionXml = database->GetRawData("EvilAttackAction1.xml");
+		//auto m_spAttackMotionXml = database->GetRawData("EvilAttackMotionFile.xml");
+		//
+		//unsigned char* m_ActionData = m_spAttackActionXml->m_spData.get();
+		//unsigned char* m_MotionData = m_spAttackMotionXml->m_spData.get();
+		//
+		//std::string m_Action(m_ActionData, m_ActionData + m_spAttackActionXml->m_DataSize / sizeof m_ActionData[0]);
+		//std::string m_Motion(m_MotionData, m_MotionData + m_spAttackMotionXml->m_DataSize / sizeof m_MotionData[0]);
+		////There seems to be garbage in the first 3 letters
 		//m_Action.erase(0, 3);
 		//m_Motion.erase(0, 3);
 		//
 
-		ParseAttackAction_Motion(m_Action, m_Motion);
+		RegisterResources(nullptr);
 		printf("\nParsing Complete");
 	}
 	HOOK(boost::shared_ptr<void>, __stdcall, sub_D0B4F0, 0xD0B4F0, void* This)

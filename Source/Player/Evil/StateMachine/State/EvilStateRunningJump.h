@@ -16,13 +16,13 @@ namespace SUC::Player::Evil
 		}
 		void EnterState() override
 		{
-			EvilGlobal::canExecuteAttacks = false;
+			EvilGlobal::s_CanAttack = false;
 			lastFrame = -1;
 			GetContext()->SetStateFlag(Sonic::Player::CPlayerSpeedContext::eStateFlag_IgnorePadInput, true);
 		}
 		void ForceExit()
 		{
-			EvilGlobal::canExecuteAttacks = true;
+			EvilGlobal::s_CanAttack = true;
 			GetContext()->m_pPlayer->m_StateMachine.ChangeState("Fall");
 			GetContext()->SetStateFlag(Sonic::Player::CPlayerSpeedContext::eStateFlag_IgnorePadInput, false);			
 		}
@@ -42,7 +42,7 @@ namespace SUC::Player::Evil
 		}
 		void LeaveState()
 		{
-			EvilGlobal::canExecuteAttacks = true;
+			EvilGlobal::s_CanAttack = true;
 			GetContext()->SetStateFlag(Sonic::Player::CPlayerSpeedContext::eStateFlag_IgnorePadInput, false);
 		}
 	};

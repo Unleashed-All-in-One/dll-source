@@ -7,35 +7,32 @@ namespace Sonic
 }
 namespace SUC::Player::Evil
 {
-
-	struct EvilParameters
-	{
-		float attackVelocityDivider;
-		float lifeMaxAmount;
-		float lifeCurrentAmount;
-		float movementSpeed;
-		float turnRate;
-		float timerComboMax = 0.75f;
-		float timerDamageMax = 0.3f;
-		float timerAttackMax = 0.35f;
-	};
 	class EvilGlobal
 	{
 	public:
-		static inline std::string lastAttackName;
-		static inline boost::shared_ptr<Sonic::CGameObject3D> shockwaveGameObject;
-		static inline EvilParameters* parameters;
-		static inline bool canExecuteAttacks;
-		static inline bool disableAnimations;
-		static inline bool allowFreemoveArmLeft, allowFreemoveArmRight;
-		static inline Hedgehog::Math::CVector freemovePositionLeft;
-		static inline Hedgehog::Math::CVector freemovePositionRight;
+		struct EvilParameters
+		{
+			float attackVelocityDivider;
+			float lifeMaxAmount;
+			float lifeCurrentAmount;
+			float movementSpeed;
+			float turnRate;
+			float timerComboMax = 0.75f;
+			float timerDamageMax = 0.3f;
+			float timerAttackMax = 0.35f;
+		};
+
+		static inline std::string s_LatestAttackName;
+		static inline EvilParameters* s_Param;
+		static inline bool s_CanAttack;
+		static inline bool s_AllowArmMovL, s_AllowArmMovR;
+		static inline Hedgehog::Math::CVector s_ArmPosL;
+		static inline Hedgehog::Math::CVector s_ArmPosR;
+		static inline boost::shared_ptr<Sonic::CMotionCameraController> s_spMotionCameraController;
 
 		static SUC::Player::Evil::Motion GetMotionFromName(std::string in_Name);
 		static WerehogAttackNew GetAttackFromName();
 		static std::string GetStateNameFromTable(std::string in);
-		static void initializeValues();
-
-		static inline boost::shared_ptr<Sonic::CMotionCameraController> m_spMotionCameraController;
+		static void Initialize();
 	};
 }

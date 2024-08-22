@@ -36,10 +36,10 @@ namespace SUC::Player::Evil
 			MovementRoutine(this);
 			auto context = GetContext();
 			const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-			Common::ClampFloat(EvilGlobal::parameters->attackVelocityDivider, 0.001f, 100);
+			Common::ClampFloat(EvilGlobal::s_Param->attackVelocityDivider, 0.001f, 100);
 			CVector velocityWithoutY = playerContext->m_Velocity;
 			velocityWithoutY.y() = 0;
-			playerContext->m_spMatrixNode->m_Transform.SetPosition(playerContext->m_spMatrixNode->m_Transform.m_Position += (velocityWithoutY / EvilGlobal::parameters->attackVelocityDivider));
+			playerContext->m_spMatrixNode->m_Transform.SetPosition(playerContext->m_spMatrixNode->m_Transform.m_Position += (velocityWithoutY / EvilGlobal::s_Param->attackVelocityDivider));
 			//int __stdcall PostMovement(CSonicContext *sonicContext)
 
 			FUNCTION_PTR(int, __stdcall, PostMov, 0x00E63530, void* context);

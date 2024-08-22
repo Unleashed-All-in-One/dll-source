@@ -1,4 +1,5 @@
-﻿#include "..\..\UI\SubtitleUI.h"
+﻿#include "WerehogMenu.h"
+#include "..\..\UI\SubtitleUI.h"
 const uint32_t* const WIDTH = (uint32_t*)0x1DFDDDC;
 const uint32_t* const HEIGHT = (uint32_t*)0x1DFDDE0;
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -176,6 +177,7 @@ namespace SUC::ImGuiMenu
 
 		//Draw all elements until the pop with DroidSans
 		ImGui::PushFont(ms_PrimaryFont);
+		WerehogMenu::Draw();
 		DebugMenu::Draw();
 		ImGui::PopFont();
 

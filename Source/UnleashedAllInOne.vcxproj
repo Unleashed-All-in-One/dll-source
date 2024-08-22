@@ -120,6 +120,7 @@
   <ItemGroup>
     <ClCompile Include="Accuracy\GenericSonic.cpp" />
     <ClCompile Include="Accuracy\Whip.cpp" />
+    <ClCompile Include="Player\AnimationPoseExtensions.cpp" />
     <ClCompile Include="Player\Evil\ClassicPluginExtensions.cpp" />
     <ClCompile Include="Player\Evil\EvilGlobal.cpp" />
     <ClCompile Include="Player\Evil\EvilSonic.cpp" />
@@ -182,6 +183,7 @@
     <ClCompile Include="System\DebugMenu\imgui_widgets.cpp" />
     <ClCompile Include="System\DebugMenu\SynchronizedObject.cpp" />
     <ClCompile Include="System\DebugMenu\TypesParamRemove.cpp" />
+    <ClCompile Include="System\DebugMenu\WerehogMenu.cpp" />
     <ClCompile Include="System\DiscordStatus.cpp" />
     <ClCompile Include="System\DiscordGameSDK\achievement_manager.cpp" />
     <ClCompile Include="System\DiscordGameSDK\activity_manager.cpp" />
@@ -225,6 +227,7 @@
     <ClInclude Include="BlueBlurCustom\Sonic\System\ApplicationDocument.h" />
     <ClInclude Include="Gameplay\GameplayHookContainer.h" />
     <ClInclude Include="Macros.h" />
+    <ClInclude Include="Player\AnimationPoseExtensions.h" />
     <ClInclude Include="Player\Evil\AnimationExtension\CameraMotion.h" />
     <ClInclude Include="Player\Evil\AnimationExtension\CeramicSA_AnimatorPose.h" />
     <ClInclude Include="Player\Evil\AnimationExtension\CeramicSA_hk2010.h" />
@@ -303,6 +306,7 @@
     <ClInclude Include="System\DebugMenu\imstb_truetype.h" />
     <ClInclude Include="System\DebugMenu\SynchronizedObject.h" />
     <ClInclude Include="System\DebugMenu\TypesParamRemove.h" />
+    <ClInclude Include="System\DebugMenu\WerehogMenu.h" />
     <ClInclude Include="System\DiscordStatus.h" />
     <ClInclude Include="System\DiscordGameSDK\achievement_manager.h" />
     <ClInclude Include="System\DiscordGameSDK\activity_manager.h" />

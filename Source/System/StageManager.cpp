@@ -23,9 +23,14 @@ namespace SUC::System
 	bool skipCurrentQueueEvent;
 	DWORD* storySequence;
 	bool eventTransitionFinished;
-
 	std::string ModeStrings[4] = { "Stage", "Event", "PlayableMenu", "Title" };
-
+	std::function<std::string()> overrideStageIDEvent;
+	bool m_TriggerStageLoadNextFrame;
+	void StageManager::SetOverrideStageIDProcessor(std::function<std::string()> in_Function, bool in_TriggerOnNextTick, const char* in_FileNameCode)
+	{
+		m_TriggerStageLoadNextFrame = in_TriggerOnNextTick;
+		overrideStageIDEvent = in_Function;
+	}
 	std::string SplitString(std::string const& s, char separator)
 	{
 		std::string::size_type pos = s.find(separator);
@@ -541,6 +546,20 @@ namespace SUC::System
 
 		return originalModuleStuffTest(a1, Edx, a2);
 	}
+
+	HOOK(void*, __fastcall, SM_UpdateApplication, 0xE7BED0, void* This, void* Edx, float elapsedTime, uint8_t a3)
+	{
+		if(m_TriggerStageLoadNextFrame)
+		{
+			m_TriggerStageLoadNextFrame = false;
+			std::string m_NextStage = "ghz100";
+			if (overrideStageIDEvent)
+				m_NextStage = overrideStageIDEvent();
+			SequenceHelpers::LoadStage(_strdup(m_NextStage.c_str()));
+			SequenceHelpers::SetPlayerType(0);
+		}
+		return originalSM_UpdateApplication(This, Edx, elapsedTime, a3);
+	}
 	struct SConversionLoadingInfo
 	{
 		int LoadingType;
@@ -593,6 +612,7 @@ namespace SUC::System
 		INSTALL_HOOK(CGameplayFlowStage_CStateWaitEnd);
 		INSTALL_HOOK(CHudGateMenuMainCStateOutroBegin);
 		INSTALL_HOOK(HudLoading_CHudLoadingCStateOutroBegin);
+		INSTALL_HOOK(SM_UpdateApplication);
 
 		//Patch out reading MissionScript to avoid crashes when loading stages without the stgXXX archive name format
 		INSTALL_HOOK(Sonic_Mission_CScriptImpl_SendMissionType);

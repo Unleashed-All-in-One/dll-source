@@ -68,7 +68,7 @@ namespace SUC::Player::Evil
 			jmp[RedRingCollectedCheckReturnAddress]
 		}
 	}
-	void ClassicPluginExtensions::registerPatches()
+	void ClassicPluginExtensions::RegisterHooks()
 	{
 		INSTALL_HOOK(ProcMsgRestart);
 		INSTALL_HOOK(SetupPlayerStageIntro);

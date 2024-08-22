@@ -226,27 +226,31 @@ namespace Sonic::Message
 	{
 	public:
 		HH_FND_MSG_MAKE_TYPE(0x01682150);
-		CMotionCameraController* m_pCameraController;
-		boost::shared_ptr<CMotionCameraController>* m_spCameraController;
-		BB_INSERT_PADDING(0x8);
-		Hedgehog::Base::CSharedString* m_Field32;
-		BB_INSERT_PADDING(0x4);
-		int m_CameraPriority;
+
+		boost::shared_ptr<CCameraController> m_spCameraController;
+		boost::shared_ptr<CCameraController> m_spCameraController2;
+		Hedgehog::Base::CSharedString m_CameraName;
+		float m_EaseTimeEnter;
+		uint32_t m_CameraPriority;
 		bool m_Field44;
 		bool m_Field45;
 		float m_Field46;
 		int m_Field50;
-		MsgPushCameraController(boost::shared_ptr<CMotionCameraController>& in_spCameraController, int in_CameraPriority)
-		{
-			m_spCameraController = &in_spCameraController;
-			m_pCameraController = in_spCameraController.get();
+
+		MsgPushCameraController(const boost::shared_ptr<CCameraController>& in_spCameraController, int in_CameraPriority)
+		{			
+			m_spCameraController = in_spCameraController;
+			m_spCameraController2 = in_spCameraController;
 			m_CameraPriority = in_CameraPriority;
-			m_Field32 = (Hedgehog::base::CSharedString*)(0x013E0DC0);
+			m_CameraName = *(Hedgehog::base::CSharedString*)(0x013E0DC0);
 		}
 	};
-	BB_ASSERT_OFFSETOF(MsgPushCameraController, m_pCameraController, 0x10);
-	BB_ASSERT_OFFSETOF(MsgPushCameraController, m_spCameraController, 0x14);
-	BB_ASSERT_OFFSETOF(MsgPushCameraController, m_Field32, 0x20);
+
+
+	//BB_ASSERT_SIZEOF(MsgPushCameraController, 0x30); //Why is this message mapping larger :screaming:
+	BB_ASSERT_OFFSETOF(MsgPushCameraController, m_spCameraController, 0x10);
+	BB_ASSERT_OFFSETOF(MsgPushCameraController, m_CameraName, 0x20);
+	BB_ASSERT_OFFSETOF(MsgPushCameraController, m_EaseTimeEnter, 0x24);
 	BB_ASSERT_OFFSETOF(MsgPushCameraController, m_CameraPriority, 0x28);
 	BB_ASSERT_OFFSETOF(MsgPushCameraController, m_Field44, 0x2C);
 

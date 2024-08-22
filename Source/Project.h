@@ -124,10 +124,11 @@ namespace SUC
 	};
 	inline char* Format(const char* fmt, ...)
 	{
-		thread_local char buffer[1024];
-
 		va_list args;
 		va_start(args, fmt);
+
+		const int size = snprintf(NULL, 0, fmt, args);
+		thread_local char* buffer = (char*)malloc(size + 1);
 		(void)vsprintf(buffer, fmt, args);
 		va_end(args);
 

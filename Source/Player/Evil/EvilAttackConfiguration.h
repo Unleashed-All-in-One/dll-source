@@ -162,7 +162,7 @@ namespace SUC::Player::Evil
 		static std::vector<Motion> s_AnimationTable;
 		static std::string GetBoneNameFromCollisionParam(int index)
 		{
-			std::vector<std::string> collisionBoneNames = { "RHand", "LHand", "RLeg", "LLeg", "MiddleHand", "Head", "Hips", "MiddleLeg" };
+			std::vector<std::string> collisionBoneNames = { "None", "RHand", "LHand", "RLeg", "LLeg", "MiddleHand", "Head", "Hips", "MiddleLeg" };
 			return collisionBoneNames[index];
 		}
 	};

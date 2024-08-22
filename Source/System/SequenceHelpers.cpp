@@ -257,7 +257,9 @@ namespace SUC::System
 	{
 		FUNCTION_PTR(void, __stdcall, ChangeModuleTest, 0x01107D50, Hedgehog::Universe::CMessageActor * Th, int a2);
 
-		//ChangeModuleTest(Sonic::Sequence::Main::GetInstance(), (int)in_Flow);
+		ChangeModuleTest(Sonic::Sequence::Main::GetInstance(), (int)in_Flow);
+
+		return;
 		Sonic::Message::MsgRequestChangeModule* message2 = new Sonic::Message::MsgRequestChangeModule();
 		message2->m_ModuleIndex = (int)in_Flow;
 		message2->moduleInfo = Sonic::Message::SRequestChangeModuleInfo();
@@ -272,6 +274,8 @@ namespace SUC::System
 
 		init2 = true;
 		ModuleChangeProcessor(message2->moduleInfo, STAGEACT_CONSTRUCTOR, (int)in_Flow);
+
+
 		//Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager->RegisterStateFactory();
 
 
@@ -414,7 +418,6 @@ namespace SUC::System
 			auto appDocMember = (Sonic2::CApplicationDocument::CMember*)Sonic::CApplicationDocument::GetInstance()->m_pMember;
 			CGameplayFlowStageAct* act = (CGameplayFlowStageAct*)appDocMember->m_pGameplayFlowManager->GetCurrentState().get();
 			printf("");
-
 		}
 	}
 	void SequenceHelpers::RegisterHooks()
@@ -425,5 +428,4 @@ namespace SUC::System
 		INSTALL_HOOK(CStoryLua_SetupStage);
 	}
 #pragma endregion
-
 }

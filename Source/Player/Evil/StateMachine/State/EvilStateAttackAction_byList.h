@@ -1,4 +1,5 @@
 #pragma once
+#include "../../../../System/DebugMenu/WerehogMenu.h"
 #include "../Posture/EvilStateAttackPosture_byList.h"
 #include "../../GameObjects/AttackHitbox.h"
 namespace SUC::Player::Evil
@@ -94,7 +95,6 @@ namespace SUC::Player::Evil
 			m_LastTriggerIndex = 0;
 			ms_InitialVelocity = CVector(0, 0, 0);
 			ms_AlteredVelocity = ms_InitialVelocity;
-			context->m_Velocity = ms_InitialVelocity;
 			context->m_pPlayer->m_PostureStateMachine.ChangeState<CStateAttackAction_byList_Posture>();
 		}
 		bool HasHitboxBeenSpawned(std::string name)
@@ -115,9 +115,12 @@ namespace SUC::Player::Evil
 			DebugDrawText::log("RESET", 5);
 			collision.clear();
 		}
+		void LeaveState() override
+		{
+		}
 		void UpdateState() override
 		{
-			m_CurrentMotion = EvilGlobal::GetMotionFromName(EvilGlobal::lastAttackName);
+			m_CurrentMotion = EvilGlobal::GetMotionFromName(EvilGlobal::s_LatestAttackName);
 			auto context = GetContext();
 			const auto spAnimInfo = boost::make_shared<Sonic::Message::MsgGetAnimationInfo>();
 			context->m_pPlayer->SendMessageImm(context->m_pPlayer->m_ActorID, spAnimInfo);
@@ -127,20 +130,17 @@ namespace SUC::Player::Evil
 				Reset();
 			}
 			//if it isnt playing the anim for some reason, force it to play now
-			if (std::strstr(spAnimInfo->m_Name.c_str(), EvilGlobal::GetStateNameFromTable(EvilGlobal::lastAttackName).c_str()) == nullptr)
-				context->ChangeAnimation(EvilGlobal::GetStateNameFromTable(EvilGlobal::lastAttackName).c_str());
+			if (std::strstr(spAnimInfo->m_Name.c_str(), EvilGlobal::GetStateNameFromTable(EvilGlobal::s_LatestAttackName).c_str()) == nullptr)
+				context->ChangeAnimation(EvilGlobal::GetStateNameFromTable(EvilGlobal::s_LatestAttackName).c_str());
 
 			//if the current anim is playing and the frame of it is still the same after 2 frames, it means the animation has ended, change states.
-			if (std::strstr(spAnimInfo->m_Name.c_str(), EvilGlobal::GetStateNameFromTable(EvilGlobal::lastAttackName).c_str()) != nullptr && spAnimInfo->m_Frame == m_LastFrame)
+			if (std::strstr(spAnimInfo->m_Name.c_str(), EvilGlobal::GetStateNameFromTable(EvilGlobal::s_LatestAttackName).c_str()) != nullptr && spAnimInfo->m_Frame == m_LastFrame)
 			{
+				LeaveState();
 				context->m_pPlayer->m_PostureStateMachine.ChangeState("Standard");
 				context->ChangeState("Stand");
 				//EvilGlobal::shockwaveGameObject->SendMessage(EvilGlobal::shockwaveGameObject->m_ActorID, boost::make_shared<Sonic::Message::MsgKill>());
 				return;
-			}
-			if (EvilGlobal::shockwaveGameObject)
-			{
-				EvilGlobal::shockwaveGameObject->m_spMatrixNodeTransform->m_Transform.m_Position = context->m_spMatrixNode->m_Transform.m_Position + (context->m_spMatrixNode->m_Transform.m_Rotation * CVector(0, 0, 2));
 			}
 
 			//this is probably super overkill and could just be done using a for loop with no checks
@@ -162,10 +162,11 @@ namespace SUC::Player::Evil
 			{
 				if (m_CurrentMotion.MotionMoveSpeedRatio != 0 && m_CurrentMotion.MotionMoveSpeedRatio_H[0].FrameValue != 0)
 				{
-					float velocity = m_CurrentMotion.MotionMoveSpeedRatio / m_CurrentMotion.MotionMoveSpeedRatio_H[0].FrameValue;
+					float velocity = m_CurrentMotion.MotionMoveSpeedRatio_H[0].FrameValue * m_CurrentMotion.MotionMoveSpeedRatio;
 					if (abs(velocity) != 0 && !std::isnan(velocity))
 					{
 						ms_AlteredVelocity = GetForward() * velocity;
+						ImGuiMenu::WerehogMenu::s_AppliedVelocity = ms_AlteredVelocity;
 						if (m_CurrentMotion.MotionMoveSpeedRatio_H_Y.size() > 0)
 							ms_AlteredVelocity.y() = m_CurrentMotion.MotionMoveSpeedRatio_H_Y[0].FrameValue;
 						context->m_Velocity = ms_AlteredVelocity;
@@ -213,7 +214,7 @@ namespace SUC::Player::Evil
 			{
 				context->m_Velocity = ms_AlteredVelocity;
 			}
-			context->m_Velocity = ms_AlteredVelocity;
+			context->m_Velocity = ms_AlteredVelocity / 10;
 			ms_AlteredVelocity = CVector(ms_AlteredVelocity.x() * ms_DecelerationForce, 0, ms_AlteredVelocity.z() * ms_DecelerationForce);
 			//if (m_CurrentMotion.MotionMoveSpeedRatio_H.size() > m_LastActionIndex)
 			//{
