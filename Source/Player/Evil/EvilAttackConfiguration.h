@@ -105,6 +105,7 @@ namespace SUC::Player::Evil
 		std::string AttackScope;
 		float DontCatchTime;
 		bool DontJump;
+		bool IsGravity;
 		int ShakeCameraStartFrame;
 		float GroundHeightRepair;
 		std::string MoveType;

@@ -45,7 +45,6 @@ namespace SUC::System
 				const size_t animIndex = i % animCount;
 
 				AnimationSetPatcher::CAnimationStateInfo& entry = m_AnimEntries[m_AnimationContainer->m_Count + i];
-
 				entry.m_Name = AnimationSetPatcher::s_ClassicCustomAnimations[animIndex].m_stateName;
 				entry.m_FileName = AnimationSetPatcher::s_ClassicCustomAnimations[animIndex].m_fileName;
 				entry.m_Speed = AnimationSetPatcher::s_ClassicCustomAnimations[animIndex].m_speed;

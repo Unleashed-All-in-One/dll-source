@@ -1,11 +1,7 @@
 #include "Project.h"
-#include "Gameplay/GameplayHookContainer.h"
-#include "Accuracy/AccuracyHookContainer.h"
-#include "Player/PlayerHookContainer.h"
 #include "SetObject/SetObjectHookContainer.h"
 #include "UI/UIHookContainer.h"
 #include "System/SystemHookContainer.h"
-#include "Testing/TestingCode.h"
 namespace SUC
 {
 	//---------------Gameplay---------------
@@ -86,15 +82,7 @@ namespace SUC
 	{
 #if _DEBUG
 		MessageBox(nullptr, TEXT("Attach Debugger to see hooks."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
-#endif
-
-		Hooks::InstallGameplayHooks();
-		Hooks::InstallAccuracyHooks();
-		Hooks::InstallSetObjectHooks();
-		Hooks::InstallSystemHooks();
-		Hooks::InstallUIHooks();
-		Hooks::InstallPlayerHooks();
-		TestingCode::applyPatches();
+#endif		
 		INSTALL_HOOK(Project_UpdateApplication);
 		INSTALL_HOOK(Project_CHudSonicStage_Update);
 

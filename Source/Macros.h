@@ -60,3 +60,11 @@
 #define PARTICLE_CLAW "slash"
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+
+class CollisionLayerID
+{
+public:
+	static inline const int& Common = *reinterpret_cast<int*>(0x01E0AF30);
+	static inline const int& BasicTerrain = *reinterpret_cast<int*>(0x01E0AFAC);
+	static inline const int& PlayerEvent = *reinterpret_cast<int*>(0x01E0AFD8);
+};

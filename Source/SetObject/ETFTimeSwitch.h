@@ -90,7 +90,7 @@ namespace SUC::SetObject
 			hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(1, 6, 1);
 
 
-			AddRigidBody(m_spRigidBody, shapeEventTrigger1, *pColID_Common, m_spNodeEventCollision);
+			AddRigidBody(m_spRigidBody, shapeEventTrigger1, CollisionLayerID::Common, m_spNodeEventCollision);
 			// You don't need to override this if you're not using it, but this would be for setting up event colliders & rigidbodies.
 			// note you can do this in "SetAddRenderables" but sonic team *tends to* do collision stuff here.
 			return true;

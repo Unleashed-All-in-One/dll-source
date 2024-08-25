@@ -20,6 +20,7 @@ namespace SUC::Player::Evil
 		SharedPtrTypeless sound;
 		const char* prevAnim;
 		SharedPtrTypeless genericEffect;
+		float m_MotionMoveSpeedRatioNew;
 	public:
 		static constexpr const char* ms_pStateName = "Evil_AttackAction_byList";
 
@@ -95,7 +96,9 @@ namespace SUC::Player::Evil
 			m_LastTriggerIndex = 0;
 			ms_InitialVelocity = CVector(0, 0, 0);
 			ms_AlteredVelocity = ms_InitialVelocity;
-			context->m_pPlayer->m_PostureStateMachine.ChangeState<CStateAttackAction_byList_Posture>();
+			SONIC_CLASSIC_CONTEXT->m_pPlayer->m_PostureStateMachine.ChangeState("Standard");
+
+			context->ChangeAnimation(EvilGlobal::GetStateNameFromTable(EvilGlobal::s_LatestAttackName).c_str());
 		}
 		bool HasHitboxBeenSpawned(std::string name)
 		{
@@ -112,33 +115,43 @@ namespace SUC::Player::Evil
 			{
 				collision.at(i)->SendMessage(collision.at(i)->m_ActorID, boost::make_shared<Sonic::Message::MsgKill>());
 			}
+
 			DebugDrawText::log("RESET", 5);
 			collision.clear();
+			LeaveState();
 		}
 		void LeaveState() override
 		{
+			auto context = GetContext();
+			context->m_Velocity = CVector::Identity();
+
 		}
 		void UpdateState() override
 		{
-			m_CurrentMotion = EvilGlobal::GetMotionFromName(EvilGlobal::s_LatestAttackName);
 			auto context = GetContext();
+			m_CurrentMotion = EvilGlobal::GetMotionFromName(EvilGlobal::s_LatestAttackName);
+			//if(m_CurrentMotion.IsGravity)
+			//{
+			//	context->m_pPlayer->m_PostureStateMachine.ChangeState("Standard");
+			//}
+			//else
+			//{
+			//}
 			const auto spAnimInfo = boost::make_shared<Sonic::Message::MsgGetAnimationInfo>();
 			context->m_pPlayer->SendMessageImm(context->m_pPlayer->m_ActorID, spAnimInfo);
 			DebugDrawText::log(std::format("CSTATEATTACKACTION_AnimFrame = {0}", spAnimInfo->m_Frame).c_str(), 0);
 			if (spAnimInfo->m_Frame <= m_LastFrame)
 			{
-				Reset();
 			}
 			//if it isnt playing the anim for some reason, force it to play now
-			if (std::strstr(spAnimInfo->m_Name.c_str(), EvilGlobal::GetStateNameFromTable(EvilGlobal::s_LatestAttackName).c_str()) == nullptr)
-				context->ChangeAnimation(EvilGlobal::GetStateNameFromTable(EvilGlobal::s_LatestAttackName).c_str());
+			
 
 			//if the current anim is playing and the frame of it is still the same after 2 frames, it means the animation has ended, change states.
 			if (std::strstr(spAnimInfo->m_Name.c_str(), EvilGlobal::GetStateNameFromTable(EvilGlobal::s_LatestAttackName).c_str()) != nullptr && spAnimInfo->m_Frame == m_LastFrame)
 			{
-				LeaveState();
-				context->m_pPlayer->m_PostureStateMachine.ChangeState("Standard");
-				context->ChangeState("Stand");
+				SONIC_CLASSIC_CONTEXT->ChangeState("Stand");
+				Reset();
+
 				//EvilGlobal::shockwaveGameObject->SendMessage(EvilGlobal::shockwaveGameObject->m_ActorID, boost::make_shared<Sonic::Message::MsgKill>());
 				return;
 			}
@@ -158,15 +171,23 @@ namespace SUC::Player::Evil
 				}
 
 			}
+			for (auto moveSpeedRatioH : m_CurrentMotion.MotionMoveSpeedRatio_H)
+			{
+				if(spAnimInfo->m_Frame >= moveSpeedRatioH.FrameStart)
+				{
+					m_MotionMoveSpeedRatioNew = moveSpeedRatioH.FrameValue;
+				}
+			}
 			if (spAnimInfo->m_Frame >= m_CurrentMotion.MotionSpeed_FirstFrame && spAnimInfo->m_Frame < m_CurrentMotion.MotionSpeed_MiddleFrame)
 			{
-				if (m_CurrentMotion.MotionMoveSpeedRatio != 0 && m_CurrentMotion.MotionMoveSpeedRatio_H[0].FrameValue != 0)
+				if (m_MotionMoveSpeedRatioNew != 0 && m_CurrentMotion.MotionMoveSpeedRatio_H[0].FrameValue != 0)
 				{
-					float velocity = m_CurrentMotion.MotionMoveSpeedRatio_H[0].FrameValue * m_CurrentMotion.MotionMoveSpeedRatio;
+					float velocity = m_MotionMoveSpeedRatioNew;
 					if (abs(velocity) != 0 && !std::isnan(velocity))
 					{
-						ms_AlteredVelocity = GetForward() * velocity;
+						ms_AlteredVelocity = SONIC_CLASSIC_CONTEXT->GetFrontDirection() * (velocity);
 						ImGuiMenu::WerehogMenu::s_AppliedVelocity = ms_AlteredVelocity;
+						ImGuiMenu::WerehogMenu::s_MoveSpeedVelocity = velocity;
 						if (m_CurrentMotion.MotionMoveSpeedRatio_H_Y.size() > 0)
 							ms_AlteredVelocity.y() = m_CurrentMotion.MotionMoveSpeedRatio_H_Y[0].FrameValue;
 						context->m_Velocity = ms_AlteredVelocity;
@@ -214,7 +235,7 @@ namespace SUC::Player::Evil
 			{
 				context->m_Velocity = ms_AlteredVelocity;
 			}
-			context->m_Velocity = ms_AlteredVelocity / 10;
+			context->m_Velocity = ms_AlteredVelocity;
 			ms_AlteredVelocity = CVector(ms_AlteredVelocity.x() * ms_DecelerationForce, 0, ms_AlteredVelocity.z() * ms_DecelerationForce);
 			//if (m_CurrentMotion.MotionMoveSpeedRatio_H.size() > m_LastActionIndex)
 			//{

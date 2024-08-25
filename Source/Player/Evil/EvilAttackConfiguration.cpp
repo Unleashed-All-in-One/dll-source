@@ -117,6 +117,7 @@ namespace SUC::Player::Evil
 		returned.MotionFirstSpeed = std::stof(in_MotionNode->first_node("MotionFirstSpeed")->value());
 		returned.MiddleSpeed = std::stof(in_MotionNode->first_node("MiddleSpeed")->value());
 		returned.EndSpeed = std::stof(in_MotionNode->first_node("EndSpeed")->value());
+		returned.IsGravity = std::string(in_MotionNode->first_node("IsGravity")->value()) == "true";
 		returned.MotionSpeed_FirstFrame = std::stof(in_MotionNode->first_node("MotionSpeed_FirstFrame")->value());
 		returned.MotionSpeed_MiddleFrame = std::stof(in_MotionNode->first_node("MotionSpeed_MiddleFrame")->value());
 
@@ -246,7 +247,7 @@ namespace SUC::Player::Evil
 			else
 			{
 				vec[i].FileName = attack.FileName;
-				SUC::System::AnimationSetPatcher::RegisterClassicAnimation(file, attack.FileName);
+				SUC::System::AnimationSetPatcher::RegisterClassicAnimation(file, attack.FileName, 1, false);
 			}
 			if (std::find(alreadyRegistered.begin(), alreadyRegistered.end(), attack.MotionName) == alreadyRegistered.end())
 			{

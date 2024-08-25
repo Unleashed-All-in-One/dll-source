@@ -297,7 +297,7 @@ namespace SUC::Player::Evil
 		auto node = playerContext->m_pPlayer->m_spCharacterModel->GetNode("Hand_R");
 		DebugDrawText::log(std::format("Matrix 0 {0}, {1}, {2}", node->GetWorldMatrix().data()[0], node->GetWorldMatrix().data()[1], node->GetWorldMatrix().data()[2]).c_str(), 10);
 		//EvilGlobal::shockwaveGameObject = Common::CreatePlayerSupportShockWaveReturnGameObject(playerContext->m_spMatrixNode->m_Transform.m_Position + (playerContext->m_spMatrixNode->m_Transform.m_Rotation * CVector(0, 0, 2)), 2, 2, 100);
-		PlayAnim(EvilGlobal::GetStateNameFromTable(attack));
+		//PlayAnim(EvilGlobal::GetStateNameFromTable(attack));
 		/*Common::PlaySoundStatic(sound, attacks.at(attackIndex).cueIDs[comboIndex]);*/
 		EvilGlobal::s_LatestAttackName = attack;
 
@@ -791,8 +791,8 @@ namespace SUC::Player::Evil
 	{
 		if (IS_CLASSIC_SONIC && timerAttack < EvilGlobal::s_Param->timerAttackMax && timerCombo < EvilGlobal::s_Param->timerComboMax)
 		{
-			if (playingAttack)
-				PlayAnim(EvilGlobal::GetStateNameFromTable(EvilGlobal::s_LatestAttackName));
+			//if (playingAttack)
+			//	PlayAnim(EvilGlobal::GetStateNameFromTable(EvilGlobal::s_LatestAttackName));
 		}
 		else
 			originalCSonicStateWalk_Update(This);

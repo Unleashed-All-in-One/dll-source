@@ -81,7 +81,7 @@ namespace SUC::SetObject
 
 			shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(m_setWidth, 1, 1);
 
-			AddEventCollision("Object", shapeEventTrigger1, *pColID_PlayerEvent, true, m_spNodeEventCollision);
+			AddEventCollision("Object", shapeEventTrigger1, CollisionLayerID::PlayerEvent, true, m_spNodeEventCollision);
 			return true;
 		}
 		void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override

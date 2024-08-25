@@ -1,10 +1,16 @@
 ﻿
+#include "Accuracy/AccuracyHookContainer.h"
+#include "Gameplay/GameplayHookContainer.h"
+#include "Player/PlayerHookContainer.h"
+#include "SetObject/SetObjectHookContainer.h"
 #include "System/DiscordStatus.h"
+#include "System/SystemHookContainer.h"
+#include "Testing/TestingCode.h"
 #include "UI/EventViewer.h"
+#include "UI/UIHookContainer.h"
 
 extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 {
-
 	// Load configuration
 	SUC::Project::Load(modInfo);
 	//Make Gens support 4gb+
@@ -16,6 +22,13 @@ extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 {
 	SUC::Project::RegisterGlobalHooks();
+	SUC::Hooks::InstallGameplayHooks();
+	SUC::Hooks::InstallAccuracyHooks();
+	SUC::Hooks::InstallSetObjectHooks();
+	SUC::Hooks::InstallSystemHooks();
+	SUC::Hooks::InstallUIHooks();
+	SUC::Hooks::InstallPlayerHooks();
+	TestingCode::applyPatches();
 }
 extern "C" __declspec(dllexport) void PostInit()
 {

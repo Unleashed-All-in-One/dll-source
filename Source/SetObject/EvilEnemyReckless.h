@@ -1,4 +1,5 @@
 #pragma once
+#include "../System/CollisionID.h"
 using namespace hh::math;
 namespace SUC::SetObject
 {
@@ -12,8 +13,11 @@ namespace SUC::SetObject
 		boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
 		boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
 		boost::shared_ptr<Hedgehog::Animation::CAnimationPose> m_AnimatorPose;
+		boost::shared_ptr<Sonic::CRayCastCollision> m_spRaycastCollision;
 		SharedPtrTypeless sound;
 		std::vector<SUC::NewAnimationData> animations;
+		bool m_IsGrounded;
+		hh::math::CVector m_Velocity;
 
 		bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
 		{
@@ -30,7 +34,8 @@ namespace SUC::SetObject
 			animations.push_back(SUC::NewAnimationData("RunL", "recl_run_l", 1, true, nullptr));
 			/*animations.push_back(SUC::NewAnimationData("Appear", "cmn_obj_sk2_hintring_appear", 1, false, nullptr));
 			animations.push_back(SUC::NewAnimationData("Touch", "cmn_obj_sk2_hintring_touch", 1, false, "Idle"));*/
-
+			
+		m_spRaycastCollision = boost::make_shared<Sonic::CRayCastCollision>(Sonic::CGameDocument::GetInstance()->GetWorld().get());
 			this->SetContext(this); //set Context of AnimatorStateMachine to IAnimatorContext
 			ObjectUtility::RegisterAnimations(m_AnimatorPose, animations, m_spSpawnedModel, this);
 			Sonic::CGameObject::AddRenderable("Object", m_spSpawnedModel, true);
@@ -76,10 +81,15 @@ namespace SUC::SetObject
 			m_spNodeEventCollision->NotifyChanged();
 			m_spNodeEventCollision->SetParent(m_spMatrixNodeTransform.get());
 			//void __thiscall sub_10C0E00(_DWORD *this, int a2)
-			hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(1, 6, 1);
+			hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(1, 1, 1);
 
 
-			AddRigidBody(m_spRigidBody, shapeEventTrigger1, *pColID_Common, m_spNodeEventCollision);
+			AddRigidBody(m_spRigidBody, shapeEventTrigger1, CollisionLayerID::Common, m_spNodeEventCollision);
+			typedef void (*FuncType)();
+
+			uint32_t* test = (uint32_t*)m_spRigidBody->m_pHkpRigidBody;
+			FuncType functionToCall = (FuncType)((char*)test + 340);
+			functionToCall();
 			// You don't need to override this if you're not using it, but this would be for setting up event colliders & rigidbodies.
 			// note you can do this in "SetAddRenderables" but sonic team *tends to* do collision stuff here.
 			return true;
@@ -102,6 +112,36 @@ namespace SUC::SetObject
 				if (this->GetCurrentState()->m_Name != "RunL")
 					this->ChangeState("RunL");
 			}
+			Hedgehog::Math::CVector newPos = m_spMatrixNodeTransform->m_Transform.m_Position;
+
+			// Apply fake gravity via constant raycast LOL
+			Hedgehog::Math::CVector rayEnd = newPos - Hedgehog::Math::CVector(0, 1, 0);
+
+			// Variable to store the hit result
+			Sonic::SCollisionHitPointInfo result;
+
+			// Cast a ray from the object root to the given end position & store the result
+			m_spRaycastCollision->m_pPhysicsWorld->CheckLineCollisionClosest(result, newPos, rayEnd, CollisionLayerID::BasicTerrain);
+			m_IsGrounded = result.Valid;
+			if (!m_IsGrounded)
+			{
+				m_Velocity += Hedgehog::Math::CVector(0, -0.002f, 0);				
+			}
+			else
+			{
+				m_Velocity.y() = 0;
+			}
+			auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
+			if(inputPtr->IsTapped(Sonic::eKeyState_RightBumper))
+			{
+				m_spMatrixNodeTransform->m_Transform.m_Position.y() += 10;
+				
+			}
+			DebugDrawText::log(SUC::Format("PosEnemyY: %.3f", m_spMatrixNodeTransform->m_Transform.m_Position.y()), 0);
+			newPos = m_spMatrixNodeTransform->m_Transform.m_Position + m_Velocity;
+			// Update Matrix Node
+			m_spMatrixNodeTransform->m_Transform.SetPosition(newPos);
+			m_spMatrixNodeTransform->NotifyChanged();
 		}
 		static void RegisterObject();
 	};

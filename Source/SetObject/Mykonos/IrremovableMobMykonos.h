@@ -135,8 +135,8 @@ namespace SUC::SetObject
 			hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(0.75f, 3.25f, 0.5f);
 			hk2010_2_0::hkpBoxShape* shapeEventTrigger2 = new hk2010_2_0::hkpBoxShape(1, 3.5f, 1);
 
-			AddRigidBody(m_spRigidBody, shapeEventTrigger1, *pColID_Common, m_spNodeEventCollision);
-			AddEventCollision("Object", shapeEventTrigger2, *pColID_PlayerEvent, true, m_spNodeEventCollision);
+			AddRigidBody(m_spRigidBody, shapeEventTrigger1, CollisionLayerID::Common, m_spNodeEventCollision);
+			AddEventCollision("Object", shapeEventTrigger2, CollisionLayerID::PlayerEvent, true, m_spNodeEventCollision);
 			return true;
 		}
 		void InitializeEditParam(Sonic::CEditParam& in_rEditParam) override

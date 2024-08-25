@@ -75,7 +75,7 @@ namespace SUC::SetObject
             m_spNodeEventCollision->NotifyChanged();
             m_spNodeEventCollision->SetParent(m_spMatrixNodeTransform.get());
             hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(m_CollisionWidth, m_CollisionHeight, m_CollisionLength);
-            AddEventCollision("Object", shapeEventTrigger1, *pColID_PlayerEvent, true, m_spNodeEventCollision);
+            AddEventCollision("Object", shapeEventTrigger1, CollisionLayerID::PlayerEvent, true, m_spNodeEventCollision);
             return true;
         }
         void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override

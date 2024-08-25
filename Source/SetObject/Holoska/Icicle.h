@@ -120,9 +120,9 @@ namespace SUC::SetObject
 			m_spNodeEventCollision->SetParent(m_spNodeRigidbody.get());
 			//void __thiscall sub_10C0E00(_DWORD *this, int a2)
 			hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(20, 40, 20);
-			AddRigidBody(m_spRigidBody, "snw_obj_icicle", "snw_obj_km_icicleA_000", *pColID_Common, m_spNodeRigidbody, in_spDatabase);
-			AddRigidBody(m_spRigidBody2, "snw_obj_icicle", "snw_obj_km_icicleB_000", *pColID_Common, m_spNodeRigidbody, in_spDatabase);
-			AddEventCollision("Normal", shapeEventTrigger1, *pColID_PlayerEvent, false, m_spNodeEventCollision);
+			AddRigidBody(m_spRigidBody, "snw_obj_icicle", "snw_obj_km_icicleA_000", CollisionLayerID::Common, m_spNodeRigidbody, in_spDatabase);
+			AddRigidBody(m_spRigidBody2, "snw_obj_icicle", "snw_obj_km_icicleB_000", CollisionLayerID::Common, m_spNodeRigidbody, in_spDatabase);
+			AddEventCollision("Normal", shapeEventTrigger1, CollisionLayerID::PlayerEvent, false, m_spNodeEventCollision);
 			m_spRigidBody->m_CollisionCategory = 51;
 			m_spRigidBody2->m_CollisionCategory = 51;
 			auto test = (uint32_t*)m_spRigidBody->m_pHkpRigidBody;

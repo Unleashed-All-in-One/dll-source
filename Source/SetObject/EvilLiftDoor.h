@@ -3,7 +3,6 @@
 using namespace hh::math;
 namespace SUC::SetObject
 {
-	static const int* pColID_BasicTerrain = reinterpret_cast<int*>(0x01E0AFAC);
 	class EvilLiftDoor :public Sonic::CObjectBase, public Sonic::CSetObjectListener
 	{
 	public:
@@ -97,8 +96,8 @@ namespace SUC::SetObject
 			hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(5, 6, 2);
 			hk2010_2_0::hkpBoxShape* shapeEventTrigger2 = new hk2010_2_0::hkpBoxShape(8, 2, 4);
 
-			AddEventCollision("Object", shapeEventTrigger2, *pColID_PlayerEvent, true, m_spNodeEventCollisionSolid);
-			AddRigidBody(m_spRigidBody, shapeEventTrigger1, *pColID_Common, m_spNodeEventCollision);
+			AddEventCollision("Object", shapeEventTrigger2, CollisionLayerID::PlayerEvent, true, m_spNodeEventCollisionSolid);
+			AddRigidBody(m_spRigidBody, shapeEventTrigger1, CollisionLayerID::Common, m_spNodeEventCollision);
 			return true;
 		}
 		void SetDoorPos(CVector pos)

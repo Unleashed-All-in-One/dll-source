@@ -1,5 +1,4 @@
-static const int* pColID_Common = reinterpret_cast<int*>(0x01E0AF30);
-static const int* pColID_PlayerEvent = reinterpret_cast<int*>(0x01E0AFD8);
+
 
 //This is in the latest blueblur, but we have to reconfigure the project because of big changes to blueblur, so for now this is staying here.
 namespace Sonic::Player

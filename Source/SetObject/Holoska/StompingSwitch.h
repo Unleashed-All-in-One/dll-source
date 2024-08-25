@@ -69,8 +69,10 @@ namespace SUC::SetObject
         {
             if (in_Flag)
             {
-                if (std::strstr(in_rMsg.GetType(), "MsgDamage") != nullptr) {
-                    if (in_rMsg.m_SenderActorID == sonic->m_pPlayer->m_ActorID && m_DetectionCooldown <= 0 && sonic->m_pPlayer->m_StateMachine.GetCurrentState()->GetStateName() == "Stomping") {
+                if (std::strstr(in_rMsg.GetType(), "MsgDamage") != nullptr) 
+                {
+                    if (in_rMsg.m_SenderActorID == sonic->m_pPlayer->m_ActorID && m_DetectionCooldown <= 0 && sonic->m_pPlayer->m_StateMachine.GetCurrentState()->GetStateName() == "Stomping") 
+                    {
                         m_DetectionCooldown = 0.25f;
                         OnLanded();
                     }
@@ -96,17 +98,17 @@ namespace SUC::SetObject
             m_spNodeEventCollision->NotifyChanged();
             m_spNodeEventCollision->SetParent(m_spNodeRigidbody.get());
             hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(2.9, 0.5, 2.9);
-            AddEventCollision("Normal", shapeEventTrigger1, *pColID_PlayerEvent, false, m_spNodeEventCollision);
-            AddRigidBody(m_spRigidBody, shapeEventTrigger1, *pColID_Common, m_spNodeEventCollision);
+            AddEventCollision("Normal", shapeEventTrigger1, CollisionLayerID::PlayerEvent, false, m_spNodeEventCollision);
+            AddRigidBody(m_spRigidBody, shapeEventTrigger1, CollisionLayerID::Common, m_spNodeEventCollision);
 
             m_spNodePoleCollision = boost::make_shared<Sonic::CMatrixNodeTransform>();
             m_spNodePoleCollision->m_Transform.SetPosition(Hedgehog::Math::CVector(0, 1.25, 0));
             m_spNodePoleCollision->NotifyChanged();
             m_spNodePoleCollision->SetParent(m_spNodeRigidbody.get());
             hk2010_2_0::hkpBoxShape* shapeEventTrigger2 = new hk2010_2_0::hkpBoxShape(0.5, 2.5, 0.5);
-            AddRigidBody(m_spRigidBody, shapeEventTrigger2, *pColID_Common, m_spNodePoleCollision);
+            AddRigidBody(m_spRigidBody, shapeEventTrigger2, CollisionLayerID::Common, m_spNodePoleCollision);
 
-            AddRigidBody(m_spRigidBody, "cmn_obj_km_switchpushM_000", "cmn_obj_km_switchpushM_000", *pColID_Common, m_spMatrixNodeTransform, in_spDatabase);
+            AddRigidBody(m_spRigidBody, "cmn_obj_km_switchpushM_000", "cmn_obj_km_switchpushM_000", CollisionLayerID::Common, m_spMatrixNodeTransform, in_spDatabase);
 
             return true;
         }

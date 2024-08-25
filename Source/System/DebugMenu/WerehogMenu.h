@@ -10,5 +10,6 @@ namespace SUC::ImGuiMenu
         static bool s_Visible;
         static inline SUC::Player::Evil::Motion* s_MotionDisplay;
         static inline hh::math::CVector s_AppliedVelocity;
+        static inline float s_MoveSpeedVelocity;
     };	
 }

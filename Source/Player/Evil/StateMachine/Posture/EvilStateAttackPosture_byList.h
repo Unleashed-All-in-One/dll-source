@@ -39,7 +39,10 @@ namespace SUC::Player::Evil
 			Common::ClampFloat(EvilGlobal::s_Param->attackVelocityDivider, 0.001f, 100);
 			CVector velocityWithoutY = playerContext->m_Velocity;
 			velocityWithoutY.y() = 0;
-			playerContext->m_spMatrixNode->m_Transform.SetPosition(playerContext->m_spMatrixNode->m_Transform.m_Position += (velocityWithoutY / EvilGlobal::s_Param->attackVelocityDivider));
+
+			FUNCTION_PTR(void, __fastcall, Posture3DCommon_MovementRoutine, 0x00E37FD0, Sonic::Player::CPlayerSpeedPosture3DCommon * state);
+			Posture3DCommon_MovementRoutine(this);
+			//playerContext->m_spMatrixNode->m_Transform.SetPosition(playerContext->m_spMatrixNode->m_Transform.m_Position += (velocityWithoutY / EvilGlobal::s_Param->attackVelocityDivider));
 			//int __stdcall PostMovement(CSonicContext *sonicContext)
 
 			FUNCTION_PTR(int, __stdcall, PostMov, 0x00E63530, void* context);

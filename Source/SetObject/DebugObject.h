@@ -122,7 +122,7 @@ namespace SUC::SetObject
 			m_spNodeEventCollision->SetParent(m_spMatrixNodeTransform.get());
 
 			hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(1, m_setColliderLength, 1);
-			AddEventCollision("Object", shapeEventTrigger1, *pColID_PlayerEvent, true, m_spNodeEventCollision);
+			AddEventCollision("Object", shapeEventTrigger1, CollisionLayerID::PlayerEvent, true, m_spNodeEventCollision);
 			return true;
 		}
 		void AddImpulse(Hedgehog::Math::CVector impulse, bool relative)
