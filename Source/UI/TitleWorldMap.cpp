@@ -6,6 +6,7 @@
 #include "TitleWorldMap.h"
 #include "../System/AspectRatioHelper.h"
 #include "../System/MiniAudioHelper.h"
+#include "../BlueBlurCustom/Sonic/Particle/ParticleManager.h"
 using namespace hh::math;
 
 namespace SUC::UI::TitleScreen
@@ -646,6 +647,35 @@ namespace SUC::UI::TitleScreen
 
 			rcCtsGuideText->SetPosition(140, 40);
 	}
+	///This was prob one of the hardest things ive had to figure out
+///ParticleManager is responsible for all Glitter functionality
+///It is only spawned in the Act gameplayflows and thus in the titlescreen it didnt exist
+///This spawns it.
+	void SpawnParticleManager()
+	{
+		const Hedgehog::Base::THolder<Sonic::CWorld>& worldHolder =	Sonic::CGameDocument::GetInstance()->GetWorld().get();
+		Sonic::CGameDocument* pGameDocument = Sonic::CGameDocument::GetInstance().get().get();
+		const boost::shared_ptr<Hedgehog::Database::CDatabase>& spDatabase = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spApplicationDatabase;
+		FUNCTION_PTR(void*, __stdcall, AddRenderableWorld, 0x00D4E3C0, void* world, const Hedgehog::Base::CStringSymbol in_Category,
+			const boost::shared_ptr<Hedgehog::Mirage::CRenderable>&in_spRenderable);
+
+		Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager = boost::make_shared<Sonic::CParticleManager>();
+		const auto& m_spParticleManager = Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager;
+		//necessary since its stored in gamedoc, all particle functions seem to reference this
+
+		Sonic::CGameDocument::GetInstance()->AddGameObject(m_spParticleManager);
+		m_spParticleManager->AddCallback(worldHolder, pGameDocument, spDatabase);
+		Sonic::CApplicationDocument::GetInstance()->AddMessageActor("GameObject", m_spParticleManager.get());
+		const auto& world = Sonic::CGameDocument::GetInstance()->GetWorld().get().get();
+		AddRenderableWorld(world, "SparkleObject", m_spParticleManager->m_spTypicalRenderer);
+		AddRenderableWorld(world, "Sparkle_FB", m_spParticleManager->m_spDeformationRenderer);
+		AddRenderableWorld(world, "Sparkle_Stencil", m_spParticleManager->m_spPlayableMenuRenderer);
+		AddRenderableWorld(world, "SMO", m_spParticleManager->m_spShadowMapRenderer);
+		AddRenderableWorld(world, "Object_Icon", m_spParticleManager->m_spObjectIconRenderer);
+		pGameDocument->AddUpdateUnit("0", m_spParticleManager.get());
+		Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager = m_spParticleManager;
+		Sonic::CGameDocument::GetInstance()->m_pMember->m_pParticleManager = m_spParticleManager.get();
+	}
 
 	void TitleWorldMap::CreateScreen(Sonic::CGameObject* pParentGameObject)
 	{
@@ -861,7 +891,7 @@ namespace SUC::UI::TitleScreen
 		rcCtsGuide4Mission->SetPosition(sceneFixPosX, 0);
 		rcCtsGuide5Medal->SetPosition(sceneFixPosX, 0);
 
-
+		SpawnParticleManager();
 		m_spWorldmapObject = boost::make_shared<CTitleWorldMapSky>(CVector(-79.8565f, 0, 4.78983f));
 		// CVector(0, 0, -2.34f)
 		m_GlobeModel = boost::make_shared<CTitleWorldMapGlobe>(TitleWorldMap::s_PivotPosition);

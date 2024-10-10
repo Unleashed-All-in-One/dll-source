@@ -1,8 +1,73 @@
 #pragma once
+#include <hk2010_2_0/hk2010_2_0.h>
+#include <Sonic/Havok/PhysicsWorld.h>
+#include "../BlueBlurCustom/Sonic/System/CharacterProxy.h"
+#include "../hkTest.h"
+#include "../BlueBlurCustom/Sonic/System/CharacterProxy.h"
+#include "../Player/Evil/AnimationExtension/CeramicSA_hk2010.h"
 #include "../System/CollisionID.h"
 using namespace hh::math;
+
+//class RigidbodyNode : public Hedgehog::Mirage::CMatrixNode
+//{
+//public:
+//	BB_INSERT_PADDING(0xF0 - sizeof(Hedgehog::Mirage::CMatrixNode));
+//	RigidbodyNode* Ctor(RigidbodyNode* in_Rb, hk2010_2_0::hkpRigidBody* a2)
+//	{
+//		static uint32_t pAddr = 0x010BD9E0;
+//		__asm
+//		{
+//			push a2
+//			mov esi, in_Rb
+//			call[pAddr]
+//		}
+//
+//	}
+//	RigidbodyNode()
+//	{
+//		
+//	}
+//	RigidbodyNode(Sonic::CRigidBody* a2)
+//	{
+//		Ctor(this, a2->m_pHkpRigidBody);
+//	}
+//};
 namespace SUC::SetObject
 {
+
+
+	inline void __declspec(naked) SetMotionType(Sonic::CRigidBody* in_Rb, int a2)
+	{
+		static uint32_t pAddr = 0x11806E0;
+		__asm
+		{
+			mov esi, in_Rb
+			push a2
+			call[pAddr]
+		}
+
+	};
+	inline BBExt::CCharacterProxy* CtorProxy(void* a1, BBExt::CCharacterProxy* a2, Hedgehog::Base::THolder<Sonic::CWorld> a3, hk2010_2_0::hkpShape* a4, hh::math::CVector& a5, hh::math::CQuaternion& a6, int a7, hh::math::CVector& a8)
+	{
+		static uint32_t pAddr = 0x010E3EF0;
+		//a1 = eax
+		//a2 = ecx
+		__asm
+		{
+			push a8
+			push a7
+			push a6
+			push a5
+			push a4
+			push a3
+			mov eax, a1
+			mov ecx, a2
+			call[pAddr]
+		}
+
+	};
+
+
 	class EvilEnemyReckless :public Sonic::CObjectBase, public Sonic::CSetObjectListener, public Sonic::IAnimationContext, public Sonic::CAnimationStateMachine
 	{
 	public:
@@ -11,9 +76,12 @@ namespace SUC::SetObject
 
 			boost::shared_ptr<hh::mr::CSingleElement> m_spSpawnedModel;
 		boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
+		boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeNextPos;
 		boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
 		boost::shared_ptr<Hedgehog::Animation::CAnimationPose> m_AnimatorPose;
 		boost::shared_ptr<Sonic::CRayCastCollision> m_spRaycastCollision;
+		boost::shared_ptr<BBExt::CCharacterProxy> m_spCharacterProxy;
+
 		SharedPtrTypeless sound;
 		std::vector<SUC::NewAnimationData> animations;
 		bool m_IsGrounded;
@@ -34,8 +102,8 @@ namespace SUC::SetObject
 			animations.push_back(SUC::NewAnimationData("RunL", "recl_run_l", 1, true, nullptr));
 			/*animations.push_back(SUC::NewAnimationData("Appear", "cmn_obj_sk2_hintring_appear", 1, false, nullptr));
 			animations.push_back(SUC::NewAnimationData("Touch", "cmn_obj_sk2_hintring_touch", 1, false, "Idle"));*/
-			
-		m_spRaycastCollision = boost::make_shared<Sonic::CRayCastCollision>(Sonic::CGameDocument::GetInstance()->GetWorld().get());
+
+			m_spRaycastCollision = boost::make_shared<Sonic::CRayCastCollision>(Sonic::CGameDocument::GetInstance()->GetWorld().get());
 			this->SetContext(this); //set Context of AnimatorStateMachine to IAnimatorContext
 			ObjectUtility::RegisterAnimations(m_AnimatorPose, animations, m_spSpawnedModel, this);
 			Sonic::CGameObject::AddRenderable("Object", m_spSpawnedModel, true);
@@ -55,10 +123,12 @@ namespace SUC::SetObject
 		{
 			return Hedgehog::Math::CVector(1.0f, 1.0f, 1.0f);
 		}
+		bool isColliding;
 		bool ProcessMessage(Hedgehog::Universe::Message& in_rMsg, bool in_Flag) override
 		{
 			if (in_Flag)
 			{
+
 
 				if (std::strstr(in_rMsg.GetType(), "MsgSetPosition") != nullptr)
 				{
@@ -71,34 +141,94 @@ namespace SUC::SetObject
 					Common::PlaySoundStaticCueName(sound, "es_damage_norm");
 					return true;
 				}
+				if(std::strstr(in_rMsg.GetType(), "MsgHitEventCollision"))
+				{
+					m_Velocity -= (m_spMatrixNodeTransform->m_Transform.m_Position - m_spNodeNextPos->m_Transform.m_Position).normalized();
+					isColliding = true;
+					return true;
+				}
 			}
 			return Sonic::CObjectBase::ProcessMessage(in_rMsg, in_Flag);
 		};
+		bool AddRigidBody2(const boost::shared_ptr<Sonic::CRigidBody>& in_spRigidBody,
+			hk2010_2_0::hkpShape* in_pShape, const boost::shared_ptr<Hedgehog::Mirage::CMatrixNode>& in_spMatrixNode)
+		{
+			BB_FUNCTION_PTR(bool, __stdcall, fpCGameObject3DAddRigidBody2, 0xE98BD0,
+				const boost::shared_ptr<Sonic::CRigidBody>&, Sonic::CGameObject3D * This, hk2010_2_0::hkpShape * in_pShape,
+				Hedgehog::Mirage::CMatrixNode* in_pMatrixNode,boost::shared_ptr<Hedgehog::Mirage::CMatrixNode> in_spMatrixNode);
+			return fpCGameObject3DAddRigidBody2(in_spRigidBody, this, in_pShape, in_spMatrixNode.get(), in_spMatrixNode);
+		}
+		hk2010_2_0::hkpRigidBody* rb;
 		bool SetAddColliders(const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
 		{
 			m_spNodeEventCollision = boost::make_shared<Sonic::CMatrixNodeTransform>();
 			m_spNodeEventCollision->m_Transform.SetPosition(Hedgehog::Math::CVector(0, 0, 0));
 			m_spNodeEventCollision->NotifyChanged();
 			m_spNodeEventCollision->SetParent(m_spMatrixNodeTransform.get());
-			//void __thiscall sub_10C0E00(_DWORD *this, int a2)
+			m_spNodeNextPos = boost::make_shared<Sonic::CMatrixNodeTransform>();
+			m_spNodeNextPos->m_Transform.SetPosition(Hedgehog::Math::CVector(0, 0, 0));
+			m_spNodeNextPos->NotifyChanged();
+			m_spNodeNextPos->SetParent(m_spMatrixNodeTransform.get());
 			hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(1, 1, 1);
 
+			BBExt::CCharacterProxy* characterproxy = new BBExt::CCharacterProxy();
+			auto a7 = Sonic::CollisionID({ Sonic::CollisionID::TypeTerrain }, { Sonic::CollisionID::TypeTerrain, Sonic::CollisionID::TypeKeepOffEnemy });
+			auto a8 = hh::math::CVector(0, 0, 0);
+			characterproxy = CtorProxy(this, characterproxy, Sonic::CGameDocument::GetInstance()->GetWorld().get(), shapeEventTrigger1, m_spNodeEventCollision->m_Transform.m_Position, m_spNodeEventCollision->m_Transform.m_Rotation, a7, a8);
 
-			AddRigidBody(m_spRigidBody, shapeEventTrigger1, CollisionLayerID::Common, m_spNodeEventCollision);
-			typedef void (*FuncType)();
+			//m_spCharacterProxy = boost::make_shared<BBExt::CCharacterProxy>(this, Sonic::CGameDocument::GetInstance()->GetWorld().get(), shapeEventTrigger1, CVector::Zero(), m_spMatrixNodeTransform->m_Transform.m_Rotation, Sonic::CollisionID({Sonic::CollisionID::TypeTerrain }, {Sonic::CollisionID::TypeTerrain, Sonic::CollisionID::TypeKeepOffEnemy }));
 
-			uint32_t* test = (uint32_t*)m_spRigidBody->m_pHkpRigidBody;
-			FuncType functionToCall = (FuncType)((char*)test + 340);
-			functionToCall();
+
+			
+			AddEventCollision("Object", shapeEventTrigger1, CollisionLayerID::BasicTerrain, false, m_spNodeNextPos);
+			//void __thiscall sub_10C0E00(_DWORD *this, int a2)
+			//
+
+			//hk2010_2_0::hkpRigidBodyCinfo info = hk2010_2_0::hkpRigidBodyCinfo();
+			//info.m_position = hh::math::CVector4(m_spMatrixNodeTransform->m_Transform.m_Position.x(), m_spMatrixNodeTransform->m_Transform.m_Position.y() + 20, m_spMatrixNodeTransform->m_Transform.m_Position.z(), 1);
+			//info.m_mass = 1000.0;
+			//info.m_shape = shapeEventTrigger1;
+			//info.m_motionType = hk2010_2_0::hkpMotion::MOTION_DYNAMIC;
+			//info.m_gravityFactor = 1;
+			//info.m_solverDeactivation = 2;
+			//rb = new hk2010_2_0::hkpRigidBody(info);
+			//rb->setMotionType(hk2010_2_0::hkpMotion::MOTION_DYNAMIC);
+			//Sonic::CGameDocument::GetInstance()->GetWorld()->m_pMember->m_spPhysicsWorld->m_pHkpWorld->addEntity(rb);
+			//m_spMatrixNodeTransform->NotifyChanged();
+			////m_spRigidBody->m_pPhysicsWorld->m_pHkpWorld->addEntity(m_spRigidBody->m_pHkpRigidBody);
+			//rb->removeReference();
+			//m_spRigidBody->m_pHkpRigidBody = rb;
+
+			//SetMotionType(&m_spRigidBody, 0);
+			//m_spRigidBody->m_pHkpRigidBody->addReference();
 			// You don't need to override this if you're not using it, but this would be for setting up event colliders & rigidbodies.
 			// note you can do this in "SetAddRenderables" but sonic team *tends to* do collision stuff here.
 			return true;
 		}
 
-
 		void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
 		{
+			m_spMatrixNodeTransform->m_Transform.m_Position += m_Velocity;
 			m_AnimatorPose->Update(in_rUpdateInfo.DeltaTime);
+			DebugDrawText::log(SUC::Format("%.3f %.3f %.3f", m_spNodeNextPos->m_Transform.m_Position.x(), m_spNodeNextPos->m_Transform.m_Position.y(), m_spNodeNextPos->m_Transform.m_Position.z()), 0);
+			
+			
+			//do physics here
+			m_Velocity.y() -= 0.001f;
+			m_spNodeNextPos->m_Transform.SetPosition(m_Velocity);
+			m_spNodeNextPos->m_Transform.m_Rotation = m_spMatrixNodeTransform->m_Transform.m_Rotation;
+			m_spNodeNextPos->NotifyChanged();
+
+			auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
+			if (inputPtr->IsTapped(Sonic::eKeyState_RightBumper))
+			{
+				m_spMatrixNodeTransform->m_Transform.m_Position.y() += 10;
+				m_spMatrixNodeTransform->NotifyChanged();
+				rb->m_dynamicMotion.m_linearVelocity.y() += 10;
+			}
+
+			m_spMatrixNodeTransform->NotifyChanged();
+			return;
 			Sonic::Player::CPlayerSpeedContext* playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
 			float distance = abs(ObjectUtility::Distance(playerContext->m_spMatrixNode->m_Transform.m_Position, m_spMatrixNodeTransform->m_Transform.m_Position));
 
@@ -125,20 +255,15 @@ namespace SUC::SetObject
 			m_IsGrounded = result.Valid;
 			if (!m_IsGrounded)
 			{
-				m_Velocity += Hedgehog::Math::CVector(0, -0.002f, 0);				
+				m_Velocity += Hedgehog::Math::CVector(0, -0.25f, 0);				
 			}
 			else
 			{
 				m_Velocity.y() = 0;
 			}
-			auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
-			if(inputPtr->IsTapped(Sonic::eKeyState_RightBumper))
-			{
-				m_spMatrixNodeTransform->m_Transform.m_Position.y() += 10;
-				
-			}
+			
 			DebugDrawText::log(SUC::Format("PosEnemyY: %.3f", m_spMatrixNodeTransform->m_Transform.m_Position.y()), 0);
-			newPos = m_spMatrixNodeTransform->m_Transform.m_Position + m_Velocity;
+			newPos = m_spMatrixNodeTransform->m_Transform.m_Position + (m_Velocity * in_rUpdateInfo.DeltaTime);
 			// Update Matrix Node
 			m_spMatrixNodeTransform->m_Transform.SetPosition(newPos);
 			m_spMatrixNodeTransform->NotifyChanged();

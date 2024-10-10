@@ -224,7 +224,10 @@
     <ClInclude Include="Accuracy\AccuracyHookContainer.h" />
     <ClInclude Include="Accuracy\GenericSonic.h" />
     <ClInclude Include="Accuracy\Whip.h" />
+    <ClInclude Include="BlueBlurCustom\Sonic\CGlitterPlayer.h" />
+    <ClInclude Include="BlueBlurCustom\Sonic\Particle\ParticleManager.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\System\ApplicationDocument.h" />
+    <ClInclude Include="BlueBlurCustom\Sonic\System\CharacterProxy.h" />
     <ClInclude Include="Gameplay\GameplayHookContainer.h" />
     <ClInclude Include="Macros.h" />
     <ClInclude Include="Player\AnimationPoseExtensions.h" />

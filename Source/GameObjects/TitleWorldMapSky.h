@@ -2,7 +2,7 @@
 class CTitleWorldMapSky : public Sonic::CGameObject3D
 {
 	INSERT_PADDING(0x4);
-	void* m_GlitterPlayer;
+	Sonic::CGlitterPlayer* m_GlitterPlayer;
 	boost::shared_ptr<hh::mr::CSingleElement> m_spModel;
 	Hedgehog::Math::CVector m_Position;
 	Hedgehog::Math::CVector m_Velocity;

@@ -9,6 +9,12 @@
 #include "UI/EventViewer.h"
 #include "UI/UIHookContainer.h"
 
+//void __thiscall InAppTracker::StartTracking(_BYTE *this, const char *a2, const char *a3, const char *a4)
+HOOK(void, __fastcall, StartTracking, 0x00A5C930, void* This, void* Edx, const char* a2, const char* a3, const char* a4)
+{
+	DebugDrawText::log(SUC::Format("TRACK: %s | %s | %s", a2,a3,a4));
+	originalStartTracking(This, Edx, a2, a3, a4);
+}
 extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 {
 	// Load configuration

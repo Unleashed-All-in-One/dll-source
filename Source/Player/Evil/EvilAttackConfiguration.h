@@ -16,7 +16,7 @@ namespace SUC::Player::Evil
 		MiddleHand,
 		Head,
 		Hips,
-		MiddleLeg // huuuh?
+		MiddleLeg // pause
 	};
 	struct CollisionParam
 	{
