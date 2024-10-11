@@ -78,21 +78,21 @@ namespace SUC::System
 		int latestFlag = SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected;
 		int stageSelected = SUC::UI::TitleScreen::TitleWorldMap::s_StageSelectWindowSelection;
 
-		if (SUC::UI::TitleScreen::TitleWorldMap::s_IsCapitalWindowOpened)
-			stageToLoad = SUC::Project::s_WorldData.data[latestFlag].data[SUC::Project::GetCapital(latestFlag, SUC::UI::TitleScreen::TitleWorldMap::s_Flags[latestFlag].night)].levelID.c_str();
-		else
-		{
-			if (SUC::Project::s_WorldData.data[latestFlag].dataNight.size() != 0 && SUC::UI::TitleScreen::TitleWorldMap::s_Flags[latestFlag].night)
-			{
-				stageToLoad = SUC::Project::s_WorldData.data[latestFlag].dataNight[stageSelected].levelID.c_str();
-				SequenceHelpers::SetPlayerType(1);
-			}
-			else
-			{
-				stageToLoad = SUC::Project::s_WorldData.data[latestFlag].data[stageSelected].levelID.c_str();
-				SequenceHelpers::SetPlayerType(0);
-			}
-		}
+		//if (SUC::UI::TitleScreen::TitleWorldMap::s_IsCapitalWindowOpened)
+		//	stageToLoad = SUC::Project::s_WorldData.data[latestFlag].data[SUC::Project::GetCapital(latestFlag, SUC::UI::TitleScreen::TitleWorldMap::s_Flags[latestFlag].night)].levelID.c_str();
+		//else
+		//{
+		//	if (SUC::Project::s_WorldData.data[latestFlag].dataNight.size() != 0 && SUC::UI::TitleScreen::TitleWorldMap::s_Flags[latestFlag].night)
+		//	{
+		//		stageToLoad = SUC::Project::s_WorldData.data[latestFlag].dataNight[stageSelected].levelID.c_str();
+		//		SequenceHelpers::SetPlayerType(1);
+		//	}
+		//	else
+		//	{
+		//		stageToLoad = SUC::Project::s_WorldData.data[latestFlag].data[stageSelected].levelID.c_str();
+		//		SequenceHelpers::SetPlayerType(0);
+		//	}
+		//}
 		return stageToLoad;
 	}
 	void StageManager::ForcePlayCutscene(std::string in_EventName, std::string in_StageName, bool flag, int playerType)

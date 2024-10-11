@@ -8,14 +8,27 @@
 #include "../System/MiniAudioHelper.h"
 #include "../BlueBlurCustom/Sonic/Particle/ParticleManager.h"
 using namespace hh::math;
-
+class CWorldCountry
+{
+public:
+	int m_ID;
+	hh::math::CVector m_Position;
+	bool m_IsInShade, m_LastState, m_IsChangingDaylight;
+	Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcFlag;
+	Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcDaylightIndicator;
+	//bool night, playingMedalTransition;
+	float visibility;
+	CWorldCountry(const hh::math::CVector& in_Position) : m_Position(in_Position){};
+};
 namespace SUC::UI::TitleScreen
 {
+	hh::math::CVector flagDotReferencePosition;
+	const auto lightPosition = CVector(-79.8565f, 0, 4.78983f);
+	constexpr float earthRadius = 5.25f; //Used to normalize flag positions to the globe's curvature
 	bool TitleWorldMap::s_ForceTitleFlow = false;
 	bool TitleWorldMap::s_IsWorldMapCameraInitialized = false;
-	const CVector TitleWorldMap::s_PivotPosition = CVector(0, 0, -2.34f);
+	const CVector TitleWorldMap::s_PivotPosition = CVector(0, 0, 0);
 	const TitleWorldMapCamera* TitleWorldMap::s_WorldMapCamera;
-	TitleWorldMap::SFlagUIInformation TitleWorldMap::s_Flags[9];
 	bool TitleWorldMap::s_WorldmapCursorDisabled = true;
 	bool TitleWorldMap::s_TargetDisabled = true;
 	bool TitleWorldMap::s_IsCapitalWindowOpened = false;
@@ -43,11 +56,10 @@ namespace SUC::UI::TitleScreen
 
 	bool isStageWindowOpen = false;
 	//	theres defo a better way to handle this
-	bool m_isInShade[9];
 	bool m_SunMoonTransitionArray[9];
+	std::vector<CWorldCountry*> m_Country;
 	//
 
-	std::vector<CVector> m_flagPositions;
 	static AudioHandle cursorMoveHandle, cursorSelectHandle, stageSelectHandle, worldMapMusicHandle;
 	CVector2 posCursorCenter;
 	CVector2* offsetAspect;
@@ -75,12 +87,17 @@ namespace SUC::UI::TitleScreen
 	boost::shared_ptr<Sonic::CLightManager> light;
 	//boost::shared_ptr<Sonic::CGameObject3D> earth;
 	boost::shared_ptr<CTitleWorldMapGlobe> m_GlobeModel;
-
-	boost::shared_ptr<CTitleWorldMapSky> m_spWorldmapObject;
+	boost::shared_ptr<CTitleWorldMapSky> m_spSkySpace;
+	boost::shared_ptr<CTitleWorldMapSun> m_spSun;
 	float multiplierRotationLight = 0.1f;
 
 	hh::math::CQuaternion rotationEarth;
 
+	hh::math::CVector Spherize(hh::math::CVector in_Vector)
+	{
+		return ((in_Vector - TitleWorldMap::s_PivotPosition).normalized() * earthRadius) +
+			TitleWorldMap::s_PivotPosition;
+	}
 
 	void CreateParticleController(boost::shared_ptr<Sonic::CGameObject>& a1)
 	{
@@ -154,10 +171,10 @@ namespace SUC::UI::TitleScreen
 		rcCtsGuideWindow->SetHideFlag(hide);
 		rcCtsGuideText->SetHideFlag(hide);
 
-		for (size_t i = 0; i < 9; i++)
+		for (const auto & m_ContinentUI : m_Country)
 		{
-			s_Flags[i].flag->SetHideFlag(hide);
-			s_Flags[i].sun_moon->SetHideFlag(hide);
+			m_ContinentUI->m_rcFlag->SetHideFlag(hide);
+			m_ContinentUI->m_rcDaylightIndicator->SetHideFlag(hide);
 		}
 	}
 
@@ -321,7 +338,7 @@ namespace SUC::UI::TitleScreen
 			printf("\n[WorldMap] Missing config for FlagID %d", id);
 			return;
 		}
-		stageSelectedWindowMax = TitleWorldMap::s_Flags[id].night && SUC::Project::s_WorldData.data[id].dataNight.size() != 0
+		stageSelectedWindowMax = m_Country[id]->m_IsInShade && SUC::Project::s_WorldData.data[id].dataNight.size() != 0
 			? SUC::Project::s_WorldData.data[id].dataNight.size() - 1
 			: SUC::Project::s_WorldData.data[id].data.size() - 1;
 		//Common::ClampInt(stageSelectedWindowMax, 0, 6);
@@ -336,7 +353,7 @@ namespace SUC::UI::TitleScreen
 				break;
 
 			const char* optionName;
-			if (TitleWorldMap::s_Flags[id].night && SUC::Project::s_WorldData.data[id].dataNight.size() != 0)
+			if (m_Country[id]->m_IsInShade && SUC::Project::s_WorldData.data[id].dataNight.size() != 0)
 				optionName = SUC::Project::s_WorldData.data[id].dataNight[i + offset].optionName.c_str();
 			else
 				optionName = SUC::Project::s_WorldData.data[id].data[i + offset].optionName.c_str();
@@ -474,7 +491,7 @@ namespace SUC::UI::TitleScreen
 		CSDCommon::PlayAnimation(rcWorldmapFooterImgA, "Intro_Anim_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 
 		PlayCursorAnim("Intro_Anim");
-		for (size_t i = 0; i < 9; i++) CSDCommon::PlayAnimation(s_Flags[i].flag, "Intro_Anim",
+		for (size_t i = 0; i < 9; i++) CSDCommon::PlayAnimation(m_Country[i]->m_rcFlag, "Intro_Anim",
 			Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 	}
 
@@ -533,10 +550,10 @@ namespace SUC::UI::TitleScreen
 		CProject::DestroyScene(rcWorldMap.Get(), rcCtsChoicesWindow);
 		CProject::DestroyScene(rcWorldMap.Get(), rcCtsChoicesSelect);
 
-		for (size_t i = 0; i < 9; i++)
+		for (size_t i = 0; i < m_Country.size(); i++)
 		{
-			Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), TitleWorldMap::s_Flags[i].flag);
-			Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), TitleWorldMap::s_Flags[i].sun_moon);
+			Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), m_Country[i]->m_rcFlag);
+			Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), m_Country[i]->m_rcDaylightIndicator);
 		}
 		for (size_t i = 0; i < 9; i++) Chao::CSD::CProject::DestroyScene(rcWorldMap.Get(), rcTextElement[i]);
 
@@ -719,7 +736,7 @@ namespace SUC::UI::TitleScreen
 
 		//Set light properties
 		light->m_GlobalLightDiffuse = CVector(0.02f, 0.02f, 0.02f);
-		//light->m_GlobalLightDirection = CVector(-79.8565f, 0, 4.78983f);
+		//light->m_GlobalLightDirection = lightPosition;
 		light->m_GlobalLightSpecular = CVector(0.02f, 0.02f, 0.02f);
 		Sonic::CCsdDatabaseWrapper wrapper(This->m_pMember->m_pGameDocument->m_pMember->m_spDatabase.get());
 		auto spCsdProject = wrapper.GetCsdProject("ui_worldmap");
@@ -811,52 +828,40 @@ namespace SUC::UI::TitleScreen
 		rcCursorBottom = rcWorldMap->CreateScene("cts_cursor");
 		rcCursorRight = rcWorldMap->CreateScene("cts_cursor");
 		TitleWorldMap::s_IsWorldMapCameraInitialized = false;
-		constexpr float earthRadius = 5.25f; //Used to normalize flag positions to the globe's curvature
-		m_flagPositions.push_back(CVector(0.31f, 0.36f, 2.28f));
-		m_flagPositions.push_back(CVector(2.310000f, 2.360000f, 1.111371f));
-		m_flagPositions.push_back(CVector(2.810000f, -0.140000f, -6.649425f));
-		m_flagPositions.push_back(CVector(2.810000f, -1.890000, 1.742745));
-		m_flagPositions.push_back(CVector(-0.190000, 4.610000, -3.543527));
-		m_flagPositions.push_back(CVector(-5.190000, 0.110000, -3.363136));
-		m_flagPositions.push_back(CVector(0.060000, -2.639999, -6.829812));
-		m_flagPositions.push_back(CVector(-4.440000, -2.390000, -0.798426));
-		m_flagPositions.push_back(CVector(-3.600000, 3.00000, -1.160));
+		m_Country.push_back(new CWorldCountry(Spherize(CVector(0.31f, 0.36f, 2.28f))));
+		m_Country.push_back(new CWorldCountry(Spherize(CVector(2.310000f, 2.360000f, 1.111371f))));
+		m_Country.push_back(new CWorldCountry(Spherize(CVector(2.810000f, -0.140000f, -6.649425f))));
+		m_Country.push_back(new CWorldCountry(Spherize(CVector(2.810000f, -1.890000f, 1.742745f))));
+		m_Country.push_back(new CWorldCountry(Spherize(CVector(-0.190000f, 4.610000f, -3.543527f))));
+		m_Country.push_back(new CWorldCountry(Spherize(CVector(-5.190000f, 0.110000f, -3.363136f))));
+		m_Country.push_back(new CWorldCountry(Spherize(CVector(0.060000f, -2.639999f, -6.829812f))));
+		m_Country.push_back(new CWorldCountry(Spherize(CVector(-4.440000f, -2.390000f, -0.798426f))));
+		m_Country.push_back(new CWorldCountry(Spherize(CVector(-3.600000f, 3.00000f, -1.160f))));
 
-		// Now normalize all these positions
-		for (int i = 0; i < m_flagPositions.size(); ++i)
+		int continentIndex = 0;
+		for (auto& m_Continent : m_Country)
 		{
-			m_flagPositions.at(i) = ((m_flagPositions.at(i) - TitleWorldMap::s_PivotPosition).normalized() * earthRadius) +
-				TitleWorldMap::s_PivotPosition;
-		}
-		//Set up sun/moon medals' animations
-		for (size_t i = 0; i < 9; i++)
-		{
-			TitleWorldMap::s_Flags[i] = TitleWorldMap::SFlagUIInformation();
-
-			TitleWorldMap::s_Flags[i].flag = rcWorldMap->CreateScene("cts_parts_flag");
-			TitleWorldMap::s_Flags[i].sun_moon = rcWorldMap->CreateScene("cts_parts_sun_moon");
-
-			TitleWorldMap::s_Flags[i].playingMedalTransition = false;
-			CSDCommon::PlayAnimation(TitleWorldMap::s_Flags[i].flag, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1,
-				0);
-			TitleWorldMap::s_Flags[i].flag->GetNode("img")->SetPatternIndex(i);
-
+			m_Continent->m_rcFlag = rcWorldMap->CreateScene("cts_parts_flag");
+			m_Continent->m_rcDaylightIndicator = rcWorldMap->CreateScene("cts_parts_sun_moon");
+					   
+			m_Continent->m_rcFlag->GetNode("img")->SetPatternIndex(continentIndex);
+			CSDCommon::PlayAnimation(m_Continent->m_rcFlag, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1,0);
+			auto cameraPos = CVector(0, camHeight, cameraDistance);
 			float shadeAmount = fmax(
-				0.0f, -(CVector(-79.8565f, 0, 4.78983f).dot(
-					(m_flagPositions.at(i) - CVector(0, 0, -2.34f)).normalized())))
+				0.0f, -(lightPosition.dot((m_Continent->m_Position - TitleWorldMap::s_PivotPosition).normalized())))
 				* 100;
 			float visibility = fmax(
-				0.0f, -(CVector(0, 0, -20).dot((m_flagPositions.at(i) - CVector(0, 0, -2.34f)).normalized()))) * 100;
-			bool isDark = shadeAmount > 50;
+				0.0f, -(cameraPos.dot((m_Continent->m_Position - TitleWorldMap::s_PivotPosition).normalized()))) * 100;
 
-			m_isInShade[i] = isDark;
-			CSDCommon::PlayAnimation(TitleWorldMap::s_Flags[i].sun_moon, "Switch_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,
-				0, isDark ? 0 : 100); //Set image to either sun or moon
-			CSDCommon::PlayAnimation(TitleWorldMap::s_Flags[i].sun_moon, "Fade_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,
+			CSDCommon::PlayAnimation(m_Continent->m_rcDaylightIndicator, "Switch_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,
+				0, (shadeAmount > 50) ? 0 : 100); //Set image to either sun or moon
+			CSDCommon::PlayAnimation(m_Continent->m_rcDaylightIndicator, "Fade_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,
 				0, visibility, visibility);
+			m_Continent->m_IsInShade = shadeAmount > 50;
+			continentIndex++;
 		}
 		TitleWorldMap::CreateScreen(This);
-		for (auto e : TitleWorldMap::s_Flags) e.flag->SetHideFlag(true);
+		for (auto e : m_Country) e->m_rcFlag->SetHideFlag(true);
 
 		TitleWorldMap::SetHideEverything(true);
 		rcCtsGuide4Mission->SetHideFlag(true);
@@ -891,59 +896,61 @@ namespace SUC::UI::TitleScreen
 		rcCtsGuide4Mission->SetPosition(sceneFixPosX, 0);
 		rcCtsGuide5Medal->SetPosition(sceneFixPosX, 0);
 
-		SpawnParticleManager();
-		m_spWorldmapObject = boost::make_shared<CTitleWorldMapSky>(CVector(-79.8565f, 0, 4.78983f));
-		// CVector(0, 0, -2.34f)
+		m_spSkySpace = boost::make_shared<CTitleWorldMapSky>(lightPosition);
+		m_spSun = boost::make_shared<CTitleWorldMapSun>();
+		// TitleWorldMap::s_PivotPosition
 		m_GlobeModel = boost::make_shared<CTitleWorldMapGlobe>(TitleWorldMap::s_PivotPosition);
 		m_GlobeModel->SetPosition(CVector(0, 0, 0));
 		m_GlobeModel->m_spMatrixNodeTransform->NotifyChanged();
 		Sonic::CGameDocument::GetInstance()->AddGameObject(m_GlobeModel);
-		Sonic::CGameDocument::GetInstance()->AddGameObject(m_spWorldmapObject);
+		Sonic::CGameDocument::GetInstance()->AddGameObject(m_spSkySpace);
+		Sonic::CGameDocument::GetInstance()->AddGameObject(m_spSun);
 
 		return originalTitleWorldMap_CTitleMain(This, Edx, a2, a3, a4);
 	}
 
 	void Flags_Update()
 	{
-		for (size_t i = 0; i < 9; i++)
+		for (size_t i = 0; i < m_Country.size(); i++)
 		{
+			auto& m_Flag = m_Country[i];
 			float visibility = fmax(
 				0.0f, -(TitleWorldMap::s_WorldMapCamera->m_MyCamera.m_Direction.dot(
-					(m_flagPositions.at(i) - CVector(0, 0, -2.34f)).normalized()))) * 100;
-			auto uiPos = WorldToUIPosition(m_flagPositions.at(i));
+					(m_Flag->m_Position - TitleWorldMap::s_PivotPosition).normalized()))) * 100;
+			auto uiPos = WorldToUIPosition(m_GlobeModel->m_spModelButtonTransform->m_Transform.m_Rotation * m_Flag->m_Position);
 
 			float shadeAmount = fmax(
 				0.0f, -(light->m_GlobalLightDirection.
-					dot((m_flagPositions.at(i) - CVector(0, 0, -2.34f)).normalized()))) *
+					dot((m_Flag->m_Position - TitleWorldMap::s_PivotPosition).normalized()))) *
 				100;
 			bool isDark = shadeAmount > 50;
-			if (TitleWorldMap::s_Flags[i].playingMedalTransition
-				&& TitleWorldMap::s_Flags[i].sun_moon->m_MotionFrame == 0
-				|| TitleWorldMap::s_Flags[i].sun_moon->m_MotionFrame == TitleWorldMap::s_Flags[i].sun_moon->m_MotionEndFrame)
-				TitleWorldMap::s_Flags[i].playingMedalTransition = false;
+			if (m_Flag->m_IsChangingDaylight
+				&& m_Flag->m_rcDaylightIndicator->m_MotionFrame == 0
+				|| m_Flag->m_rcDaylightIndicator->m_MotionFrame == m_Flag->m_rcDaylightIndicator->m_MotionEndFrame)
+				m_Flag->m_IsChangingDaylight = false;
 
 			if (introPlayed)
-				CSDCommon::PlayAnimation(TitleWorldMap::s_Flags[i].flag, "Fade_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,
+				CSDCommon::PlayAnimation(m_Flag->m_rcFlag, "Fade_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,
 					0, visibility, visibility);
 
-			if (!TitleWorldMap::s_Flags[i].playingMedalTransition)
-				CSDCommon::PlayAnimation(TitleWorldMap::s_Flags[i].sun_moon, "Fade_Anim",
+			if (!m_Flag->m_IsChangingDaylight)
+				CSDCommon::PlayAnimation(m_Flag->m_rcDaylightIndicator, "Fade_Anim",
 					Chao::CSD::eMotionRepeatType_PlayOnce, 0, visibility, visibility);
 
-			TitleWorldMap::s_Flags[i].flag->SetPosition(uiPos.x(), uiPos.y());
-			TitleWorldMap::s_Flags[i].sun_moon->SetPosition(uiPos.x() + 36, uiPos.y() - 23);
-			TitleWorldMap::s_Flags[i].night = !isDark;
+			m_Flag->m_rcFlag->SetPosition(uiPos.x(), uiPos.y());
+			m_Flag->m_rcDaylightIndicator->SetPosition(uiPos.x() + 36, uiPos.y() - 23);
+			m_Flag->m_IsInShade = !isDark;
 
-			if (isDark && !m_isInShade[i])
+			if (isDark && !m_Flag->m_LastState)
 			{
-				TitleWorldMap::s_Flags[i].playingMedalTransition = true;
-				CSDCommon::PlayAnimation(TitleWorldMap::s_Flags[i].sun_moon, "Switch_Anim",
+				m_Flag->m_IsChangingDaylight = true;
+				CSDCommon::PlayAnimation(m_Flag->m_rcDaylightIndicator, "Switch_Anim",
 					Chao::CSD::eMotionRepeatType_PlayOnce, 0, 0, 0, true, true);
 			}
-			else if (!isDark && m_isInShade[i])
+			else if (!isDark && m_Flag->m_LastState)
 			{
-				TitleWorldMap::s_Flags[i].playingMedalTransition = true;
-				CSDCommon::PlayAnimation(TitleWorldMap::s_Flags[i].sun_moon, "Switch_Anim",
+				m_Flag->m_IsChangingDaylight = true;
+				CSDCommon::PlayAnimation(m_Flag->m_rcDaylightIndicator, "Switch_Anim",
 					Chao::CSD::eMotionRepeatType_PlayOnce, 0, 0);
 			}
 
@@ -952,12 +959,12 @@ namespace SUC::UI::TitleScreen
 			if (currentFlagSelected != -1)
 			{
 				TitleWorldMap::s_LastFlagSelected = currentFlagSelected;
-				if (isDark && !m_isInShade[i])
+				if (isDark && !m_Flag->m_LastState)
 					MiniAudioHelper::playSound(cursorSelectHandle, 15, "Sunset");
-				else if (!isDark && m_isInShade[i])
+				else if (!isDark && m_Flag->m_LastState)
 					MiniAudioHelper::playSound(cursorSelectHandle, 16, "Sunrise");
 			}
-			m_isInShade[i] = isDark;
+			m_Flag->m_LastState = isDark;
 			flagSelectionAmount += inrange;
 		}
 	}
@@ -991,7 +998,7 @@ namespace SUC::UI::TitleScreen
 				MiniAudioHelper::playSound(stageSelectHandle, 3, "Boot");
 				System::StageManager::s_HubModeEnabled = SUC::Project::s_WorldData.data[TitleWorldMap::s_LastFlagSelected].data[
 					SUC::Project::GetCapital(TitleWorldMap::s_LastFlagSelected,
-						TitleWorldMap::s_Flags[TitleWorldMap::s_LastFlagSelected].night)].isWhiteWorld;
+						m_Country[TitleWorldMap::s_LastFlagSelected]->m_IsInShade)].isWhiteWorld;
 
 				/*if (StageManager::WhiteWorldEnabled)
 				{
@@ -1120,13 +1127,22 @@ namespace SUC::UI::TitleScreen
 	HOOK(void*, __fastcall, TitleWorldMap_UpdateApplication, 0xE7BED0, Sonic::CGameObject* This, void* Edx,
 		float elapsedTime, uint8_t a3)
 	{
+		if (m_spSkySpace)
+		{
+			//m_spSkySpace->SetRotation(lightRotation);
+			DebugDrawText::log(std::format("ROTATION0: {0}, {1}, {2}", m_spSkySpace->m_spMatrixNodeTransform->m_Transform.m_Rotation.x(), m_spSkySpace->m_spMatrixNodeTransform->m_Transform.m_Rotation.y(), m_spSkySpace->m_spMatrixNodeTransform->m_Transform.m_Rotation.z()).c_str(), 0);
+			//DebugDrawText::log(std::format("ROTATION1: {0}, {1}, {2}", m_spWorldmapObject->m_spModelButtonTransform->m_Transform.m_Rotation.x(), m_spWorldmapObject->m_spModelButtonTransform->m_Transform.m_Rotation.y(), m_spWorldmapObject->m_spModelButtonTransform->m_Transform.m_Rotation.z()).c_str(), 0);
+		}
 		auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->
 			m_CurrentPadStateIndex];
+		//Allow keyboard users to use the world map
+		inputPtr->LeftStickHorizontal = inputPtr->IsDown(Sonic::eKeyState_DpadLeft) ? -1.0f : (inputPtr->IsDown(Sonic::eKeyState_DpadRight) ? 1.0f : inputPtr->LeftStickHorizontal);
+		inputPtr->LeftStickVertical = inputPtr->IsDown(Sonic::eKeyState_DpadDown) ? -1.0f : (inputPtr->IsDown(Sonic::eKeyState_DpadUp) ? 1.0f : inputPtr->LeftStickVertical);
 
 		if (TitleWorldMap::s_IsActive)
 		{
 			//Pretty much just "if titleworldmap exists"
-			if (TitleWorldMap::s_Flags[0].flag && rcCtsGuide4Mission && rcCtsGuide5Medal)
+			if (m_Country[0]->m_rcFlag && rcCtsGuide4Mission && rcCtsGuide5Medal)
 			{
 				if (rcInfoImg2->m_MotionDisableFlag) CSDCommon::PlayAnimation(
 					rcInfoImg2, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 0, 0);
@@ -1144,7 +1160,7 @@ namespace SUC::UI::TitleScreen
 				flagSelectionAmount = 0;
 				if (TitleWorldMap::s_WorldMapCamera)
 				{
-					if (TitleWorldMap::s_Flags[0].flag->m_MotionDisableFlag && !introPlayed)
+					if (m_Country[0]->m_rcFlag->m_MotionDisableFlag && !introPlayed)
 						introPlayed = true;
 
 
@@ -1213,7 +1229,7 @@ namespace SUC::UI::TitleScreen
 							rcStageSelectFlag->GetNode("img")->SetPatternIndex(TitleWorldMap::s_LastFlagSelected);
 
 							if (SUC::Project::GetCapital(TitleWorldMap::s_LastFlagSelected,
-								TitleWorldMap::s_Flags[TitleWorldMap::s_LastFlagSelected].night) != -1)
+								m_Country[TitleWorldMap::s_LastFlagSelected]->m_IsInShade) != -1)
 							{
 								TitleWorldMap::s_IsCapitalWindowOpened = true;
 								ShowTextAct(false);
@@ -1418,7 +1434,11 @@ namespace SUC::UI::TitleScreen
 		constexpr float rotationPitchRate = 1.25f;
 		constexpr float rotationYawRate = 1.25f;
 
-		const CVector2 pan(input.LeftStickHorizontal, input.LeftStickVertical);
+		CVector2 pan(input.LeftStickHorizontal, input.LeftStickVertical);
+		
+			pan.x() = input.IsDown(Sonic::eKeyState_DpadLeft) ? -1.0f : (input.IsDown(Sonic::eKeyState_DpadRight) ? 1.0f : pan.x());
+			pan.y() = input.IsDown(Sonic::eKeyState_DpadDown) ? -1.0f : (input.IsDown(Sonic::eKeyState_DpadUp) ? 1.0f : pan.y());
+		
 		constexpr float deadzone = 0.2f; // TODO: MAKE PARAMETER? USE SOMETHING IN GENS?
 
 
@@ -1426,8 +1446,8 @@ namespace SUC::UI::TitleScreen
 
 		if (!TitleWorldMap::s_WorldmapCursorDisabled && !TitleWorldMapPause::s_IsPaused && hasInput && !isStageWindowOpen)
 		{
-			rotationPitch -= input.LeftStickVertical * rotationPitchRate * updateInfo.DeltaTime;
-			rotationYaw += input.LeftStickHorizontal * rotationYawRate * updateInfo.DeltaTime;
+			rotationPitch -= pan.y() * rotationPitchRate * updateInfo.DeltaTime;
+			rotationYaw += pan.x() * rotationYawRate * updateInfo.DeltaTime;
 		}
 		// Do the thing where we magnetize our input.
 		// TODO: Handle the HUD update here too I guess, because this is where a flag will be "selected"
@@ -1435,9 +1455,9 @@ namespace SUC::UI::TitleScreen
 		else
 		{
 			constexpr float dotThreshold = 0.95f; // Value I determined to work pretty well.
-			for (CVector position : m_flagPositions)
+			for (auto m_Continent : m_Country)
 			{
-				const CVector direction = (position - TitleWorldMap::s_PivotPosition).normalized();
+				const CVector direction = (m_Continent->m_Position - TitleWorldMap::s_PivotPosition).normalized();
 				if (-direction.dot(camera->m_MyCamera.m_Direction) < dotThreshold && currentFlagSelected == -1)
 					continue;
 				if (introPlayed)
@@ -1483,7 +1503,7 @@ namespace SUC::UI::TitleScreen
 
 		constexpr float rotationhRateLight = 0.1f;
 
-		const auto lightPosition = CVector(-79.8565f, 0, 4.78983f);
+		
 		//Set up light stuff
 		const float rotationForce = rotationhRateLight * multiplierRotationLight * updateInfo.DeltaTime;
 		s_RotationAngle += rotationForce;
@@ -1491,21 +1511,22 @@ namespace SUC::UI::TitleScreen
 		s_RotationAngle = WrapAroundFloat(s_RotationAngle, 360.0 * DEG2RAD);
 
 		const CQuaternion lightRotation = TitleWorldMap::QuaternionFromAngleAxis(-s_RotationAngle, CVector(0, 1, 0));
-		if (m_spWorldmapObject)
-		{
-			m_spWorldmapObject->SetRotation(lightRotation);
-			DebugDrawText::log(std::format("ROTATION0: {0}, {1}, {2}", m_spWorldmapObject->m_spMatrixNodeTransform->m_Transform.m_Rotation.x(), m_spWorldmapObject->m_spMatrixNodeTransform->m_Transform.m_Rotation.y(), m_spWorldmapObject->m_spMatrixNodeTransform->m_Transform.m_Rotation.z()).c_str(), 0);
-			//DebugDrawText::log(std::format("ROTATION1: {0}, {1}, {2}", m_spWorldmapObject->m_spModelButtonTransform->m_Transform.m_Rotation.x(), m_spWorldmapObject->m_spModelButtonTransform->m_Transform.m_Rotation.y(), m_spWorldmapObject->m_spModelButtonTransform->m_Transform.m_Rotation.z()).c_str(), 0);
-		}
+		
 		light->m_GlobalLightDirection = lightRotation * (lightPosition - TitleWorldMap::s_PivotPosition) +
 			TitleWorldMap::s_PivotPosition;
+		if(m_spSkySpace)
+			if(m_spSkySpace->spSun)
+			{
+				m_spSkySpace->spSun->m_Transform.SetPosition(Eigen::AngleAxisf(180 * DEG2RAD, CVector(0, 1, 0)) * light->m_GlobalLightDirection);
+				m_spSkySpace->spSun->NotifyChanged();
+			}
 		//Set light properties
 		light->m_GlobalLightDiffuse = CVector(0.02f, 0.02f, 0.02f);
-		//light->m_GlobalLightDirection = CVector(-79.8565f, 0, 4.78983f);
+		//light->m_GlobalLightDirection = lightPosition;
 
 		light->m_GlobalLightSpecular = CVector(5, 5, 5);
 
-
+		flagDotReferencePosition = TitleWorldMap::s_WorldMapCamera->m_MyCamera.m_Direction;
 
 		ApplyCameraStuff(This, camera);
 		camera->UpdateParallel(updateInfo);
@@ -1526,6 +1547,14 @@ namespace SUC::UI::TitleScreen
 	{
 		return nullptr;
 	}
+	//void __thiscall Sonic::CGameplayFlowTitle::PlayMusic(CTempState *this)
+	//void __thiscall sub_CF8F40(void *this)
+	HOOK(void, __fastcall, sub_CF8F40, 0x00CF8FE0, void* This, void* Edx)
+	{
+		originalsub_CF8F40(This, Edx);
+		if(!Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager)
+		SpawnParticleManager();
+	}
 	void TitleWorldMap::RegisterHooks()
 	{
 		WRITE_JUMP(0x00584CEE, (void*)0x00588820);
@@ -1538,6 +1567,7 @@ namespace SUC::UI::TitleScreen
 
 		INSTALL_HOOK(UpdatePar);
 		INSTALL_HOOK(sub_58C800);
+		INSTALL_HOOK(sub_CF8F40);
 		WRITE_JUMP(0x0058C481, 0x0058C651);
 
 		//INSTALL_HOOK(TitleAddRenderables);

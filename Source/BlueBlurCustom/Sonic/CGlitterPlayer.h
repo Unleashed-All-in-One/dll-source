@@ -1,6 +1,6 @@
 namespace Sonic
 {
-	class CParticleController : public Hedgehog::Universe::CMessageActor, public Hedgehog::Base::CObject
+	class CParticleController : public Hedgehog::Universe::CMessageActor
 	{
 	public:
 

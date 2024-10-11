@@ -2,6 +2,7 @@
 #include "..\GameObjects\TitleWorldMapCamera.h"
 #include "..\GameObjects\TitleWorldMapGlobe.h"
 #include "..\GameObjects\TitleWorldMapSky.h"
+#include "..\GameObjects\TitleWorldMapSun.h"
 
 #include "Title.h"
 #include "TitleWorldMapPause.h"
@@ -56,6 +57,5 @@ namespace SUC::UI::TitleScreen
 		static bool s_IsWorldMapCameraInitialized;
 		static int s_LastFlagSelected;
 		static int s_StageSelectWindowSelection;
-		static SFlagUIInformation s_Flags[9];
 	};
 }
