@@ -77,7 +77,7 @@ namespace SUC::System
 
 		int latestFlag = SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected;
 		int stageSelected = SUC::UI::TitleScreen::TitleWorldMap::s_StageSelectWindowSelection;
-
+		///CHECK FOR REMOVAL
 		//if (SUC::UI::TitleScreen::TitleWorldMap::s_IsCapitalWindowOpened)
 		//	stageToLoad = SUC::Project::s_WorldData.data[latestFlag].data[SUC::Project::GetCapital(latestFlag, SUC::UI::TitleScreen::TitleWorldMap::s_Flags[latestFlag].night)].levelID.c_str();
 		//else

@@ -171,7 +171,8 @@ namespace SUC::UI::TitleScreen
 		case 3:
 		{
 			DebugDrawText::log("Exit");
-			TitleWorldMap::SetHideEverything(true);
+				///CHECK FOR REMOVAL - borked v
+			//TitleWorldMap::SetHideEverything(true);
 			TitleWorldMap::s_IsActive = false;
 			Title::SetSubMenu(false);
 			Title::ToggleUI(false);
