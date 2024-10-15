@@ -1,6 +1,5 @@
 #pragma once
 #include "../BlueBlurCustom/Sonic/CGlitterPlayer.h"
-#include "../BlueBlurCustom/Sonic/Particle/ParticleManager.h"
 class CTitleWorldMapSun : public Sonic::CGameObject3D
 {
 public:

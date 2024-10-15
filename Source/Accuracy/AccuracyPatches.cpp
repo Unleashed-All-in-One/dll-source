@@ -144,5 +144,8 @@ namespace SUC::Accuracy
 
 		//Get rid of mission icons and pamSettings permanently (in theory)
 		WRITE_JUMP(0x0107EAF8, 0x0107EB8F);
+
+		//Ignore PAM position & rotation
+		WRITE_JUMP(0x00D0A3F0, (void*)0x00D0A4C1); 
 	}
 }

@@ -357,7 +357,8 @@ namespace SUC::UI::TitleScreen
 		if (!parsedSave)
 		{
 			auto saveObject = System::SaveManager::GetCurrentSave(false);
-			hasSavefile = saveObject != nullptr;
+			//hasSavefile = saveObject != nullptr;
+			hasSavefile = true;
 			currentTitleIndex = hasSavefile ? Title::ETitleIndexState::Continue : Title::ETitleIndexState::New_Game;
 			UpdateTitleText();
 			parsedSave = true;

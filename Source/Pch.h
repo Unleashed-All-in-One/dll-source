@@ -40,6 +40,7 @@
 
 #include "Macros.h"
 // Other
+#include "BlueBlurCustom/Hedgehog/Motion/hhSingleEffectMotionAll.h"
 #include <tweeny-3.2.0.h>
 #include <INIReader.h>
 #include <json/json.h>
@@ -62,6 +63,7 @@
 #include "System/SequenceHelpers.h"
 #include "Project.h"
 #include "Temporary.h"
+#include "Utility.h"
 
 //System
 #include "System/AnimationSetPatcher.h"

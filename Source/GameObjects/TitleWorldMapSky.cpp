@@ -1,31 +1,5 @@
 #include "TitleWorldMapSky.h"
 #include "../BlueBlurCustom/Sonic/CGlitterPlayer.h"
-#include "../BlueBlurCustom/Sonic/Particle/ParticleManager.h"
-
-//boost::shared_ptr<Sonic::CParticleManager> m_spParticleManager;
-//void ParticleTest()
-//{
-//	SharedPtrTypeless handle;
-//	// . . .
-//	
-//	// . . . 
-//	m_spParticleManager->
-//	fpAddParticle5(m_spParticleManager.get(), handle, nullptr, "worldmap_sun", 0);
-//}
-class MsgParticlePlayOneShotByMatrix : public hh::fnd::MessageTypeSet
-{
-	HH_FND_MSG_MAKE_TYPE(0x01680D14);
-public:
-	hh::math::CMatrix m_Matrix;
-	Hedgehog::base::CSharedString m_ParticleName;
-	float m_Timescale;
-	int idk2;
-};
-
-BB_ASSERT_OFFSETOF(MsgParticlePlayOneShotByMatrix, m_ParticleName, 0x50);
-BB_ASSERT_OFFSETOF(MsgParticlePlayOneShotByMatrix, m_Timescale, 0x54);
-BB_ASSERT_OFFSETOF(MsgParticlePlayOneShotByMatrix, idk2, 0x58);
-//char __thiscall sub_E8FEF0(char *this, int a2, int a3)
 
 void CTitleWorldMapSky::AddCallback(const Hedgehog::Base::THolder<Sonic::CWorld>& worldHolder,Sonic::CGameDocument* pGameDocument,const boost::shared_ptr<Hedgehog::Database::CDatabase>& spDatabase)
 {

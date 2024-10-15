@@ -225,6 +225,7 @@
     <ClInclude Include="Accuracy\AccuracyHookContainer.h" />
     <ClInclude Include="Accuracy\GenericSonic.h" />
     <ClInclude Include="Accuracy\Whip.h" />
+    <ClInclude Include="BlueBlurCustom\Hedgehog\Motion\hhSingleEffectMotionAll.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\CGlitterPlayer.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\Particle\ParticleManager.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\System\ApplicationDocument.h" />
@@ -358,6 +359,7 @@
     <ClInclude Include="UI\TitleWorldMap.h" />
     <ClInclude Include="UI\TitleWorldMapPause.h" />
     <ClInclude Include="UI\UIHookContainer.h" />
+    <ClInclude Include="Utility.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

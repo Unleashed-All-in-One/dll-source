@@ -25,6 +25,7 @@ namespace SUC::Utility
 }
 namespace SUC::UI::TitleScreen
 {
+	class CSUCTitleCompanion;
 	//From GensDebug
 	//============================
 	// NonCopyable Interface Impl
@@ -58,57 +59,6 @@ namespace SUC::UI::TitleScreen
 	protected:
 		explicit Singleton<T>() { }
 	};
-	
-	class TitleWorldMap
-	{
-	public:
-		struct SaveStageInfo
-		{
-			std::string stageID_string;
-			uint32_t stageIDForGens;
-			bool isStageCompleted;
-			uint32_t bestScore;
-			float bestTime;
-			float bestTime2;
-			float bestTime3;
-			uint32_t bestRank;
-			uint32_t bestRing;
-			uint32_t redRingCount;
-		};
-		struct SFlagUIInformation
-		{
-			Chao::CSD::RCPtr<Chao::CSD::CScene> flag;
-			Chao::CSD::RCPtr<Chao::CSD::CScene> sun_moon;
-			int id;
-			bool night, playingMedalTransition;
-			float visibility;
-		};
-
-		static void RegisterHooks();
-		static void Start();
-		//static void CreateScreen(Sonic::CGameObject* pParentGameObject);
-		//static void ToggleScreen(const bool visible, Sonic::CGameObject* pParentGameObject);
-		//static void KillScreen();
-		//static void SetHideEverything(const bool visible);
-		//static void IntroAnim(Chao::CSD::RCPtr<Chao::CSD::CScene> scene);
-		static void PlayPanningAnim();
-		static void EnableInput();
-		static hh::math::CQuaternion QuaternionFromAngleAxis(float angle, const hh::math::CVector& axis);
-
-
-		// Earth's position is in the center of the screen.
-		// Later, we'll want to be able to move both the camera target & position in synch so the camera can smoothly move downward.
-		static const Hedgehog::Math::CVector s_PivotPosition;
-		static const Sonic::CCamera* s_WorldMapCamera;
-		static bool s_IsActive;
-		static bool s_ForceTitleFlow;
-		static bool s_WorldmapCursorDisabled;
-		static bool s_TargetDisabled;
-		static bool s_IsCapitalWindowOpened;
-		static bool s_IsWorldMapCameraInitialized;
-		static int s_LastFlagSelected;
-		static int s_StageSelectWindowSelection;
-	};
 	class CWorldCountry
 	{
 		SharedPtrTypeless m_SoundHandle;
@@ -116,6 +66,7 @@ namespace SUC::UI::TitleScreen
 	public:
 		int m_ID;
 		hh::math::CVector m_Position;
+		hh::math::CQuaternion m_Rotation;
 		hh::math::CVector2 m_ScreenPosition;
 		bool m_IsInShade, m_LastState, m_IsChangingDaylight;
 		Chao::CSD::RCPtr<Chao::CSD::CScene> m_rcFlag;
@@ -125,66 +76,22 @@ namespace SUC::UI::TitleScreen
 		bool m_CanFade;
 		bool m_IsSelected = true;
 		CWorldCountry(const hh::math::CVector& in_Position) : m_Position(in_Position) {};
-		void Update(const hh::math::CVector& in_LightPos, const hh::math::CQuaternion& in_WorldRotation, const Sonic::CCamera* in_Cam)
-		{
-			visibility = fmax(
-				0.0f, -(in_Cam->m_MyCamera.m_Direction.dot(
-					(m_Position - SUC::UI::TitleScreen::TitleWorldMap::s_PivotPosition).normalized()))) * 100;
-			//CHECK FOR REMOVAL (missing offset aspect)
-			auto pos = Utility::WorldToUIPosition(in_WorldRotation * m_Position, in_Cam, Hedgehog::Math::CVector2(0, 0));
-			m_ScreenPosition = hh::math::CVector2(pos.x(), pos.y());
-			float shadeAmount = fmax(
-				0.0f, -(in_LightPos.
-					dot((m_Position).normalized()))) *
-				100;
-			bool isDark = shadeAmount > 50;
-			if (m_IsChangingDaylight)
-			{
-				if (m_rcDaylightIndicator->m_MotionFrame == 0 
-					|| m_rcDaylightIndicator->m_MotionDisableFlag)
-					m_IsChangingDaylight = false;
-			}
-				//			&& 
-				//			)
-				//			m_Flag->m_IsChangingDaylight = false;
-
-
-			m_IsInShade = !isDark;
-			
-			if (!m_IsChangingDaylight)
-			{
-				if (m_IsInShade == m_LastState)
-				{
-
-					CSDCommon::PlayAnimation(m_rcDaylightIndicator, "Fade_Anim",
-						Chao::CSD::eMotionRepeatType_PlayOnce, 0, visibility, visibility);
-				}
-
-				if (m_IsInShade != m_LastState)
-				{
-					m_IsChangingDaylight = true;
-					CSDCommon::PlayAnimation(m_rcDaylightIndicator, "Switch_Anim",
-						Chao::CSD::eMotionRepeatType_PlayOnce, 0, 0, 0, !m_IsInShade, !m_IsInShade);
-				}
-			}
-			CSDCommon::PlayAnimation(m_rcFlag, "Fade_Anim",
-				Chao::CSD::eMotionRepeatType_PlayOnce, 0, visibility, visibility);
-
-			m_rcFlag->SetPosition(m_ScreenPosition.x(), m_ScreenPosition.y());
-			m_rcDaylightIndicator->SetPosition(m_ScreenPosition.x() + 36, m_ScreenPosition.y() - 23);
-
-			DebugDrawText::log(SUC::Format("[FLAG]\n LAST: %s | CURRENT: %s", m_LastState ? "true" : "false", m_IsInShade ? "true" : "false"), 0);
-			m_LastState = m_IsInShade;
-
-			
-			if (m_IsSelected)
-			{
-				if (m_IsInShade && !m_LastState)
-					Common::PlaySoundStaticCueName(m_SoundHandle, "sys_worldmap_sunset");
-				else if (!m_IsInShade && m_LastState)
-					Common::PlaySoundStaticCueName(m_SoundHandle, "sys_worldmap_sunrise");
-			}
-		}
+		void Update(const hh::math::CVector& in_LightPos, const hh::math::CQuaternion& in_WorldRotation, const Sonic::CCamera* in_Cam);
+		hh::math::CVector GetPositionAdjusted() const;
+		
+	};
+	struct SaveStageInfo
+	{
+		std::string stageID_string;
+		uint32_t stageIDForGens;
+		bool isStageCompleted;
+		uint32_t bestScore;
+		float bestTime;
+		float bestTime2;
+		float bestTime3;
+		uint32_t bestRank;
+		uint32_t bestRing;
+		uint32_t redRingCount;
 	};
 #define WM_STAGELIST_MAXLISTVISIBLE (size_t)6
 	class CSUCTitleCompanion : public Sonic::CGameObject, public Hedgehog::Universe::CStateMachineBase,
@@ -278,7 +185,7 @@ namespace SUC::UI::TitleScreen
 
 		void PopulateStageSelect(int id, int offset = 0);
 
-		TitleWorldMap::SaveStageInfo GetInfoForStage(std::string id);
+		SaveStageInfo GetInfoForStage(std::string id);
 
 		void PopulateCountryPreviewInfo(int flag);
 
@@ -301,5 +208,44 @@ namespace SUC::UI::TitleScreen
 		void SetStageSelectionScreenshot();
 		///Stage selection highlight & stage launch
 		void StageWindow_Update(Sonic::CGameObject* This);
+	};
+
+
+	class TitleWorldMap
+	{
+	public:
+		
+		struct SFlagUIInformation
+		{
+			Chao::CSD::RCPtr<Chao::CSD::CScene> flag;
+			Chao::CSD::RCPtr<Chao::CSD::CScene> sun_moon;
+			int id;
+			bool night, playingMedalTransition;
+			float visibility;
+		};
+
+		static inline boost::shared_ptr<CSUCTitleCompanion> m_spTitle;
+		static void RegisterHooks();
+		static void Start();
+		//static void CreateScreen(Sonic::CGameObject* pParentGameObject);
+		//static void ToggleScreen(const bool visible, Sonic::CGameObject* pParentGameObject);
+		//static void KillScreen();
+		//static void SetHideEverything(const bool visible);
+		//static void IntroAnim(Chao::CSD::RCPtr<Chao::CSD::CScene> scene);
+		static void PlayPanningAnim();
+		static void EnableInput();
+
+		// Earth's position is in the center of the screen.
+		// Later, we'll want to be able to move both the camera target & position in synch so the camera can smoothly move downward.
+		static const Hedgehog::Math::CVector s_PivotPosition;
+		static const Sonic::CCamera* s_WorldMapCamera;
+		static bool s_IsActive;
+		static bool s_ForceTitleFlow;
+		static bool s_WorldmapCursorDisabled;
+		static bool s_TargetDisabled;
+		static bool s_IsCapitalWindowOpened;
+		static bool s_IsWorldMapCameraInitialized;
+		static int s_LastFlagSelected;
+		static int s_StageSelectWindowSelection;
 	};
 }
