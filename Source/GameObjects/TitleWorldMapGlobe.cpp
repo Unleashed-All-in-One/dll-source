@@ -71,7 +71,7 @@ void CTitleWorldMapGlobe::UpdateSerial(const Hedgehog::Universe::SUpdateInfo& up
 	fpUpdateMotionAll(m_spEffectMotionAll.get(),updateInfo.DeltaTime);
 	fpUpdateMotionAll(m_spEffectMotionAll2.get(),updateInfo.DeltaTime);
 
-	const auto& m_Countries = SUC::UI::TitleScreen::TitleWorldMap::m_spTitle->m_Country;
+	const auto& m_Countries = SUC::UI::TitleScreen::TitleWorldMap::m_spTitle->m_Countries;
 	m_Angle += 0.01f;
 	m_Angle = SUC::Util::WrapAroundFloat(m_Angle, 360);
 	m_Rotation = (Eigen::Quaternionf(Eigen::AngleAxisf(m_Angle * DEG_TO_RAD, Hedgehog::Math::CVector(0,1,0))));

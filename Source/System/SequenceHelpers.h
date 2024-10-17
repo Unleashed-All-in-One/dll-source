@@ -55,6 +55,17 @@ namespace SUC::System
 			entry = newEntry;
 		}
 	};
+	class LuaStringEntryContainer2
+	{
+	public:
+		class LuaStringEntry2 {
+			BYTE gap0[4];
+		public:
+			Hedgehog::Base::CSharedString content;			
+		};
+		void* unknown;
+		LuaStringEntry2* entry;
+	};
 
 
 	class LuaIntegerEntry {
@@ -121,7 +132,6 @@ namespace SUC::System
 		static void RegisterHooks();
 		static void Update();
 		static std::string GetCurrentStageName(bool withoutNumber);
-
 		static Sonic::Sequence::Story* storySequenceInstance;
 	};
 }

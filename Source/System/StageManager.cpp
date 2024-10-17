@@ -26,6 +26,21 @@ namespace SUC::System
 	std::string ModeStrings[4] = { "Stage", "Event", "PlayableMenu", "Title" };
 	std::function<std::string()> overrideStageIDEvent;
 	bool m_TriggerStageLoadNextFrame;
+	bool expectingLoad; //mega pause
+
+	
+	SLoadInfo* m_CurrentLoadInfo;
+
+	void StageManager::ConfigureNextStage(std::string in_Stage, SLoadInfo::SSonicType in_Type, bool in_Hub)
+	{
+		DebugDrawText::log("Deleted old SLoadInfo", 10, 100, TEXT_RED);
+		m_CurrentLoadInfo = nullptr;
+
+		m_CurrentLoadInfo = new SLoadInfo();
+		m_CurrentLoadInfo->IsHub = in_Hub;
+		m_CurrentLoadInfo->PlayerType = in_Type;
+		m_CurrentLoadInfo->StageArchiveName = _strdup(in_Stage.c_str());
+	}
 	void StageManager::SetOverrideStageIDProcessor(std::function<std::string()> in_Function, bool in_TriggerOnNextTick, const char* in_FileNameCode)
 	{
 		m_TriggerStageLoadNextFrame = in_TriggerOnNextTick;
@@ -597,22 +612,61 @@ namespace SUC::System
 	{
 		return false;
 	}
+	void SetInfo()
+	{
+		const auto& gp = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter;
+		
+		gp->m_pStageParameter->TerrainArchiveName = m_CurrentLoadInfo->StageArchiveName.c_str();
+		gp->m_pStageParameter->ModeName = "Stage";
+		gp->m_pStageParameter->Field2C = m_CurrentLoadInfo->StageArchiveName.c_str();
+		gp->m_pStageParameter->Field30 = m_CurrentLoadInfo->StageArchiveName.c_str();
+		Sonic::CApplicationDocument::GetInstance()->GetService<Sonic::CServiceGamePlay>()->m_PlayerID = m_CurrentLoadInfo->PlayerType;
+	}
+	//void __thiscall Sonic::Sequence::CStoryImpl::LuanneFunctions::SetupStage(StorySequence *this, int a2, Luanne_StringMessageContainer *stage)
+	HOOK(void, __fastcall, SetupStage,0x00D71A90,void* This, void* Edx, int a2, void* a3)
+	{
+		if (expectingLoad)
+		{
+			expectingLoad = false;
+			SetInfo();
+		}
+		else
+			return originalSetupStage(This, Edx, a2, a3);
+	}
+	//Hedgehog::Base::CSharedString *__thiscall Sonic::CGameplayFlowStageAct::SetupLoadingAct(Sonic::CGameplayFlowStage *this)
+	HOOK(void*, __fastcall, SetupLoadingAct, 0x00D057F0, void* This, void* Edx)
+	{
+		if (expectingLoad)
+		{
+			expectingLoad = false;
+			SetInfo();
+		}
+		return originalSetupLoadingAct(This, Edx);
+	}
+	void StageManager::TriggerStageLoad()
+	{
+		expectingLoad = true;
+		SetInfo();
+		SequenceHelpers::ChangeModule(ModuleFlow::StageAct);
+	}
+	//char __thiscall Sonic::Sequence::CSequenceMainImpl::ProcessMessage(MainSequenceActor *this, int a1, int a2)
 	void StageManager::Initialize()
 	{
 		//Blocks Gate UI options and switch
 		WRITE_JUMP(0x01080F02, 0x01080FB7);
-		WRITE_JUMP(0xD56CCA, ASM_OverrideStageIDLoading);
+		//WRITE_JUMP(0xD56CCA, ASM_OverrideStageIDLoading);
 		WRITE_JUMP(0x00B267D0, ASM_SetCorrectStageForCutscene);
 		WRITE_JUMP(0x00D0E164, ASM_InterceptGameplayFlowLoading);
 
 		//NOTE: can be replaced with latest BB
+		//INSTALL_HOOK(SetupLoadingAct);
 		INSTALL_HOOK(CStoryImplConstructor);
 		INSTALL_HOOK(CEventSceneStart);
 		INSTALL_HOOK(CEventSceneEnd);
 		INSTALL_HOOK(CGameplayFlowStage_CStateWaitEnd);
 		INSTALL_HOOK(CHudGateMenuMainCStateOutroBegin);
-		INSTALL_HOOK(HudLoading_CHudLoadingCStateOutroBegin);
-		INSTALL_HOOK(SM_UpdateApplication);
+		//INSTALL_HOOK(HudLoading_CHudLoadingCStateOutroBegin);
+		//INSTALL_HOOK(SM_UpdateApplication);
 
 		//Patch out reading MissionScript to avoid crashes when loading stages without the stgXXX archive name format
 		INSTALL_HOOK(Sonic_Mission_CScriptImpl_SendMissionType);

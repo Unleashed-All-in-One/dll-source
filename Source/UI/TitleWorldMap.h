@@ -98,10 +98,7 @@ namespace SUC::UI::TitleScreen
 		public Singleton<CSUCTitleCompanion>
 	{
 	public:
-		
-
-		static inline const auto lightPosition = Hedgehog::Math::CVector(-79.8565f, 0, 4.78983f);
-		
+		static inline const auto lightPosition = Hedgehog::Math::CVector(-79.8565f, 0, 4.78983f);		
 #pragma region UI
 		class CWorldMapCanvas
 		{
@@ -126,13 +123,13 @@ namespace SUC::UI::TitleScreen
 
 			void SetInactive(bool in_Hide);
 		};
-		CWorldMapCanvas* UI;
+		CWorldMapCanvas* WorldMapUI;
 #pragma endregion
 
 		Hedgehog::Math::CVector2 posCursorCenter;
 		SharedPtrTypeless cursorMoveHandle, cursorSelectHandle, stageSelectHandle, worldMapMusicHandle;
 		bool playingPointerMove;
-		bool introPlayed = false;
+		bool m_PanPlayed = false;
 		int currentFlagSelected;
 		int lastFlagIndex = 0;
 		int stageSelectedWindowMax = 6;
@@ -143,17 +140,17 @@ namespace SUC::UI::TitleScreen
 		float timeStageSelectDelay = 0;
 
 
-		bool isStageWindowOpen = false;
+		bool m_StageWindowActive = false;
 
-		bool cursorSelected = false;
-		float cursorMultiplier = 24;
+		bool m_IsCursorOverFlag = false;
+		float m_CursorSpeed = 24;
 		int m_StageListOverflow;
 		int m_StageListSelection;
-		std::vector<CWorldCountry*> m_Country;
+		std::vector<CWorldCountry*> m_Countries;
 		boost::shared_ptr<SaveLoadTestStruct> m_spSave;
 		boost::shared_ptr<Sonic::CLightManager> light;
 
-		boost::shared_ptr<CTitleWorldMapGlobe> m_GlobeModel;
+		boost::shared_ptr<CTitleWorldMapGlobe> m_spEarth;
 		boost::shared_ptr<CTitleWorldMapSky> m_spSkySpace;
 		boost::shared_ptr<CTitleWorldMapSun> m_spSun;
 		void DestroyCSDScene(Chao::CSD::RCPtr<Chao::CSD::CScene>& in_CsdScene);
@@ -206,7 +203,7 @@ namespace SUC::UI::TitleScreen
 		void CapitalWindow_Update();
 
 		void SetStageSelectionScreenshot();
-		///Stage selection highlight & stage launch
+
 		void StageWindow_Update(Sonic::CGameObject* This);
 	};
 

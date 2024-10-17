@@ -1,10 +1,25 @@
 #include <Hedgehog/Universe/Engine/hhStateMachineBase.h>
 #include "..\BlueBlurCustom\Sonic\System\ApplicationDocument.h"
-
+#include "..\BlueBlurCustom\Sonic\System\CGameplayFlowManager.h"
+namespace Sonic
+{
+	namespace Sequence
+	{
+		class CSequenceMainImpl
+		{
+		public:
+			BB_INSERT_PADDING(124);
+			Hedgehog::base::CSharedString m_Field124;
+			boost::shared_ptr<void> m_Field128;
+		};
+		BB_ASSERT_OFFSETOF(CSequenceMainImpl, m_Field124, 124);
+	} 
+}
 namespace SUC::System
 {
 	Sonic::Sequence::Story* SequenceHelpers::storySequenceInstance;
 
+	
 
 	const char* nextStage = nullptr;
 	int nextPlayerType = 0;
@@ -253,14 +268,28 @@ namespace SUC::System
 		//
 		//8 * m_ModuleIndex + 0x15B8528
 	}
+	struct CThingy
+	{
+		int f;
+		void* m_Field04;
+	};
+
+	class CSequenceMode : public Hedgehog::Universe::CMessageActor
+	{
+	public:
+		virtual void Zero() {};
+		virtual void Start();
+		virtual void End();
+	};
+	BB_ASSERT_OFFSETOF(CThingy, m_Field04, 4);
 	void SequenceHelpers::ChangeModule(ModuleFlow in_Flow)
 	{
 		FUNCTION_PTR(void, __stdcall, ChangeModuleTest, 0x01107D50, Hedgehog::Universe::CMessageActor * Th, int a2);
 
-		ChangeModuleTest(Sonic::Sequence::Main::GetInstance(), (int)in_Flow);
+		//ChangeModuleTest(Sonic::Sequence::Main::GetInstance(), (int)in_Flow);
 
-		return;
-		Sonic::Message::MsgRequestChangeModule* message2 = new Sonic::Message::MsgRequestChangeModule();
+		//return;
+		auto message2 = boost::make_shared<Sonic::Message::MsgRequestChangeModule>();
 		message2->m_ModuleIndex = (int)in_Flow;
 		message2->moduleInfo = Sonic::Message::SRequestChangeModuleInfo();
 		if (in_Flow == StageAct)
@@ -268,12 +297,48 @@ namespace SUC::System
 			//message2->moduleInfo.m_Field00 = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameter->TerrainArchiveName;
 			//message2->moduleInfo.m_Field04 = "Stage";
 		}
-		message2->moduleInfo.m_Field00 = "DMykonos_2";
+		message2->moduleInfo.m_Field00 = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameter->TerrainArchiveName;
 		message2->moduleInfo.m_Field04 = "Stage";
+		message2->moduleInfo.m_Field08 = 0;
+		message2->moduleInfo.m_Field32 = -1;
+		message2->moduleInfo.m_Field48 = 3.0f;
 		message2->moduleInfo.m_Field20 = hh::list<Hedgehog::base::CSharedString>();
 
+		FUNCTION_PTR(int*, __thiscall, sub_544C20, 0x544C20, void* This, const char * a2);
+		FUNCTION_PTR(void*, __thiscall, sub_544B90, 0x544B90, void* This, const Hedgehog::Base::CSharedString & a2, int a3);
+		CThingy* thing = (CThingy*)0x01E78908;
+		///void* thing2 = *(void**)(thing + 4);
+		///sub_544B90(thing, "Stage", 0);
+		//int *__thiscall Sonic::Sequence::CSequenceMainImpl::LuanneFunctions::StartModule(int this, int a2, Luanne_IntegerMessageContainer *a3)
+		FUNCTION_PTR(void*, __thiscall, StartModule, 0x00D77020, void* This, LuaStringEntryContainer2 * a3);
+		//const char *__thiscall sub_6615B0(int **this)
+		FUNCTION_PTR(const char*, __thiscall, sub_6615B0, 0x6615B0, Hedgehog::Base::CSharedString* This);
+		//auto cont = new LuaStringEntryContainer2();
+		//cont->entry = new LuaStringEntryContainer2::LuaStringEntry2();
+		//cont->entry->content = "Stage";
+		//StartModule(Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spSequenceMain.get(), cont);
+
+
+		auto spSequenceMain = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spSequenceMain.get();
+		spSequenceMain->m_Field124 = "StageAct";
+		auto v4 = thing->m_Field04;
+		auto m_FlowName = spSequenceMain->m_Field124.c_str();
+		auto result = sub_544C20(thing, m_FlowName);
+		if (result)
+		{
+			CSequenceMode* test2 = (CSequenceMode*)(*(int(__cdecl**)(int*))((*result & 0xFFFFFFFE) + 4))(result + 2);
+			test2->Start();
+			printf("");
+		}
+
+		//int *__thiscall sub_544C20(char *this, Hedgehog::Base::CSharedString *a2)
+
+
 		init2 = true;
-		ModuleChangeProcessor(message2->moduleInfo, STAGEACT_CONSTRUCTOR, (int)in_Flow);
+		auto actor = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pMessageManager->GetMessageActor(5);
+		//actor->SendMessage(actor->m_ActorID, message2);
+
+		//ModuleChangeProcessor(message2->moduleInfo, STAGEACT_CONSTRUCTOR, (int)in_Flow);
 
 
 		//Sonic::CApplicationDocument::GetInstance()->m_pMember->m_pGameplayFlowManager->RegisterStateFactory();

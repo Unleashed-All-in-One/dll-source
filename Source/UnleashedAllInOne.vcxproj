@@ -229,6 +229,7 @@
     <ClInclude Include="BlueBlurCustom\Sonic\CGlitterPlayer.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\Particle\ParticleManager.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\System\ApplicationDocument.h" />
+    <ClInclude Include="BlueBlurCustom\Sonic\System\CGameplayFlowManager.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\System\CharacterProxy.h" />
     <ClInclude Include="GameObjects\TitleWorldMapSun.h" />
     <ClInclude Include="Gameplay\GameplayHookContainer.h" />

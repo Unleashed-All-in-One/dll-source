@@ -234,68 +234,68 @@ namespace SUC::UI::TitleScreen
 
 	void CSUCTitleCompanion::DestroyCSDScene(Chao::CSD::RCPtr<Chao::CSD::CScene>& in_CsdScene)
 	{
-		Chao::CSD::CProject::DestroyScene(UI->rcWorldMap.Get(), in_CsdScene);
+		Chao::CSD::CProject::DestroyScene(WorldMapUI->rcWorldMap.Get(), in_CsdScene);
 	}
 
 	void CSUCTitleCompanion::KillCallback()
 	{
 		using Chao::CSD::CProject;
 		KillScreen();
-		DestroyCSDScene(UI->rcInfoBg1);
-		DestroyCSDScene(UI->rcInfoImg2);
-		DestroyCSDScene(UI->rcInfoImg3);
-		DestroyCSDScene(UI->rcInfoImg4);
-		DestroyCSDScene(UI->rcHeaderBgW);
-		DestroyCSDScene(UI->rcHeaderImgW);
-		DestroyCSDScene(UI->rcFooterBgW);
-		DestroyCSDScene(UI->rcFooterImgW);
-		DestroyCSDScene(UI->rcWorldmapFooterImgA);
-		DestroyCSDScene(UI->rcCursorLeft);
-		DestroyCSDScene(UI->rcCursorTop);
-		DestroyCSDScene(UI->rcCursorBottom);
-		DestroyCSDScene(UI->rcCursorRight);
-		DestroyCSDScene(UI->rcCtsName);
-		DestroyCSDScene(UI->rcCtsCursorEffect);
-		DestroyCSDScene(UI->rcCtsGuideScreenshot);
-		DestroyCSDScene(UI->rcCtsStageScreenshot);
-		DestroyCSDScene(UI->rcCtsGuideWindow);
-		DestroyCSDScene(UI->rcCtsGuideText);
-		DestroyCSDScene(UI->rcTextWorldDescription);
-		DestroyCSDScene(UI->rcCtsGuide4Mission);
-		DestroyCSDScene(UI->rcCtsGuide5Medal);
-		DestroyCSDScene(UI->rcCtsStageWindow);
-		DestroyCSDScene(UI->rcCtsStageSelect);
-		DestroyCSDScene(UI->rcCtsStageInfoWindow);
-		DestroyCSDScene(UI->rcCtsGuide1Hiscore);
-		DestroyCSDScene(UI->rcCtsGuide2BestTime);
-		DestroyCSDScene(UI->rcCtsGuide3Rank);
-		DestroyCSDScene(UI->rcCtsStage4Mission);
-		DestroyCSDScene(UI->rcCtsStage5Medal);
-		DestroyCSDScene(UI->rcCtsChoicesBg);
-		DestroyCSDScene(UI->rcCtsChoicesWindow);
-		DestroyCSDScene(UI->rcCtsChoicesSelect);
+		DestroyCSDScene(WorldMapUI->rcInfoBg1);
+		DestroyCSDScene(WorldMapUI->rcInfoImg2);
+		DestroyCSDScene(WorldMapUI->rcInfoImg3);
+		DestroyCSDScene(WorldMapUI->rcInfoImg4);
+		DestroyCSDScene(WorldMapUI->rcHeaderBgW);
+		DestroyCSDScene(WorldMapUI->rcHeaderImgW);
+		DestroyCSDScene(WorldMapUI->rcFooterBgW);
+		DestroyCSDScene(WorldMapUI->rcFooterImgW);
+		DestroyCSDScene(WorldMapUI->rcWorldmapFooterImgA);
+		DestroyCSDScene(WorldMapUI->rcCursorLeft);
+		DestroyCSDScene(WorldMapUI->rcCursorTop);
+		DestroyCSDScene(WorldMapUI->rcCursorBottom);
+		DestroyCSDScene(WorldMapUI->rcCursorRight);
+		DestroyCSDScene(WorldMapUI->rcCtsName);
+		DestroyCSDScene(WorldMapUI->rcCtsCursorEffect);
+		DestroyCSDScene(WorldMapUI->rcCtsGuideScreenshot);
+		DestroyCSDScene(WorldMapUI->rcCtsStageScreenshot);
+		DestroyCSDScene(WorldMapUI->rcCtsGuideWindow);
+		DestroyCSDScene(WorldMapUI->rcCtsGuideText);
+		DestroyCSDScene(WorldMapUI->rcTextWorldDescription);
+		DestroyCSDScene(WorldMapUI->rcCtsGuide4Mission);
+		DestroyCSDScene(WorldMapUI->rcCtsGuide5Medal);
+		DestroyCSDScene(WorldMapUI->rcCtsStageWindow);
+		DestroyCSDScene(WorldMapUI->rcCtsStageSelect);
+		DestroyCSDScene(WorldMapUI->rcCtsStageInfoWindow);
+		DestroyCSDScene(WorldMapUI->rcCtsGuide1Hiscore);
+		DestroyCSDScene(WorldMapUI->rcCtsGuide2BestTime);
+		DestroyCSDScene(WorldMapUI->rcCtsGuide3Rank);
+		DestroyCSDScene(WorldMapUI->rcCtsStage4Mission);
+		DestroyCSDScene(WorldMapUI->rcCtsStage5Medal);
+		DestroyCSDScene(WorldMapUI->rcCtsChoicesBg);
+		DestroyCSDScene(WorldMapUI->rcCtsChoicesWindow);
+		DestroyCSDScene(WorldMapUI->rcCtsChoicesSelect);
 
-		for (size_t i = 0; i < m_Country.size(); i++)
+		for (size_t i = 0; i < m_Countries.size(); i++)
 		{
-			Chao::CSD::CProject::DestroyScene(UI->rcWorldMap.Get(), m_Country[i]->m_rcFlag);
-			Chao::CSD::CProject::DestroyScene(UI->rcWorldMap.Get(), m_Country[i]->m_rcDaylightIndicator);
+			Chao::CSD::CProject::DestroyScene(WorldMapUI->rcWorldMap.Get(), m_Countries[i]->m_rcFlag);
+			Chao::CSD::CProject::DestroyScene(WorldMapUI->rcWorldMap.Get(), m_Countries[i]->m_rcDaylightIndicator);
 		}
-		for (size_t i = 0; i < 9; i++) Chao::CSD::CProject::DestroyScene(UI->rcWorldMap.Get(), UI->rcTextElement[i]);
+		for (size_t i = 0; i < 9; i++) Chao::CSD::CProject::DestroyScene(WorldMapUI->rcWorldMap.Get(), WorldMapUI->rcTextElement[i]);
 
-		UI->rcWorldMap = nullptr;
+		WorldMapUI->rcWorldMap = nullptr;
 
 		timePan = 0;
 		camHeight = -20;
-		introPlayed = false;
+		m_PanPlayed = false;
 		TitleWorldMap::s_WorldmapCursorDisabled = true;
 		//rotationPitch = -0.4f;
 		//FOV = 0.84906584f;
 		cameraDistance = 5.0f;
 		//rotationYaw = 0.55f;
 		TitleWorldMap::s_TargetDisabled = true;
-		cursorSelected = false;
+		m_IsCursorOverFlag = false;
 		TitleWorldMap::s_StageSelectWindowSelection = 0;
-		isStageWindowOpen = false;
+		m_StageWindowActive = false;
 		timeStageSelectDelay = 0;
 		lastflagSelectionAmount = 0;
 	}
@@ -310,7 +310,7 @@ namespace SUC::UI::TitleScreen
 	void CSUCTitleCompanion::AddCallback(const Hedgehog::Base::THolder<Sonic::CWorld>& worldHolder,
 		Sonic::CGameDocument* pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& spDatabase)
 	{
-		UI = new CWorldMapCanvas();
+		WorldMapUI = new CWorldMapCanvas();
 		Sonic::CApplicationDocument::GetInstance()->AddMessageActor("GameObject", this);
 		//pGameDocument->AddUpdateUnit("0", this);
 		//pGameDocument->AddUpdateUnit("1", this);
@@ -327,8 +327,8 @@ namespace SUC::UI::TitleScreen
 
 	void CSUCTitleCompanion::SetUIVisibility(bool in_Hide)
 	{
-		UI->SetInactive(in_Hide);
-		for (const auto& m_ContinentUI : m_Country)
+		WorldMapUI->SetInactive(in_Hide);
+		for (const auto& m_ContinentUI : m_Countries)
 		{
 			m_ContinentUI->m_rcFlag->SetHideFlag(in_Hide);
 			m_ContinentUI->m_rcDaylightIndicator->SetHideFlag(in_Hide);
@@ -338,31 +338,31 @@ namespace SUC::UI::TitleScreen
 	void CSUCTitleCompanion::PlayCursorAnim(const char* name, bool reverse)
 	{
 		float reversePoint = reverse ? 80 : 0;
-		CSDCommon::PlayAnimation(UI->rcCursorTop, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, reversePoint, false,
+		CSDCommon::PlayAnimation(WorldMapUI->rcCursorTop, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, reversePoint, false,
 		                         reverse);
-		CSDCommon::PlayAnimation(UI->rcCursorBottom, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, reversePoint, false,
+		CSDCommon::PlayAnimation(WorldMapUI->rcCursorBottom, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, reversePoint, false,
 		                         reverse);
-		CSDCommon::PlayAnimation(UI->rcCursorLeft, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, reversePoint, false,
+		CSDCommon::PlayAnimation(WorldMapUI->rcCursorLeft, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, reversePoint, false,
 		                         reverse);
-		CSDCommon::PlayAnimation(UI->rcCursorRight, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, reversePoint, false,
+		CSDCommon::PlayAnimation(WorldMapUI->rcCursorRight, name, Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, reversePoint, false,
 		                         reverse);
 	}
 
 	void CSUCTitleCompanion::CheckCursorAnimStatus()
 	{
-		if (UI->rcCtsGuideWindow)
+		if (WorldMapUI->rcCtsGuideWindow)
 		{
-			if (UI->rcCtsGuideWindow->m_MotionFrame >= 85 && UI->rcCtsGuideWindow->m_MotionFrame <= 90)
+			if (WorldMapUI->rcCtsGuideWindow->m_MotionFrame >= 85 && WorldMapUI->rcCtsGuideWindow->m_MotionFrame <= 90)
 			{
-				UI->rcCtsGuide4Mission->SetHideFlag(false);
-				UI->rcCtsGuide5Medal->SetHideFlag(false);
+				WorldMapUI->rcCtsGuide4Mission->SetHideFlag(false);
+				WorldMapUI->rcCtsGuide5Medal->SetHideFlag(false);
 			}
 		}
 	}
 
 	void CSUCTitleCompanion::SetCursorPos(const CVector2& pos)
 	{
-		if (!UI->rcCursorLeft || !TitleWorldMap::s_IsActive)
+		if (!WorldMapUI->rcCursorLeft || !TitleWorldMap::s_IsActive)
 			return;
 		if (((pos.x() + pos.y()) != 0) && !playingPointerMove)
 		{
@@ -383,22 +383,22 @@ namespace SUC::UI::TitleScreen
 		auto posT = CVector2(pos.x(), pos.y() + sizeBox / 2);
 		auto posB = CVector2(pos.x(), pos.y() - (sizeBox / 2));
 
-		UI->rcCursorLeft->SetPosition(posL.x() + System::AspectRatioHelper::ScreenHalfPoint->x(),
+		WorldMapUI->rcCursorLeft->SetPosition(posL.x() + System::AspectRatioHelper::ScreenHalfPoint->x(),
 		                              posL.y() + System::AspectRatioHelper::ScreenHalfPoint->y());
-		UI->rcCursorRight->SetPosition(posR.x() + System::AspectRatioHelper::ScreenHalfPoint->x(),
+		WorldMapUI->rcCursorRight->SetPosition(posR.x() + System::AspectRatioHelper::ScreenHalfPoint->x(),
 		                               posR.y() + System::AspectRatioHelper::ScreenHalfPoint->y());
-		UI->rcCursorTop->SetPosition(posT.x() + System::AspectRatioHelper::ScreenHalfPoint->x(),
+		WorldMapUI->rcCursorTop->SetPosition(posT.x() + System::AspectRatioHelper::ScreenHalfPoint->x(),
 		                             posT.y() + System::AspectRatioHelper::ScreenHalfPoint->y());
-		UI->rcCursorBottom->SetPosition(posB.x() + System::AspectRatioHelper::ScreenHalfPoint->x(),
+		WorldMapUI->rcCursorBottom->SetPosition(posB.x() + System::AspectRatioHelper::ScreenHalfPoint->x(),
 		                                posB.y() + System::AspectRatioHelper::ScreenHalfPoint->y());
-		UI->rcCursorRight->GetNode("arrow_position_9")->SetRotation(180);
-		UI->rcCursorTop->GetNode("arrow_position_9")->SetRotation(90);
-		UI->rcCursorBottom->GetNode("arrow_position_9")->SetRotation(-90);
+		WorldMapUI->rcCursorRight->GetNode("arrow_position_9")->SetRotation(180);
+		WorldMapUI->rcCursorTop->GetNode("arrow_position_9")->SetRotation(90);
+		WorldMapUI->rcCursorBottom->GetNode("arrow_position_9")->SetRotation(-90);
 	}
 
 	bool CSUCTitleCompanion::IsInsideCursorRange(const CVector2& input, float visibility, int flagID)
 	{
-		if (!UI->rcCursorLeft || TitleWorldMap::s_WorldmapCursorDisabled ||
+		if (!WorldMapUI->rcCursorLeft || TitleWorldMap::s_WorldmapCursorDisabled ||
 			TitleWorldMapPause::s_IsPaused)
 			return false;
 		bool result = false;
@@ -411,9 +411,9 @@ namespace SUC::UI::TitleScreen
 			{
 				lastFlagIndex = flagID;
 				//for eventual night versions, add 9
-				UI->rcCtsGuideScreenshot->GetNode("town_ss_img")->SetPatternIndex(flagID);
+				WorldMapUI->rcCtsGuideScreenshot->GetNode("town_ss_img")->SetPatternIndex(flagID);
 				//rcCtsGuideText->GetNode("text_size")->SetPatternIndex(flagID);
-				UI->rcCtsName->GetNode("img")->SetPatternIndex(flagID);
+				WorldMapUI->rcCtsName->GetNode("img")->SetPatternIndex(flagID);
 
 				result = true;
 			}
@@ -443,11 +443,11 @@ namespace SUC::UI::TitleScreen
 			sprintf(buff, "text_line_%d", i);
 			if (i <= lines.size() - 1)
 			{
-				UI->rcCtsGuideText->GetNode(buff)->SetText(lines.at(i).c_str());
+				WorldMapUI->rcCtsGuideText->GetNode(buff)->SetText(lines.at(i).c_str());
 			}
 			else
 			{
-				UI->rcCtsGuideText->GetNode(buff)->SetText(" ");
+				WorldMapUI->rcCtsGuideText->GetNode(buff)->SetText(" ");
 			}
 		}
 	}
@@ -459,13 +459,13 @@ namespace SUC::UI::TitleScreen
 			printf("\n[WorldMap] Missing config for FlagID %d", id);
 			return;
 		}
-		stageSelectedWindowMax = m_Country[id]->m_IsInShade && SUC::Project::s_WorldData.data[id].dataNight.size() != 0
+		stageSelectedWindowMax = m_Countries[id]->m_IsInShade && SUC::Project::s_WorldData.data[id].dataNight.size() != 0
 			                         ? SUC::Project::s_WorldData.data[id].dataNight.size() - 1
 			                         : SUC::Project::s_WorldData.data[id].data.size() - 1;
 		//Common::ClampInt(stageSelectedWindowMax, 0, 6);
 		for (size_t i = 0; i <= WM_STAGELIST_MAXLISTVISIBLE; i++)
 		{
-			UI->rcTextElement[i]->SetHideFlag(true);
+			WorldMapUI->rcTextElement[i]->SetHideFlag(true);
 		}
 
 		for (size_t i = 0; i <= WM_STAGELIST_MAXLISTVISIBLE; i++)
@@ -474,13 +474,13 @@ namespace SUC::UI::TitleScreen
 				break;
 
 			const char* optionName;
-			if (m_Country[id]->m_IsInShade && SUC::Project::s_WorldData.data[id].dataNight.size() != 0)
+			if (m_Countries[id]->m_IsInShade && SUC::Project::s_WorldData.data[id].dataNight.size() != 0)
 				optionName = SUC::Project::s_WorldData.data[id].dataNight[i + offset].optionName.c_str();
 			else
 				optionName = SUC::Project::s_WorldData.data[id].data[i + offset].optionName.c_str();
 
-			UI->rcTextElement[i]->SetHideFlag(false);
-			UI->rcTextElement[i]->GetNode("Text_blue")->SetText(optionName);
+			WorldMapUI->rcTextElement[i]->SetHideFlag(false);
+			WorldMapUI->rcTextElement[i]->GetNode("Text_blue")->SetText(optionName);
 		}
 	}
 
@@ -520,14 +520,14 @@ namespace SUC::UI::TitleScreen
 		sprintf(stageMax, "%02d", SUC::Project::s_WorldData.data[flag].data.size());
 		sprintf(stageCount, "%02d", stageCompletedAmount);
 
-		UI->rcCtsGuide4Mission->GetNode("num_nume")->SetText(stageCount);
-		UI->rcCtsGuide4Mission->GetNode("num_deno")->SetText(stageMax);
+		WorldMapUI->rcCtsGuide4Mission->GetNode("num_nume")->SetText(stageCount);
+		WorldMapUI->rcCtsGuide4Mission->GetNode("num_deno")->SetText(stageMax);
 
-		UI->rcCtsGuide5Medal->GetNode("s_num_nume")->SetText(redRingsCurrent);
-		UI->rcCtsGuide5Medal->GetNode("s_num_deno")->SetText(redRingsMax);
+		WorldMapUI->rcCtsGuide5Medal->GetNode("s_num_nume")->SetText(redRingsCurrent);
+		WorldMapUI->rcCtsGuide5Medal->GetNode("s_num_deno")->SetText(redRingsMax);
 
-		UI->rcCtsGuide5Medal->GetNode("m_num_nume")->SetText(redRingsCurrent);
-		UI->rcCtsGuide5Medal->GetNode("m_num_deno")->SetText(redRingsMax);
+		WorldMapUI->rcCtsGuide5Medal->GetNode("m_num_nume")->SetText(redRingsCurrent);
+		WorldMapUI->rcCtsGuide5Medal->GetNode("m_num_deno")->SetText(redRingsMax);
 	}
 
 	void CSUCTitleCompanion::PopulateStageWindowInfo(std::string id)
@@ -556,35 +556,35 @@ namespace SUC::UI::TitleScreen
 		sprintf(scoreCount, "%08d", info.bestScore);
 		sprintf(redCount, "%02d", info.redRingCount);
 
-		UI->rcCtsGuide2BestTime->GetNode("num")->SetText(bestTimeC);
-		UI->rcCtsGuide1Hiscore->GetNode("num")->SetText(scoreCount);
-		UI->rcCtsGuide3Rank->GetNode("rank_shade")->SetPatternIndex(info.bestRank);
-		UI->rcCtsGuide3Rank->GetNode("rank_img")->SetPatternIndex(info.bestRank);
+		WorldMapUI->rcCtsGuide2BestTime->GetNode("num")->SetText(bestTimeC);
+		WorldMapUI->rcCtsGuide1Hiscore->GetNode("num")->SetText(scoreCount);
+		WorldMapUI->rcCtsGuide3Rank->GetNode("rank_shade")->SetPatternIndex(info.bestRank);
+		WorldMapUI->rcCtsGuide3Rank->GetNode("rank_img")->SetPatternIndex(info.bestRank);
 
-		UI->rcCtsStage5Medal->GetNode("s_num_nume")->SetText(redCount);
-		UI->rcCtsStage5Medal->GetNode("s_num_deno")->SetText("05");
+		WorldMapUI->rcCtsStage5Medal->GetNode("s_num_nume")->SetText(redCount);
+		WorldMapUI->rcCtsStage5Medal->GetNode("s_num_deno")->SetText("05");
 
-		UI->rcCtsStage5Medal->GetNode("m_num_nume")->SetText(redCount);
-		UI->rcCtsStage5Medal->GetNode("m_num_deno")->SetText("05");
+		WorldMapUI->rcCtsStage5Medal->GetNode("m_num_nume")->SetText(redCount);
+		WorldMapUI->rcCtsStage5Medal->GetNode("m_num_deno")->SetText("05");
 	}
 
 	void CSUCTitleCompanion::SetVisibilityPlayerInfo(bool visible)
 	{
-		UI->rcInfoBg1->SetHideFlag(!visible);
-		UI->rcInfoImg1->SetHideFlag(!visible);
-		UI->rcInfoImg2->SetHideFlag(!visible);
-		UI->rcInfoImg3->SetHideFlag(!visible);
-		UI->rcInfoImg4->SetHideFlag(!visible);
-		UI->rcCtsGuide4Mission->SetHideFlag(!visible);
-		UI->rcCtsGuide5Medal->SetHideFlag(!visible);
-		CSDCommon::FreezeMotion(UI->rcCtsGuideScreenshot, 0);
-		CSDCommon::FreezeMotion(UI->rcCtsGuideText, 0);
-		CSDCommon::FreezeMotion(UI->rcCtsGuideWindow, 0);
-		CSDCommon::PlayAnimation(UI->rcCtsGuideScreenshot, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
+		WorldMapUI->rcInfoBg1->SetHideFlag(!visible);
+		WorldMapUI->rcInfoImg1->SetHideFlag(!visible);
+		WorldMapUI->rcInfoImg2->SetHideFlag(!visible);
+		WorldMapUI->rcInfoImg3->SetHideFlag(!visible);
+		WorldMapUI->rcInfoImg4->SetHideFlag(!visible);
+		WorldMapUI->rcCtsGuide4Mission->SetHideFlag(!visible);
+		WorldMapUI->rcCtsGuide5Medal->SetHideFlag(!visible);
+		CSDCommon::FreezeMotion(WorldMapUI->rcCtsGuideScreenshot, 0);
+		CSDCommon::FreezeMotion(WorldMapUI->rcCtsGuideText, 0);
+		CSDCommon::FreezeMotion(WorldMapUI->rcCtsGuideWindow, 0);
+		CSDCommon::PlayAnimation(WorldMapUI->rcCtsGuideScreenshot, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
 		                         !visible);
-		CSDCommon::PlayAnimation(UI->rcCtsGuideText, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
+		CSDCommon::PlayAnimation(WorldMapUI->rcCtsGuideText, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
 		                         !visible);
-		CSDCommon::PlayAnimation(UI->rcCtsGuideWindow, "Intro_Anim_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
+		CSDCommon::PlayAnimation(WorldMapUI->rcCtsGuideWindow, "Intro_Anim_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
 		                         !visible);
 	}
 
@@ -593,77 +593,77 @@ namespace SUC::UI::TitleScreen
 		selectedCapital = 0;
 		if (visible) //im only doing this so that it doesnt disable when disabling and plays anims instead
 		{
-			UI->rcCtsChoicesBg->SetHideFlag(!visible);
-			UI->rcCtsChoicesWindow->SetHideFlag(!visible);
+			WorldMapUI->rcCtsChoicesBg->SetHideFlag(!visible);
+			WorldMapUI->rcCtsChoicesWindow->SetHideFlag(!visible);
 		}
-		UI->rcCtsChoicesSelect->SetHideFlag(!visible);
-		CSDCommon::PlayAnimation(UI->rcCtsChoicesBg, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
+		WorldMapUI->rcCtsChoicesSelect->SetHideFlag(!visible);
+		CSDCommon::PlayAnimation(WorldMapUI->rcCtsChoicesBg, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
 		                         !visible);
-		CSDCommon::PlayAnimation(UI->rcCtsChoicesWindow, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
+		CSDCommon::PlayAnimation(WorldMapUI->rcCtsChoicesWindow, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
 		                         !visible);
 
-		UI->rcTextElement[7]->SetHideFlag(!visible);
-		UI->rcTextElement[8]->SetHideFlag(!visible);
+		WorldMapUI->rcTextElement[7]->SetHideFlag(!visible);
+		WorldMapUI->rcTextElement[8]->SetHideFlag(!visible);
 
-		CSDCommon::PlayAnimation(UI->rcTextElement[7], "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-		CSDCommon::PlayAnimation(UI->rcTextElement[8], "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-		CSDCommon::PlayAnimation(UI->rcCtsChoicesSelect, "Scroll_down_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, 100);
+		CSDCommon::PlayAnimation(WorldMapUI->rcTextElement[7], "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(WorldMapUI->rcTextElement[8], "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+		CSDCommon::PlayAnimation(WorldMapUI->rcCtsChoicesSelect, "Scroll_down_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 0, 100);
 	}
 
 	void CSUCTitleCompanion::SetVisibilityStageWindow(bool visible)
 	{
-		CSDCommon::PlayAnimation(UI->rcCtsStageWindow, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
+		CSDCommon::PlayAnimation(WorldMapUI->rcCtsStageWindow, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
 		                         !visible);
-		CSDCommon::PlayAnimation(UI->rcCtsName_2, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
+		CSDCommon::PlayAnimation(WorldMapUI->rcCtsName_2, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
 		                         !visible);
-		CSDCommon::PlayAnimation(UI->rcCtsStageSelect, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
+		CSDCommon::PlayAnimation(WorldMapUI->rcCtsStageSelect, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
 		                         !visible);
-		CSDCommon::PlayAnimation(UI->rcStageSelectFlag, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
+		CSDCommon::PlayAnimation(WorldMapUI->rcStageSelectFlag, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
 		                         !visible);
-		CSDCommon::PlayAnimation(UI->rcCtsStageScreenshot, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
+		CSDCommon::PlayAnimation(WorldMapUI->rcCtsStageScreenshot, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true,
 		                         !visible);
-		CSDCommon::PlayAnimation(UI->rcCtsStageInfoWindow, "Intro_Anim_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0,
+		CSDCommon::PlayAnimation(WorldMapUI->rcCtsStageInfoWindow, "Intro_Anim_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0,
 		                         true, !visible);
-		CSDCommon::FreezeMotion(UI->rcCtsStageSelect, 0);
+		CSDCommon::FreezeMotion(WorldMapUI->rcCtsStageSelect, 0);
 
 		PopulateStageSelect(TitleWorldMap::s_LastFlagSelected);
-		UI->rcCtsStageSelect->SetHideFlag(!visible);
-		UI->rcCtsStage5Medal->SetHideFlag(!visible);
-		UI->rcCtsGuide3Rank->SetHideFlag(!visible);
-		UI->rcCtsGuide1Hiscore->SetHideFlag(!visible);
-		UI->rcCtsGuide2BestTime->SetHideFlag(!visible);
+		WorldMapUI->rcCtsStageSelect->SetHideFlag(!visible);
+		WorldMapUI->rcCtsStage5Medal->SetHideFlag(!visible);
+		WorldMapUI->rcCtsGuide3Rank->SetHideFlag(!visible);
+		WorldMapUI->rcCtsGuide1Hiscore->SetHideFlag(!visible);
+		WorldMapUI->rcCtsGuide2BestTime->SetHideFlag(!visible);
 		if (visible) //im only doing this so that it doesnt disable when disabling and plays anims instead
 		{
-			CSDCommon::PlayAnimation(UI->rcCtsGuideText, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0);
+			CSDCommon::PlayAnimation(WorldMapUI->rcCtsGuideText, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0);
 			SetLevelTextCast("Head for the goal!");
-			UI->rcCtsGuideText->SetPosition(0, 40);
-			UI->rcCtsStageWindow->SetHideFlag(false);
-			UI->rcCtsStageScreenshot->SetHideFlag(false);
-			UI->rcCtsName_2->SetHideFlag(false);
-			UI->rcStageSelectFlag->SetHideFlag(false);
-			UI->rcCtsStageInfoWindow->SetHideFlag(false);
+			WorldMapUI->rcCtsGuideText->SetPosition(0, 40);
+			WorldMapUI->rcCtsStageWindow->SetHideFlag(false);
+			WorldMapUI->rcCtsStageScreenshot->SetHideFlag(false);
+			WorldMapUI->rcCtsName_2->SetHideFlag(false);
+			WorldMapUI->rcStageSelectFlag->SetHideFlag(false);
+			WorldMapUI->rcCtsStageInfoWindow->SetHideFlag(false);
 		}
 		else
 
-			UI->rcCtsGuideText->SetPosition(140, 40);
+			WorldMapUI->rcCtsGuideText->SetPosition(140, 40);
 	}
 
 	void CSUCTitleCompanion::CreateScreen()
 	{
-		if (UI->rcWorldMap && !UI->spWorldMap)
+		if (WorldMapUI->rcWorldMap && !WorldMapUI->spWorldMap)
 		{
 			this->m_pMember->m_pGameDocument->AddGameObject(
-				UI->spWorldMap = boost::make_shared<Sonic::CGameObjectCSD>(UI->rcWorldMap, 0.5f, "HUD", false), "main",
+				WorldMapUI->spWorldMap = boost::make_shared<Sonic::CGameObjectCSD>(WorldMapUI->rcWorldMap, 0.5f, "HUD", false), "main",
 				this);
 		}
 	}
 
 	void CSUCTitleCompanion::KillScreen()
 	{
-		if (UI->spWorldMap)
+		if (WorldMapUI->spWorldMap)
 		{
-			UI->spWorldMap->SendMessage(UI->spWorldMap->m_ActorID, boost::make_shared<Sonic::Message::MsgKill>());
-			UI->spWorldMap = nullptr;
+			WorldMapUI->spWorldMap->SendMessage(WorldMapUI->spWorldMap->m_ActorID, boost::make_shared<Sonic::Message::MsgKill>());
+			WorldMapUI->spWorldMap = nullptr;
 		}
 	}
 
@@ -688,14 +688,14 @@ namespace SUC::UI::TitleScreen
 			selectedCapital += 1;
 
 			Common::PlaySoundStaticCueName(stageSelectHandle, "sys_worldmap_cursor");
-			CSDCommon::PlayAnimation(UI->rcCtsChoicesSelect, "Scroll_up_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			CSDCommon::PlayAnimation(WorldMapUI->rcCtsChoicesSelect, "Scroll_up_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 		}
 		//Selection decrease
 		if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickUp) && selectedCapital == 1)
 		{
 			selectedCapital -= 1;
 			Common::PlaySoundStaticCueName(stageSelectHandle, "sys_worldmap_cursor");
-			CSDCommon::PlayAnimation(UI->rcCtsChoicesSelect, "Scroll_down_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			CSDCommon::PlayAnimation(WorldMapUI->rcCtsChoicesSelect, "Scroll_down_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 		}
 		Common::ClampInt(selectedCapital, 0, 1);
 
@@ -706,7 +706,7 @@ namespace SUC::UI::TitleScreen
 				Common::PlaySoundStaticCueName(stageSelectHandle, "sys_worldmap_finaldecide");
 				System::StageManager::s_HubModeEnabled = SUC::Project::s_WorldData.data[TitleWorldMap::s_LastFlagSelected].data[
 					SUC::Project::GetCapital(TitleWorldMap::s_LastFlagSelected,
-					                         m_Country[TitleWorldMap::s_LastFlagSelected]->m_IsInShade)].isWhiteWorld;
+					                         m_Countries[TitleWorldMap::s_LastFlagSelected]->m_IsInShade)].isWhiteWorld;
 
 				/*if (StageManager::WhiteWorldEnabled)
 					{
@@ -716,7 +716,7 @@ namespace SUC::UI::TitleScreen
 						WRITE_STRING(0x0169A304, GetStageToLoad());
 
 					}*/
-				Title::ShowLoadingTransition(true);
+				Title::ShowLoadingTransition(false, System::StageManager::TriggerStageLoad);
 			}
 			else
 			{
@@ -735,17 +735,17 @@ namespace SUC::UI::TitleScreen
 		/// 
 			/// Rewrite all of this and make it use the new blueblur image replace stuff
 			/// 
-		if (!UI->rcCtsStageScreenshot)
+		if (!WorldMapUI->rcCtsStageScreenshot)
 			return;
 		char nameCast[16];
 		for (size_t i = 0; i < 9; i++)
 		{
 			sprintf(nameCast, "ss_%02dd", i + 1);
-			UI->rcCtsStageScreenshot->GetNode(nameCast)->SetHideFlag(true);
+			WorldMapUI->rcCtsStageScreenshot->GetNode(nameCast)->SetHideFlag(true);
 		}
 		sprintf(nameCast, "ss_%02dd", TitleWorldMap::s_LastFlagSelected + 1);
 
-		UI->rcCtsStageScreenshot->GetNode(nameCast)->SetHideFlag(false);
+		WorldMapUI->rcCtsStageScreenshot->GetNode(nameCast)->SetHideFlag(false);
 	}
 
 	void CSUCTitleCompanion::StageWindow_Update(Sonic::CGameObject* This)
@@ -759,10 +759,26 @@ namespace SUC::UI::TitleScreen
 		if (inputPtr->IsTapped(Sonic::eKeyState_A) && timeStageSelectDelay >= 5)
 		{
 			Common::PlaySoundStaticCueName(stageSelectHandle, "sys_worldmap_finaldecide");
-			System::StageManager::s_HubModeEnabled = SUC::Project::s_WorldData.data[TitleWorldMap::s_LastFlagSelected].data[
-				TitleWorldMap::s_StageSelectWindowSelection].isWhiteWorld;
+			auto m_Country = m_Countries[TitleWorldMap::s_LastFlagSelected];
+			Project::WorldData::FlagData::LevelData m_StageData;
+			if(m_Country->m_IsInShade)
+			{
+				m_StageData = SUC::Project::s_WorldData.data[
+					TitleWorldMap::s_LastFlagSelected].dataNight[
+						TitleWorldMap::s_StageSelectWindowSelection];
+			}
+			else
+			{
+				m_StageData = SUC::Project::s_WorldData.data[
+					TitleWorldMap::s_LastFlagSelected].data[
+						TitleWorldMap::s_StageSelectWindowSelection];				
+			}
+			
+			System::StageManager::s_HubModeEnabled = m_StageData.isWhiteWorld;
 
-			Title::ShowLoadingTransition(true);
+			System::StageManager::ConfigureNextStage(m_StageData.levelID, m_Country->m_IsInShade ? System::SLoadInfo::WEREHOG : System::SLoadInfo::MODERN, m_StageData.isCapital);
+
+			Title::ShowLoadingTransition(true, System::StageManager::TriggerStageLoad);
 		}
 		DebugDrawText::log(std::format("SELINDEX: {0}\nSTAGESEL: {1}", m_StageListSelection,
 		                               TitleWorldMap::s_StageSelectWindowSelection).c_str(), 0);
@@ -781,7 +797,7 @@ namespace SUC::UI::TitleScreen
 			PopulateStageSelect(TitleWorldMap::s_LastFlagSelected, m_StageListOverflow);
 
 			Common::PlaySoundStaticCueName(stageSelectHandle, "sys_worldmap_cursor");
-			CSDCommon::PlayAnimation(UI->rcCtsStageSelect, "Select_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1,
+			CSDCommon::PlayAnimation(WorldMapUI->rcCtsStageSelect, "Select_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1,
 			                         130 - ((m_StageListSelection + 1) * 10), 130 - (m_StageListSelection) * 10);
 		}
 
@@ -809,7 +825,7 @@ namespace SUC::UI::TitleScreen
 			PopulateStageSelect(TitleWorldMap::s_LastFlagSelected, m_StageListOverflow);
 			Common::PlaySoundStaticCueName(stageSelectHandle, "sys_worldmap_cursor");
 			if (TitleWorldMap::s_StageSelectWindowSelection > 0 && doAnim) //technically not needed
-				CSDCommon::PlayAnimation(UI->rcCtsStageSelect, "Select_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1,
+				CSDCommon::PlayAnimation(WorldMapUI->rcCtsStageSelect, "Select_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1,
 				                         (m_StageListSelection - 1) * 10, m_StageListSelection * 10);
 		}
 
@@ -892,28 +908,28 @@ namespace SUC::UI::TitleScreen
 			Sonic::CCsdDatabaseWrapper wrapper(m_Title->m_pMember->m_pGameDocument->m_pMember->m_spDatabase.get());
 			boost::shared_ptr<Sonic::CCsdProject> spCsdProject = wrapper.GetCsdProject("ui_worldmap");
 
-			m_Title->UI->Configure(spCsdProject);
+			m_Title->WorldMapUI->Configure(spCsdProject);
 
 
 			constexpr float earthRadius = 5.25f; //Used to normalize flag positions to the globe's curvature
 			//By default the cursor in the worldmap is set to the left anchor 
 			
 			TitleWorldMap::s_IsWorldMapCameraInitialized = false;
-			m_Title->m_Country.push_back(new CWorldCountry(Util::Spherize(CVector(0.31f, 0.36f, 2.28f), earthRadius)));
-			m_Title->m_Country.push_back(new CWorldCountry(Util::Spherize(CVector(2.310000f, 2.360000f, 1.111371f),		earthRadius)));
-			m_Title->m_Country.push_back(new CWorldCountry(Util::Spherize(CVector(2.810000f, -0.140000f, -6.649425f),	earthRadius)));
-			m_Title->m_Country.push_back(new CWorldCountry(Util::Spherize(CVector(2.810000f, -1.890000f, 1.742745f),		earthRadius)));
-			m_Title->m_Country.push_back(new CWorldCountry(Util::Spherize(CVector(-0.190000f, 4.610000f, -3.543527f),	earthRadius)));
-			m_Title->m_Country.push_back(new CWorldCountry(Util::Spherize(CVector(-5.190000f, 0.110000f, -3.363136f),	earthRadius)));
-			m_Title->m_Country.push_back(new CWorldCountry(Util::Spherize(CVector(0.060000f, -2.639999f, -6.829812f),	earthRadius)));
-			m_Title->m_Country.push_back(new CWorldCountry(Util::Spherize(CVector(-4.440000f, -2.390000f, -0.798426f),	earthRadius)));
-			m_Title->m_Country.push_back(new CWorldCountry(Util::Spherize(CVector(-3.600000f, 3.00000f, -1.160f),		earthRadius)));
+			m_Title->m_Countries.push_back(new CWorldCountry(Util::Spherize(CVector(0.31f, 0.36f, 2.28f), earthRadius)));
+			m_Title->m_Countries.push_back(new CWorldCountry(Util::Spherize(CVector(2.310000f, 2.360000f, 1.111371f),		earthRadius)));
+			m_Title->m_Countries.push_back(new CWorldCountry(Util::Spherize(CVector(2.810000f, -0.140000f, -6.649425f),	earthRadius)));
+			m_Title->m_Countries.push_back(new CWorldCountry(Util::Spherize(CVector(2.810000f, -1.890000f, 1.742745f),		earthRadius)));
+			m_Title->m_Countries.push_back(new CWorldCountry(Util::Spherize(CVector(-0.190000f, 4.610000f, -3.543527f),	earthRadius)));
+			m_Title->m_Countries.push_back(new CWorldCountry(Util::Spherize(CVector(-5.190000f, 0.110000f, -3.363136f),	earthRadius)));
+			m_Title->m_Countries.push_back(new CWorldCountry(Util::Spherize(CVector(0.060000f, -2.639999f, -6.829812f),	earthRadius)));
+			m_Title->m_Countries.push_back(new CWorldCountry(Util::Spherize(CVector(-4.440000f, -2.390000f, -0.798426f),	earthRadius)));
+			m_Title->m_Countries.push_back(new CWorldCountry(Util::Spherize(CVector(-3.600000f, 3.00000f, -1.160f),		earthRadius)));
 
 			int continentIndex = 0;
-			for (auto& m_Continent : m_Title->m_Country)
+			for (auto& m_Continent : m_Title->m_Countries)
 			{
-				m_Continent->m_rcFlag = m_Title->UI->rcWorldMap->CreateScene("cts_parts_flag");
-				m_Continent->m_rcDaylightIndicator = m_Title->UI->rcWorldMap->CreateScene("cts_parts_sun_moon");
+				m_Continent->m_rcFlag = m_Title->WorldMapUI->rcWorldMap->CreateScene("cts_parts_flag");
+				m_Continent->m_rcDaylightIndicator = m_Title->WorldMapUI->rcWorldMap->CreateScene("cts_parts_sun_moon");
 
 				m_Continent->m_rcFlag->GetNode("img")->SetPatternIndex(continentIndex);
 				CSDCommon::PlayAnimation(m_Continent->m_rcFlag, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
@@ -932,47 +948,47 @@ namespace SUC::UI::TitleScreen
 				continentIndex++;
 			}
 			m_Title->CreateScreen();
-			for (auto e : m_Title->m_Country) e->m_rcFlag->SetHideFlag(true);
+			for (auto e : m_Title->m_Countries) e->m_rcFlag->SetHideFlag(true);
 
-			m_Title->UI->SetInactive(true);
+			m_Title->WorldMapUI->SetInactive(true);
 			//CHECK FOR REMOVAL
-			m_Title->UI->rcCtsGuide4Mission->SetHideFlag(true);
-			m_Title->UI->rcCtsGuide5Medal->SetHideFlag(true);
-			m_Title->UI->rcCtsStageWindow->SetHideFlag(true);
-			m_Title->UI->rcCtsStageSelect->SetHideFlag(true);
-			m_Title->UI->rcCtsName_2->SetHideFlag(true);
-			m_Title->UI->rcCtsCursorEffect->SetHideFlag(true);
-			m_Title->UI->rcStageSelectFlag->SetHideFlag(true);
-			m_Title->UI->rcCtsStageInfoWindow->SetHideFlag(true);
-			m_Title->UI->rcCtsStage4Mission->SetHideFlag(true);
-			m_Title->UI->rcCtsStage5Medal->SetHideFlag(true);
-			m_Title->UI->rcCtsGuide1Hiscore->SetHideFlag(true);
-			m_Title->UI->rcCtsGuide2BestTime->SetHideFlag(true);
-			m_Title->UI->rcCtsGuide3Rank->SetHideFlag(true);
-			m_Title->UI->rcCtsChoicesBg->SetHideFlag(true);
-			m_Title->UI->rcCtsChoicesWindow->SetHideFlag(true);
-			m_Title->UI->rcCtsChoicesSelect->SetHideFlag(true);
-			m_Title->UI->rcCtsStageScreenshot->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsGuide4Mission->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsGuide5Medal->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsStageWindow->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsStageSelect->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsName_2->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsCursorEffect->SetHideFlag(true);
+			m_Title->WorldMapUI->rcStageSelectFlag->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsStageInfoWindow->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsStage4Mission->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsStage5Medal->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsGuide1Hiscore->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsGuide2BestTime->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsGuide3Rank->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsChoicesBg->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsChoicesWindow->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsChoicesSelect->SetHideFlag(true);
+			m_Title->WorldMapUI->rcCtsStageScreenshot->SetHideFlag(true);
 
 			float sceneFixPosX = 140;
 			//Set up scenes to make it work in 16:9, because for some reason unleashed does it in code
-			m_Title->UI->rcHeaderImgW->SetPosition(-sceneFixPosX, 0);
-			m_Title->UI->rcInfoBg1->SetPosition(-sceneFixPosX, 0);
-			m_Title->UI->rcInfoImg1->SetPosition(-sceneFixPosX, 0);
-			m_Title->UI->rcInfoImg2->SetPosition(-sceneFixPosX, 0);
-			m_Title->UI->rcInfoImg3->SetPosition(-sceneFixPosX, 0);
-			m_Title->UI->rcInfoImg4->SetPosition(-sceneFixPosX, 0);
-			m_Title->UI->rcCtsGuideWindow->SetPosition(sceneFixPosX, 0);
-			m_Title->UI->rcCtsGuideScreenshot->SetPosition(sceneFixPosX, 0);
-			m_Title->UI->rcCtsGuideText->SetPosition(sceneFixPosX, 40);
-			m_Title->UI->rcCtsGuide4Mission->SetPosition(sceneFixPosX, 0);
-			m_Title->UI->rcCtsGuide5Medal->SetPosition(sceneFixPosX, 0);
+			m_Title->WorldMapUI->rcHeaderImgW->SetPosition(-sceneFixPosX, 0);
+			m_Title->WorldMapUI->rcInfoBg1->SetPosition(-sceneFixPosX, 0);
+			m_Title->WorldMapUI->rcInfoImg1->SetPosition(-sceneFixPosX, 0);
+			m_Title->WorldMapUI->rcInfoImg2->SetPosition(-sceneFixPosX, 0);
+			m_Title->WorldMapUI->rcInfoImg3->SetPosition(-sceneFixPosX, 0);
+			m_Title->WorldMapUI->rcInfoImg4->SetPosition(-sceneFixPosX, 0);
+			m_Title->WorldMapUI->rcCtsGuideWindow->SetPosition(sceneFixPosX, 0);
+			m_Title->WorldMapUI->rcCtsGuideScreenshot->SetPosition(sceneFixPosX, 0);
+			m_Title->WorldMapUI->rcCtsGuideText->SetPosition(sceneFixPosX, 40);
+			m_Title->WorldMapUI->rcCtsGuide4Mission->SetPosition(sceneFixPosX, 0);
+			m_Title->WorldMapUI->rcCtsGuide5Medal->SetPosition(sceneFixPosX, 0);
 
 			m_Title->m_spSkySpace = boost::make_shared<CTitleWorldMapSky>(m_Title->lightPosition);
 			m_Title->m_spSun = boost::make_shared<CTitleWorldMapSun>();
 			// TitleWorldMap::s_PivotPosition
-			m_Title->m_GlobeModel = boost::make_shared<CTitleWorldMapGlobe>();
-			Sonic::CGameDocument::GetInstance()->AddGameObject(m_Title->m_GlobeModel);
+			m_Title->m_spEarth = boost::make_shared<CTitleWorldMapGlobe>();
+			Sonic::CGameDocument::GetInstance()->AddGameObject(m_Title->m_spEarth);
 			Sonic::CGameDocument::GetInstance()->AddGameObject(m_Title->m_spSkySpace);
 			Sonic::CGameDocument::GetInstance()->AddGameObject(m_Title->m_spSun);
 
@@ -989,29 +1005,29 @@ namespace SUC::UI::TitleScreen
 			TitleWorldMap::s_ForceTitleFlow = false;
 			m_Title->ShowSaveIcon();
 			//Set lives text
-			m_Title->UI->rcInfoImg1->GetNode("num")->SetText(Common::IntToString(Common::GetLivesCount(), "%02d"));
+			m_Title->WorldMapUI->rcInfoImg1->GetNode("num")->SetText(Common::IntToString(Common::GetLivesCount(), "%02d"));
 			
 			m_Title->SetUIVisibility(false);
 			m_Title->PlayCursorAnim("Intro_Anim");
-			CSDCommon::PlayAnimation(m_Title->UI->rcInfoBg1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-			CSDCommon::PlayAnimation(m_Title->UI->rcInfoImg1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-			CSDCommon::PlayAnimation(m_Title->UI->rcInfoImg2, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-			CSDCommon::PlayAnimation(m_Title->UI->rcInfoImg3, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-			CSDCommon::PlayAnimation(m_Title->UI->rcInfoImg4, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-			CSDCommon::PlayAnimation(m_Title->UI->rcHeaderBgW, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 60);
+			CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcInfoBg1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcInfoImg1, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcInfoImg2, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcInfoImg3, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcInfoImg4, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcHeaderBgW, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 60);
 			//60 so it doesnt fade in from the previous header and footer of HudTitle
-			CSDCommon::PlayAnimation(m_Title->UI->rcFooterBgW, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 60);
+			CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcFooterBgW, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 60);
 			//60 so it doesnt fade in from the previous header and footer of HudTitle
-			CSDCommon::PlayAnimation(m_Title->UI->rcHeaderImgW, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-			CSDCommon::PlayAnimation(m_Title->UI->rcCtsGuideScreenshot, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-			CSDCommon::PlayAnimation(m_Title->UI->rcCtsGuideText, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-			CSDCommon::PlayAnimation(m_Title->UI->rcCtsGuideWindow, "Intro_Anim_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-			CSDCommon::PlayAnimation(m_Title->UI->rcWorldmapFooterImgA, "Intro_Anim_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcHeaderImgW, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcCtsGuideScreenshot, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcCtsGuideText, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcCtsGuideWindow, "Intro_Anim_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
+			CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcWorldmapFooterImgA, "Intro_Anim_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 
 			m_Title->PlayCursorAnim("Intro_Anim");
-			for (size_t i = 0; i < 9; i++) CSDCommon::PlayAnimation(m_Title->m_Country[i]->m_rcFlag, "Intro_Anim",
+			for (size_t i = 0; i < 9; i++) CSDCommon::PlayAnimation(m_Title->m_Countries[i]->m_rcFlag, "Intro_Anim",
 				Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-			m_Title->UI->SetInactive(true);
+			m_Title->WorldMapUI->SetInactive(true);
 		}
 		void Update() override
 		{
@@ -1031,7 +1047,7 @@ namespace SUC::UI::TitleScreen
 		{
 			TitleWorldMap::s_WorldmapCursorDisabled = false;
 			auto m_Title = GetBase();
-			m_Title->UI->SetInactive(false);
+			m_Title->WorldMapUI->SetInactive(false);
 		}
 		void Update() override
 		{
@@ -1051,14 +1067,14 @@ namespace SUC::UI::TitleScreen
 			if (TitleWorldMap::s_IsActive)
 			{
 				//Pretty much just "if titleworldmap exists"
-				if (m_Title->m_Country[0]->m_rcFlag && m_Title->UI->rcCtsGuide4Mission && m_Title->UI->rcCtsGuide5Medal)
+				if (m_Title->m_Countries[0]->m_rcFlag && m_Title->WorldMapUI->rcCtsGuide4Mission && m_Title->WorldMapUI->rcCtsGuide5Medal)
 				{
-					if (m_Title->UI->rcInfoImg2->m_MotionDisableFlag) CSDCommon::PlayAnimation(
-						m_Title->UI->rcInfoImg2, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 0, 0);
-					if (m_Title->UI->rcInfoImg3->m_MotionDisableFlag)CSDCommon::PlayAnimation(
-						m_Title->UI->rcInfoImg3, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 0, 0);
-					if (m_Title->UI->rcInfoImg4->m_MotionDisableFlag)CSDCommon::PlayAnimation(
-						m_Title->UI->rcInfoImg4, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 0, 0);
+					if (m_Title->WorldMapUI->rcInfoImg2->m_MotionDisableFlag) CSDCommon::PlayAnimation(
+						m_Title->WorldMapUI->rcInfoImg2, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 0, 0);
+					if (m_Title->WorldMapUI->rcInfoImg3->m_MotionDisableFlag)CSDCommon::PlayAnimation(
+						m_Title->WorldMapUI->rcInfoImg3, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 0, 0);
+					if (m_Title->WorldMapUI->rcInfoImg4->m_MotionDisableFlag)CSDCommon::PlayAnimation(
+						m_Title->WorldMapUI->rcInfoImg4, "Usual_Anim", Chao::CSD::eMotionRepeatType_Loop, 0, 0);
 
 					multiplierRotationLight = inputPtr->IsDown(Sonic::eKeyState_X) ? 10 : 0.005;
 					if(inputPtr->IsDown(Sonic::eKeyState_X))
@@ -1071,31 +1087,31 @@ namespace SUC::UI::TitleScreen
 						if(m_Title->stageSelectHandle)
 						m_Title->stageSelectHandle.reset();
 					}
-					if (!m_Title->isStageWindowOpen && !TitleWorldMapPause::s_IsPaused)
-						m_Title->SetCursorPos(CVector2(inputPtr->LeftStickHorizontal * m_Title->cursorMultiplier,
-							-inputPtr->LeftStickVertical * m_Title->cursorMultiplier));
+					if (!m_Title->m_StageWindowActive && !TitleWorldMapPause::s_IsPaused)
+						m_Title->SetCursorPos(CVector2(inputPtr->LeftStickHorizontal * m_Title->m_CursorSpeed,
+							-inputPtr->LeftStickVertical * m_Title->m_CursorSpeed));
 					else
 					{
 						m_Title->cursorMoveHandle.reset();
 					}
-					if(!m_Title->isStageWindowOpen)
+					if(!m_Title->m_StageWindowActive)
 					m_Title->flagSelectionAmount = 0;
 					if (TitleWorldMap::s_WorldMapCamera)
 					{
-						if (m_Title->m_Country[0]->m_rcFlag->m_MotionDisableFlag && !m_Title->introPlayed)
-							m_Title->introPlayed = true;
+						if (m_Title->m_Countries[0]->m_rcFlag->m_MotionDisableFlag && !m_Title->m_PanPlayed)
+							m_Title->m_PanPlayed = true;
 
 						//Update all flags
-						for (int i = 0; i < m_Title->m_Country.size(); ++i)
+						for (int i = 0; i < m_Title->m_Countries.size(); ++i)
 						{
-							auto worldCountry = m_Title->m_Country[i];
-							if (m_Title->introPlayed)
-								worldCountry->Update(m_Title->light->m_GlobalLightDirection, m_Title->m_GlobeModel->m_Rotation, TitleWorldMap::s_WorldMapCamera);
+							auto worldCountry = m_Title->m_Countries[i];
+							if (m_Title->m_PanPlayed)
+								worldCountry->Update(m_Title->light->m_GlobalLightDirection, m_Title->m_spEarth->m_Rotation, TitleWorldMap::s_WorldMapCamera);
 
 							bool inrange = m_Title->IsInsideCursorRange(worldCountry->m_ScreenPosition, worldCountry->visibility, i);
 							worldCountry->m_IsSelected = inrange;
 							m_Title->currentFlagSelected = inrange ? i : -1;
-							if (!m_Title->isStageWindowOpen)
+							if (!m_Title->m_StageWindowActive)
 							m_Title->flagSelectionAmount += inrange;
 						}
 
@@ -1104,22 +1120,22 @@ namespace SUC::UI::TitleScreen
 							if (m_Title->flagSelectionAmount > 0)
 							{
 								//Show country info window, etc
-								m_Title->cursorSelected = true;
-								CSDCommon::PlayAnimation(m_Title->UI->rcCtsName, "Intro_1_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1,
+								m_Title->m_IsCursorOverFlag = true;
+								CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcCtsName, "Intro_1_Anim", Chao::CSD::eMotionRepeatType_PlayOnce, 1,
 									0);
-								CSDCommon::PlayAnimation(m_Title->UI->rcCtsCursorEffect, "Select_Anim", Chao::CSD::eMotionRepeatType_Loop,
+								CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcCtsCursorEffect, "Select_Anim", Chao::CSD::eMotionRepeatType_Loop,
 									1, 0);
 								m_Title->PlayCursorAnim("Select_Anim");
-								m_Title->UI->rcCtsGuide4Mission->SetHideFlag(false);
-								m_Title->UI->rcCtsGuide5Medal->SetHideFlag(false);
-								CSDCommon::FreezeMotion(m_Title->UI->rcCtsGuideScreenshot, 0);
-								CSDCommon::FreezeMotion(m_Title->UI->rcCtsGuideText, 0);
-								CSDCommon::FreezeMotion(m_Title->UI->rcCtsGuideWindow, 0);
-								CSDCommon::PlayAnimation(m_Title->UI->rcCtsGuideScreenshot, "Intro_Anim",
+								m_Title->WorldMapUI->rcCtsGuide4Mission->SetHideFlag(false);
+								m_Title->WorldMapUI->rcCtsGuide5Medal->SetHideFlag(false);
+								CSDCommon::FreezeMotion(m_Title->WorldMapUI->rcCtsGuideScreenshot, 0);
+								CSDCommon::FreezeMotion(m_Title->WorldMapUI->rcCtsGuideText, 0);
+								CSDCommon::FreezeMotion(m_Title->WorldMapUI->rcCtsGuideWindow, 0);
+								CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcCtsGuideScreenshot, "Intro_Anim",
 									Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
-								CSDCommon::PlayAnimation(m_Title->UI->rcCtsGuideText, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,
+								CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcCtsGuideText, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,
 									1, 0);
-								CSDCommon::PlayAnimation(m_Title->UI->rcCtsGuideWindow, "Intro_Anim_2",
+								CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcCtsGuideWindow, "Intro_Anim_2",
 									Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 
 								Common::PlaySoundStaticCueName(m_Title->cursorSelectHandle, "sys_worldmap_window");
@@ -1132,41 +1148,41 @@ namespace SUC::UI::TitleScreen
 							else
 							{
 								//Hide country info
-								m_Title->cursorSelected = false;
+								m_Title->m_IsCursorOverFlag = false;
 								m_Title->PlayCursorAnim("Select_Anim", true);
-								m_Title->UI->rcCtsGuide4Mission->SetHideFlag(true);
-								m_Title->UI->rcCtsGuide5Medal->SetHideFlag(true);
-								CSDCommon::FreezeMotion(m_Title->UI->rcCtsGuideScreenshot, 0);
-								CSDCommon::FreezeMotion(m_Title->UI->rcCtsGuideText, 0);
-								CSDCommon::FreezeMotion(m_Title->UI->rcCtsGuideWindow, 0);
-								CSDCommon::PlayAnimation(m_Title->UI->rcCtsGuideScreenshot, "Intro_Anim",
+								m_Title->WorldMapUI->rcCtsGuide4Mission->SetHideFlag(true);
+								m_Title->WorldMapUI->rcCtsGuide5Medal->SetHideFlag(true);
+								CSDCommon::FreezeMotion(m_Title->WorldMapUI->rcCtsGuideScreenshot, 0);
+								CSDCommon::FreezeMotion(m_Title->WorldMapUI->rcCtsGuideText, 0);
+								CSDCommon::FreezeMotion(m_Title->WorldMapUI->rcCtsGuideWindow, 0);
+								CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcCtsGuideScreenshot, "Intro_Anim",
 									Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true, true);
-								CSDCommon::PlayAnimation(m_Title->UI->rcCtsGuideText, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,
+								CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcCtsGuideText, "Intro_Anim", Chao::CSD::eMotionRepeatType_PlayOnce,
 									1, 0, 0, true, true);
-								CSDCommon::PlayAnimation(m_Title->UI->rcCtsGuideWindow, "Intro_Anim_2",
+								CSDCommon::PlayAnimation(m_Title->WorldMapUI->rcCtsGuideWindow, "Intro_Anim_2",
 									Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 0, true, true);
 							}
 						}
-						if (m_Title->flagSelectionAmount > 0 && m_Title->introPlayed)
+						if (m_Title->flagSelectionAmount > 0 && m_Title->m_PanPlayed)
 						{
 							//Open Stage Selection
-							if (inputPtr->IsTapped(Sonic::eKeyState_A) && !m_Title->isStageWindowOpen)
+							if (inputPtr->IsTapped(Sonic::eKeyState_A) && !m_Title->m_StageWindowActive)
 							{
-								m_Title->isStageWindowOpen = true;
+								m_Title->m_StageWindowActive = true;
 								TitleWorldMap::s_WorldmapCursorDisabled = true;
 								TitleWorldMap::s_StageSelectWindowSelection = 0;
 								m_Title->m_StageListSelection = 0;
 								m_Title->PopulateStageSelect(TitleWorldMap::s_LastFlagSelected);
 								m_Title->SetVisibilityPlayerInfo(false);
 								Common::PlaySoundStaticCueName(m_Title->stageSelectHandle, "sys_worldmap_decide");
-								m_Title->UI->rcCtsName_2->GetNode("img_1")->SetPatternIndex(TitleWorldMap::s_LastFlagSelected);
-								m_Title->UI->rcStageSelectFlag->GetNode("img")->SetPatternIndex(TitleWorldMap::s_LastFlagSelected);
+								m_Title->WorldMapUI->rcCtsName_2->GetNode("img_1")->SetPatternIndex(TitleWorldMap::s_LastFlagSelected);
+								m_Title->WorldMapUI->rcStageSelectFlag->GetNode("img")->SetPatternIndex(TitleWorldMap::s_LastFlagSelected);
 
 								if (SUC::Project::GetCapital(TitleWorldMap::s_LastFlagSelected,
-									m_Title->m_Country[TitleWorldMap::s_LastFlagSelected]->m_IsInShade) != -1)
+									m_Title->m_Countries[TitleWorldMap::s_LastFlagSelected]->m_IsInShade) != -1)
 								{
 									TitleWorldMap::s_IsCapitalWindowOpened = true;
-									m_Title->UI->ShowTextAct(false);
+									m_Title->WorldMapUI->ShowTextAct(false);
 									m_Title->SetVisibilityCapitalWindow(true);
 								}
 								else
@@ -1174,9 +1190,9 @@ namespace SUC::UI::TitleScreen
 									m_Title->SetVisibilityStageWindow(true);
 								}
 							}
-							if (inputPtr->IsTapped(Sonic::eKeyState_B) && m_Title->isStageWindowOpen)
+							if (inputPtr->IsTapped(Sonic::eKeyState_B) && m_Title->m_StageWindowActive)
 							{
-								m_Title->isStageWindowOpen = false;
+								m_Title->m_StageWindowActive = false;
 								TitleWorldMap::s_WorldmapCursorDisabled = false;
 
 								m_Title->SetVisibilityPlayerInfo(true);
@@ -1188,10 +1204,10 @@ namespace SUC::UI::TitleScreen
 									m_Title->SetVisibilityCapitalWindow(false);
 								else
 									m_Title->SetVisibilityStageWindow(false);
-								m_Title->UI->ShowTextAct(false);
+								m_Title->WorldMapUI->ShowTextAct(false);
 								TitleWorldMap::s_IsCapitalWindowOpened = false;
 							}
-							if (m_Title->isStageWindowOpen && !TitleWorldMap::s_IsCapitalWindowOpened)
+							if (m_Title->m_StageWindowActive && !TitleWorldMap::s_IsCapitalWindowOpened)
 							{
 								m_Title->StageWindow_Update(m_Title);
 							}
@@ -1200,8 +1216,8 @@ namespace SUC::UI::TitleScreen
 								m_Title->CapitalWindow_Update();
 							}
 						}
-						m_Title->UI->rcCtsName->SetHideFlag(!m_Title->cursorSelected);
-						m_Title->UI->rcCtsCursorEffect->SetHideFlag(!m_Title->cursorSelected);
+						m_Title->WorldMapUI->rcCtsName->SetHideFlag(!m_Title->m_IsCursorOverFlag);
+						m_Title->WorldMapUI->rcCtsCursorEffect->SetHideFlag(!m_Title->m_IsCursorOverFlag);
 						m_Title->lastflagSelectionAmount = m_Title->flagSelectionAmount;
 					}
 					m_Title->CheckCursorAnimStatus();
@@ -1389,7 +1405,7 @@ namespace SUC::UI::TitleScreen
 		
 		const bool hasInput = m_Input.squaredNorm() > deadzone * deadzone;
 		//CHECK FOR REMOVAL - && !isStageWindowOpen
-		if (!TitleWorldMap::s_WorldmapCursorDisabled && !TitleWorldMapPause::s_IsPaused && hasInput&& !m_Title->isStageWindowOpen)
+		if (!TitleWorldMap::s_WorldmapCursorDisabled && !TitleWorldMapPause::s_IsPaused && hasInput&& !m_Title->m_StageWindowActive)
 		{
 			m_CameraPitch -= m_Input.y() * rotationPitchRate * updateInfo.DeltaTime;
 			m_CameraYaw += m_Input.x() * rotationYawRate * updateInfo.DeltaTime;
@@ -1398,15 +1414,15 @@ namespace SUC::UI::TitleScreen
 		// TODO: Handle the HUD update here too I guess, because this is where a flag will be "selected"
 		// Otherwise, make that handled somewhere else. I know you do an overlap check already, but best to do this once.
 
-		for (int i = 0; i < m_Title->m_Country.size(); ++i)
+		for (int i = 0; i < m_Title->m_Countries.size(); ++i)
 		{
-			auto& m_Continent = m_Title->m_Country[i];
+			auto& m_Continent = m_Title->m_Countries[i];
 			const CVector direction = m_Continent->GetPositionAdjusted().normalized();
 			if (-direction.dot(camera->m_MyCamera.m_Direction) < dotThreshold)
 			{
 				continue;
 			}
-			if (m_Title->introPlayed)
+			if (m_Title->m_PanPlayed)
 			{
 				MagnetizeToFlag(direction, updateInfo.DeltaTime, 1 - (m_Input.squaredNorm() / 2));
 			}
@@ -1506,27 +1522,7 @@ namespace SUC::UI::TitleScreen
 		if(!Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager)
 			Util::SpawnParticleManager();
 	}
-	void* updateDirectorCustom(CUpdateDirector* context, float elapsedTime)
-	{
-		//const bool loadObjectsInRange = config->loadObjectsInRange && strcmp(STAGE_ID, "blb") != 0;
-
-		context->AddUpdateCommand(elapsedTime, "0");
-		context->AddUpdateCommand(elapsedTime, "1");
-		context->AddUpdateCommand(elapsedTime, "2");
-		context->AddUpdateCommand(elapsedTime, "3");
-		context->AddUpdateCommand(elapsedTime, "b");
-
-		context->CallUnknownFunction(elapsedTime);
-
-		context->AddRenderCommand(elapsedTime, "0");
-		context->AddRenderCommand(elapsedTime, "1");
-		context->AddRenderCommand(elapsedTime, "2");
-		context->AddRenderCommand(elapsedTime, "3");
-		context->AddRenderCommand(elapsedTime, "b");
-
-		context->FinishRenderer();
-		return context->FinishUpdater();
-	}
+	
 	HOOK(void*, __fastcall, UpdateDirectorSimple, 0x1105A60, void* This, void* Edx, CUpdateDirector* context, float elapsedTime)
 	{
 		//if (TitleWorldMap::m_spTitle)
