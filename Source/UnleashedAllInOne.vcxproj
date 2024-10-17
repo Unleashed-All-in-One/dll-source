@@ -228,6 +228,8 @@
     <ClInclude Include="BlueBlurCustom\Hedgehog\Motion\hhSingleEffectMotionAll.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\CGlitterPlayer.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\Particle\ParticleManager.h" />
+    <ClInclude Include="BlueBlurCustom\Sonic\Sequence\SequenceMain.h" />
+    <ClInclude Include="BlueBlurCustom\Sonic\Sequence\SequenceModeBase.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\System\ApplicationDocument.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\System\CGameplayFlowManager.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\System\CharacterProxy.h" />
