@@ -166,7 +166,7 @@ namespace SUC::ImGuiMenu
 		ImGui::NewFrame();
 		ImGuizmo::BeginFrame();
 
-		if (GetAsyncKeyState(VK_F1) & 1)
+		if (GetAsyncKeyState(VK_F2) & 1)
 			DebugMenu::s_Visible ^= true;
 
 

@@ -224,7 +224,7 @@ namespace SUC::SetObject
 			{
 				m_spMatrixNodeTransform->m_Transform.m_Position.y() += 10;
 				m_spMatrixNodeTransform->NotifyChanged();
-				rb->m_dynamicMotion.m_linearVelocity.y() += 10;
+				//rb->m_dynamicMotion.m_linearVelocity.y() += 10;
 			}
 
 			m_spMatrixNodeTransform->NotifyChanged();

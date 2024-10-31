@@ -28,7 +28,7 @@ namespace SUC::UI::TitleScreen
 		static void ShowWindow(const char* text);
 		static void HideWindow();
 		static void Update();
-		static void ShowLoadingTransition(bool enableLoad);
+		static void ShowLoadingTransition(bool enableLoad, const std::function<void()>& onComplete = nullptr);
 
 		static bool ms_IsWorldMapActive;
 	};

@@ -28,8 +28,8 @@ namespace SUC::ImGuiMenu
 	}
 	void customStageLoad()
 	{
-		std::string temp = sceneIndexToLoad.c_str();
-		System::StageManager::SetOverrideStageIDProcessor(GetSceneToLoad, true, __FILENAME__);
+		
+		//System::StageManager::SetOverrideStageIDProcessor(GetSceneToLoad, true, __FILENAME__);
 		//auto message = Sonic::Message::MsgSequenceEvent(2, 0);
 		//auto message2 = Sonic::Message::MsgStorySequenceEvent(0, 0);
 		//auto test = Sonic::Sequence::Main::GetInstance();
@@ -41,8 +41,10 @@ namespace SUC::ImGuiMenu
 		//StorySeqProcessStorySequenceEvent(Sonic::Sequence::Story::GetInstance(), &message2);
 		//Sonic::Sequence::Main::ProcessMessage(&message);
 	}
+	std::string m_Moduletest;
 	void drawStageTreeNode(SUC::Project::DebugStageTree::DebugStageTreeNode node)
 	{
+		
 		ImGui::SetNextItemOpen(true, ImGuiCond_Appearing);
 		if (ImGui::TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_None))
 		{
@@ -58,7 +60,9 @@ namespace SUC::ImGuiMenu
 					sceneIndexToLoad = node.treeEntries[x].stage;
 					eventIndexToLoad = node.treeEntries[x].cutsceneID;
 					DebugMenu::s_Visible = false;
-					customStageLoad();
+					std::string temp = sceneIndexToLoad.c_str();
+					System::StageManager::ConfigureNextStage(sceneIndexToLoad.c_str(), System::SLoadInfo::MODERN, false);
+					System::StageManager::TriggerStageLoad();
 					//if (!eventIndexToLoad.empty())
 					//	SUC::System::StageManager::ForcePlayCutscene(eventIndexToLoad, sceneIndexToLoad, false, 0);
 				}
@@ -90,6 +94,11 @@ namespace SUC::ImGuiMenu
 		{
 
 			ImGui::TextUnformatted("Sonic Unleashed Conversion");
+			ImGuiInputTextString("ModuleName", &m_Moduletest);
+			if (ImGui::Button("Test module"))
+			{
+				System::SequenceHelpers::ChangeModuleByName(m_Moduletest.c_str());
+			}
 			ImGui::SetNextItemOpen(true, ImGuiCond_Appearing);
 
 			if (ImGui::TreeNodeEx("StageArchives", ImGuiTreeNodeFlags_None))

@@ -276,9 +276,8 @@ HOOK(int, __fastcall, CHudGateMenuMainIntroInfo, 0x1080110, hh::fnd::CStateMachi
 	int index = stageID == 0 ? stageID : stageID + 1;
 	auto idArchive = (const char*)((int*)0x015BBA34)[stageID];
 
-	Common::ClampUInt(stageID, 0, SUC::Project::s_WorldData.data[SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected].data.size() - 1);
-	SUC::System::StageManager::s_NextStage = SUC::Project::s_WorldData.data[SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected].data[stageID].levelID.
-	                                                                                                                                                 c_str();
+	//Common::ClampUInt(stageID, 0, SUC::Project::s_WorldData.data[SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected].data.size() - 1);
+	//SUC::System::StageManager::s_NextStage = SUC::Project::s_WorldData.data[SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected].data[stageID].levelID.c_str();
 	return returne;
 }
 
@@ -286,8 +285,7 @@ HOOK(char, *_stdcall, StageGate_MoveToOtherStage, 0x107FBC0, int a1)
 {
 	char* returned = originalStageGate_MoveToOtherStage(a1);
 	uint8_t stageID = (*(uint8_t*)(a1 + 336));
-	SUC::System::StageManager::s_NextStage = SUC::Project::s_WorldData.data[SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected].data[stageID].levelID.
-	                                                                                                                                                 c_str();
+	//SUC::System::StageManager::s_NextStage = SUC::Project::s_WorldData.data[SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected].data[stageID].levelID.c_str();
 	return returned;
 }
 

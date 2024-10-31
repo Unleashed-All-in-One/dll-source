@@ -171,7 +171,8 @@ namespace SUC::UI::TitleScreen
 		case 3:
 		{
 			DebugDrawText::log("Exit");
-			TitleWorldMap::SetHideEverything(true);
+				///CHECK FOR REMOVAL - borked v
+			//TitleWorldMap::SetHideEverything(true);
 			TitleWorldMap::s_IsActive = false;
 			Title::SetSubMenu(false);
 			Title::ToggleUI(false);
@@ -187,42 +188,42 @@ namespace SUC::UI::TitleScreen
 	}
 	HOOK(void*, __fastcall, TitleWorldMapPause_UpdateApplication, 0xE7BED0, Sonic::CGameObject* This, void* Edx, float elapsedTime, uint8_t a3)
 	{
-		if (!TitleWorldMap::s_IsActive)
-			return originalTitleWorldMapPause_UpdateApplication(This, Edx, elapsedTime, a3);
-
-		auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
-		if (inputPtr->IsTapped(Sonic::eKeyState_Start) && TitleWorldMap::s_IsActive && !active)
-		{
-			HudPause_OpenPauseScreen(false);
-			Common::PlaySoundStatic(m_SoundHandleEnter, 1000000);
-			active = true;
-			TitleWorldMapPause::s_IsPaused = true;
-			pauseText->SetHideFlag(false);
-		}
-
-		if (active)
-		{
-
-			if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickDown))
-			{
-				m_cursorPos += 1;
-				ChangeSelection();
-			}
-			if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickUp))
-			{
-				m_cursorPos -= 1;
-				ChangeSelection();
-			}
-			if (inputPtr->IsTapped(Sonic::eKeyState_B))
-			{
-				HudPause_ClosePauseScreen();
-			}
-			if (inputPtr->IsTapped(Sonic::eKeyState_A))
-			{
-				PauseCase(m_cursorPos);
-			}
-		}
-		m_prevCursorPos = m_cursorPos;
+		//if (!TitleWorldMap::s_IsActive)
+		//	return originalTitleWorldMapPause_UpdateApplication(This, Edx, elapsedTime, a3);
+		//
+		//auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
+		//if (inputPtr->IsTapped(Sonic::eKeyState_Start) && TitleWorldMap::s_IsActive && !active)
+		//{
+		//	HudPause_OpenPauseScreen(false);
+		//	Common::PlaySoundStatic(m_SoundHandleEnter, 1000000);
+		//	active = true;
+		//	TitleWorldMapPause::s_IsPaused = true;
+		//	pauseText->SetHideFlag(false);
+		//}
+		//
+		//if (active)
+		//{
+		//
+		//	if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickDown))
+		//	{
+		//		m_cursorPos += 1;
+		//		ChangeSelection();
+		//	}
+		//	if (inputPtr->IsTapped(Sonic::eKeyState_LeftStickUp))
+		//	{
+		//		m_cursorPos -= 1;
+		//		ChangeSelection();
+		//	}
+		//	if (inputPtr->IsTapped(Sonic::eKeyState_B))
+		//	{
+		//		HudPause_ClosePauseScreen();
+		//	}
+		//	if (inputPtr->IsTapped(Sonic::eKeyState_A))
+		//	{
+		//		PauseCase(m_cursorPos);
+		//	}
+		//}
+		//m_prevCursorPos = m_cursorPos;
 		return originalTitleWorldMapPause_UpdateApplication(This, Edx, elapsedTime, a3);
 	}
 

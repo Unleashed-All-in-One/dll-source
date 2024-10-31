@@ -14,7 +14,7 @@ namespace SUC::UI::TitleScreen
 	boost::shared_ptr<Sonic::CGameObjectCSD> spTitleScreen;
 	boost::shared_ptr<Sonic::CGameObjectCSD> spTitleScreenLogos;
 	boost::shared_ptr<Sonic::StageSelectMenu::CDebugStageSelectMenuXml> spDebugMenu;
-
+	std::function<void()> onCompleteFunc;
 	Title::ETitleIndexState currentTitleIndex = Title::ETitleIndexState::New_Game;
 	Hedgehog::Math::CVector2* scale = new Hedgehog::Math::CVector2(1, 1);
 	bool enteredStart, isInSubmenu, moved, hasSavefile, playingStartAnim, reversedAnim, isStartAnimComplete, startButtonAnimComplete, startBgAnimComplete, parsedSave, showedWindow = false;
@@ -103,12 +103,14 @@ namespace SUC::UI::TitleScreen
 		Sonic::CGameDocument::GetInstance()->AddGameObject(spDebugMenu);
 		System::StageManager::s_LoadingReplacementEnabled = false;
 	}
-	void Title::ShowLoadingTransition(bool enableLoad)
+	bool waitingtest;
+	void Title::ShowLoadingTransition(bool enableLoad, const std::function<void()>& onComplete)
 	{
+		onCompleteFunc = onComplete;
 		UnleashedHUD_API::StartFadeout();
 		PlayTitleBGM(TitleStateContextBase, "");
 		if (enableLoad)
-			canLoad = 1;
+			waitingtest = 1;
 	}
 	void __declspec(naked) TitleUI_SetCustomExecFunction()
 	{
@@ -357,7 +359,8 @@ namespace SUC::UI::TitleScreen
 		if (!parsedSave)
 		{
 			auto saveObject = System::SaveManager::GetCurrentSave(false);
-			hasSavefile = saveObject != nullptr;
+			//hasSavefile = saveObject != nullptr;
+			hasSavefile = true;
 			currentTitleIndex = hasSavefile ? Title::ETitleIndexState::Continue : Title::ETitleIndexState::New_Game;
 			UpdateTitleText();
 			parsedSave = true;
@@ -528,16 +531,19 @@ namespace SUC::UI::TitleScreen
 	{
 		auto inputPtr = &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex];
 
-		if (canLoad == 1)
+		if (waitingtest)
 		{
 			if (bg_transition)
 			{
-				if (UnleashedHUD_API::IsLoadingFadeoutCompleted())
-				{
-					System::SequenceHelpers::LoadStage(System::StageManager::GetStageToLoad());
-					System::SequenceHelpers::SetPlayerType(GENERIC_SONIC);
-					canLoad = 0;
-				}
+
+				//if (UnleashedHUD_API::IsLoadingFadeoutCompleted())
+				//{
+					if(onCompleteFunc != nullptr)
+						onCompleteFunc();
+					//System::SequenceHelpers::LoadStage(System::StageManager::GetStageToLoad());
+					//System::SequenceHelpers::SetPlayerType(GENERIC_SONIC);
+					waitingtest = 0;
+				//}
 			}
 		}
 

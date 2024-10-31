@@ -23,9 +23,23 @@ namespace SUC::System
 	bool skipCurrentQueueEvent;
 	DWORD* storySequence;
 	bool eventTransitionFinished;
-	std::string ModeStrings[4] = { "Stage", "Event", "PlayableMenu", "Title" };
 	std::function<std::string()> overrideStageIDEvent;
 	bool m_TriggerStageLoadNextFrame;
+	bool expectingLoad; //mega pause
+
+	
+	SLoadInfo* m_CurrentLoadInfo;
+
+	void StageManager::ConfigureNextStage(std::string in_Stage, SLoadInfo::SSonicType in_Type, bool in_Hub)
+	{
+		DebugDrawText::log("Deleted old SLoadInfo", 10, 100, TEXT_RED);
+		m_CurrentLoadInfo = nullptr;
+
+		m_CurrentLoadInfo = new SLoadInfo();
+		m_CurrentLoadInfo->IsHub = in_Hub;
+		m_CurrentLoadInfo->PlayerType = in_Type;
+		m_CurrentLoadInfo->StageArchiveName = _strdup(in_Stage.c_str());
+	}
 	void StageManager::SetOverrideStageIDProcessor(std::function<std::string()> in_Function, bool in_TriggerOnNextTick, const char* in_FileNameCode)
 	{
 		m_TriggerStageLoadNextFrame = in_TriggerOnNextTick;
@@ -75,9 +89,9 @@ namespace SUC::System
 	{
 		const char* stageToLoad = "ghz200";
 
-		int latestFlag = SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected;
-		int stageSelected = SUC::UI::TitleScreen::TitleWorldMap::s_StageSelectWindowSelection;
-
+		//int latestFlag = SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected;
+		//int stageSelected = SUC::UI::TitleScreen::TitleWorldMap::s_StageSelectWindowSelection;
+		///CHECK FOR REMOVAL
 		//if (SUC::UI::TitleScreen::TitleWorldMap::s_IsCapitalWindowOpened)
 		//	stageToLoad = SUC::Project::s_WorldData.data[latestFlag].data[SUC::Project::GetCapital(latestFlag, SUC::UI::TitleScreen::TitleWorldMap::s_Flags[latestFlag].night)].levelID.c_str();
 		//else
@@ -167,19 +181,17 @@ namespace SUC::System
 		{
 			//Play event (realtime)
 
-			auto playEventRequest = new LuaParamPlayEvent();
-			playEventRequest->entry = new LuaParamPlayEventEntry();
-			playEventRequest->entry->eventName = s_NextEventScene.c_str();
-			playEventRequest->entry->eventStageType = IntStuffPlayEvent();
-			playEventRequest->entry->eventStageType.value = 0;
-			FUNCTION_PTR(void, __thiscall, PlayEventLuanne, 0x00D72520, Sonic::Sequence::Story * StorySeq, int a2, LuaParamPlayEvent * a3);
-			PlayEventLuanne(SequenceHelpers::storySequenceInstance, 0, playEventRequest);
-
+			//auto playEventRequest = new LuaParamPlayEvent();
+			//playEventRequest->entry = new LuaParamPlayEventEntry();
+			//playEventRequest->entry->eventName = s_NextEventScene.c_str();
+			//playEventRequest->entry->eventStageType = IntStuffPlayEvent();
+			//playEventRequest->entry->eventStageType.value = 0;
+			//FUNCTION_PTR(void, __thiscall, PlayEventLuanne, 0x00D72520, Sonic::Sequence::Story * StorySeq, int a2, LuaParamPlayEvent * a3);
+			//PlayEventLuanne(SequenceHelpers::storySequenceInstance, 0, playEventRequest);
+			SequenceHelpers::QueueEvent(s_NextEventScene.c_str());
 			isMovieCutscene = true;
 			//SequenceHelpers::ResetStorySequence();
-			auto message1 = Sonic::Message::MsgSequenceEvent(0, 7);
 			SequenceHelpers::ChangeModule(ModuleFlow::Event);
-			Sonic::Sequence::Main::ProcessMessage(&message1);
 			//SequenceHelpers::SetPlayerType(0);
 			SetGameParameters(s_NextStage, s_NextEventScene);
 			break;
@@ -226,70 +238,70 @@ namespace SUC::System
 		SequenceHelpers::LoadStage(stageToLoad);
 		strcpy(*(char**)stageTerrainAddress, stageToLoad);
 	}
-	void CalculateNextStage()
-	{
-		SUC::UI::TitleScreen::TitleWorldMap::s_IsWorldMapCameraInitialized = false;
-		if (!StageManager::s_LoadingReplacementEnabled)
-			return;
-
-		if (!StageManager::s_InStoryMode)
-		{
-			const char* stageToLoad = "ghz200";
-			if (!StageManager::s_LoadingReplacementEnabled)
-			{
-				return;
-			}
-			if (Project::s_WorldData.data.size() < SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected)
-			{
-				MessageBoxA(NULL, SUC::Format("The country you selected (%d) has an invalid configuration!", UI::TitleScreen::TitleWorldMap::s_LastFlagSelected), MOD_NAME, 0);
-				LogMessage("Missing configuration for flag!");
-			}
-			else
-			{
-				stageToLoad = StageManager::GetStageToLoad();
-			}
-			SUC::UI::TitleScreen::TitleWorldMap::s_IsActive = false;
-			/*if (!StageManager::s_NextStage.empty())
-			{
-				stageToLoad = _strdup(StageManager::s_NextStage.c_str());
-			}*/
-			StageManager::SetGameParameters(stageToLoad, "Stage");
-		}
-		else
-		{
-			if (StageManager::s_ETFEntered)
-			{
-				StageManager::SetGameParameters(StageManager::s_NextStage.c_str(), "Stage");
-				//StageManager::enteredStageFromETF = false;
-			}
-			if (!skipCurrentQueueEvent)
-			{
-				LuaManager::OnStageLoad();
-			}
-			else
-			{
-				StageManager::s_ETFEntered = false;
-				skipCurrentQueueEvent = false;
-			}
-			//if (StageManager::LastSavedQueueIndex == -1)
-			//{
-			//	printf("[StageManager] No saves have been found.");
-			//	StageManager::LastSavedQueueIndex = 0;
-			//}
-			//if (!skipCurrentQueueEvent)
-			//{
-			//	if (inStoryBefore == StageManager::InStory)
-			//		StageManager::LastSavedQueueIndex++;
-			//	executeSequenceData(SUC::Project::s_SequenceDataQueue.data);
-			//}
-			//if(SUC::Project::s_SequenceDataQueue.data[StageManager::LastSavedQueueIndex].type != 5)
-			//strcpy(*(char**)stageTerrainAddress, SUC::Project::s_SequenceDataQueue.data[StageManager::LastSavedQueueIndex].dataName.c_str());
-			//skipCurrentQueueEvent = false;
-		}
-
-		DebugDrawText::log(SUC::Format("[StageManager] Forcing TerrainArchiveName: %s", StageManager::s_NextStage.c_str()), 10, 0, TEXT_YELLOW);
-		inStoryBefore = StageManager::s_InStoryMode;
-	}
+	//void CalculateNextStage()
+	//{
+	//	SUC::UI::TitleScreen::TitleWorldMap::s_IsWorldMapCameraInitialized = false;
+	//	if (!StageManager::s_LoadingReplacementEnabled)
+	//		return;
+	//
+	//	if (!StageManager::s_InStoryMode)
+	//	{
+	//		const char* stageToLoad = "ghz200";
+	//		if (!StageManager::s_LoadingReplacementEnabled)
+	//		{
+	//			return;
+	//		}
+	//		if (Project::s_WorldData.data.size() < SUC::UI::TitleScreen::TitleWorldMap::s_LastFlagSelected)
+	//		{
+	//			MessageBoxA(NULL, SUC::Format("The country you selected (%d) has an invalid configuration!", UI::TitleScreen::TitleWorldMap::s_LastFlagSelected), MOD_NAME, 0);
+	//			LogMessage("Missing configuration for flag!");
+	//		}
+	//		else
+	//		{
+	//			stageToLoad = StageManager::GetStageToLoad();
+	//		}
+	//		SUC::UI::TitleScreen::TitleWorldMap::s_IsActive = false;
+	//		/*if (!StageManager::s_NextStage.empty())
+	//		{
+	//			stageToLoad = _strdup(StageManager::s_NextStage.c_str());
+	//		}*/
+	//		StageManager::SetGameParameters(stageToLoad, "Stage");
+	//	}
+	//	else
+	//	{
+	//		if (StageManager::s_ETFEntered)
+	//		{
+	//			StageManager::SetGameParameters(StageManager::s_NextStage.c_str(), "Stage");
+	//			//StageManager::enteredStageFromETF = false;
+	//		}
+	//		if (!skipCurrentQueueEvent)
+	//		{
+	//			LuaManager::OnStageLoad();
+	//		}
+	//		else
+	//		{
+	//			StageManager::s_ETFEntered = false;
+	//			skipCurrentQueueEvent = false;
+	//		}
+	//		//if (StageManager::LastSavedQueueIndex == -1)
+	//		//{
+	//		//	printf("[StageManager] No saves have been found.");
+	//		//	StageManager::LastSavedQueueIndex = 0;
+	//		//}
+	//		//if (!skipCurrentQueueEvent)
+	//		//{
+	//		//	if (inStoryBefore == StageManager::InStory)
+	//		//		StageManager::LastSavedQueueIndex++;
+	//		//	executeSequenceData(SUC::Project::s_SequenceDataQueue.data);
+	//		//}
+	//		//if(SUC::Project::s_SequenceDataQueue.data[StageManager::LastSavedQueueIndex].type != 5)
+	//		//strcpy(*(char**)stageTerrainAddress, SUC::Project::s_SequenceDataQueue.data[StageManager::LastSavedQueueIndex].dataName.c_str());
+	//		//skipCurrentQueueEvent = false;
+	//	}
+	//
+	//	DebugDrawText::log(SUC::Format("[StageManager] Forcing TerrainArchiveName: %s", StageManager::s_NextStage.c_str()), 10, 0, TEXT_YELLOW);
+	//	inStoryBefore = StageManager::s_InStoryMode;
+	//}
 	void setCorrectStageForCutscene_OnRealtime()
 	{
 		std::string stageIdCopy = std::string(StageManager::s_NextStage);
@@ -317,21 +329,21 @@ namespace SUC::System
 	}
 	void StageManager::SetCorrectStage()
 	{
-		CalculateNextStage();
+		//CalculateNextStage();
 	}
-	void __declspec(naked) ASM_OverrideStageIDLoading()
-	{
-		static uint32_t sub_662010 = 0x662010;
-		static uint32_t returnAddress = 0xD56CCF;
-		__asm
-		{
-			call[sub_662010]
-			push    esi
-			call    CalculateNextStage
-			pop     esi
-			jmp[returnAddress]
-		}
-	}
+	//void __declspec(naked) ASM_OverrideStageIDLoading()
+	//{
+	//	static uint32_t sub_662010 = 0x662010;
+	//	static uint32_t returnAddress = 0xD56CCF;
+	//	__asm
+	//	{
+	//		call[sub_662010]
+	//		push    esi
+	//		call    CalculateNextStage
+	//		pop     esi
+	//		jmp[returnAddress]
+	//	}
+	//}
 	void __declspec(naked) ASM_InterceptGameplayFlowLoading()
 	{
 		static uint32_t normal = 0x00D0E166;
@@ -431,7 +443,7 @@ namespace SUC::System
 		}
 		else
 		{
-			CalculateNextStage();
+			//CalculateNextStage();
 			skipCurrentQueueEvent = true;
 		}
 		return 0;
@@ -496,7 +508,7 @@ namespace SUC::System
 	{
 		skipCurrentQueueEvent = false;
 		//StageManager::LastSavedQueueIndex++;
-		CalculateNextStage();
+		//CalculateNextStage();
 		return originalCEventSceneEnd(This, Edx, a2);
 	}
 	HOOK(void*, __fastcall, CEventSceneStart, 0xB1ECF0, int* This, void* Edx, int a2, int a3, int a4)
@@ -509,43 +521,8 @@ namespace SUC::System
 		return;
 	}
 	//figure out a way to call this as a function
-	HOOK(int*, __fastcall, StartModule, 0x00D77020, DWORD* StorySequence, void* Edx, DWORD* a2, LuaStringEntryContainer* a3)
-	{
-		auto exampleRead = a3->entry->content;
-		if (!StageManager::s_HubModeEnabled)
-		{
-			if (std::string(exampleRead) == "PlayableMenu")
-			{
-				a3 = new LuaStringEntryContainer(_strdup(ModeStrings[0].c_str()));
-			}
-		}
-		else
-		{
-			if (std::string(exampleRead) == "Stage" || std::string(exampleRead) == "Event" || std::string(exampleRead) == "StageEvent")
-			{
-				a3 = new LuaStringEntryContainer(_strdup(ModeStrings[2].c_str()));
-			}
-		}
-		if (SUC::UI::TitleScreen::TitleWorldMap::s_ForceTitleFlow)
-		{
-			if (std::string(exampleRead) != "Title")
-			{
-				a3 = new LuaStringEntryContainer(_strdup(ModeStrings[3].c_str()));
-			}
-		}
-		DebugDrawText::log(std::format("[LUASTORYSEQUENCE] Loading module \"{0}\"", a3->entry->content).c_str());
-		return originalStartModule(StorySequence, Edx, a2, a3);
-	}
+	
 
-	//void __stdcall sub_D6BE60(int a1, int a2)
-	HOOK(void, __fastcall, ModuleStuffTest, 0xD6BE60, int a1, void* Edx, int a2)
-	{
-		auto v2 = a1;
-		auto v6 = *(DWORD*)(v2 + 4);
-		auto v7 = *(DWORD*)(v6 + 52);
-
-		return originalModuleStuffTest(a1, Edx, a2);
-	}
 
 	HOOK(void*, __fastcall, SM_UpdateApplication, 0xE7BED0, void* This, void* Edx, float elapsedTime, uint8_t a3)
 	{
@@ -597,13 +574,18 @@ namespace SUC::System
 	{
 		return false;
 	}
+	void StageManager::TriggerStageLoad()
+	{
+		expectingLoad = true;
+		SequenceHelpers::SetStageInfo(m_CurrentLoadInfo);
+		SequenceHelpers::ChangeModule(ModuleFlow::StageAct);
+	}
+	//char __thiscall Sonic::Sequence::CSequenceMainImpl::ProcessMessage(MainSequenceActor *this, int a1, int a2)
 	void StageManager::Initialize()
 	{
 		//Blocks Gate UI options and switch
 		WRITE_JUMP(0x01080F02, 0x01080FB7);
-		WRITE_JUMP(0xD56CCA, ASM_OverrideStageIDLoading);
 		WRITE_JUMP(0x00B267D0, ASM_SetCorrectStageForCutscene);
-		WRITE_JUMP(0x00D0E164, ASM_InterceptGameplayFlowLoading);
 
 		//NOTE: can be replaced with latest BB
 		INSTALL_HOOK(CStoryImplConstructor);
@@ -611,8 +593,8 @@ namespace SUC::System
 		INSTALL_HOOK(CEventSceneEnd);
 		INSTALL_HOOK(CGameplayFlowStage_CStateWaitEnd);
 		INSTALL_HOOK(CHudGateMenuMainCStateOutroBegin);
-		INSTALL_HOOK(HudLoading_CHudLoadingCStateOutroBegin);
-		INSTALL_HOOK(SM_UpdateApplication);
+		//INSTALL_HOOK(HudLoading_CHudLoadingCStateOutroBegin);
+		//INSTALL_HOOK(SM_UpdateApplication);
 
 		//Patch out reading MissionScript to avoid crashes when loading stages without the stgXXX archive name format
 		INSTALL_HOOK(Sonic_Mission_CScriptImpl_SendMissionType);
