@@ -107,6 +107,12 @@ namespace SUC::Accuracy
 		//TODO: Implement checking the save file.
 		return true;
 	}
+	//
+	HOOK(bool, __stdcall, IsStagePlayedThrough, 0x107AE80, uint32_t stageID)
+	{
+		//TODO: Implement checking the save file.
+		return true;
+	}
 	//Used by HUDs
 	//Returns a ratio of how big the boost bar is. 0 is equal to the beginning of the game, 1 is the full Generations boost bar.
 	extern "C" __declspec(dllexport) float API_GetBoostSize()
@@ -129,6 +135,7 @@ namespace SUC::Accuracy
 
 		//Patch calls so that stages always appear as completed according to the SUC save file
 		INSTALL_HOOK(IsStageCompleted);
+		INSTALL_HOOK(IsStagePlayedThrough);
 
 		//Restores Unleashed's reverb/echo for sounds.
 		INSTALL_HOOK(hhSoundHandleCtor);

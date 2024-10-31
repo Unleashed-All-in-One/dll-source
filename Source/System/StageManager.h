@@ -12,6 +12,9 @@ namespace SUC::System
 		std::string StageArchiveName;
 		SSonicType PlayerType;
 		bool IsHub;
+		SLoadInfo(std::string in_ArchiveName, SSonicType in_Type, bool in_IsHub) : StageArchiveName(in_ArchiveName), PlayerType(in_Type), IsHub(in_IsHub)
+		{}
+		SLoadInfo(){}
 	};
 	class StageManager
 	{

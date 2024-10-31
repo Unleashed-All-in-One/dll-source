@@ -131,6 +131,7 @@ namespace SUC::UI::TitleScreen
 		bool playingPointerMove;
 		bool m_PanPlayed = false;
 		int currentFlagSelected;
+		int flagSelected;
 		int lastFlagIndex = 0;
 		int stageSelectedWindowMax = 6;
 		int selectedCapital = 0;
@@ -242,7 +243,5 @@ namespace SUC::UI::TitleScreen
 		static bool s_TargetDisabled;
 		static bool s_IsCapitalWindowOpened;
 		static bool s_IsWorldMapCameraInitialized;
-		static int s_LastFlagSelected;
-		static int s_StageSelectWindowSelection;
 	};
 }

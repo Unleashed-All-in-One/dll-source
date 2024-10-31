@@ -3,7 +3,7 @@
 // Mod Info						
 //=========================================================
 #define MOD_NAME			"Sonic Unleashed Conversion"
-#define INI_FILE			"UnleashedConversion.ini"
+#define INI_FILE			"mod.ini"
 #define STAGE_LIST_FILE		"stage_list.json"
 #define ARCHIVE_LIST_FILE	"archivelist.json"
 #define QUEUE_LIST_FILE		"sequence.json"

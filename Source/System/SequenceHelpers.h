@@ -1,4 +1,6 @@
 #pragma once
+#include "StageManager.h"
+
 enum PlayerType : int
 {
 	GENERIC_SONIC = 0,
@@ -124,7 +126,9 @@ namespace SUC::System
 	{
 	public:
 		static void ResetStorySequence();
+		static void SetStageInfo(const SLoadInfo* in_LoadInfo);
 		static void ChangeModule(ModuleFlow in_Flow);
+		static Sonic::Sequence::CSequenceMode* ChangeModuleByName(const char* in_Name);
 		static void PlayEvent(const char* in_EventName, ModuleFlow in_EventModule);
 		static void QueueEvent(const char* in_EventName);
 		static void LoadStage(const char* in_StageName, int sequenceEventExtra = 0, bool resetStorySequence = true);
@@ -132,6 +136,5 @@ namespace SUC::System
 		static void RegisterHooks();
 		static void Update();
 		static std::string GetCurrentStageName(bool withoutNumber);
-		static Sonic::Sequence::Story* storySequenceInstance;
 	};
 }

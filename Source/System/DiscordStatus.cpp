@@ -7,17 +7,19 @@ namespace SUC::System::Discord
 	discord::Core* core{};
 	bool m_isEvent = false;
 
-
+	bool m_IsActive;
 	HOOK(void, __fastcall, HudLoading_CHudLoadingCStateIntroBegin, 0x10938F0, hh::fnd::CStateMachineBase::CStateBase* This)
 	{
-		char const* eventName = *(char**)Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x2C });
-		m_isEvent = !std::string(eventName).empty();
-
-		if (!m_isEvent)
+		if(m_IsActive)
 		{
-			DiscordStatus::ChangeInformationFromStageInfo(true);
-		}
+			char const* eventName = *(char**)Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x2C });
+			m_isEvent = !std::string(eventName).empty();
 
+			if (!m_isEvent)
+			{
+				DiscordStatus::ChangeInformationFromStageInfo(true);
+			}			
+		}
 		originalHudLoading_CHudLoadingCStateIntroBegin(This);
 	}
 	void Log(discord::LogLevel level, const char* message)
@@ -26,6 +28,8 @@ namespace SUC::System::Discord
 	}	
 	void DiscordStatus::ChangeInformationFromStageInfo(bool timestamp)
 	{
+		if (!m_IsActive)
+			return;
 		uint8_t stageID = Common::GetCurrentStageID() & 0xFF;
 		static char* stageName = *(char**)(4 * stageID + 0x1E66B48);
 		stageName[5] = '0' + ((Common::GetCurrentStageID() & 0xFF00) >> 8);
@@ -97,9 +101,13 @@ namespace SUC::System::Discord
 		coreResult == discord::Result::Ok && core
 			? printf("[DiscordStatus] Core Initialized Successfully!\n")
 			: printf("[DiscordStatus] Core Initialization failed!\n");
-		core->SetLogHook(discord::LogLevel::Debug, Log);
-		core->SetLogHook(discord::LogLevel::Info, Log);
-		core->SetLogHook(discord::LogLevel::Warn, Log);
-		core->SetLogHook(discord::LogLevel::Error, Log);
+		m_IsActive = coreResult == discord::Result::Ok;
+		if(m_IsActive)
+		{
+			core->SetLogHook(discord::LogLevel::Debug, Log);
+			core->SetLogHook(discord::LogLevel::Info, Log);
+			core->SetLogHook(discord::LogLevel::Warn, Log);
+			core->SetLogHook(discord::LogLevel::Error, Log);
+		}
 	}
 }
