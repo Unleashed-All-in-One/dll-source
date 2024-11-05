@@ -4,12 +4,14 @@
 //=========================================================
 #define MOD_NAME			"Sonic Unleashed Conversion"
 #define INI_FILE			"mod.ini"
+#define GLOBAL_CONFIG_FILE	"config.xml"
 #define STAGE_LIST_FILE		"stage_list.json"
 #define ARCHIVE_LIST_FILE	"archivelist.json"
 #define QUEUE_LIST_FILE		"sequence.json"
 #define SAVE_FILE_NAME		"save.swa"
 #define LUA_FILE			"main.lua"
 #define CLIENT_ID			1248726119402967091
+#define IS_DEMO				*(int*)0x01A57434
 
 
 #define HINTSFILE_NAME_FORMAT "{0}\\disk\\Hints\\hints_{1}.json"

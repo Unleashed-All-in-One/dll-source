@@ -27,6 +27,10 @@ extern "C" __declspec(dllexport) void PreInit(ModInfo_t * modInfo)
 }
 extern "C" __declspec(dllexport) void Init(ModInfo_t * modInfo)
 {
+#if _DEBUG
+	MessageBox(nullptr, TEXT("Attach Debugger to see hooks."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
+#endif
+	SUC::Project::ParseGlobalFile();
 	SUC::Project::RegisterGlobalHooks();
 	SUC::Hooks::InstallGameplayHooks();
 	SUC::Hooks::InstallAccuracyHooks();

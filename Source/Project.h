@@ -1,4 +1,5 @@
 #pragma once
+#include "System/tinyxml2.h"
 
 //namespace mod = SUC;
 //namespace SUC
@@ -32,6 +33,7 @@ namespace SUC
 					std::string stage;
 					std::string cutsceneID;
 					std::string displayName;
+					bool night;
 				};
 				std::string name;
 				std::vector<DebugStageTreeNodeEntry> treeEntries;
@@ -82,14 +84,15 @@ namespace SUC
 		};
 		//-------------Mod Initialization--------
 		static void Load(ModInfo_t* in_ModInfo);
+		static void ParseGlobalFile();
 		static void RegisterGlobalHooks();
 		static void CheckIncompatibleMods();
 
 		//---------------Functions---------------
-		static void GetStageList();
-		static void GetDebugTree();
+		static void GetStageList(tinyxml2::XMLDocument& in_XmlDocument);
+		static void GetDebugTree(tinyxml2::XMLDocument& in_XmlDocument);
 		static void GetLevelQueue();
-		static void GetTempCustomArchiveTree();
+		static void GetTempCustomArchiveTree(tinyxml2::XMLDocument& in_XmlDocument);
 		static int GetFlagFromStage(const char* in_Stage);
 		static int GetCapital(int in_FlagID, bool in_IsNight);
 		static std::vector<std::string> GetAllWhiteWorld();

@@ -1,16 +1,28 @@
 #include <Hedgehog/Universe/Engine/hhStateMachineBase.h>
 #include "..\BlueBlurCustom\Sonic\System\ApplicationDocument.h"
 #include "..\BlueBlurCustom\Sonic\System\CGameplayFlowManager.h"
-
+namespace Sonic::Sequence
+{
+	class CStoryImpl
+	{
+	public:
+		BB_INSERT_PADDING(0x90);
+		char m_Field90;
+		char m_Field91;
+	};
+}
 namespace SUC::System
 {
 	Sonic::Sequence::CSequenceMode* ChangeSequenceMode(const char* in_NewSequenceName)
 	{
+		IS_DEMO = true;
 		Sonic::Sequence::CModeCreaterListImpl* m_pModeFactory = Sonic::Sequence::CModeCreaterListImpl::GetInstance();
 
 		boost::shared_ptr<Sonic::Sequence::CSequenceMainImpl> spSequenceMain =
 			Sonic::CApplicationDocument::GetInstance()->m_pMember->
 			m_spSequenceMain;
+		spSequenceMain->m_pStorySequence->m_Field90 = 1;
+		spSequenceMain->m_pStorySequence->m_Field91 = 1;
 		auto it = m_pModeFactory->m_SequenceModes.find(in_NewSequenceName);
 		if (it != m_pModeFactory->m_SequenceModes.end())
 		{
@@ -18,9 +30,9 @@ namespace SUC::System
 
 			Sonic::Sequence::CSequenceMode* m_pNewSequenceMode = it->second();
 			spSequenceMain->m_spCurrentSequenceMode->EndModule();
-			spSequenceMain->m_Field88 = 0;
-			spSequenceMain->m_Field8C = 0;
-			spSequenceMain->m_NextModuleIndex = 0;
+			//spSequenceMain->m_Field88 = 0;
+			//spSequenceMain->m_Field8C = 0;
+			//spSequenceMain->m_NextModuleIndex = 0;
 			spSequenceMain->m_spCurrentSequenceMode.reset();
 			spSequenceMain->m_spCurrentSequenceMode = boost::shared_ptr<Sonic::Sequence::CSequenceMode>(m_pNewSequenceMode);
 			m_pNewSequenceMode->ChangeModule();
@@ -125,13 +137,24 @@ namespace SUC::System
 			{
 				auto e = Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spSequenceMain;
 
-				const char* string = SUC::Format("Field88: %d\nField8C: %d\nField90: %d\nField98: %d\nField9C: %d", e->m_Field88, e->m_Field8C, e->m_NextModuleIndex, e->m_Field98, e->m_Field9C);
-				DebugDrawText::log(string, 0, 1000, TEXT_GREEN);
+				//const char* string = SUC::Format("Field88: %d\nField8C: %d\nField90: %d\nField98: %d\nField9C: %d", e->m_Field88, e->m_Field8C, e->m_NextModuleIndex, e->m_Field98, e->m_Field9C);
+				//DebugDrawText::log(string, 0, 1000, TEXT_GREEN);
 			}
 		}
 	}
+	//void __thiscall Sonic::Sequence::CStoryImpl::LuanneFunctions::SetupPlayer(int this, int a2, Luanne_IntegerMessageContainer *intMessage)
+	HOOK(void, __fastcall, SetupPlayer, 0x00D72360, void* This, void* Edx, int a2, void* message)
+	{
+		return;
+	}
+	HOOK(char, __fastcall, sub_D76B10, 0xD76B10, void* Tthis, void*edx,  int a2, int a3)
+	{
+		return 1;
+	}
 	void SequenceHelpers::RegisterHooks()
 	{
+		INSTALL_HOOK(SetupPlayer);
+		INSTALL_HOOK(sub_D76B10);
 		//INSTALL_HOOK(ConstructStorySequence);
 		//INSTALL_HOOK(CStoryLua_SetupPlayer);
 		//INSTALL_HOOK(CStoryLua_SetupPlayerForce);

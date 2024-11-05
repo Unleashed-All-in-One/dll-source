@@ -2,6 +2,8 @@
 #include "SetObject/SetObjectHookContainer.h"
 #include "UI/UIHookContainer.h"
 #include "System/SystemHookContainer.h"
+#include "System/tinyxml2.h"
+
 namespace SUC
 {
 	//---------------Gameplay---------------
@@ -73,16 +75,19 @@ namespace SUC
 		menuType = (ETitleType)reader.GetInteger("Appearance", "MenuType", menuType);
 		s_LargeAddressAware = reader.GetBoolean("Main", "Use4GB", s_LargeAddressAware);
 		s_CpkRedirCompatibilityMode = reader.Get("Main", "IncludeDir1", "disk_sounds") == "";
-		s_GenerationsStages = { "ghz100","ghz200","cpz100","cpz200","ssz100","ssz200","sph100","sph200","cte100", "cte200","ssh100","ssh200","csc100","csc200","euc100","euc200","pla100","pla200" };
-		GetStageList();
+		
+	}
+	void Project::ParseGlobalFile()
+	{
+		tinyxml2::XMLDocument m_Document;
+		m_Document.LoadFile(GLOBAL_CONFIG_FILE);
 		GetLevelQueue();
-		GetTempCustomArchiveTree();
+		GetStageList(m_Document);
+		GetTempCustomArchiveTree(m_Document);
+		GetDebugTree(m_Document);
 	}
 	void Project::RegisterGlobalHooks()
 	{
-#if _DEBUG
-		MessageBox(nullptr, TEXT("Attach Debugger to see hooks."), TEXT("Unleashed Conversion"), MB_ICONINFORMATION);
-#endif		
 		INSTALL_HOOK(Project_UpdateApplication);
 		INSTALL_HOOK(Project_CHudSonicStage_Update);
 
@@ -97,7 +102,6 @@ namespace SUC
 		{
 			if (GetModuleHandleA(incompatibleModAssembly.second))
 			{
-				;
 				MessageBoxA(nullptr, SUC::Format("\"%s\" should not be enabled with %s.", incompatibleModAssembly.first, MOD_NAME), MOD_NAME, MB_ICONERROR);
 				exit(-1);
 			}
@@ -145,71 +149,37 @@ namespace SUC
 		}
 		in_StageTree.treeEntries = entries;
 	}
-	void SUC::Project::GetDebugTree()
+	void SUC::Project::GetDebugTree(tinyxml2::XMLDocument& in_XmlDocument)
 	{
-		std::string path = SUC::Project::s_ModPath + "\\debuglist.json";
-		std::ifstream jsonFile(path.c_str());
-
-		s_DebugStageTree = DebugStageTree();
-
-		if (!jsonFile)
-		{
-			return;
-		}
-
-		Json::Value root;
-		jsonFile >> root;
-
-		const Json::Value& stageTreeT = root["StageTree"];
-		if (!stageTreeT.isArray())
-		{
-			printf("StageTree is not a valid array.\n");
-			return;
-		}
-
+		Project::s_DebugStageTree = Project::DebugStageTree();
 		std::vector<SUC::Project::DebugStageTree::DebugStageTreeNode> stageTrees;
-		for (const auto& tree : stageTreeT)
+
+		tinyxml2::XMLElement* m_XmlStageListRoot = in_XmlDocument.FirstChildElement("ModSchema")->FirstChildElement("StageSelectRoot");
+		for (tinyxml2::XMLElement* stageTreeNodeElem = m_XmlStageListRoot->FirstChildElement("StageTreeNode"); stageTreeNodeElem != nullptr; stageTreeNodeElem = stageTreeNodeElem->NextSiblingElement("StageTreeNode"))
 		{
-			SUC::Project::DebugStageTree::DebugStageTreeNode stageTree;
-			ParseStageTree(tree, stageTree);
-			stageTrees.push_back(stageTree);
+			SUC::Project::DebugStageTree::DebugStageTreeNode stageNode = SUC::Project::DebugStageTree::DebugStageTreeNode();
+			stageNode.name = stageTreeNodeElem->FirstChildElement("Name")->GetText() ? stageTreeNodeElem->FirstChildElement("Name")->GetText() : "";
+
+			for (tinyxml2::XMLElement* nodeElem = stageTreeNodeElem->FirstChildElement("Node"); nodeElem != nullptr; nodeElem = nodeElem->NextSiblingElement("Node"))
+			{
+				auto node = SUC::Project::DebugStageTree::DebugStageTreeNode::DebugStageTreeNode();
+				node.name = nodeElem->FirstChildElement("Name")->GetText() ? nodeElem->FirstChildElement("Name")->GetText() : "";
+
+				for (tinyxml2::XMLElement* treeEntryElem = nodeElem->FirstChildElement("TreeEntry"); treeEntryElem != nullptr; treeEntryElem = treeEntryElem->NextSiblingElement("TreeEntry"))
+				{
+					SUC::Project::DebugStageTree::DebugStageTreeNode::DebugStageTreeNodeEntry entry = SUC::Project::DebugStageTree::DebugStageTreeNode::DebugStageTreeNodeEntry();
+					entry.stage = treeEntryElem->FirstChildElement("Archive")->GetText() ? treeEntryElem->FirstChildElement("Archive")->GetText() : "";
+					entry.cutsceneID = treeEntryElem->FirstChildElement("EventID")->GetText() ? treeEntryElem->FirstChildElement("EventID")->GetText() : "";
+					entry.displayName = treeEntryElem->FirstChildElement("DisplayName") ? treeEntryElem->FirstChildElement("DisplayName")->GetText() : entry.stage;
+					entry.night = treeEntryElem->FirstChildElement("Night") ? strcmp(treeEntryElem->FirstChildElement("Night")->GetText(), "true") == 0 : false;
+					node.treeEntries.push_back(entry);
+				}
+
+				stageNode.children.push_back(node);
+			}
+			stageTrees.push_back(stageNode);
 		}
-
-		/*for (const auto& tree : stageTreeT)
-		{
-			DebugStageTreeNode stageTreeObj;
-			stageTreeObj.name = tree["name"].asString();
-
-			const Json::Value& treeEntries = tree["TreeEntry"];
-			if (!treeEntries.isArray())
-			{
-				printf("StageTreeEntry is not a valid array.\n");
-				return;
-			}
-
-			for (const auto& entry : treeEntries)
-			{
-				DebugStageTreeNodeEntry treeEntry;
-				treeEntry.stage = entry["stage"].asString();
-				if(entry["cutsceneID"])
-					treeEntry.cutsceneID = entry["cutsceneID"].asString();
-				if (entry["displayName"])
-				{
-					treeEntry.displayName = entry["displayName"].asString();
-				}
-				else
-				{
-					if (!treeEntry.cutsceneID.empty())
-						treeEntry.displayName = std::format("{0} @{1}", treeEntry.cutsceneID, treeEntry.stage);
-					else
-						treeEntry.displayName = treeEntry.stage;
-				}
-				stageTreeObj.treeEntries.push_back(treeEntry);
-			}
-
-			stageTrees.push_back(stageTreeObj);
-		}*/
-		s_DebugStageTree.treeNodes = stageTrees;
+		Project::s_DebugStageTree.treeNodes = stageTrees;
 
 	}
 	void SUC::Project::GetLevelQueue()
@@ -282,89 +252,83 @@ namespace SUC
 		}
 		return -1;
 	}
-	void SUC::Project::GetTempCustomArchiveTree()
+	void ParseArchiveTreeXMLRoot(const std::string& in_Path)
 	{
-		std::ifstream jsonFile(ARCHIVE_LIST_FILE);
-
-		s_AdditionalArchiveTree = ArchiveTreeDefinitions();
-
-		if (!jsonFile)
-		{
-			MessageBox(NULL, L"Failed to parse ArchiveTree", NULL, MB_ICONERROR);
-			exit(-1);
-			return;
-		}
-
-		Json::Value root;
-		jsonFile >> root;
-		Json::Value arrayFlag = root["ArchiveTreeDefinitions"];
-		for (int i = 0; i < arrayFlag.size(); i++)
-		{
-			System::ArchiveTreePatcher::ArchiveDependency dependency;
-			dependency.m_archive = arrayFlag[i]["archiveName"].asCString();
-			Json::Value flagDep = arrayFlag[i]["dependencies"];
-			for (size_t d = 0; d < flagDep.size(); d++)
-			{
-				dependency.m_dependencies.push_back(flagDep[d]["archiveName"].asCString());
-			}
-			s_AdditionalArchiveTree.data.push_back(dependency);
-		}
-
+		
 	}
-	void SUC::Project::GetStageList()
+	void SUC::Project::GetTempCustomArchiveTree(tinyxml2::XMLDocument& in_XmlDocument)
 	{
-		std::ifstream jsonFile(STAGE_LIST_FILE);
+		Project::s_AdditionalArchiveTree = Project::ArchiveTreeDefinitions();
 
-		s_WorldData = WorldData();
-
-		std::vector<std::string> modList;
-		Common::GetModIniList(modList);
-		modList.insert(modList.end(), ""); //Unleashed title's own stage_list
-
-		//Parse stage_list
-		for (size_t a = 0; a < modList.size(); a++)
+		tinyxml2::XMLElement* m_XmlStageListRoot = in_XmlDocument.FirstChildElement("ModSchema")->FirstChildElement("ArchiveRoot");
+		for (tinyxml2::XMLElement* nodeElem = m_XmlStageListRoot->FirstChildElement("Node"); nodeElem != nullptr; nodeElem = nodeElem->NextSiblingElement("Node"))
 		{
-			size_t pos = modList.at(a).find_last_of("\\/");
-			if (pos != std::string::npos)
-			{
-				modList.at(a).erase(pos + 1);
-			}
-			std::ifstream jsonFile(modList.at(a) + STAGE_LIST_FILE);
+			System::ArchiveTreePatcher::ArchiveDependency m_NewArchive = System::ArchiveTreePatcher::ArchiveDependency();
+			m_NewArchive.m_archive = nodeElem->FirstChildElement("Name")->GetText() ? nodeElem->FirstChildElement("Name")->GetText() : "";
 
-			if (!jsonFile)
-				continue;
-
-			Json::Value root;
-			jsonFile >> root;
-			auto wd = root["WorldData"];
-			Json::Value arrayFlag = wd["FlagData"];
-			for (int i = 0; i < arrayFlag.size(); i++)
+			for (tinyxml2::XMLElement* usedByElem = nodeElem->FirstChildElement("UsedBy")->FirstChildElement("Name"); usedByElem != nullptr; usedByElem = usedByElem->NextSiblingElement("Name"))
 			{
-				s_WorldData.data.push_back(SUC::Project::WorldData::FlagData());
-				s_WorldData.data[i].description = std::string(arrayFlag[i]["Description"].asCString());
-				Json::Value element = arrayFlag[i]["LevelData"];
-				for (int x = 0; x < element.size(); x++)
+				if (const char* usedByName = usedByElem->GetText())
 				{
-					s_WorldData.data[i].data.push_back(SUC::Project::WorldData::FlagData::LevelData());
-					s_WorldData.data[i].data[x].levelID = std::string(element[x]["levelID"].asCString());
-					s_WorldData.data[i].data[x].optionName = std::string(element[x]["optionName"].asCString());
-					s_WorldData.data[i].data[x].isWhiteWorld = element[x]["isWhiteWorld"].asBool();
-					s_WorldData.data[i].data[x].isCapital = element[x]["isCapital"].asBool();
-				}
-				if (arrayFlag[i]["NightLevelData"] != NULL)
-				{
-					element = arrayFlag[i]["NightLevelData"];
-					for (int x = 0; x < element.size(); x++)
-					{
-						s_WorldData.data[i].dataNight.push_back(SUC::Project::WorldData::FlagData::LevelData());
-						s_WorldData.data[i].dataNight[x].levelID = std::string(element[x]["levelID"].asCString());
-						s_WorldData.data[i].dataNight[x].optionName = std::string(element[x]["optionName"].asCString());
-						s_WorldData.data[i].dataNight[x].isWhiteWorld = element[x]["isWhiteWorld"].asBool();
-						s_WorldData.data[i].dataNight[x].isCapital = element[x]["isCapital"].asBool();
-					}
+					m_NewArchive.m_dependencies.push_back(usedByName);
 				}
 			}
-			break;
+
+			Project::s_AdditionalArchiveTree.data.push_back(m_NewArchive);
+		}
+	}
+	
+	void ParseStageListXMLRoot(const std::string& in_Path)
+	{
+		
+	}
+	void SUC::Project::GetStageList(tinyxml2::XMLDocument& in_XmlDocument)
+	{
+		Project::s_WorldData = Project::WorldData();
+
+		tinyxml2::XMLElement* m_XmlStageListRoot = in_XmlDocument.FirstChildElement("ModSchema")->FirstChildElement("StageListRoot");
+		for (tinyxml2::XMLElement* m_XmlCountry = m_XmlStageListRoot->FirstChildElement("Country"); m_XmlCountry != nullptr; m_XmlCountry = m_XmlCountry->NextSiblingElement("Country"))
+		{
+			Project::WorldData::FlagData country = Project::WorldData::FlagData();
+			tinyxml2::XMLElement* descElem = m_XmlCountry->FirstChildElement("Description");
+
+			if (descElem && descElem->GetText()) country.description = descElem->GetText();
+
+			tinyxml2::XMLElement* m_XmlStageList = m_XmlCountry->FirstChildElement("StageList");
+
+			// Loop through each <Stage> within <StageList>
+			for (tinyxml2::XMLElement* m_XmlStage = m_XmlStageList->FirstChildElement("StageDay"); m_XmlStage != nullptr; m_XmlStage = m_XmlStage->NextSiblingElement("StageDay"))
+			{
+				Project::WorldData::FlagData::LevelData stage = Project::WorldData::FlagData::LevelData();
+				tinyxml2::XMLElement* archiveElem = m_XmlStage->FirstChildElement("Archive");
+				tinyxml2::XMLElement* displayNameElem = m_XmlStage->FirstChildElement("DisplayName");
+				tinyxml2::XMLElement* isTownElem = m_XmlStage->FirstChildElement("IsTown");
+				tinyxml2::XMLElement* isCapitalElem = m_XmlStage->FirstChildElement("IsCapital");
+
+				if (archiveElem && archiveElem->GetText()) stage.levelID = archiveElem->GetText();
+				if (displayNameElem && displayNameElem->GetText()) stage.optionName = displayNameElem->GetText();
+				stage.isWhiteWorld = (isTownElem && strcmp(isTownElem->GetText(), "true") == 0);
+				stage.isCapital = (isCapitalElem && strcmp(isCapitalElem->GetText(), "true") == 0);
+
+				country.data.push_back(stage);
+			}
+			for (tinyxml2::XMLElement* m_XmlStage = m_XmlStageList->FirstChildElement("StageNight"); m_XmlStage != nullptr; m_XmlStage = m_XmlStage->NextSiblingElement("StageNight"))
+			{
+				Project::WorldData::FlagData::LevelData stage = Project::WorldData::FlagData::LevelData();
+				tinyxml2::XMLElement* archiveElem = m_XmlStage->FirstChildElement("Archive");
+				tinyxml2::XMLElement* displayNameElem = m_XmlStage->FirstChildElement("DisplayName");
+				tinyxml2::XMLElement* isTownElem = m_XmlStage->FirstChildElement("IsTown");
+				tinyxml2::XMLElement* isCapitalElem = m_XmlStage->FirstChildElement("IsCapital");
+
+				if (archiveElem && archiveElem->GetText()) stage.levelID = archiveElem->GetText();
+				if (displayNameElem && displayNameElem->GetText()) stage.optionName = displayNameElem->GetText();
+				stage.isWhiteWorld = (isTownElem && strcmp(isTownElem->GetText(), "true") == 0);
+				stage.isCapital = (isCapitalElem && strcmp(isCapitalElem->GetText(), "true") == 0);
+
+				country.dataNight.push_back(stage);
+			}
+
+			Project::s_WorldData.data.push_back(country);
 		}
 	}
 	std::vector<std::string> SUC::Project::GetAllLevelIDs(bool onlyCustom)

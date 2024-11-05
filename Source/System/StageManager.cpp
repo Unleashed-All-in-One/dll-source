@@ -533,7 +533,6 @@ namespace SUC::System
 			if (overrideStageIDEvent)
 				m_NextStage = overrideStageIDEvent();
 			SequenceHelpers::LoadStage(_strdup(m_NextStage.c_str()));
-			SequenceHelpers::SetPlayerType(0);
 		}
 		return originalSM_UpdateApplication(This, Edx, elapsedTime, a3);
 	}

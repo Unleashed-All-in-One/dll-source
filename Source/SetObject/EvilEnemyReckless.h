@@ -174,7 +174,7 @@ namespace SUC::SetObject
 			BBExt::CCharacterProxy* characterproxy = new BBExt::CCharacterProxy();
 			auto a7 = Sonic::CollisionID({ Sonic::CollisionID::TypeTerrain }, { Sonic::CollisionID::TypeTerrain, Sonic::CollisionID::TypeKeepOffEnemy });
 			auto a8 = hh::math::CVector(0, 0, 0);
-			characterproxy = CtorProxy(this, characterproxy, Sonic::CGameDocument::GetInstance()->GetWorld().get(), shapeEventTrigger1, m_spNodeEventCollision->m_Transform.m_Position, m_spNodeEventCollision->m_Transform.m_Rotation, a7, a8);
+			//characterproxy = CtorProxy(this, characterproxy, Sonic::CGameDocument::GetInstance()->GetWorld().get(), shapeEventTrigger1, m_spNodeEventCollision->m_Transform.m_Position, m_spNodeEventCollision->m_Transform.m_Rotation, a7, a8);
 
 			//m_spCharacterProxy = boost::make_shared<BBExt::CCharacterProxy>(this, Sonic::CGameDocument::GetInstance()->GetWorld().get(), shapeEventTrigger1, CVector::Zero(), m_spMatrixNodeTransform->m_Transform.m_Rotation, Sonic::CollisionID({Sonic::CollisionID::TypeTerrain }, {Sonic::CollisionID::TypeTerrain, Sonic::CollisionID::TypeKeepOffEnemy }));
 

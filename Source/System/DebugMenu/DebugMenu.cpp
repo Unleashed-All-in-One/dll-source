@@ -61,7 +61,7 @@ namespace SUC::ImGuiMenu
 					eventIndexToLoad = node.treeEntries[x].cutsceneID;
 					DebugMenu::s_Visible = false;
 					std::string temp = sceneIndexToLoad.c_str();
-					System::StageManager::ConfigureNextStage(sceneIndexToLoad.c_str(), System::SLoadInfo::MODERN, false);
+					System::StageManager::ConfigureNextStage(sceneIndexToLoad.c_str(), node.treeEntries[x].night ? System::SLoadInfo::WEREHOG : System::SLoadInfo::MODERN, false);
 					System::StageManager::TriggerStageLoad();
 					//if (!eventIndexToLoad.empty())
 					//	SUC::System::StageManager::ForcePlayCutscene(eventIndexToLoad, sceneIndexToLoad, false, 0);
@@ -84,7 +84,6 @@ namespace SUC::ImGuiMenu
 		{
 			scaleFactor = hh::math::CVector2((ImGui::GetIO().DisplaySize.x / 1920), (ImGui::GetIO().DisplaySize.y / 1080));
 			parsedTree = true;
-			SUC::Project::GetDebugTree();
 		}
 		ImGui::SetNextWindowBgAlpha(1);
 		ImGui::SetNextWindowSize({ 1700 * scaleFactor.x(), 956 * scaleFactor.y() }, ImGuiCond_Always);
