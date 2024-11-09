@@ -84,6 +84,16 @@ namespace SUC::Player::Evil
 	class Motion
 	{
 	public:
+		enum EMoveType : int
+		{
+			AutoFoundEnemy = 0x0,
+			FirstPadDirection = 0x1,
+			IngPadDirection = 0x2,
+			FirstAutoTarget = 0x3,
+			IngAutoTarget = 0x4,
+			Default = 0x5,
+		};
+
 		std::string MotionName;
 		std::string FileName;
 		float MotionBlendTimeS;
@@ -108,7 +118,9 @@ namespace SUC::Player::Evil
 		bool IsGravity;
 		int ShakeCameraStartFrame;
 		float GroundHeightRepair;
-		std::string MoveType;
+		float AutoTargetPower;
+		float AutoTargetEndFrame;
+		EMoveType MoveType;
 		std::string ComposedFileName;
 		EffectConfig Effect;
 		CollisionConfig Collision;

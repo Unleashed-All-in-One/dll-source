@@ -120,8 +120,23 @@ namespace SUC::Player::Evil
 		returned.IsGravity = std::string(in_MotionNode->first_node("IsGravity")->value()) == "true";
 		returned.MotionSpeed_FirstFrame = std::stof(in_MotionNode->first_node("MotionSpeed_FirstFrame")->value());
 		returned.MotionSpeed_MiddleFrame = std::stof(in_MotionNode->first_node("MotionSpeed_MiddleFrame")->value());
+		returned.AutoTargetPower = std::stof(in_MotionNode->first_node("AutoTargetPower")->value());
+		returned.AutoTargetEndFrame = std::stof(in_MotionNode->first_node("AutoTargetEndFrame")->value());
+		std::string moveType = in_MotionNode->first_node("MoveType")->value();
 
-		returned.MoveType = in_MotionNode->first_node("MoveType")->value();
+		if (moveType == "AutoFoundEnemy")
+			returned.MoveType = Motion::EMoveType::AutoFoundEnemy;
+		if (moveType == "FirstPadDirection")
+			returned.MoveType = Motion::EMoveType::FirstPadDirection;
+		if (moveType == "IngPadDirection")
+			returned.MoveType = Motion::EMoveType::IngPadDirection;
+		if (moveType == "FirstAutoTarget")
+			returned.MoveType = Motion::EMoveType::FirstAutoTarget;
+		if (moveType == "IngAutoTarget")
+			returned.MoveType = Motion::EMoveType::IngAutoTarget;
+		if (moveType == "Default")
+			returned.MoveType = Motion::EMoveType::Default;
+
 		//Maximum is 21 since in Unleashed the maximum is 21, for whatever reason
 		for (size_t i = 0; i < 20; i++)
 		{

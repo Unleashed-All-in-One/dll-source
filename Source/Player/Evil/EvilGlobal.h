@@ -21,7 +21,7 @@ namespace SUC::Player::Evil
 			float timerDamageMax = 0.3f;
 			float timerAttackMax = 0.35f;
 		};
-
+		static inline float s_AnimationSpeed = 1;
 		static inline std::string s_LatestAttackName;
 		static inline EvilParameters* s_Param;
 		static inline bool s_CanAttack;

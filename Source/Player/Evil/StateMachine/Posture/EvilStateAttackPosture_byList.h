@@ -28,20 +28,23 @@ namespace SUC::Player::Evil
 		{
 			GetContext()->m_Velocity = CVector(0, 0, 0);
 		}
+		FUNCTION_PTR(void, __fastcall, Posture3DCommon_MovementRoutine, 0x00E37FD0, Sonic::Player::CPlayerSpeedPosture3DCommon* state);
+		FUNCTION_PTR(void, __fastcall, Posture3DCommon_MovementRoutine2, 0x00E365A0, Sonic::Player::CPlayerSpeedPosture3DCommon* state);
 		void UpdateState() override
 		{
 			void* vtable = *(void**)this;
 			BB_FUNCTION_PTR(void, __thiscall, MovementRoutine, 0x00E37FD0, void* This);
 			//if(isGrounded)
-			MovementRoutine(this);
-			auto context = GetContext();
+			//MovementRoutine(this);
+			//auto context = GetContext();
 			const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
 			Common::ClampFloat(EvilGlobal::s_Param->attackVelocityDivider, 0.001f, 100);
 			CVector velocityWithoutY = playerContext->m_Velocity;
-			velocityWithoutY.y() = 0;
+			//velocityWithoutY.y() = 0;
 
+			TransformPlayer(Project::GetDeltaTime(), false);
 			FUNCTION_PTR(void, __fastcall, Posture3DCommon_MovementRoutine, 0x00E37FD0, Sonic::Player::CPlayerSpeedPosture3DCommon * state);
-			Posture3DCommon_MovementRoutine(this);
+			Posture3DCommon_MovementRoutine2(this);
 			//playerContext->m_spMatrixNode->m_Transform.SetPosition(playerContext->m_spMatrixNode->m_Transform.m_Position += (velocityWithoutY / EvilGlobal::s_Param->attackVelocityDivider));
 			//int __stdcall PostMovement(CSonicContext *sonicContext)
 

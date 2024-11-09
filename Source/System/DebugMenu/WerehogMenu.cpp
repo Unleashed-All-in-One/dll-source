@@ -19,8 +19,8 @@ namespace SUC::ImGuiMenu
 				ImGui::End();
 				return;
 			}
-			ImGui::TextUnformatted(SUC::Format("Current attack: %s", s_MotionDisplay->FileName.c_str()));
-			ImGui::TextUnformatted(SUC::Format("Move Type: %s", s_MotionDisplay->MoveType.c_str()));
+			ImGui::TextUnformatted(SUC::Format("Current attack: %s", s_MotionDisplay->MotionName.c_str()));
+			ImGui::TextUnformatted(SUC::Format("Move Type: %d", s_MotionDisplay->MoveType));
 			ImGui::TextUnformatted(SUC::Format("Velocity: %.3f", s_MoveSpeedVelocity));
 			ImGui::InputFloat3("Applied Velocity", s_AppliedVelocity.data());
 			ImGui::Separator();																 

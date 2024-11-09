@@ -41,7 +41,7 @@ namespace SUC::Player::Evil
 	void EvilGlobal::Initialize()
 	{
 		EvilParameters* params = new EvilParameters();
-		params->attackVelocityDivider = 1.5f;
+		params->attackVelocityDivider = 1;
 		params->lifeMaxAmount = 15;
 		params->timerDamageMax = 2;
 		s_Param = params;

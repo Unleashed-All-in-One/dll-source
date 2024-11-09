@@ -4,6 +4,28 @@
 #include "../../GameObjects/AttackHitbox.h"
 namespace SUC::Player::Evil
 {
+	class MsgChangePlayerAnimation : public hh::fnd::MessageTypeSet
+	{
+	public:
+		HH_FND_MSG_MAKE_TYPE(0x016802A8);
+		Hedgehog::Base::CSharedString m_AnimationName;
+		uint32_t m_Field14;
+		uint32_t m_Field18;
+		uint32_t m_Field1C;
+		uint32_t m_Field20;
+		uint32_t m_Field24;
+		uint32_t m_Field28;
+
+		MsgChangePlayerAnimation(const Hedgehog::Base::CSharedString& in_AnimationName, uint32_t in_Field14 = 1,
+			uint32_t in_Field18 = 0, uint32_t in_Field1C = 0, uint32_t in_Field20 = 0,
+			uint32_t in_Field24 = 1, uint32_t in_Field28 = 0) : m_AnimationName(in_AnimationName),
+			                                                    m_Field14(in_Field14), m_Field18(in_Field18),
+			                                                    m_Field1C(in_Field1C), m_Field20(in_Field20),
+			                                                    m_Field24(in_Field24), m_Field28(in_Field28)
+		{
+		}
+		
+	};
 	class CStateAttackAction_byList : public Sonic::Player::CPlayerSpeedContext::CStateSpeedBase
 	{
 		int m_LastActionIndex;
@@ -23,7 +45,12 @@ namespace SUC::Player::Evil
 		float m_MotionMoveSpeedRatioNew;
 	public:
 		static constexpr const char* ms_pStateName = "Evil_AttackAction_byList";
-
+		void ChangeAnimation(const char* in_Name)
+		{
+			const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
+			const auto spAnimInfo = boost::make_shared<MsgChangePlayerAnimation>(in_Name);
+			playerContext->m_pPlayer->m_AnimationStateMachine->ChangeState(in_Name);
+		}
 		CVector GetForward()
 		{
 			auto context = GetContext();
@@ -97,8 +124,8 @@ namespace SUC::Player::Evil
 			ms_InitialVelocity = CVector(0, 0, 0);
 			ms_AlteredVelocity = ms_InitialVelocity;
 			SONIC_CLASSIC_CONTEXT->m_pPlayer->m_PostureStateMachine.ChangeState("Standard");
-
-			context->ChangeAnimation(EvilGlobal::GetStateNameFromTable(EvilGlobal::s_LatestAttackName).c_str());
+			ChangeAnimation(EvilGlobal::GetStateNameFromTable(EvilGlobal::s_LatestAttackName).c_str());
+			SONIC_CLASSIC_CONTEXT->m_Field168 = true;
 		}
 		bool HasHitboxBeenSpawned(std::string name)
 		{
@@ -111,6 +138,7 @@ namespace SUC::Player::Evil
 		}
 		void Reset()
 		{
+			SONIC_CLASSIC_CONTEXT->m_Field168 = false;
 			for (size_t i = 0; i < collision.size(); i++)
 			{
 				collision.at(i)->SendMessage(collision.at(i)->m_ActorID, boost::make_shared<Sonic::Message::MsgKill>());
@@ -126,9 +154,67 @@ namespace SUC::Player::Evil
 			context->m_Velocity = CVector::Identity();
 
 		}
+		void HitboxRoutine(float in_CurrentAnimFrame)
+		{
+			for (size_t i = 0; i < m_CurrentMotion.Collision.BoneInfo.size(); i++)
+			{
+				std::string hitboxName = std::format("{0}{1}", EvilAttackConfiguration::GetBoneNameFromCollisionParam((int)m_CurrentMotion.Collision.BoneInfo[i].BoneType), i + 1);
+
+				if (in_CurrentAnimFrame >= m_CurrentMotion.Collision.BoneInfo[i].StartFrame && !HasHitboxBeenSpawned(hitboxName))
+				{
+					GenerateHitbox(m_CurrentMotion.Collision.BoneInfo[i], i);
+				}
+				if (in_CurrentAnimFrame >= m_CurrentMotion.Collision.BoneInfo[i].EndFrame && HasHitboxBeenSpawned(hitboxName))
+				{
+					KillHitbox(hitboxName);
+				}
+
+			}
+		}
+		void FXRoutine(float in_CurrentAnimFrame, const Motion& in_Motion)
+		{
+			bool m_EndEarly = false;
+			for (size_t i = m_LastTriggerIndex; i < in_Motion.TriggerInfos.Resources.size(); i++)
+			{
+				if (m_EndEarly)
+					break;
+				if (in_CurrentAnimFrame >= in_Motion.TriggerInfos.Resources[i].Frame.Start)
+				{
+					for (size_t x = 0; x < in_Motion.ResourceInfos.Resources.size(); x++)
+					{
+						if (in_Motion.ResourceInfos.Resources[x].ID == in_Motion.TriggerInfos.Resources[i].ResourceID)
+						{
+							m_LastTriggerIndex = i + 1;
+							if (in_Motion.ResourceInfos.Resources[x].Type == ResourceType::CSB)
+							{
+								if (!in_Motion.ResourceInfos.Resources[x].Params.Cue.empty())
+								{
+									Common::PlaySoundStaticCueName(sound, in_Motion.ResourceInfos.Resources[x].Params.Cue.c_str());
+									m_EndEarly = true;
+									break;
+								}
+							}
+							if (in_Motion.ResourceInfos.Resources[x].Type == ResourceType::Effect)
+							{
+								//genericEffect
+								auto bone = SONIC_CLASSIC_CONTEXT->m_pPlayer->m_spCharacterModel->GetNode(in_Motion.TriggerInfos.Resources[x].NodeName.c_str());
+								if (!genericEffect)
+									Common::fCGlitterCreate(SONIC_CLASSIC_CONTEXT->m_pPlayer->m_spContext.get(), genericEffect, &bone, in_Motion.ResourceInfos.Resources[x].Params.FileName.c_str(), 1);
+							}
+						}
+					}
+				}
+			}
+		}
 		void UpdateState() override
 		{
+			auto triggers = m_CurrentMotion.TriggerInfos;
+			auto resources = m_CurrentMotion.ResourceInfos;
+			MoveRatioHelper* m_CurrentMoveRatioXZ = nullptr;
+			MoveRatioHelper* m_CurrentMoveRatioY = nullptr;
+			bool skip = false;
 			auto context = GetContext();
+
 			m_CurrentMotion = EvilGlobal::GetMotionFromName(EvilGlobal::s_LatestAttackName);
 			//if(m_CurrentMotion.IsGravity)
 			//{
@@ -137,7 +223,7 @@ namespace SUC::Player::Evil
 			//else
 			//{
 			//}
-			const auto spAnimInfo = boost::make_shared<Sonic::Message::MsgGetAnimationInfo>();
+			boost::shared_ptr<Sonic::Message::MsgGetAnimationInfo> spAnimInfo = boost::make_shared<Sonic::Message::MsgGetAnimationInfo>();
 			context->m_pPlayer->SendMessageImm(context->m_pPlayer->m_ActorID, spAnimInfo);
 			DebugDrawText::log(std::format("CSTATEATTACKACTION_AnimFrame = {0}", spAnimInfo->m_Frame).c_str(), 0);
 			if (spAnimInfo->m_Frame <= m_LastFrame)
@@ -156,87 +242,66 @@ namespace SUC::Player::Evil
 				return;
 			}
 
+
 			//this is probably super overkill and could just be done using a for loop with no checks
-			for (size_t i = 0; i < m_CurrentMotion.Collision.BoneInfo.size(); i++)
-			{
-				std::string hitboxName = std::format("{0}{1}", EvilAttackConfiguration::GetBoneNameFromCollisionParam((int)m_CurrentMotion.Collision.BoneInfo[i].BoneType), i + 1);
+			FXRoutine(spAnimInfo->m_Frame, m_CurrentMotion);
+			HitboxRoutine(spAnimInfo->m_Frame);
 
-				if (spAnimInfo->m_Frame >= m_CurrentMotion.Collision.BoneInfo[i].StartFrame && !HasHitboxBeenSpawned(hitboxName))
-				{
-					GenerateHitbox(m_CurrentMotion.Collision.BoneInfo[i], i);
-				}
-				if (spAnimInfo->m_Frame >= m_CurrentMotion.Collision.BoneInfo[i].EndFrame && HasHitboxBeenSpawned(hitboxName))
-				{
-					KillHitbox(hitboxName);
-				}
-
-			}
 			for (auto moveSpeedRatioH : m_CurrentMotion.MotionMoveSpeedRatio_H)
 			{
 				if(spAnimInfo->m_Frame >= moveSpeedRatioH.FrameStart)
 				{
-					m_MotionMoveSpeedRatioNew = moveSpeedRatioH.FrameValue;
-				}
-			}
-			if (spAnimInfo->m_Frame >= m_CurrentMotion.MotionSpeed_FirstFrame && spAnimInfo->m_Frame < m_CurrentMotion.MotionSpeed_MiddleFrame)
-			{
-				if (m_MotionMoveSpeedRatioNew != 0 && m_CurrentMotion.MotionMoveSpeedRatio_H[0].FrameValue != 0)
-				{
-					float velocity = m_MotionMoveSpeedRatioNew;
-					if (abs(velocity) != 0 && !std::isnan(velocity))
-					{
-						ms_AlteredVelocity = SONIC_CLASSIC_CONTEXT->GetFrontDirection() * (velocity);
-						ImGuiMenu::WerehogMenu::s_AppliedVelocity = ms_AlteredVelocity;
-						ImGuiMenu::WerehogMenu::s_MoveSpeedVelocity = velocity;
-						if (m_CurrentMotion.MotionMoveSpeedRatio_H_Y.size() > 0)
-							ms_AlteredVelocity.y() = m_CurrentMotion.MotionMoveSpeedRatio_H_Y[0].FrameValue;
-						context->m_Velocity = ms_AlteredVelocity;
-					}
-				}
-			}
-			else
-				context->m_Velocity = ms_InitialVelocity;
-
-			auto triggers = m_CurrentMotion.TriggerInfos;
-			auto resources = m_CurrentMotion.ResourceInfos;
-			bool skip = false;
-			for (size_t i = m_LastTriggerIndex; i < triggers.Resources.size(); i++)
-			{
-				if (skip)
+					m_CurrentMoveRatioXZ = &moveSpeedRatioH;
 					break;
-				if (spAnimInfo->m_Frame >= triggers.Resources[i].Frame.Start)
+				}
+			}
+			for (auto moveSpeedRatioH : m_CurrentMotion.MotionMoveSpeedRatio_H_Y)
+			{
+				if (spAnimInfo->m_Frame >= moveSpeedRatioH.FrameStart)
 				{
-					for (size_t x = 0; x < resources.Resources.size(); x++)
+					m_CurrentMoveRatioY = &moveSpeedRatioH;
+					break;
+				}
+			}
+			//Apply basic velocity from attack
+			if(m_CurrentMotion.MoveType == Motion::EMoveType::Default || m_CurrentMotion.MoveType == Motion::EMoveType::IngAutoTarget)
+			{
+				if (spAnimInfo->m_Frame >= m_CurrentMotion.MotionSpeed_FirstFrame && spAnimInfo->m_Frame < m_CurrentMotion.MotionSpeed_MiddleFrame)
+				{
+					if (m_CurrentMoveRatioXZ != nullptr)
 					{
-						if (resources.Resources[x].ID == triggers.Resources[i].ResourceID)
+						float velocity = m_CurrentMoveRatioXZ->FrameValue;
+						//Prevent division or multiplication by 0
+						if (abs(velocity) != 0 && !std::isnan(velocity))
 						{
-							m_LastTriggerIndex = i + 1;
-							if (resources.Resources[x].Type == ResourceType::CSB)
-							{
-								if (!resources.Resources[x].Params.Cue.empty())
-								{
-									Common::PlaySoundStaticCueName(sound, resources.Resources[x].Params.Cue.c_str());
-									skip = true;
-									break;
-								}
-							}
-							if (resources.Resources[x].Type == ResourceType::Effect)
-							{
-								//genericEffect
-								auto bone = context->m_pPlayer->m_spCharacterModel->GetNode(triggers.Resources[x].NodeName.c_str());
-								if (!genericEffect)
-									Common::fCGlitterCreate(context->m_pPlayer->m_spContext.get(), genericEffect, &bone, resources.Resources[x].Params.FileName.c_str(), 1);
-							}
+							ms_AlteredVelocity = SONIC_CLASSIC_CONTEXT->GetFrontDirection() * (velocity);
+							ImGuiMenu::WerehogMenu::s_MoveSpeedVelocity = velocity;
+							context->m_Velocity = ms_AlteredVelocity;
 						}
 					}
+
+					if (m_CurrentMoveRatioY != nullptr)	ms_AlteredVelocity.y() = m_CurrentMoveRatioY->FrameValue;
 				}
+				else
+					context->m_Velocity = ms_InitialVelocity;
 			}
+			//WIP Auto target attacks
+			if(m_CurrentMotion.MoveType == Motion::EMoveType::IngAutoTarget)
+			{
+				if (spAnimInfo->m_Frame >= m_CurrentMotion.AutoTargetEndFrame )
+				{
+					//30.0f is AutoTargetLength
+					ms_AlteredVelocity += SONIC_CLASSIC_CONTEXT->GetFrontDirection() * (m_CurrentMotion.AutoTargetPower * 2.0f);
+				}				
+			}
+
+			ImGuiMenu::WerehogMenu::s_AppliedVelocity = ms_AlteredVelocity;
 			if (spAnimInfo->m_Frame >= m_CurrentMotion.MotionSpeed_MiddleFrame)
 			{
 				context->m_Velocity = ms_AlteredVelocity;
 			}
+			ms_AlteredVelocity = CVector(ms_AlteredVelocity.x() * ms_DecelerationForce, ms_AlteredVelocity.y(), ms_AlteredVelocity.z() * ms_DecelerationForce);
 			context->m_Velocity = ms_AlteredVelocity;
-			ms_AlteredVelocity = CVector(ms_AlteredVelocity.x() * ms_DecelerationForce, 0, ms_AlteredVelocity.z() * ms_DecelerationForce);
 			//if (m_CurrentMotion.MotionMoveSpeedRatio_H.size() > m_LastActionIndex)
 			//{
 			//	if ((spAnimInfo->m_Frame == m_CurrentMotion.MotionMoveSpeedRatio_H.at(m_LastActionIndex).FrameStart	)

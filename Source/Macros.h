@@ -64,9 +64,9 @@
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #define ms_IsUpdateForRender *(bool*)0x1A430EC
-
 #define RAD_TO_DEG = (double)57.29578018188477
 #define DEG_TO_RAD = (double)0.01745329238474369
+#define InputSingleton  &Sonic::CInputState::GetInstance()->m_PadStates[Sonic::CInputState::GetInstance()->m_CurrentPadStateIndex]
 
 class CollisionLayerID
 {

@@ -120,6 +120,8 @@
   <ItemGroup>
     <ClCompile Include="Accuracy\GenericSonic.cpp" />
     <ClCompile Include="Accuracy\Whip.cpp" />
+    <ClCompile Include="BlueBlurCustom\DoNotCommit\hhCQuaternion.cpp" />
+    <ClCompile Include="BlueBlurCustom\DoNotCommit\hhCVector.cpp" />
     <ClCompile Include="GameObjects\TitleWorldMapSun.cpp" />
     <ClCompile Include="Player\AnimationPoseExtensions.cpp" />
     <ClCompile Include="Player\Evil\ClassicPluginExtensions.cpp" />
@@ -226,6 +228,9 @@
     <ClInclude Include="Accuracy\AccuracyHookContainer.h" />
     <ClInclude Include="Accuracy\GenericSonic.h" />
     <ClInclude Include="Accuracy\Whip.h" />
+    <ClInclude Include="BlueBlurCustom\DoNotCommit\hhCQuaternion.h" />
+    <ClInclude Include="BlueBlurCustom\DoNotCommit\hhCVector.h" />
+    <ClInclude Include="BlueBlurCustom\DoNotCommit\hhMath.h" />
     <ClInclude Include="BlueBlurCustom\Hedgehog\Motion\hhSingleEffectMotionAll.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\CGlitterPlayer.h" />
     <ClInclude Include="BlueBlurCustom\Sonic\Particle\ParticleManager.h" />
@@ -252,8 +257,11 @@
     <ClInclude Include="Player\Evil\StateMachine\State\EvilStateArmSwing.h" />
     <ClInclude Include="Player\Evil\StateMachine\State\EvilStateAttackAction_byList.h" />
     <ClInclude Include="Player\Evil\StateMachine\State\EvilStateDamageNormal.h" />
+    <ClInclude Include="Player\Evil\StateMachine\State\EvilStateRunE.h" />
     <ClInclude Include="Player\Evil\StateMachine\State\EvilStateRunningJump.h" />
     <ClInclude Include="Player\Evil\EvilAttackConfiguration.h" />
+    <ClInclude Include="Player\Evil\StateMachine\State\EvilStateWalkE.h" />
+    <ClInclude Include="Player\Evil\StateMachine\State\EvilStateWalkSlowE.h" />
     <ClInclude Include="Player\PlayerHookContainer.h" />
     <ClInclude Include="SetObject\CObjCamera2D.h" />
     <ClInclude Include="SetObject\DebugObject.h" />

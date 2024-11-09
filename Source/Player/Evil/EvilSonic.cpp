@@ -1,6 +1,7 @@
 
 #include "EvilSonic.h"
 
+#include "ClassicPluginExtensions.h"
 #include "EvilGlobal.h"
 #include "EvilAttackConfiguration.h"
 #include "StateMachine/State/EvilStateRunningJump.h"
@@ -32,7 +33,6 @@ namespace SUC::Player::Evil
 	public:
 		HH_FND_MSG_MAKE_TYPE(0x01681FA0);
 	};
-	Sonic::Player::CPlayerSpeedContext::CStateSpeedBase* this_is_a_bad_hack_please_fix;
 	SharedPtrTypeless sound, soundUnleash, soundUnleashStart;
 	SharedPtrTypeless soundRegularJump;
 	SharedPtrTypeless indexParticle_L, indexParticle_R;
@@ -70,7 +70,12 @@ namespace SUC::Player::Evil
 	WerehogState currentState;
 
 	std::string lastMusicCue;
-
+	void ChangeAnimation(const char* in_Name)
+	{
+		const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
+		const auto spAnimInfo = boost::make_shared<MsgChangePlayerAnimation>(in_Name);
+		playerContext->m_pPlayer->m_AnimationStateMachine->ChangeState(in_Name);
+	}
 	void RegisterClassicAnimations()
 	{
 		//Register some of the basic non-attack anims
@@ -93,6 +98,9 @@ namespace SUC::Player::Evil
 		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_run", "evilsonic_run", 3);
 		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_runE", "evilsonic_runE");
 		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_dash_jumpS", "evilsonic_dash_jumpS");
+		System::AnimationSetPatcher::RegisterClassicAnimation("WalkSlow_M", "evilsonic_walk_slow", 4, true);
+		System::AnimationSetPatcher::RegisterClassicAnimation("Walk_M", "evilsonic_walk", 4, true);
+		System::AnimationSetPatcher::RegisterClassicAnimation("Run_M", "evilsonic_run",4 ,true);
 	}
 	bool IsCurrentAnimationName(std::string in)
 	{
@@ -128,7 +136,7 @@ namespace SUC::Player::Evil
 		const auto spAnimInfo = boost::make_shared<Sonic::Message::MsgGetAnimationInfo>();
 		playerContext->m_pPlayer->SendMessageImm(playerContext->m_pPlayer->m_ActorID, spAnimInfo);
 		const char* animName = name.c_str();
-		playerContext->ChangeAnimation(animName);
+		ChangeAnimation(animName);
 	}
 	float GetVelocity()
 	{
@@ -451,7 +459,7 @@ namespace SUC::Player::Evil
 			canJump = true;
 			isGrounded = true;
 			playingAttack = false;
-			playerContext->ChangeState("StartCrouching");
+			playerContext->m_pPlayer->m_PostureStateMachine.ChangeState("StartCrouchingPosture");
 		}
 
 	}
@@ -481,7 +489,6 @@ namespace SUC::Player::Evil
 			{
 				return;
 			}
-
 			DebugDrawText::log((std::string("Current Player State: ") + stateCheckS).c_str(), 0);
 			if (timerDamage <= EvilGlobal::s_Param->timerDamageMax)
 				timerDamage += in_rUpdateInfo.DeltaTime;
@@ -598,31 +605,31 @@ namespace SUC::Player::Evil
 			if (!playingAttack && isGrounded)
 			{
 
-				DebugDrawText::log(std::format("SPEED_MAGNITUDE: {0}", abs(playerContext->m_Velocity.norm())).c_str(), 0);
-				playerContext->m_pPlayer->SendMessageImm(playerContext->m_pPlayer->m_ActorID, spAnimInfo);
-				if (currentState == WerehogState::Dash)
-				{
-					if (abs(playerContext->m_Velocity.norm() > 12))
-					{
-						if ((!IsCurrentAnimationName("Evilsonic_dash"))
-							|| (IsCurrentAnimationName("Evilsonic_dash") && spAnimInfo->m_Frame >= 10))
-						{
-							PlayAnim("Evilsonic_dash");
-						}
-					}
-				}
-				if (currentState == WerehogState::Normal)
-				{
-					/*	if(std::strstr(spAnimInfo->m_Name.c_str(), "Evilsonic_dash") != nullptr)
-							PlayAnim("Evilsonic_dashE");*/
-					if (abs(playerContext->m_Velocity.norm() > 5))
-					{
-						if ((!IsCurrentAnimationName("Evilsonic_run"))
-							|| (IsCurrentAnimationName("Evilsonic_run") && spAnimInfo->m_Frame >= 51))
-							PlayAnim("Evilsonic_run");
-					}
-
-				}
+				//DebugDrawText::log(std::format("SPEED_MAGNITUDE: {0}", abs(playerContext->m_Velocity.norm())).c_str(), 0);
+				//playerContext->m_pPlayer->SendMessageImm(playerContext->m_pPlayer->m_ActorID, spAnimInfo);
+				//if (currentState == WerehogState::Dash)
+				//{
+				//	if (abs(playerContext->m_Velocity.norm() > 12))
+				//	{
+				//		if ((!IsCurrentAnimationName("Evilsonic_dash"))
+				//			|| (IsCurrentAnimationName("Evilsonic_dash") && spAnimInfo->m_Frame >= 10))
+				//		{
+				//			PlayAnim("Evilsonic_dash");
+				//		}
+				//	}
+				//}
+				//if (currentState == WerehogState::Normal)
+				//{
+				//	/*	if(std::strstr(spAnimInfo->m_Name.c_str(), "Evilsonic_dash") != nullptr)
+				//			PlayAnim("Evilsonic_dashE");*/
+				//	if (abs(playerContext->m_Velocity.norm() > 5))
+				//	{
+				//		if ((!IsCurrentAnimationName("Evilsonic_run"))
+				//			|| (IsCurrentAnimationName("Evilsonic_run") && spAnimInfo->m_Frame >= 51))
+				//			PlayAnim("Evilsonic_run");
+				//	}
+				//
+				//}
 			}
 
 			if (timerCombo > EvilGlobal::s_Param->timerComboMax)
@@ -674,6 +681,7 @@ namespace SUC::Player::Evil
 									{
 										attackName += "YButtonDown";
 										break;
+											
 									}
 									}
 								}
@@ -882,9 +890,20 @@ namespace SUC::Player::Evil
 	HOOK(void, __fastcall, NormalDamageDeadAfter, 0x12520D0, int* a1, void* Edx)
 	{
 	}
+	
+
 	//Hedgehog::Math::CVector *__thiscall sub_1241B50(CTempState *this)
-	HOOK(void, __fastcall, CClassicStateWalk_Update, 0x1241B50, void* This, void* Edx)
+	HOOK(void, __fastcall, CClassicStateWalk_Update, 0x012419B0, void* This, void* Edx)
 	{
+		SONIC_GENERAL_CONTEXT->m_pPlayer->m_StateMachine.ChangeState("Evil_WalkSlowE");
+	}
+	//sub_53B830()
+	HOOK(int, __fastcall, Footsteps, 0x53B830, int This,void* Edx, void* a2, int a3, int a4, float a5)
+	{
+		if (!IS_CLASSIC_SONIC)
+			return originalFootsteps(This, Edx, a2, a3, a4, a5);
+		else
+			return 0;
 	}
 	extern "C" __declspec(dllexport) float API_GetLife()
 	{
@@ -894,11 +913,36 @@ namespace SUC::Player::Evil
 	{
 		return IS_CLASSIC_SONIC;
 	}
+	//BOOL __thiscall GetIsOutOfControl(CSonicContext *this)
+	HOOK(char, __fastcall, GetIsOutOfControl, 0x00E4D350, Sonic::Player::CPlayerSpeedContext* This, void* Edx)
+	{
+		if (IS_CLASSIC_SONIC)
+		{
+			auto m_StateName = This->m_pPlayer->m_StateMachine.GetCurrentState()->GetStateName();
+			return This->GetStateFlag(Sonic::Player::CPlayerSpeedContext::eStateFlag_OutOfControl) || m_StateName != "Stand";
+		}
+		else
+			originalGetIsOutOfControl(This, Edx);
+	}
+	HOOK(Hedgehog::Math::CVector*, __fastcall, SonicClassicGetAnimSpeed, 0xDD9240, void* This, void* Edx, void* a2)
+	{
+			if(SONIC_CLASSIC_CONTEXT->m_spParameter)
+			{
+				return new Hedgehog::Math::CVector(EvilGlobal::s_AnimationSpeed, EvilGlobal::s_AnimationSpeed, EvilGlobal::s_AnimationSpeed);
+			}			
+		
+		return originalSonicClassicGetAnimSpeed(This,Edx,a2);
+	}
+	//Hedgehog::Math::CVector *__thiscall sub_DD92B0(_DWORD *this, Hedgehog::Math::CVector *a2)
+
 	void EvilSonic::RegisterPatches()
 	{
 		EvilGlobal::s_CanAttack = true;
 		RegisterClassicAnimations();
 		INSTALL_HOOK(CPlayerSpeedContext_AddCallback);
+		INSTALL_HOOK(Footsteps);
+		INSTALL_HOOK(GetIsOutOfControl);
+		INSTALL_HOOK(SonicClassicGetAnimSpeed);
 		INSTALL_HOOK(Classic_UpdateSerial);
 		INSTALL_HOOK(Classic_InitParameters);
 
