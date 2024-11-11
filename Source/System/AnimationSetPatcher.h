@@ -43,5 +43,8 @@ namespace SUC::System
 		static NewAnimationDataList s_NewAnimationDataGeneric;
 		static NewAnimationDataList s_NewAnimationDataSuper;
 		static inline std::vector<NewAnimationData> s_ClassicCustomAnimations;
+		static inline std::vector<Hedgehog::Animation::SMotionInfo> m_AnimEntriesClassic;
+		static inline std::vector<Hedgehog::Animation::SMotionInfo> m_AnimEntriesGeneric;
+		static inline std::vector<Hedgehog::Animation::SMotionInfo> m_AnimEntriesSuper;
 	};
 }

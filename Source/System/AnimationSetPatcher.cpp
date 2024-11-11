@@ -5,9 +5,6 @@ namespace SUC::System
 
 	std::vector<SUC::NewAnimationData> AnimationSetPatcher::s_NewAnimationDataGeneric;
 	std::vector<SUC::NewAnimationData> AnimationSetPatcher::s_NewAnimationDataSuper;
-	std::vector<Hedgehog::Animation::SMotionInfo> m_AnimEntriesClassic;
-	std::vector<Hedgehog::Animation::SMotionInfo> m_AnimEntriesGeneric;
-	std::vector<Hedgehog::Animation::SMotionInfo> m_AnimEntriesSuper;
 	/// <summary>
 	/// Registers new animation states (requires AddMotionEntriesToSet first)
 	/// </summary>
@@ -58,7 +55,7 @@ namespace SUC::System
 	HOOK(void*, __cdecl, InitializeClassicSonicAnimationList, 0x01281D50)
 	{
 		void* result = originalInitializeClassicSonicAnimationList();
-		AddMotionEntriesToSet(m_AnimEntriesClassic,AnimationSetPatcher::s_ClassicCustomAnimations, (AnimationSetPatcher::CAnimationStateSet*)0x15DCE60);
+		AddMotionEntriesToSet(AnimationSetPatcher::m_AnimEntriesClassic,AnimationSetPatcher::s_ClassicCustomAnimations, (AnimationSetPatcher::CAnimationStateSet*)0x15DCE60);
 		return result;
 	}	
 	HOOK(void, __fastcall, CSonicClassicCreateAnimationStates, 0x00DDF1C0, void* This, void* Edx, Sonic::CAnimationStateMachine* A2, void* A3)
@@ -72,7 +69,7 @@ namespace SUC::System
 	HOOK(void*, __cdecl, InitializeSonicAnimationList, 0x1272490)
 	{
 		void* pResult = originalInitializeSonicAnimationList();
-		AddMotionEntriesToSet(m_AnimEntriesGeneric, AnimationSetPatcher::s_NewAnimationDataGeneric, (AnimationSetPatcher::CAnimationStateSet*)0x15E8D40);
+		AddMotionEntriesToSet(AnimationSetPatcher::m_AnimEntriesGeneric, AnimationSetPatcher::s_NewAnimationDataGeneric, (AnimationSetPatcher::CAnimationStateSet*)0x15E8D40);
 
 		return pResult;
 	}
@@ -92,7 +89,7 @@ namespace SUC::System
 		void* pResult = originalInitializeSuperSonicAnimationList();
 
 
-		AddMotionEntriesToSet(m_AnimEntriesSuper, AnimationSetPatcher::s_NewAnimationDataSuper, (AnimationSetPatcher::CAnimationStateSet*)0x1A55980);
+		AddMotionEntriesToSet(AnimationSetPatcher::m_AnimEntriesSuper, AnimationSetPatcher::s_NewAnimationDataSuper, (AnimationSetPatcher::CAnimationStateSet*)0x1A55980);
 
 		return pResult;
 	}

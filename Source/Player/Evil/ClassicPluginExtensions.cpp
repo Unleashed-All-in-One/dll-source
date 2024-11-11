@@ -7,6 +7,8 @@
 #include "../Evil/StateMachine/State/EvilStateRunningJump.h"
 #include "../Evil/StateMachine/State/EvilStateDamageNormal.h"
 #include "../Evil/StateMachine/State/EvilStateWalkSlowE.h"
+#include "../Evil/StateMachine/State/EvilStateRunStop.h"
+#include "StateMachine/State/EvilStateJump.h"
 #include "StateMachine/State/EvilStateRunE.h"
 #include "StateMachine/State/EvilStateWalkE.h"
 
@@ -34,8 +36,8 @@ namespace SUC::Player::Evil
 			CVector2 m_InputVec = CVector2(input->LeftStickHorizontal, input->LeftStickVertical);
 
 			CVector velocity = (cameraForward * (m_InputVec.y())) + (cameraRight * (-m_InputVec.x()));
-			velocity *= (ms_MovementSpeed * 2);
-			velocity *= 30;
+			velocity *= (ms_MovementSpeed * 1.5f );
+			velocity *= 60;
 			velocity *= GetDeltaTime();
 
 			EvilGlobal::s_AnimationSpeed =1000;
@@ -43,7 +45,8 @@ namespace SUC::Player::Evil
 			if (m_InputVec.norm() != 0)
 			{
 				CQuaternion newrot = System::CQuaternionHelper::LookRotation(System::CVectorHelper::normalizedSafe(velocity));
-
+				newrot.x() = context->m_HorizontalRotation.x();
+				newrot.z() = context->m_HorizontalRotation.z();
 				context->m_HorizontalRotation = newrot;
 			}
 			velocity.y() = 0;
@@ -53,6 +56,15 @@ namespace SUC::Player::Evil
 		void CEvilBasicStateBase::UpdateState()
 		{
 			PadMovement();
+		};
+		void CEvilBasicStateBase::CheckForJump()
+		{
+			auto input = InputSingleton;
+			if(input->IsTapped(Sonic::eKeyState_A) && SONIC_CLASSIC_CONTEXT->m_VerticalVelocity.y() >= 0)
+			{
+				
+					SONIC_CLASSIC_CONTEXT->m_pPlayer->m_StateMachine.ChangeState("Evil_Jump");
+			}
 		};
 	
 	//MOVE TO SEPARATE FILES
@@ -164,6 +176,8 @@ namespace SUC::Player::Evil
 			context->m_pPlayer->m_StateMachine.RegisterStateFactory<EvilStateWalkSlowE>();
 			context->m_pPlayer->m_StateMachine.RegisterStateFactory<EvilStateWalkE>();
 			context->m_pPlayer->m_StateMachine.RegisterStateFactory<EvilStateRunE>();
+			context->m_pPlayer->m_StateMachine.RegisterStateFactory<EvilStateRunStop>();
+			context->m_pPlayer->m_StateMachine.RegisterStateFactory<EvilStateJump>();
 			//added = true;
 		}
 	}

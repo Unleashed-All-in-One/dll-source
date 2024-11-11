@@ -14,6 +14,80 @@ namespace SUC::Player::Evil
 {
 	using namespace hh::math;
 	using namespace Sonic;
+	class CPlayer3DNormalCamera : public Hedgehog::Universe::TStateMachine<Sonic::CCamera>::TState
+	{
+	public:
+		struct SParams
+		{
+			float TargetSideSensitive;
+			float TargetSideSensitiveInQuickStep;
+			float m_ParamDashPathSideMoveRate;
+		};
+		struct CListener
+		{
+			void* vftable;
+			BB_INSERT_PADDING(0x0C);
+			Hedgehog::Math::CVector m_Vector01;
+			Hedgehog::Math::CVector m_Vector02;
+			Hedgehog::Math::CVector m_Vector03;
+			boost::shared_ptr<Sonic::CRayCastCollision> m_spRayCastCollision;
+		};
+
+		float m_FovInRadians{};
+		bool m_Field68{};
+		int m_Field6C{};
+		Hedgehog::Math::CVector m_CameraPositionVisual = Hedgehog::Math::CVector::Zero();
+		Hedgehog::Math::CVector m_CameraUpVector = Hedgehog::Math::CVector::Zero();
+		Hedgehog::Math::CVector m_CameraTargetPosition = Hedgehog::Math::CVector::Zero();
+		Hedgehog::Math::CVector m_CameraPositionInputReference = Hedgehog::Math::CVector::Zero();
+		Hedgehog::Math::CVector m_CameraUpVector2 = Hedgehog::Math::CVector::Zero();
+		Hedgehog::Math::CVector m_CameraTargetPosition2 = Hedgehog::Math::CVector::Zero();
+		char m_FieldD0[16]{};
+		int m_FieldE0{};
+		char m_FieldE4[28]{};
+		SParams* m_pParams{};
+		char m_Field104[12]{};
+		void* characterProxy{};
+		float m_CameraRotationUnknown{};
+		float m_CameraTargetPositionY{};
+		int m_Field11C{};
+		Hedgehog::Math::CVector m_TargetFrontOffset = Hedgehog::Math::CVector::Zero();
+		Hedgehog::Math::CVector m_TargetSideOffset = Hedgehog::Math::CVector::Zero();
+		Hedgehog::Math::CVector m_CameraPositionCollision = Hedgehog::Math::CVector::Zero();
+		Hedgehog::Math::CVector m_TargetOffsetPosition = Hedgehog::Math::CVector::Zero();
+		Hedgehog::Math::CVector m_WorkingUpVector = Hedgehog::Math::CVector::Zero();
+		Sonic::CCharacterProxy* m_pCharacterProxy;
+		int m_Field174{};
+		void* m_pBoostCameraPlugin{};
+		void* unk_void{};
+		bool m_IsQuickstepping{};
+		bool m_IsOnBoard{};
+		__int16 gap182{};
+		float m_TargetSideQuickstepTimer{};
+		float m_CameraTargetPitch{};
+		float m_DistanceOffset1{};
+		float m_DistanceOffset2{};
+		char m_Field194[8]{};
+		int m_Field19C{};
+		Hedgehog::Math::CVector m_Field1A0 = Hedgehog::Math::CVector::Zero();
+		float m_CameraOrbitX{};
+		float m_CameraOrbitY{};
+		char m_Field1B8[8]{};
+		Hedgehog::Math::CVector m_DashPathRightVector = Hedgehog::Math::CVector::Zero();
+		Hedgehog::Math::CVector m_DashPathEasePositionTarget = Hedgehog::Math::CVector::Zero();
+		Hedgehog::Math::CVector m_DashPathEasePositionCamera = Hedgehog::Math::CVector::Zero();
+
+		bool m_IsDashPathEasing{};
+		bool m_IsFacingForward{};
+		float m_DashPathEaseTime{};
+		CListener* m_pListener{};
+		char m_Field1FC{};
+		char m_Field1FD{};
+		char m_Field1FE{};
+		char m_Field1FF{};
+	};
+	BB_ASSERT_OFFSETOF(CPlayer3DNormalCamera, m_CameraPositionCollision, 0x140);
+	ASSERT_SIZEOF(CPlayer3DNormalCamera, 0x200);
 	struct MsgResetCamera : public hh::fnd::MessageTypeSet
 	{
 	public:
@@ -73,8 +147,7 @@ namespace SUC::Player::Evil
 	void ChangeAnimation(const char* in_Name)
 	{
 		const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-		const auto spAnimInfo = boost::make_shared<MsgChangePlayerAnimation>(in_Name);
-		playerContext->m_pPlayer->m_AnimationStateMachine->ChangeState(in_Name);
+		playerContext->m_pPlayer->m_spAnimationStateMachine->ChangeState(in_Name);
 	}
 	void RegisterClassicAnimations()
 	{
@@ -82,10 +155,10 @@ namespace SUC::Player::Evil
 		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_damageMB", "evilsonic_damageMB");
 		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_guard_idle", "evilsonic_guard_idle");
 		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_BerserkerS", "evilsonic_BerserkerS");
-		System::AnimationSetPatcher::RegisterClassicAnimation("JumpEvil1", "evilsonic_jumpVS");
-		System::AnimationSetPatcher::RegisterClassicAnimation("JumpEvil2", "evilsonic_jumpVS2");
-		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_dashS", "evilsonic_dashS");
-		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_dash", "evilsonic_dash");
+		System::AnimationSetPatcher::RegisterClassicAnimation("JumpStand", "evilsonic_jumpVS");
+		System::AnimationSetPatcher::RegisterClassicAnimation("JumpSecond", "evilsonic_jumpVS2");
+		System::AnimationSetPatcher::RegisterClassicAnimation("DashS_M", "evilsonic_dashS");
+		System::AnimationSetPatcher::RegisterClassicAnimation("Dash_M", "evilsonic_dash");
 		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_start", "evilsonic_start");
 		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_runS", "evilsonic_runS");
 		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_pillar_idle", "evilsonic_pillar_idle");
@@ -97,10 +170,11 @@ namespace SUC::Player::Evil
 		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_pillar_fall", "evilsonic_pillar_fall", 1, true);
 		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_run", "evilsonic_run", 3);
 		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_runE", "evilsonic_runE");
-		System::AnimationSetPatcher::RegisterClassicAnimation("Evilsonic_dash_jumpS", "evilsonic_dash_jumpS");
-		System::AnimationSetPatcher::RegisterClassicAnimation("WalkSlow_M", "evilsonic_walk_slow", 4, true);
+		System::AnimationSetPatcher::RegisterClassicAnimation("Dash_JumpS", "evilsonic_dash_jumpS");
+		System::AnimationSetPatcher::RegisterClassicAnimation("WalkSlow_M", "evilsonic_walk_slow", 3.5f, true);
 		System::AnimationSetPatcher::RegisterClassicAnimation("Walk_M", "evilsonic_walk", 4, true);
-		System::AnimationSetPatcher::RegisterClassicAnimation("Run_M", "evilsonic_run",4 ,true);
+		System::AnimationSetPatcher::RegisterClassicAnimation("Run_M", "evilsonic_run",3.5f ,true);
+		System::AnimationSetPatcher::RegisterClassicAnimation("RunEnd_M", "evilsonic_runE",2,false);
 	}
 	bool IsCurrentAnimationName(std::string in)
 	{
@@ -933,7 +1007,28 @@ namespace SUC::Player::Evil
 		
 		return originalSonicClassicGetAnimSpeed(This,Edx,a2);
 	}
-	//Hedgehog::Math::CVector *__thiscall sub_DD92B0(_DWORD *this, Hedgehog::Math::CVector *a2)
+	hh::math::CQuaternion m_NewCameraRot;
+	CVector2 camEuler;
+	//int __fastcall Sonic::CPlayer3DNormalCamera::Calculate(CPlayer3DNormalCamera *This)
+	HOOK(int, __fastcall, CPlayer3DNormalCameraCalc, 0x10EC7E0, CPlayer3DNormalCamera* This, void* Edx)
+	{
+		if(IS_CLASSIC_SONIC)
+		{
+			auto input = InputSingleton;
+			CVector2 input2 = CVector2(input->RightStickHorizontal, input->RightStickVertical);
+			camEuler += input2;
+			m_NewCameraRot = System::CQuaternionHelper::FromEuler(camEuler.y(), camEuler.x(), 0);
+
+			const Eigen::Vector3f frontDirection = (m_NewCameraRot * -Eigen::Vector3f::UnitZ()).normalized();
+			This->m_CameraTargetPosition2 = CVector(camEuler.x(), camEuler.y(), 0);
+			This->m_CameraOrbitY = camEuler.y();
+			This->m_CameraPositionCollision = SONIC_CLASSIC_CONTEXT->m_spMatrixNode->m_Transform.m_Position;
+			auto f = originalCPlayer3DNormalCameraCalc(This, Edx);
+			This->GetContext()->m_MyCamera.m_Direction = frontDirection;
+			return 0;
+		}
+		return originalCPlayer3DNormalCameraCalc(This,Edx);
+	}
 
 	void EvilSonic::RegisterPatches()
 	{
@@ -945,6 +1040,7 @@ namespace SUC::Player::Evil
 		INSTALL_HOOK(SonicClassicGetAnimSpeed);
 		INSTALL_HOOK(Classic_UpdateSerial);
 		INSTALL_HOOK(Classic_InitParameters);
+		INSTALL_HOOK(CPlayer3DNormalCameraCalc);
 
 		/// ------------------------------
 		///	Classic patches

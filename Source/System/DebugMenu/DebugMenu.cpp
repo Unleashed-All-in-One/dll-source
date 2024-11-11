@@ -96,6 +96,7 @@ namespace SUC::ImGuiMenu
 			ImGuiInputTextString("ModuleName", &m_Moduletest);
 			if (ImGui::Button("Test module"))
 			{
+
 				System::SequenceHelpers::ChangeModuleByName(m_Moduletest.c_str());
 			}
 			ImGui::SetNextItemOpen(true, ImGuiCond_Appearing);

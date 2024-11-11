@@ -1,6 +1,8 @@
 #pragma once
 #include <hk2010_2_0/hk2010_2_0.h>
 #include <Sonic/Havok/PhysicsWorld.h>
+
+#include "../hk2010_2_0_2.h"
 #include "../BlueBlurCustom/Sonic/System/CharacterProxy.h"
 #include "../hkTest.h"
 #include "../BlueBlurCustom/Sonic/System/CharacterProxy.h"
@@ -32,6 +34,7 @@ using namespace hh::math;
 //		Ctor(this, a2->m_pHkpRigidBody);
 //	}
 //};
+
 namespace SUC::SetObject
 {
 
@@ -43,6 +46,18 @@ namespace SUC::SetObject
 		{
 			mov esi, in_Rb
 			push a2
+			call[pAddr]
+		}
+
+	};
+	inline void __declspec(naked) rigidbodyctor(hk2010_2_0_Conv::hkpRigidBody* in_Rb, hk2010_2_0_Conv::hkpRigidBodyCinfo* a2)
+	{
+		static uint32_t pAddr = 0x009245F0;
+		__asm
+		{
+			mov edx, a2
+			push    edx
+			mov     ecx, in_Rb
 			call[pAddr]
 		}
 
@@ -158,7 +173,7 @@ namespace SUC::SetObject
 				Hedgehog::Mirage::CMatrixNode* in_pMatrixNode,boost::shared_ptr<Hedgehog::Mirage::CMatrixNode> in_spMatrixNode);
 			return fpCGameObject3DAddRigidBody2(in_spRigidBody, this, in_pShape, in_spMatrixNode.get(), in_spMatrixNode);
 		}
-		hk2010_2_0::hkpRigidBody* rb;
+		hk2010_2_0_Conv::hkpRigidBody* rb;
 		bool SetAddColliders(const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
 		{
 			m_spNodeEventCollision = boost::make_shared<Sonic::CMatrixNodeTransform>();
@@ -172,32 +187,33 @@ namespace SUC::SetObject
 			hk2010_2_0::hkpBoxShape* shapeEventTrigger1 = new hk2010_2_0::hkpBoxShape(1, 1, 1);
 
 			BBExt::CCharacterProxy* characterproxy = new BBExt::CCharacterProxy();
-			auto a7 = Sonic::CollisionID({ Sonic::CollisionID::TypeTerrain }, { Sonic::CollisionID::TypeTerrain, Sonic::CollisionID::TypeKeepOffEnemy });
+			//auto a7 = Sonic::CollisionID({ Sonic::CollisionID::TypeTerrain }, { Sonic::CollisionID::TypeTerrain, Sonic::CollisionID::TypeKeepOffEnemy });
 			auto a8 = hh::math::CVector(0, 0, 0);
 			//characterproxy = CtorProxy(this, characterproxy, Sonic::CGameDocument::GetInstance()->GetWorld().get(), shapeEventTrigger1, m_spNodeEventCollision->m_Transform.m_Position, m_spNodeEventCollision->m_Transform.m_Rotation, a7, a8);
 
 			//m_spCharacterProxy = boost::make_shared<BBExt::CCharacterProxy>(this, Sonic::CGameDocument::GetInstance()->GetWorld().get(), shapeEventTrigger1, CVector::Zero(), m_spMatrixNodeTransform->m_Transform.m_Rotation, Sonic::CollisionID({Sonic::CollisionID::TypeTerrain }, {Sonic::CollisionID::TypeTerrain, Sonic::CollisionID::TypeKeepOffEnemy }));
 
 
+			FUNCTION_PTR(void, __thiscall, setMotionType2, 0x00923D50, void* hkpRigidbody, int motionType, int entityActivation, int colFilter);
+			//_WORD *__thiscall hkpWorld::addEntity(int world, _WORD *entity, int initialActivationState)
+			FUNCTION_PTR(void*, __thiscall, addEntity, 0x0090B5D0, hk2010_2_0::hkpWorld* world, void* entity, int activstate);
 			
-			AddEventCollision("Object", shapeEventTrigger1, CollisionLayerID::BasicTerrain, false, m_spNodeNextPos);
+			AddRigidBody(m_spRigidBody, shapeEventTrigger1, CollisionLayerID::BasicTerrain, m_spNodeNextPos);
+			setMotionType2(m_spRigidBody->m_pHkpRigidBody, 1, 1, 0);
 			//void __thiscall sub_10C0E00(_DWORD *this, int a2)
 			//
-
-			//hk2010_2_0::hkpRigidBodyCinfo info = hk2010_2_0::hkpRigidBodyCinfo();
+			//hk2010_2_0_Conv::hkpRigidBodyCinfo info = hk2010_2_0_Conv::hkpRigidBodyCinfo();
 			//info.m_position = hh::math::CVector4(m_spMatrixNodeTransform->m_Transform.m_Position.x(), m_spMatrixNodeTransform->m_Transform.m_Position.y() + 20, m_spMatrixNodeTransform->m_Transform.m_Position.z(), 1);
 			//info.m_mass = 1000.0;
 			//info.m_shape = shapeEventTrigger1;
-			//info.m_motionType = hk2010_2_0::hkpMotion::MOTION_DYNAMIC;
+			//info.m_motionType = hk2010_2_0_Conv::hkpMotion::MOTION_DYNAMIC;
 			//info.m_gravityFactor = 1;
-			//info.m_solverDeactivation = 2;
-			//rb = new hk2010_2_0::hkpRigidBody(info);
-			//rb->setMotionType(hk2010_2_0::hkpMotion::MOTION_DYNAMIC);
-			//Sonic::CGameDocument::GetInstance()->GetWorld()->m_pMember->m_spPhysicsWorld->m_pHkpWorld->addEntity(rb);
+			//rigidbodyctor(rb, &info);
+			//addEntity(Sonic::CGameDocument::GetInstance()->GetWorld()->m_pMember->m_spPhysicsWorld->m_pHkpWorld, rb, 1);
 			//m_spMatrixNodeTransform->NotifyChanged();
 			////m_spRigidBody->m_pPhysicsWorld->m_pHkpWorld->addEntity(m_spRigidBody->m_pHkpRigidBody);
 			//rb->removeReference();
-			//m_spRigidBody->m_pHkpRigidBody = rb;
+			//m_spRigidBody->m_pHkpRigidBody = (hk2010_2_0::hkpRigidBody*)rb;
 
 			//SetMotionType(&m_spRigidBody, 0);
 			//m_spRigidBody->m_pHkpRigidBody->addReference();
@@ -208,6 +224,8 @@ namespace SUC::SetObject
 
 		void SetUpdateParallel(const hh::fnd::SUpdateInfo& in_rUpdateInfo) override
 		{
+
+			return;
 			m_spMatrixNodeTransform->m_Transform.m_Position += m_Velocity;
 			m_AnimatorPose->Update(in_rUpdateInfo.DeltaTime);
 			DebugDrawText::log(SUC::Format("%.3f %.3f %.3f", m_spNodeNextPos->m_Transform.m_Position.x(), m_spNodeNextPos->m_Transform.m_Position.y(), m_spNodeNextPos->m_Transform.m_Position.z()), 0);

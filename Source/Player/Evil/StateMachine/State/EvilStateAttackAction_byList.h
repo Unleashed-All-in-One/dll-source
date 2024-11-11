@@ -49,7 +49,7 @@ namespace SUC::Player::Evil
 		{
 			const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
 			const auto spAnimInfo = boost::make_shared<MsgChangePlayerAnimation>(in_Name);
-			playerContext->m_pPlayer->m_AnimationStateMachine->ChangeState(in_Name);
+			playerContext->m_pPlayer->m_spAnimationStateMachine->ChangeState(in_Name);
 		}
 		CVector GetForward()
 		{

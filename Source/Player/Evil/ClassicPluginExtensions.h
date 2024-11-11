@@ -9,6 +9,7 @@ namespace SUC::Player::Evil
 		
 		void PadMovement() const;
 		void UpdateState() override;
+		static void CheckForJump();
 		static float GetPadIntensity();
 		static inline float ms_StateChangeDelay = 0.5f;
 	};
