@@ -39,7 +39,7 @@ namespace SUC::Player::Evil
 		static constexpr float ms_DecelerationForce = 0.65f;
 		static constexpr float ms_AccelerationForce = 1.4285715f; //pulled from unleashed
 		std::vector<boost::shared_ptr<CAttackHitbox>> collision;
-		SharedPtrTypeless sound;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> sound;
 		const char* prevAnim;
 		SharedPtrTypeless genericEffect;
 		float m_MotionMoveSpeedRatioNew;
@@ -199,7 +199,7 @@ namespace SUC::Player::Evil
 								//genericEffect
 								auto bone = SONIC_CLASSIC_CONTEXT->m_pPlayer->m_spCharacterModel->GetNode(in_Motion.TriggerInfos.Resources[x].NodeName.c_str());
 								if (!genericEffect)
-									Common::fCGlitterCreate(SONIC_CLASSIC_CONTEXT->m_pPlayer->m_spContext.get(), genericEffect, &bone, in_Motion.ResourceInfos.Resources[x].Params.FileName.c_str(), 1);
+									Common::SpawnParticle(SONIC_CLASSIC_CONTEXT->m_pPlayer->m_spContext.get(), genericEffect, &bone, in_Motion.ResourceInfos.Resources[x].Params.FileName.c_str(), 1);
 							}
 						}
 					}
@@ -291,7 +291,7 @@ namespace SUC::Player::Evil
 				if (spAnimInfo->m_Frame >= m_CurrentMotion.AutoTargetEndFrame )
 				{
 					//30.0f is AutoTargetLength
-					ms_AlteredVelocity += SONIC_CLASSIC_CONTEXT->GetFrontDirection() * (m_CurrentMotion.AutoTargetPower * 2.0f);
+					ms_AlteredVelocity += SONIC_CLASSIC_CONTEXT->GetFrontDirection() * (m_CurrentMotion.AutoTargetPower * 20.0f);
 				}				
 			}
 

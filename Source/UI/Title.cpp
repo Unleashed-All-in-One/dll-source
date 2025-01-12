@@ -27,8 +27,8 @@ namespace SUC::UI::TitleScreen
 
 	boost::shared_ptr<Sonic::CCamera> spCamera;
 	static uint32_t cameraInitRan = 0;
-	static AudioHandle stageSelectHandle;
-	static SharedPtrTypeless optionsHandle;
+	static boost::shared_ptr<Hedgehog::Sound::CSoundHandle> stageSelectHandle;
+	static boost::shared_ptr<Hedgehog::Sound::CSoundHandle> optionsHandle;
 	void* TitleStateContextBase;
 
 
@@ -588,7 +588,7 @@ namespace SUC::UI::TitleScreen
 
 					if (currentTitleIndex == Title::ETitleIndexState::Continue && !hasSavefile)
 						currentTitleIndex = Title::ETitleIndexState::Options;
-					MiniAudioHelper::playSound(stageSelectHandle, 0, "Cursor", false);
+					Common::PlaySoundStaticCueName(stageSelectHandle, "sys_worldmap_cursor");
 					CSDCommon::PlayAnimation(rcTitleMenuScroll, "Scroll_Anim_2_1", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0);
 					CSDCommon::PlayAnimation(rcTitleMenu, "Scroll_Anim_2_2", Chao::CSD::eMotionRepeatType_PlayOnce, 1, 0, 100, false, true);
 					UpdateTitleText();
@@ -597,7 +597,7 @@ namespace SUC::UI::TitleScreen
 				if (IsLeftDown() && !moved)
 				{
 					currentTitleIndex = (Title::ETitleIndexState)((int)(currentTitleIndex)-1);
-					MiniAudioHelper::playSound(stageSelectHandle, 0, "Cursor", false);
+					Common::PlaySoundStaticCueName(stageSelectHandle, "sys_worldmap_cursor");
 					if (currentTitleIndex < 0 || currentTitleIndex > maxTitleIndex) //uint32s become huge when going negative
 						currentTitleIndex = (Title::ETitleIndexState)maxTitleIndex;
 
@@ -678,7 +678,7 @@ namespace SUC::UI::TitleScreen
 	};
 	void Title::HideWindow()
 	{
-		MiniAudioHelper::playSound(stageSelectHandle, 1000005, "", false, false);
+		Common::PlaySoundStaticCueName(stageSelectHandle, "sys_worldmap_cansel");
 		bg_window->SetHideFlag(true);
 		fg_window->SetHideFlag(true);
 		txt_window->SetHideFlag(true);
@@ -729,27 +729,23 @@ namespace SUC::UI::TitleScreen
 #pragma region OptionsSubmenu
 
 
-	LanguageType* TitleUI_GetVoiceLanguageType()
-	{
-		uint32_t voiceOverAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x7C, 0x10 });
-		return (LanguageType*)voiceOverAddress;
-	}
+	
 	uint32_t* TitleUI_GetOptionFlag()
 	{
-		uint32_t flagsAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x7C, 0x18 });
+		uint32_t flagsAddress = Common::ComposeAddressFromOffsets(0x1E66B34, { 0x4, 0x1B4, 0x7C, 0x18 });
 		return (uint32_t*)flagsAddress;
 	}
 	float* TitleUI_GetMusicVolume()
 	{
 		// range [0.0 - 0.63]
-		uint32_t musicVolumeAddress = Common::GetMultiLevelAddress(0x1E77290, { 0x38 });
+		uint32_t musicVolumeAddress = Common::ComposeAddressFromOffsets(0x1E77290, { 0x38 });
 		return (float*)musicVolumeAddress;
 	}
 
 	float* TitleUI_GetEffectVolume()
 	{
 		// range [0.0 - 0.63]
-		uint32_t effectVolumeAddress = Common::GetMultiLevelAddress(0x1E77290, { 0x3C });
+		uint32_t effectVolumeAddress = Common::ComposeAddressFromOffsets(0x1E77290, { 0x3C });
 		return (float*)effectVolumeAddress;
 	}
 	void TitleUI_SetMusicVolume(float volume)
@@ -758,7 +754,7 @@ namespace SUC::UI::TitleScreen
 		FUNCTION_PTR(void, __thiscall, SetMusicVolume, 0x75EEF0, void* This, int a2, float volume);
 
 		SetMusicVolume(pCSoundModuleManager, 0, volume);
-		*(uint8_t*)((uint32_t)TitleUI_GetVoiceLanguageType() + 1) = (uint8_t)volume;
+		Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pSaveData->MusicVolume = (uint8_t)volume;
 	}
 
 	void TitleUI_SetEffectVolume(float volume)
@@ -767,7 +763,7 @@ namespace SUC::UI::TitleScreen
 		FUNCTION_PTR(void, __thiscall, SetMusicVolume, 0x75EEF0, void* This, int a2, float volume);
 
 		SetMusicVolume(pCSoundModuleManager, 1, volume);
-		*(uint8_t*)((uint32_t)TitleUI_GetVoiceLanguageType() + 2) = (uint8_t)volume;
+		Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pSaveData->SEVolume = (uint8_t)volume;
 	}
 	int currentOptionMainIndex;
 	bool enteredOptionSub1;

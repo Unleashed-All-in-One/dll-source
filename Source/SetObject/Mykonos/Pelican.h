@@ -11,7 +11,7 @@ namespace SUC::SetObject
 		boost::shared_ptr<Sonic::CMatrixNodeTransform> m_spNodeEventCollision;
 		boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
 		boost::shared_ptr<Hedgehog::Animation::CAnimationPose> m_AnimatorPose;
-		SharedPtrTypeless sound;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> sound;
 		std::vector<SUC::NewAnimationData> animations;
 		float timer;
 		bool isRight = true;

@@ -9,9 +9,9 @@ namespace SUC::Accuracy
 			return "";
 
 		if (sonic->m_Is2DMode)
-			return *pSuperSonicContext ? "ef_ch_sps_lms_bar_trace02" : "ef_ch_sng_lms_bar_trace02";
+			return "ef_ch_sng_lms_bar_trace02";
 
-		return *pSuperSonicContext ? "ef_ch_sps_lms_bar_trace01" : "ef_ch_sng_lms_bar_trace01";
+		return "ef_ch_sng_lms_bar_trace01";
 	}
 	void SwingPole::LocusUpdate()
 	{
@@ -30,11 +30,11 @@ namespace SUC::Accuracy
 		if (!sonic)
 			return;
 
-		if (!Common::CheckPlayerNodeExist("Foot_L"))
+		if (!Common::DoesNodeExistOnSonic("Foot_L"))
 			return;
 
 		boost::shared_ptr<Hedgehog::Mirage::CMatrixNodeSingleElementNode> FootNode = sonic->m_pPlayer->m_spCharacterModel->GetNode("Foot_L");
-		Common::fCGlitterCreate(sonic, s_SwingHandle, &FootNode, GetPoleSwingParticle(), 1);
+		Common::SpawnParticle(sonic, s_SwingHandle, &FootNode, GetPoleSwingParticle(), 1);
 	}
 	void SwingPole::TrailUpdate()
 	{
@@ -43,29 +43,30 @@ namespace SUC::Accuracy
 		if (!sonic)
 			return;
 
-		if (!Common::CheckPlayerNodeExist("Foot_L"))
+		if (!Common::DoesNodeExistOnSonic("Foot_L"))
 			return;
+		auto animName = sonic->m_pPlayer->m_spAnimationStateMachine->GetCurrentState()->GetStateName();
 
-		if (Common::SonicContextIsAnimation("PoleSpinLoop") && !s_TrailPlayed)
+		if (animName == "PoleSpinLoop" && !s_TrailPlayed)
 		{
 			PlayTrail();
 			s_TrailPlayed = true;
 		}
-		else if (!Common::SonicContextIsAnimation("PoleSpinLoop") && s_TrailPlayed)
+		else if (animName != "PoleSpinLoop" && s_TrailPlayed)
 		{
-			Common::fCGlitterEnd(sonic, s_SwingHandle, true);
+			Common::KillParticle(sonic, s_SwingHandle, true);
 			s_TrailPlayed = false;
 		}
 	}
 	bool SwingPole::IsSwingJump()
 	{
-		return strstr(Common::SonicContextGetAnimationName(), "PoleSpinJump");
+		return strstr(SONIC_GENERAL_CONTEXT->m_pPlayer->m_spAnimationStateMachine->GetCurrentState()->GetStateName().c_str(), "PoleSpinJump");
 	}
 	HOOK(void, __fastcall, PoleUpdate, 0xE6BF20, void* This, void* Edx, float* dt)
 	{
 		originalPoleUpdate(This, Edx, dt);
 
-		if (!*pModernSonicContext)
+		if (!SONIC_MODERN_CONTEXT)
 			return;
 
 		SwingPole::LocusUpdate();

@@ -3,15 +3,15 @@ namespace SUC::Gameplay
 {
 	void OnRing(hh::fnd::Message& msg, bool superRing = false)
 	{
-		if (!*pModernSonicContext)
+		auto context = SONIC_MODERN_CONTEXT;
+		if (!context)
 			return;
 
-		Sonic::Player::CPlayerSpeedContext* context = Sonic::Player::CPlayerSpeedContext::GetInstance();
 		if (context->m_pPlayer->m_ActorID != msg.m_SenderActorID)
 			return;
-
-		if (*Common::GetPlayerBoost() < 100.0f)
-			*Common::GetPlayerBoost() = std::clamp(*Common::GetPlayerBoost() + (superRing ? RingEnergy::m_SuperRingAdd : RingEnergy::m_RingAdd), 0.0f, 100.0f);
+		float m_PlayerBoost = SONIC_MODERN_CONTEXT->m_ChaosEnergy;
+		if (m_PlayerBoost < 100.0f)
+			SONIC_MODERN_CONTEXT->m_ChaosEnergy = std::clamp(m_PlayerBoost + (superRing ? RingEnergy::m_SuperRingAdd : RingEnergy::m_RingAdd), 0.0f, 100.0f);
 	}
 	HOOK(void, __fastcall, CObjRingProcMsgHitEventCollision, 0x10534B0, Sonic::CGameObject3D* This, void* Edx, hh::fnd::Message& in_rMsg)
 	{
@@ -26,12 +26,12 @@ namespace SUC::Gameplay
 	HOOK(void, __fastcall, RingEnergyUpdate, 0xE6BF20, void* This, void* Edx, float* dt)
 	{
 		originalRingEnergyUpdate(This, Edx, dt);
-
-		if (!*pModernSonicContext)
+		auto context = SONIC_MODERN_CONTEXT;
+		if (!context)
 			return;
-
-		if (Common::GetSonicStateFlags()->Drifting && *Common::GetPlayerBoost() < 100.0f)
-			*Common::GetPlayerBoost() = std::clamp(*Common::GetPlayerBoost() + (Common::GetSonicStateFlags()->Boost ? RingEnergy::m_DriftAdd * 0.4f : RingEnergy::m_DriftAdd) * *dt, 0.0f, 100.0f);
+		
+		if (context->GetStateFlag(Sonic::Player::CPlayerSpeedContext::eStateFlag_Drifting) && context->m_ChaosEnergy < 100.0f)
+			context->m_ChaosEnergy = std::clamp(context->m_ChaosEnergy + (context->GetStateFlag(Sonic::Player::CPlayerSpeedContext::eStateFlag_Boost) ? RingEnergy::m_DriftAdd * 0.4f : RingEnergy::m_DriftAdd) * (*dt), 0.0f, 100.0f);
 	}
 	void RingEnergy::RegisterHooks()
 	{

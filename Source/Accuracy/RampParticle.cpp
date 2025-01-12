@@ -5,18 +5,18 @@ namespace SUC::Accuracy
 
 	void CreateRampParticle()
 	{
-		if (!*pModernSonicContext)
+		if (!SONIC_MODERN_CONTEXT)
 			return;
 
-		void* middlematrixNode = (void*)((uint32_t)*PLAYER_CONTEXT + 0x30);
-		Common::fCGlitterCreate(*PLAYER_CONTEXT, rampParticleHandle, middlematrixNode, "ef_ch_sng_lms_jump_delux", 1);
+
+		Common::SpawnParticle(SONIC_MODERN_CONTEXT, rampParticleHandle, SONIC_MODERN_CONTEXT->m_spField30.get(), "ef_ch_sng_lms_jump_delux", 1);
 	}
 	void PlayRampAnimation()
 	{
-		if (!*pModernSonicContext)
+		if (!SONIC_MODERN_CONTEXT)
 			return;
 
-		Common::SonicContextChangeAnimation("JumpBoardLoop");
+		Common::ChangePlayerAnimation("JumpBoardLoop");
 	}
 	//https://github.com/brianuuu/DllMods/blob/master/Source/ColorsVoice/Mod.cpp
 	//https://github.com/brianuuu/DllMods/blob/master/Source/Sonic06DefinitiveExperience/NextGenPhysics.cpp
@@ -24,12 +24,12 @@ namespace SUC::Accuracy
 	{
 		originalRampApplyImpulse(This, Edx, message);
 
-		if (!*pModernSonicContext)
+		if (!SONIC_MODERN_CONTEXT)
 			return;
 
-		if (message->m_impulseType == ImpulseType::JumpBoardSpecial)
+		if (message->m_ImpulseType == MsgApplyImpulse::eImpulseType_JumpBoardSpecial)
 			CreateRampParticle();
-		else if (message->m_impulseType == ImpulseType::JumpBoard)
+		else if (message->m_ImpulseType == MsgApplyImpulse::eImpulseType_JumpBoard)
 			PlayRampAnimation();
 	}
 	void RampParticle::RegisterHooks()

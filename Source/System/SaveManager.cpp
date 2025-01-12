@@ -34,7 +34,7 @@ namespace SUC::System
 	HOOK(void*, __fastcall, SaveManager_InitializePlayer, 0x00D96110, void* This)
 	{
 		void* result = originalSaveManager_InitializePlayer(This);
-		uint32_t* livesCount = (uint32_t*)Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x7C, 0x9FDC });
+		uint32_t* livesCount = (uint32_t*)Common::ComposeAddressFromOffsets(0x1E66B34, { 0x4, 0x1B4, 0x7C, 0x9FDC });
 		*livesCount = SaveManager::GetCurrentSave()->m_Lives;
 		return result;
 	}
@@ -45,7 +45,7 @@ namespace SUC::System
 			std::string stageID = std::string(Sonic::CApplicationDocument::GetInstance()->m_pMember->m_spGameParameter->m_pStageParameter->TerrainArchiveName.c_str());
 			auto saveObj = SaveManager::GetCurrentSave();
 			DebugDrawText::log("Saving data for stage...", 10);
-			const size_t liveCountAddr = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x7C, 0x9FDC });
+			const size_t liveCountAddr = Common::ComposeAddressFromOffsets(0x1E66B34, { 0x4, 0x1B4, 0x7C, 0x9FDC });
 			saveObj->m_Lives = *(int*)liveCountAddr;
 			int stageDataIndex = saveObj->GetStageDataIndexFromID(stageID);
 			if (stageDataIndex == -1)
@@ -95,7 +95,7 @@ namespace SUC::System
 		//WRITE_JUMP(0x00D5572E, 0x00D5581D);
 		//INSTALL_HOOK(CApplicationSettingImpl_SetEnableSaveLoad);
 		INSTALL_HOOK(SaveManager_InitializePlayer);
-		INSTALL_HOOK(SaveManager_CGameplayFlowStage_CStateGoalBegin);
+		//INSTALL_HOOK(SaveManager_CGameplayFlowStage_CStateGoalBegin);
 		INSTALL_HOOK(CSaveLoadTestPC_SaveContentsExist);
 		INSTALL_HOOK(CSaveLoadTestPC_SaveContentsSave);
 		INSTALL_HOOK(CSaveLoadTestPC_SaveContentsDelete);

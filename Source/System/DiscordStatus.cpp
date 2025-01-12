@@ -12,7 +12,7 @@ namespace SUC::System::Discord
 	{
 		if(m_IsActive)
 		{
-			char const* eventName = *(char**)Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x2C });
+			char const* eventName = *(char**)Common::ComposeAddressFromOffsets(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x2C });
 			m_isEvent = !std::string(eventName).empty();
 
 			if (!m_isEvent)
@@ -30,16 +30,16 @@ namespace SUC::System::Discord
 	{
 		if (!m_IsActive)
 			return;
-		uint8_t stageID = Common::GetCurrentStageID() & 0xFF;
-		static char* stageName = *(char**)(4 * stageID + 0x1E66B48);
-		stageName[5] = '0' + ((Common::GetCurrentStageID() & 0xFF00) >> 8);
-		s_UseTimestamp = timestamp;
+		//uint8_t stageID = Common::GetCurrentStageID() & 0xFF;
+		//static char* stageName = *(char**)(4 * stageID + 0x1E66B48);
+		//stageName[5] = '0' + ((Common::GetCurrentStageID() & 0xFF00) >> 8);
+		//s_UseTimestamp = timestamp;
 		for (EDiscordPresenceData data : presenceData)
 		{
-			if (std::string(stageName) == data.id)
-			{
-				ChangeInformation(data);
-			}
+			//if (std::string(stageName) == data.id)
+			//{
+			//	ChangeInformation(data);
+			//}
 		}
 	}
 	void DiscordStatus::ChangeInformation(EDiscordPresenceData data)

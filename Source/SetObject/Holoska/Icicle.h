@@ -35,7 +35,7 @@ namespace SUC::SetObject
 		boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
 		boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody2;
 		boost::shared_ptr<Hedgehog::Animation::CAnimationPose> m_AnimatorPose;
-		SharedPtrTypeless sound;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> sound;
 		std::vector<SUC::NewAnimationData> animations;
 		void AddImpulse(Sonic::CRigidBody* f, Hedgehog::math::CVector a1)
 		{

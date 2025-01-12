@@ -6,7 +6,7 @@ namespace SUC::SetObject
 	HelpCaptionUIContainer* Hintring::m_HintUI;
 	HOOK(void*, __fastcall, InitializePlayer, 0x00D96110, void* This)
 	{
-		uint32_t stageIDAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
+		uint32_t stageIDAddress = Common::ComposeAddressFromOffsets(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 		char** stageName = (char**)stageIDAddress;
 		std::string path = std::format(HINTSFILE_NAME_FORMAT, SUC::Project::s_ModPath, std::string(*stageName)).c_str();
 		std::ifstream jsonFile;
@@ -55,7 +55,7 @@ namespace SUC::SetObject
 								{
 									//todo: match only if locale is the same as ingame
 									int locale = hintString["locale"].asInt();
-									if (locale == (int)Common::GetUILanguageType())
+									if (locale == (int)Sonic::CApplicationDocument::GetInstance()->m_UILanguage)
 										data->hintData[latestData]->hintScreens[latestScreen]->text = hintString["string"].asString();
 								}
 							}

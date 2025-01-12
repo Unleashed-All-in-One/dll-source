@@ -6,7 +6,7 @@ namespace SUC::Player::Evil
 	public:
 		static constexpr const char* ms_pStateName = "EvilDamageNormal";
 		float lastFrame;
-		SharedPtrTypeless soundHandle;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> soundHandle;
 		void EnterState() override
 		{
 			Common::PlaySoundStaticCueName(soundHandle, "V_WHG_014");

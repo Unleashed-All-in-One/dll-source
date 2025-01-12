@@ -86,7 +86,7 @@ namespace SUC::Accuracy
 	HOOK(void, __fastcall, CHudSonicStageDelayProcessImpEXP, 0x109A8D0, Sonic::CGameObject* This)
 	{
 		originalCHudSonicStageDelayProcessImpEXP(This);
-		if (!*pModernSonicContext)
+		if (!SONIC_MODERN_CONTEXT)
 			return
 
 		CHudSonicStageRemoveCallbackEXP(This, nullptr, nullptr);

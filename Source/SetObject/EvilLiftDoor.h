@@ -20,7 +20,7 @@ namespace SUC::SetObject
 		float yNormal;
 		float counterB;
 		bool complete;
-		SharedPtrTypeless soundGrunt;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> soundGrunt;
 		static EvilQTEUI* m_ItemBoxUI;
 		bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override
 		{

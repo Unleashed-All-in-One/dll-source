@@ -59,7 +59,6 @@
 #define DEBUG_DRAW_TEXT_DLL_IMPORT
 #include <DebugDrawText.h>
 #include <Common.h>
-#include <StateManager.h>
 #include "System/ArchiveTreePatcher.h"
 #include "System/SequenceHelpers.h"
 #include "Project.h"

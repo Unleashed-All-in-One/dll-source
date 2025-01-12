@@ -78,10 +78,10 @@ public:
 		StatManager* statsDay;
 		StatManager* statsNight;
 
-		SharedPtrTypeless m_WooshSound;
-		SharedPtrTypeless m_SelectHandle;
-		SharedPtrTypeless m_SwitchHandle;
-		SharedPtrTypeless m_EndHandle;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> m_WooshSound;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> m_SelectHandle;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> m_SwitchHandle;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> m_EndHandle;
 
 		boost::shared_ptr<Sonic::CGameObjectCSD> m_spStatus;
 		Chao::CSD::RCPtr<Chao::CSD::CProject> m_rcStatus;

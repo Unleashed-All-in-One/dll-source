@@ -11,7 +11,7 @@ namespace SUC::SetObject
         boost::shared_ptr<Sonic::CRigidBody> m_spRigidBody;
         bool m_playerInsideCollider;
         SharedPtrTypeless particle = nullptr;
-        SharedPtrTypeless sound = nullptr;
+        boost::shared_ptr<Hedgehog::Sound::CSoundHandle> sound = nullptr;
         float m_CollisionWidth = 1;
         float m_CollisionHeight = 1;
         float m_CollisionLength = 1;
@@ -31,8 +31,8 @@ namespace SUC::SetObject
                     if (in_rMsg.m_SenderActorID == playerContext->m_pPlayer->m_ActorID)
                     {
                         if (particle == nullptr && abs(playerContext->m_Velocity.norm()) >= playerContext->m_spParameter->Get<float>(Sonic::Player::ePlayerSpeedParameter_ParaloopMinSpeed)) {
-                            void* matrixNode = (void*)((uint32_t)*PLAYER_CONTEXT + 0x30);
-                            Common::fCGlitterCreate(playerContext, particle, matrixNode, *pSuperSonicContext ? "ef_ch_sps_lms_paraloop02" : "ef_ch_sng_lms_paraloop02", 0);
+                            void* matrixNode = SONIC_GENERAL_CONTEXT->m_spField30.get();
+                            Common::SpawnParticle(playerContext, particle, matrixNode, "ef_ch_sng_lms_paraloop02", 0);
                             Common::PlaySoundStaticCueName(sound, "suc_paraloop");
                         }
                         m_playerInsideCollider = true;
@@ -61,7 +61,7 @@ namespace SUC::SetObject
         void StopParaloop()
         {
             const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-            Common::fCGlitterEnd(playerContext, particle, true);
+            Common::KillParticle(playerContext, particle, true);
             particle = nullptr;
             m_playerInsideCollider = false;
         }

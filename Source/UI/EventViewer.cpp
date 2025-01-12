@@ -10,7 +10,7 @@ namespace SUC::UI::Event
 	bool doCount = true;
 	EventViewer::InspireResource* resource;
 	EventViewer::Trigger* nextTrigger;
-	AudioHandle soundhandle;
+	boost::shared_ptr<Hedgehog::Sound::CSoundHandle> soundhandle;
 	SharedPtrTypeless handle;
 	int currentEventIndex = 0;
 	int startFrameTime;

@@ -5,7 +5,7 @@ namespace SUC::Gameplay
 	float m_InputResetTimer = -1;
 	float m_SweepkickCollisionTime = 0.0f;
 	SharedPtrTypeless m_SquatKickParticleHandle;
-	SharedPtrTypeless m_SquatKickSoundHandle;
+	boost::shared_ptr<Hedgehog::Sound::CSoundHandle> m_SquatKickSoundHandle;
 	Hedgehog::Math::CQuaternion m_SquatKickRotation;
 	bool m_IsSweepkickActive = false;
 
@@ -21,13 +21,13 @@ namespace SUC::Gameplay
 			return;
 
 		boost::shared_ptr<Hedgehog::Mirage::CMatrixNodeSingleElementNode> RefNode = context->m_pPlayer->m_spCharacterModel->GetNode("Reference");
-		Common::fCGlitterCreate(context, m_SquatKickParticleHandle, &RefNode, (Common::IsPlayerSuper() ? "ef_ch_sps_lms_sliding_kick" : "ef_ch_sng_lms_sliding_kick"), 0);
+		Common::SpawnParticle(context, m_SquatKickParticleHandle, &RefNode, "ef_ch_sng_lms_sliding_kick", 0);
 
 		Common::PlaySoundStatic(m_SquatKickSoundHandle, 2002497);
 
 		if (Sweepkick::s_UseLight) 
 		{
-			m_SweepLight.Color = Common::IsPlayerSuper() ? Sweepkick::s_ColorSuper : Sweepkick::s_ColorGeneric;
+			m_SweepLight.Color = Sweepkick::s_ColorGeneric;
 			m_SweepLight.Play();
 		}
 
@@ -47,14 +47,13 @@ namespace SUC::Gameplay
 		originalCSonicStateSquatKickAdvance(This);
 	}
 
-	// Original Code by Briannu
 	bool __fastcall CSonicStateSquatKickAdvanceTransitionOutImpl(char const* name)
 	{
-		Eigen::Vector3f inputDirection;
-		if (strcmp(name, "Stand") == 0 && Sweepkick::s_TransitionToStand && Common::GetWorldInputDirection(inputDirection) && inputDirection.isZero())
+		auto context = SONIC_GENERAL_CONTEXT;
+		if (strcmp(name, "Stand") == 0 && Sweepkick::s_TransitionToStand && context->m_WorldInput.isZero())
 		{
-			StateManager::ChangeState(StateAction::Squat, *PLAYER_CONTEXT);
-			Common::SonicContextChangeAnimation("SquatToStand");
+			context->ChangeState(Sonic::Player::ePlayerSpeedState_Squat);
+			Common::ChangePlayerAnimation("SquatToStand");
 			return true;
 		}
 
@@ -99,7 +98,7 @@ namespace SUC::Gameplay
 		bool canSquatKick = m_IsBButtonPressed == 2
 			&& m_InputResetTimer > 0.0f
 			&& (state == "Squat" || state == "Sliding" || state == "Walk" || state == "SlidingEnd" || state == "StompingLand" || state == "SquatCharge")
-			&& !Common::IsPlayerControlLocked();
+			&& !sonic->GetStateFlag(Sonic::Player::CPlayerSpeedContext::eStateFlag_AirOutOfControl);
 
 		if (!canSquatKick)
 			return;
@@ -114,7 +113,7 @@ namespace SUC::Gameplay
 	{
 		originalSweepkickOnUpdate(This, Edx, dt);
 
-		if (!*pModernSonicContext)
+		if (!SONIC_MODERN_CONTEXT)
 			return;
 
 		Sonic::Player::CPlayerSpeedContext* sonic = Sonic::Player::CPlayerSpeedContext::GetInstance();
@@ -127,7 +126,7 @@ namespace SUC::Gameplay
 		if (m_SweepkickCollisionTime > 0)
 			m_SweepkickCollisionTime -= *dt;
 
-		if (input.IsTapped(Sonic::eKeyState_B) && !Common::GetSonicStateFlags()->OutOfControl)
+		if (input.IsTapped(Sonic::eKeyState_B) && !SONIC_MODERN_CONTEXT->GetStateFlag(Sonic::Player::CPlayerSpeedContext::eStateFlag_OutOfControl))
 			Onm_IsBButtonPressed(sonic, state);
 
 		if ((state == "SquatKick" || m_IsSweepkickActive) && sonic->m_Velocity.norm() == 0.0f)
@@ -135,14 +134,14 @@ namespace SUC::Gameplay
 
 		if (m_IsSweepkickActive && (state != "Squat" && state != "Sliding" && state != "Stand" && state != "Walk" && state != "SlidingEnd" && state != "StompingLand" && state != "SquatCharge" && state != "SquatKick")) 
 		{
-			Common::fCGlitterEnd(sonic, m_SquatKickParticleHandle, true);
+			Common::KillParticle(sonic, m_SquatKickParticleHandle, true);
 			m_SweepLight.Stop(true);
 			m_IsSweepkickActive = false;
 		}
 
-		if (m_IsSweepkickActive && state == "Walk" && Common::GetSonicStateFlags()->OutOfControl) 
+		if (m_IsSweepkickActive && state == "Walk" && SONIC_MODERN_CONTEXT->GetStateFlag(Sonic::Player::CPlayerSpeedContext::eStateFlag_OutOfControl))
 		{
-			Common::fCGlitterEnd(sonic, m_SquatKickParticleHandle, true);
+			Common::KillParticle(sonic, m_SquatKickParticleHandle, true);
 			m_SweepLight.Stop(true);
 			m_IsSweepkickActive = false;
 		}
@@ -160,7 +159,7 @@ namespace SUC::Gameplay
 	}
 	HOOK(int, __fastcall, ProcMsgRestartStageSweepkick, 0xE76810, uint32_t* This, void* Edx, void* message)
 	{
-		if (*pModernSonicContext && Sweepkick::s_UseLight)
+		if (SONIC_MODERN_CONTEXT && Sweepkick::s_UseLight)
 			m_SweepLight.Stop(true);
 
 		return originalProcMsgRestartStageSweepkick(This, Edx, message);

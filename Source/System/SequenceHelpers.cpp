@@ -15,7 +15,7 @@ namespace SUC::System
 {
 	Sonic::Sequence::CSequenceMode* ChangeSequenceMode(const char* in_NewSequenceName)
 	{
-		IS_DEMO = true;
+		IS_DEMO = false;
 		Sonic::Sequence::CModeCreaterListImpl* m_pModeFactory = Sonic::Sequence::CModeCreaterListImpl::GetInstance();
 
 		boost::shared_ptr<Sonic::Sequence::CSequenceMainImpl> spSequenceMain =

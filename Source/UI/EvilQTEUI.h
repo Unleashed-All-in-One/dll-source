@@ -9,7 +9,7 @@ public:
 	Chao::CSD::RCPtr<Chao::CSD::CScene> rcTypePress;
 	bool isChainPress;
 	int btnType;
-	SharedPtrTypeless soundEffect;
+	boost::shared_ptr<Hedgehog::Sound::CSoundHandle> soundEffect;
 	static EvilQTEUI* Generate(Sonic::CGameObject* Parent, bool isChainPr, int btnty)
 	{
 		EvilQTEUI* dataOut = new EvilQTEUI();

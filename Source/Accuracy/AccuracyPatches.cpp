@@ -124,6 +124,8 @@ namespace SUC::Accuracy
 	}
 	void AccuracyPatches::RegisterHooks()
 	{
+		STAGEACT_FADEWAIT = 0.2f;
+
 		//Make IronPole swingable for the werehog
 		INSTALL_HOOK(Sonic_CObjIronPole_UpdateSerial);
 

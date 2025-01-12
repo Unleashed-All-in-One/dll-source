@@ -202,7 +202,7 @@ namespace SUC::UI::Event
 	void __cdecl SubtitleUI::AddCaptionImpl(uint32_t* owner, uint32_t* caption, float duration, bool isCutscene)
 	{
 		// Caption disabled
-		if ((*(uint8_t*)Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x7C, 0x18 }) & 0x10) == 0)
+		if ((*(uint8_t*)Common::ComposeAddressFromOffsets(0x1E66B34, { 0x4, 0x1B4, 0x7C, 0x18 }) & 0x10) == 0)
 		{
 			return;
 		}
@@ -217,12 +217,12 @@ namespace SUC::UI::Event
 		}
 		s_CaptionData.m_Owner = owner;
 		s_CaptionData.m_CaptionStart = captionList;
-		s_CaptionData.m_IsCutscene = isCutscene && (Common::GetCurrentStageID() & 0xFF) != SMT_blb;
+		s_CaptionData.m_IsCutscene = isCutscene;
 
 		SubtitleUI::CaptionData::Caption newCaption;
 		newCaption.m_Duration = duration;
 
-		bool isJapanese = Common::GetUILanguageType() == LT_Japanese;
+		bool isJapanese = Sonic::CApplicationDocument::GetInstance()->m_UILanguage == Sonic::eLanguage_Japanese;
 		bool adjustLineBreak = !s_CaptionData.m_IsCutscene;
 
 		std::wstring str;

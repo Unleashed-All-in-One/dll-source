@@ -107,8 +107,8 @@ namespace SUC::Player::Evil
 	public:
 		HH_FND_MSG_MAKE_TYPE(0x01681FA0);
 	};
-	SharedPtrTypeless sound, soundUnleash, soundUnleashStart;
-	SharedPtrTypeless soundRegularJump;
+	boost::shared_ptr<Hedgehog::Sound::CSoundHandle> sound, soundUnleash, soundUnleashStart;
+	boost::shared_ptr<Hedgehog::Sound::CSoundHandle> soundRegularJump;
 	SharedPtrTypeless indexParticle_L, indexParticle_R;
 	SharedPtrTypeless middleParticle_L, middleParticle_R;
 	SharedPtrTypeless pinkyParticle_L, pinkyParticle_R;
@@ -144,11 +144,6 @@ namespace SUC::Player::Evil
 	WerehogState currentState;
 
 	std::string lastMusicCue;
-	void ChangeAnimation(const char* in_Name)
-	{
-		const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-		playerContext->m_pPlayer->m_spAnimationStateMachine->ChangeState(in_Name);
-	}
 	void RegisterClassicAnimations()
 	{
 		//Register some of the basic non-attack anims
@@ -194,7 +189,7 @@ namespace SUC::Player::Evil
 			SONIC_GENERAL_CONTEXT->m_Velocity += impulse;
 		}
 	}
-	void AddJumpThrust(CSonicContext* sonicContext, bool Condition)
+	void AddJumpThrust(Sonic::Player::CPlayerContext* sonicContext, bool Condition)
 	{
 		uint32_t func = 0x00E57C50;
 		__asm
@@ -210,7 +205,7 @@ namespace SUC::Player::Evil
 		const auto spAnimInfo = boost::make_shared<Sonic::Message::MsgGetAnimationInfo>();
 		playerContext->m_pPlayer->SendMessageImm(playerContext->m_pPlayer->m_ActorID, spAnimInfo);
 		const char* animName = name.c_str();
-		ChangeAnimation(animName);
+		Common::ChangePlayerAnimation(animName);
 	}
 	float GetVelocity()
 	{
@@ -284,7 +279,7 @@ namespace SUC::Player::Evil
 		{
 			auto ref = playerContext->m_pPlayer->m_spCharacterModel->GetNode("Reference");
 			if (!referenceEffect)
-				Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), referenceEffect, &ref, boneless.c_str(), 1);
+				Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), referenceEffect, &ref, boneless.c_str(), 1);
 		}
 		if (!glitterNameLeft.empty())
 		{
@@ -296,21 +291,21 @@ namespace SUC::Player::Evil
 				auto ring = playerContext->m_pPlayer->m_spCharacterModel->GetNode("Ring1_L");
 				auto thumb = playerContext->m_pPlayer->m_spCharacterModel->GetNode("Thumb1_L");
 				if (!indexParticle_L)
-					Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), indexParticle_L, &index, glitterNameLeft.c_str(), 1);
+					Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), indexParticle_L, &index, glitterNameLeft.c_str(), 1);
 				if (!middleParticle_L)
-					Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), middleParticle_L, &middle, glitterNameLeft.c_str(), 1);
+					Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), middleParticle_L, &middle, glitterNameLeft.c_str(), 1);
 				if (!pinkyParticle_L)
-					Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), pinkyParticle_L, &pinky, glitterNameLeft.c_str(), 1);
+					Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), pinkyParticle_L, &pinky, glitterNameLeft.c_str(), 1);
 				if (!ringParticle_L)
-					Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), ringParticle_L, &ring, glitterNameLeft.c_str(), 1);
+					Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), ringParticle_L, &ring, glitterNameLeft.c_str(), 1);
 				if (!thumbParticle_L)
-					Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), thumbParticle_L, &thumb, glitterNameLeft.c_str(), 1);
+					Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), thumbParticle_L, &thumb, glitterNameLeft.c_str(), 1);
 			}
 			else
 			{
 				auto hand = playerContext->m_pPlayer->m_spCharacterModel->GetNode("Arm09Sub_L");
 				if (!punch)
-					Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), punch, &hand, glitterNameLeft.c_str(), 1);
+					Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), punch, &hand, glitterNameLeft.c_str(), 1);
 			}
 		}
 		if (!glitterNameRight.empty())
@@ -323,21 +318,21 @@ namespace SUC::Player::Evil
 				auto ring = playerContext->m_pPlayer->m_spCharacterModel->GetNode("Ring1_R");
 				auto thumb = playerContext->m_pPlayer->m_spCharacterModel->GetNode("Thumb1_R");
 				if (!indexParticle_R)
-					Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), indexParticle_R, &index, glitterNameRight.c_str(), 1);
+					Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), indexParticle_R, &index, glitterNameRight.c_str(), 1);
 				if (!middleParticle_R)
-					Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), middleParticle_R, &middle, glitterNameRight.c_str(), 1);
+					Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), middleParticle_R, &middle, glitterNameRight.c_str(), 1);
 				if (!pinkyParticle_R)
-					Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), pinkyParticle_R, &pinky, glitterNameRight.c_str(), 1);
+					Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), pinkyParticle_R, &pinky, glitterNameRight.c_str(), 1);
 				if (!ringParticle_R)
-					Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), ringParticle_R, &ring, glitterNameRight.c_str(), 1);
+					Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), ringParticle_R, &ring, glitterNameRight.c_str(), 1);
 				if (!thumbParticle_R)
-					Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), thumbParticle_R, &thumb, glitterNameRight.c_str(), 1);
+					Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), thumbParticle_R, &thumb, glitterNameRight.c_str(), 1);
 			}
 			else
 			{
 				auto hand = playerContext->m_pPlayer->m_spCharacterModel->GetNode("Arm09Sub_R");
 				if (!punch)
-					Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), punch, &hand, glitterNameRight.c_str(), 1);
+					Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), punch, &hand, glitterNameRight.c_str(), 1);
 			}
 		}
 	}
@@ -355,11 +350,11 @@ namespace SUC::Player::Evil
 		auto node1 = playerContext->m_pPlayer->m_spCharacterModel->GetNode("Hand_R");
 		auto node2 = playerContext->m_pPlayer->m_spCharacterModel->GetNode("Hand_L");
 		if (!berserk[0])
-			Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), berserk[0], &node0, "evil_berserk01", 1);
+			Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), berserk[0], &node0, "evil_berserk01", 1);
 		if (!berserk[1])
-			Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), berserk[1], &node1, "evil_berserk01", 1);
+			Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), berserk[1], &node1, "evil_berserk01", 1);
 		if (!berserk[2])
-			Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), berserk[2], &node2, "evil_berserk01", 1);
+			Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), berserk[2], &node2, "evil_berserk01", 1);
 	}
 	void PlaySoundStaticCueName2(SharedPtrTypeless& soundHandle, Hedgehog::base::CSharedString cueID, CVector a4)
 	{
@@ -374,7 +369,7 @@ namespace SUC::Player::Evil
 	{
 		lastAttackIndex = attackIndex;
 		auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-		Common::SonicContextSetCollision(SonicCollision::TypeSonicSquatKick, true);
+		//Common::SonicContextSetCollision(SonicCollision::TypeSonicSquatKick, true);
 
 		auto node = playerContext->m_pPlayer->m_spCharacterModel->GetNode("Hand_R");
 		DebugDrawText::log(std::format("Matrix 0 {0}, {1}, {2}", node->GetWorldMatrix().data()[0], node->GetWorldMatrix().data()[1], node->GetWorldMatrix().data()[2]).c_str(), 10);
@@ -500,18 +495,16 @@ namespace SUC::Player::Evil
 	}
 	void CheckForThinPlatform()
 	{
-		Eigen::Vector4f outPos;
-
-		const uint32_t result = *(uint32_t*)((uint32_t) * (void**)((uint32_t)*PLAYER_CONTEXT + 0x110) + 172);
-		float* position = (float*)(*(uint32_t*)(result + 16) + 112);
-		const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
-		Eigen::Vector4f const rayLeftStart(position[0] - 1, position[1], position[2], 1.0f);
-		Eigen::Vector4f const rayLeftEnd(position[0] - 1, position[1], position[2] - 5, 1.0f);
-		Eigen::Vector4f outNormal;
-		if (Common::fRaycast(rayLeftStart, rayLeftStart, outPos, outNormal, *(uint32_t*)0x1E0AFB4))
-		{
-			DebugDrawText::log("Left Hit!", 0);
-		}
+		//Eigen::Vector4f outPos;
+		//
+		//const auto playerContext = Sonic::Player::CPlayerSpeedContext::GetInstance();
+		//Eigen::Vector4f const rayLeftStart(position[0] - 1, position[1], position[2], 1.0f);
+		//Eigen::Vector4f const rayLeftEnd(position[0] - 1, position[1], position[2] - 5, 1.0f);
+		//Eigen::Vector4f outNormal;
+		//if (Common::Raycast(rayLeftStart, rayLeftStart, outPos, outNormal, *(uint32_t*)0x1E0AFB4))
+		//{
+		//	DebugDrawText::log("Left Hit!", 0);
+		//}
 	}
 	std::string getEVSId()
 	{
@@ -657,7 +650,7 @@ namespace SUC::Player::Evil
 				//ef_ch_sng_yh1_boost2
 				auto node0 = playerContext->m_pPlayer->m_spCharacterModel->GetNode("Hips");
 				if (!shield)
-					Common::fCGlitterCreate(playerContext->m_pPlayer->m_spContext.get(), shield, &node0, "evil_guard_sphere01", 1);
+					Common::SpawnParticle(playerContext->m_pPlayer->m_spContext.get(), shield, &node0, "evil_guard_sphere01", 1);
 
 				PlayAnim("Evilsonic_guard_idle");
 			}
@@ -709,7 +702,7 @@ namespace SUC::Player::Evil
 			if (timerCombo > EvilGlobal::s_Param->timerComboMax)
 			{
 				comboProgress = 0;
-				Common::SonicContextSetCollision(SonicCollision::TypeSonicSquatKick, false);
+				//Common::SonicContextSetCollision(SonicCollision::TypeSonicSquatKick, false);
 			}
 			else
 			{
@@ -826,15 +819,15 @@ namespace SUC::Player::Evil
 
 		originalClassic_InitParameters(This);
 	}
-	HOOK(void, __fastcall, Classic_SetMaximumVelocity, 0x00DC2020, CSonicContext* This)
+	HOOK(void, __fastcall, Classic_SetMaximumVelocity, 0x00DC2020, Sonic::Player::CPlayerSpeedContext* This)
 	{
-		if (*pClassicSonicContext && Sonic::CApplicationDocument::GetInstance()->GetService<Sonic::CServiceGamePlay>()->m_PlayerID == 1)
+		if (SONIC_CLASSIC_CONTEXT && Sonic::CApplicationDocument::GetInstance()->GetService<Sonic::CServiceGamePlay>()->m_PlayerID == 1)
 		{
 			float* maxSpeed = Common::GetPlayerMaxSpeed();
 			*maxSpeed = max(*maxSpeed, SetPlayerVelocity());
 		}
 	}
-	HOOK(double, __fastcall, Classic_GetMaximumVelocity, 0x00DC1F20, CSonicContext* This, void* Edx, int a2)
+	HOOK(double, __fastcall, Classic_GetMaximumVelocity, 0x00DC1F20, Sonic::Player::CPlayerSpeedContext* This, void* Edx, int a2)
 	{
 		return SONIC_GENERAL_CONTEXT->m_MaxVelocity;
 	}
@@ -934,7 +927,7 @@ namespace SUC::Player::Evil
 			jumpcount++;
 		}
 	}
-	HOOK(char, __fastcall, CPlayerSpeedContext_ChangeToHomingAttackX, 0x00DFFE30, CSonicContext* This, void* Edx, int a2)
+	HOOK(char, __fastcall, CPlayerSpeedContext_ChangeToHomingAttackX, 0x00DFFE30, Sonic::Player::CPlayerSpeedContext* This, void* Edx, int a2)
 	{
 		if (IS_CLASSIC_SONIC)
 			return 0;
@@ -951,7 +944,7 @@ namespace SUC::Player::Evil
 	{
 		originalCSonicSetMaxSpeedBasis(This);
 
-		if (*pClassicSonicContext && Sonic::CApplicationDocument::GetInstance()->GetService<Sonic::CServiceGamePlay>()->m_PlayerID == 1)
+		if (SONIC_CLASSIC_CONTEXT && Sonic::CApplicationDocument::GetInstance()->GetService<Sonic::CServiceGamePlay>()->m_PlayerID == 1)
 		{
 			float* maxSpeed = Common::GetPlayerMaxSpeed();
 			*maxSpeed = max(*maxSpeed, SetPlayerVelocity());

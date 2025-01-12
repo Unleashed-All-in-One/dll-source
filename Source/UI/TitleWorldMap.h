@@ -25,6 +25,7 @@ namespace SUC::Utility
 }
 namespace SUC::UI::TitleScreen
 {
+#define WM_STAGELIST_MAXLISTVISIBLE (size_t)6
 	class CSUCTitleCompanion;
 	//From GensDebug
 	//============================
@@ -61,7 +62,7 @@ namespace SUC::UI::TitleScreen
 	};
 	class CWorldCountry
 	{
-		SharedPtrTypeless m_SoundHandle;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> m_SoundHandle;
 		float m_TimerContinueDaylightIndicator;
 	public:
 		int m_ID;
@@ -74,8 +75,14 @@ namespace SUC::UI::TitleScreen
 		//bool night, playingMedalTransition;
 		float visibility;
 		bool m_CanFade;
-		bool m_IsSelected = true;
-		CWorldCountry(const hh::math::CVector& in_Position) : m_Position(in_Position) {};
+		bool m_IsSelected = false;
+		CWorldCountry(const hh::math::CVector& in_Position) : m_TimerContinueDaylightIndicator(0), m_ID(0),
+		                                                      m_Position(in_Position), m_IsInShade(false),
+		                                                      m_LastState(false),
+		                                                      m_IsChangingDaylight(false),
+		                                                      visibility(0), m_CanFade(false)
+		{
+		};
 		void Update(const hh::math::CVector& in_LightPos, const hh::math::CQuaternion& in_WorldRotation, const Sonic::CCamera* in_Cam);
 		hh::math::CVector GetPositionAdjusted() const;
 		
@@ -93,7 +100,6 @@ namespace SUC::UI::TitleScreen
 		uint32_t bestRing;
 		uint32_t redRingCount;
 	};
-#define WM_STAGELIST_MAXLISTVISIBLE (size_t)6
 	class CSUCTitleCompanion : public Sonic::CGameObject, public Hedgehog::Universe::CStateMachineBase,
 		public Singleton<CSUCTitleCompanion>
 	{
@@ -117,17 +123,17 @@ namespace SUC::UI::TitleScreen
 			Chao::CSD::RCPtr<Chao::CSD::CScene> rcCtsChoicesBg, rcCtsChoicesWindow, rcCtsChoicesSelect;
 			Chao::CSD::RCPtr<Chao::CSD::CScene> rcTextWorldDescription, rcTextStageDescription;
 			Chao::CSD::RCPtr<Chao::CSD::CScene> rcTextElement[9];
-			void ShowTextAct(bool visible);
+			void ShowTextAct(bool in_Visible) const;
 
 			void Configure(const boost::shared_ptr<Sonic::CCsdProject>& in_CsdProj);
 
-			void SetInactive(bool in_Hide);
+			void SetInactive(bool in_Hide) const;
 		};
 		CWorldMapCanvas* WorldMapUI;
 #pragma endregion
 
 		Hedgehog::Math::CVector2 posCursorCenter;
-		SharedPtrTypeless cursorMoveHandle, cursorSelectHandle, stageSelectHandle, worldMapMusicHandle;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> cursorMoveHandle, cursorSelectHandle, stageSelectHandle, worldMapMusicHandle;
 		bool playingPointerMove;
 		bool m_PanPlayed = false;
 		int currentFlagSelected;
@@ -147,14 +153,14 @@ namespace SUC::UI::TitleScreen
 		float m_CursorSpeed = 24;
 		int m_StageListOverflow;
 		int m_StageListSelection;
-		std::vector<CWorldCountry*> m_Countries;
+		std::vector<CWorldCountry*> Countries;
 		boost::shared_ptr<SaveLoadTestStruct> m_spSave;
 		boost::shared_ptr<Sonic::CLightManager> light;
 
 		boost::shared_ptr<CTitleWorldMapGlobe> m_spEarth;
 		boost::shared_ptr<CTitleWorldMapSky> m_spSkySpace;
 		boost::shared_ptr<CTitleWorldMapSun> m_spSun;
-		void DestroyCSDScene(Chao::CSD::RCPtr<Chao::CSD::CScene>& in_CsdScene);
+		void DestroyCSDScene(Chao::CSD::RCPtr<Chao::CSD::CScene>& in_CsdScene) const;
 
 		void KillCallback() override;
 
@@ -173,13 +179,13 @@ namespace SUC::UI::TitleScreen
 
 		void PlayCursorAnim(const char* name, bool reverse = false);
 
-		void CheckCursorAnimStatus();
+		void CheckCursorAnimStatus() const;
 
 		void SetCursorPos(const Hedgehog::Math::CVector2& pos);
 
 		bool IsInsideCursorRange(const Hedgehog::Math::CVector2& input, float visibility, int flagID);
 
-		void SetLevelTextCast(const char* text);
+		void SetLevelTextCast(const char* text) const;
 
 		void PopulateStageSelect(int id, int offset = 0);
 
@@ -203,7 +209,7 @@ namespace SUC::UI::TitleScreen
 
 		void CapitalWindow_Update();
 
-		void SetStageSelectionScreenshot();
+		void SetStageSelectionScreenshot() const;
 
 		void StageWindow_Update(Sonic::CGameObject* This);
 	};

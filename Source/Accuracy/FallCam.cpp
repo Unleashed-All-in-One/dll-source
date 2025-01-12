@@ -1,4 +1,3 @@
-
 #include "FallCam.h"
 namespace SUC::Accuracy
 {
@@ -129,8 +128,10 @@ namespace SUC::Accuracy
 		camera.m_InputView = camera.m_View;
 	}
 
-	HOOK(void, __fastcall, FallCam_CCameraUpdateParallel, 0x10FB770, Sonic::CCamera* This, void* Edx, const hh::fnd::SUpdateInfo& in_rUpdateInfo) {
-		if (!*pModernSonicContext && !*pClassicSonicContext) {
+	HOOK(void, __fastcall, FallCam_CCameraUpdateParallel, 0x10FB770, Sonic::CCamera* This, void* Edx, const hh::fnd::SUpdateInfo& in_rUpdateInfo)
+	{
+		if (!IS_CLASSIC_SONIC && !SONIC_MODERN_CONTEXT) 
+		{
 			originalFallCam_CCameraUpdateParallel(This, Edx, in_rUpdateInfo);
 			return;
 		}
@@ -188,7 +189,7 @@ namespace SUC::Accuracy
 	{
 		int result = originalFallCam_MsgRestartStage(This, Edx, message);
 
-		if (!*pModernSonicContext && !*pClassicSonicContext)
+		if (!SONIC_MODERN_CONTEXT && !SONIC_CLASSIC_CONTEXT)
 			return result;
 
 		StopFade();

@@ -24,8 +24,8 @@ namespace SUC::SetObject
 
         float m_DetectionCooldown = 0.0f;
 
-        SharedPtrTypeless m_ButtonSoundHandle;
-        SharedPtrTypeless m_ActivationSoundHandle;
+        boost::shared_ptr<Hedgehog::Sound::CSoundHandle> m_ButtonSoundHandle;
+        boost::shared_ptr<Hedgehog::Sound::CSoundHandle> m_ActivationSoundHandle;
 
         int m_Phase = 0;
         int m_TargetSetObjectID;

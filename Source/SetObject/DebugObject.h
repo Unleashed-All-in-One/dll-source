@@ -51,7 +51,7 @@ namespace SUC::SetObject
 
 		bool isLeftStickUpPressed = false;
 		bool isAPressed = false;
-		SharedPtrTypeless soundClimb;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> soundClimb;
 
 		PoleStyle poleTypes[1] = { PoleStyle("evl_myk_obj_soc_dialopleAaTop_000", "evl_myk_obj_soc_dialopleAaMid5m_000", "evl_myk_obj_soc_dialopleAaBtm_000") };
 		bool SetAddRenderables(Sonic::CGameDocument* in_pGameDocument, const boost::shared_ptr<Hedgehog::Database::CDatabase>& in_spDatabase) override

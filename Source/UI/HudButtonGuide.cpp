@@ -15,7 +15,7 @@ namespace SUC::UI
 	bool isShowing;
 	bool isMultiMode = false;
 	bool bypassGrindrail = false;
-	SharedPtrTypeless soundHandle;
+	boost::shared_ptr<Hedgehog::Sound::CSoundHandle> soundHandle;
 	HudButtonGuide::EButtonType buttonType;
 	std::string m_animationNames[7] = { "qs_R", "qs_L", "boost", "sliding", "door", "chaser", "qs_L" };
 	Sonic::EKeyState buttonToPress;

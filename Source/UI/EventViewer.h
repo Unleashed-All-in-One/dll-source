@@ -127,7 +127,7 @@ namespace SUC::UI::Event
 		class SoundHandleEvent
 		{
 		public:
-			SharedPtrTypeless soundHandle;
+			boost::shared_ptr<Hedgehog::Sound::CSoundHandle> soundHandle;
 			std::string cueName;
 			int triggerID;
 			SoundHandleEvent(std::string in_CueName, int in_TriggerID, float in_Volume)

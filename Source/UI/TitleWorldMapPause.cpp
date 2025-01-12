@@ -15,7 +15,7 @@ namespace SUC::UI::TitleScreen
 	int m_cursorPos = 0;
 	uint32_t m_prevCursorPos = 0;
 	bool active;
-	SharedPtrTypeless m_SoundHandleEnter, m_SoundHandleExit, m_SoundHandleCursor, m_SoundHandleAccept;
+	boost::shared_ptr<Hedgehog::Sound::CSoundHandle> m_SoundHandleEnter, m_SoundHandleExit, m_SoundHandleCursor, m_SoundHandleAccept;
 	float originalVolume;
 	void TitleWorldMapPause::Start()
 	{

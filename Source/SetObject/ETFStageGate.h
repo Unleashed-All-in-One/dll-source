@@ -71,7 +71,7 @@ namespace SUC::SetObject
             //}
             }
             //fpAddParticle2(Sonic::CGameDocument::GetInstance()->m_pMember->m_spParticleManager.get(), handle1, &node, "ef_ch_sng_yh1_spinattack", 1);
-            Common::fCGlitterCreate(playerContext, handle1, &node, particleName, 0);
+            Common::SpawnParticle(playerContext, handle1, &node, particleName, 0);
             Sonic::CGameObject::AddRenderable("Object", m_spSpawnedModel, true);
             DebugDrawText::log("I EXIST!!", 10);
             return true;

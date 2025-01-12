@@ -5,7 +5,7 @@ namespace SUC::Gameplay
 	{
 		originalBDriftUpdate(This, Edx, dt);
 
-		if (!*pModernSonicContext)
+		if (!SONIC_MODERN_CONTEXT)
 			return;
 
 		if (!DriftOnB::CheckForBDrift())
@@ -22,12 +22,15 @@ namespace SUC::Gameplay
 	}
 	bool DriftOnB::CheckForBDrift()
 	{
-		Sonic::Player::CPlayerSpeedContext* sonic = Sonic::Player::CPlayerSpeedContext::GetInstance();
+		auto sonic = SONIC_MODERN_CONTEXT;
 
 		if (!sonic)
 			return false;
 
-		return abs(sonic->m_Velocity.norm()) >= 25.0f && !sonic->m_Is2DMode && !Common::IsPlayerInForwardPath() && !Common::IsPlayerControlLocked() && !Common::IsPlayerGrinding() && !Common::IsPlayerOnBoard();
+		return abs(sonic->m_Velocity.norm()) >= 25.0f && !sonic->m_Is2DMode && !sonic->m_spForwardPathController && !
+			sonic->GetStateFlag(Sonic::Player::CPlayerSpeedContext::eStateFlag_OutOfControl) && !sonic->
+			m_spGrindPathController && !sonic->GetStateFlag(
+				Sonic::Player::CPlayerSpeedContext::eStateFlag_InvokeSkateBoard);
 	}
 	void DriftOnB::RegisterHooks()
 	{

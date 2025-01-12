@@ -6,7 +6,7 @@ namespace SUC::Accuracy
 	class ExperienceObject : public Sonic::CObjectBase
 	{
 		static inline SharedPtrTypeless particle;
-		static inline SharedPtrTypeless sound;
+		static inline boost::shared_ptr<Hedgehog::Sound::CSoundHandle> sound;
 
 	public:
 		enum EEnemyVtableEntries
@@ -100,9 +100,9 @@ namespace SUC::Accuracy
 			if (!context)
 				return;
 
-			void* matrixNode = (void*)((uint32_t)*PLAYER_CONTEXT + 0x30);
-			Common::fCGlitterEnd(context, particle, true);
-			Common::fCGlitterCreate(context, particle, matrixNode, "ef_ch_sng_lms_expcol", 0);
+			void* matrixNode = SONIC_GENERAL_CONTEXT->m_spField30.get();
+			//Common::KillParticle(context, particle, true);
+			//Common::SpawnParticle(context, particle, matrixNode, "ef_ch_sng_lms_expcol", 0);
 			Common::PlaySoundStatic(sound, 4002073);
 
 			context->m_ChaosEnergy += Common::RandomFloat(0.25f, 0.75f);
@@ -151,7 +151,7 @@ namespace SUC::Accuracy
 
 			float durationOfStep1 = 1;
 			float duration1 = 2;
-			float duration2 = 2.5f;
+			float duration2 = 2.1f;
 			float distance = abs((m_Position - context->m_spMatrixNode->m_Transform.m_Position).norm());
 			m_Angle += 0.15f * deltaTimeFixed;
 			m_Rotation = ObjectUtility::QuaternionFromAngleAxisUtil(m_Angle, CVector(0, 1, 0));

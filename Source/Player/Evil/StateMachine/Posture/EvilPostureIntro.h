@@ -7,7 +7,7 @@ namespace SUC::Player::Evil
 	{
 	private:
 		float m_PreviousFrame;
-		SharedPtrTypeless m_SoundHandle;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> m_SoundHandle;
 		bool m_IsLeavingPosture;
 		boost::shared_ptr<Hedgehog::Motion::CCameraMotionData> motion;
 		bool m_InitializedPosture;

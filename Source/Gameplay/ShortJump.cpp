@@ -8,10 +8,8 @@ namespace SUC::Gameplay
 
 	void PlayAnimBegin()
 	{
-		Eigen::Vector3f playerVelocity;
-		if (!Common::GetPlayerVelocity(playerVelocity))
-			return;
-
+		auto context = SONIC_GENERAL_CONTEXT;
+		auto playerVelocity = context->m_Velocity;
 		m_ShortJumpMove = playerVelocity.norm() >= 7.0f;
 		if (m_ShortJumpMove)
 		{
@@ -19,19 +17,19 @@ namespace SUC::Gameplay
 			m_LastHurdleIndex = m_currentHurdleIndex;
 
 			Hedgehog::Base::CSharedString hurdleAnimName = (m_currentHurdleIndex == 0) ? "JumpHurdleL" : "JumpHurdleR";
-			Common::SonicContextChangeAnimation(hurdleAnimName);
+			Common::ChangePlayerAnimation(hurdleAnimName);
 			m_JumpTimer = ShortJump::s_HurdleTime;
 		}
 		else
 		{
-			Common::SonicContextChangeAnimation("JumpShortBegin");
+			Common::ChangePlayerAnimation("JumpShortBegin");
 			m_JumpTimer = ShortJump::s_JumpTime;
 		}
 	}
 	void PlayAnimTop()
 	{
 		if (!m_ShortJumpMove)
-			Common::SonicContextChangeAnimation("JumpShortTop");
+			Common::ChangePlayerAnimation("JumpShortTop");
 	}
 	void __declspec(naked) ShortTop()
 	{
@@ -55,24 +53,28 @@ namespace SUC::Gameplay
 	{
 		int result = originalHurdleJumpBegin(a1, Edx);
 
-		m_LastHurdleIndex = Common::SonicContextIsAnimation("JumpHurdleL") ? 1 : 0;
+		auto m_AnimName = SONIC_GENERAL_CONTEXT->m_pPlayer->m_spAnimationStateMachine->GetCurrentState()->GetStateName();
+		m_LastHurdleIndex = m_AnimName == "JumpHurdleL" ? 1 : 0;
 
 		return result;
 	}
 	HOOK(void, __fastcall, ShortJumpResetUpdate, 0xE6BF20, void* This, void* Edx, float* dt)
 	{
 		originalShortJumpResetUpdate(This, Edx, dt);
-
-		if (!*pModernSonicContext)
+		auto context = SONIC_MODERN_CONTEXT;
+		if (!context)
 			return;
-
-		bool isAnim = Common::SonicContextIsAnimation("JumpHurdleL") || Common::SonicContextIsAnimation("JumpHurdleR") || Common::SonicContextIsAnimation("JumpShortBegin") || Common::SonicContextIsAnimation("JumpShortTop");
+		auto m_AnimName = context->m_pPlayer->m_spAnimationStateMachine->GetCurrentState()->GetStateName();
+		bool isAnim = m_AnimName == "JumpHurdleL" || m_AnimName == "JumpHurdleR" || m_AnimName =="JumpShortBegin" || m_AnimName == "JumpShortTop";
 
 		if (isAnim && m_JumpTimer > 0.0f)
-			m_JumpTimer -= *dt;
-		else if (isAnim && m_JumpTimer <= 0.0f) {
-			StateManager::ChangeState(StateAction::Fall, *PLAYER_CONTEXT);
-			Common::SonicContextChangeAnimation("Fall");
+		{
+			m_JumpTimer -= *dt;			
+		}
+		else if (isAnim && m_JumpTimer <= 0.0f) 
+		{
+			context->ChangeState(Sonic::Player::ePlayerSpeedState_Fall);
+			Common::ChangePlayerAnimation("Fall");
 		}
 	}
 	void ShortJump::RegisterHooks()

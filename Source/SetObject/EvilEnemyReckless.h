@@ -97,7 +97,7 @@ namespace SUC::SetObject
 		boost::shared_ptr<Sonic::CRayCastCollision> m_spRaycastCollision;
 		boost::shared_ptr<BBExt::CCharacterProxy> m_spCharacterProxy;
 
-		SharedPtrTypeless sound;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> sound;
 		std::vector<SUC::NewAnimationData> animations;
 		bool m_IsGrounded;
 		hh::math::CVector m_Velocity;

@@ -8,11 +8,8 @@ namespace SUC::Gameplay
 		auto context = Sonic::Player::CPlayerSpeedContext::GetInstance();
 		auto stateName = context->m_pPlayer->m_StateMachine.GetCurrentState()->GetStateName();
 		if (std::string(stateName.c_str()) == std::string(targetState))
-		{
-			Eigen::Vector3f velocity;
-			Common::GetPlayerVelocity(velocity);
-			velocity = (velocity.norm() + 12.0f) * velocity.normalized();
-			Common::SetPlayerVelocity(velocity);
+		{			
+			context->SetVelocity((context->m_Velocity.norm() + 12.0f) * context->m_Velocity.normalized());			
 		}
 	}
 	HOOK(void, __fastcall, QSSRestore_CSonicStateSlidingAdvance, 0x11D69A0, int This)

@@ -5,7 +5,7 @@ namespace SUC::Player::Evil
 	{
 		float werehogArmHoming_timer;
 		bool isDoingHoming;
-		SharedPtrTypeless soundArmStretch;
+		boost::shared_ptr<Hedgehog::Sound::CSoundHandle> soundArmStretch;
 		Hedgehog::math::CVector posStartArm;
 		float maximumTime = 0.7f;
 	public:

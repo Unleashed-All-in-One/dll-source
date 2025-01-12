@@ -228,7 +228,7 @@ namespace SUC::System
 
 	void CalculateNextStageFromHub(uint32_t stageIDPam)
 	{
-		uint32_t stageTerrainAddress = Common::GetMultiLevelAddress(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
+		uint32_t stageTerrainAddress = Common::ComposeAddressFromOffsets(0x1E66B34, { 0x4, 0x1B4, 0x80, 0x20 });
 		char** h = (char**)stageTerrainAddress;
 		const char* stageToLoad = "ghz200";
 		//get current flag based on the pam stage loaded

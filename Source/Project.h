@@ -1,4 +1,5 @@
 #pragma once
+#include "System/ArchiveTreePatcher.h"
 #include "System/tinyxml2.h"
 
 //namespace mod = SUC;
