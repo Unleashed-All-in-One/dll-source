@@ -1,5 +1,6 @@
-# Sonic Unleashed Conversion
-Mod that tries to recreate Sonic Unleashed on PC using Sonic Generations and BlueBlur
+# Unleashed Conversion
+This is the source for a mod that never came to be, called Unleashed Conversion. This was supposed to be a mod that would've converted Sonic Generations into a gameplay-accurate Sonic Unleashed, before Unleashed Recomp started development. This mod contains a title screen port, a World Map port, fixes for Modern Sonic to be closer to how he was in Unleashed, cutscene ports, all stages from Unleashed, and custom objects.
+The mod itself is extremely unfinished, as its development was halted in Januray 2025 after being told about Unleashed Recomp privately.
 
 ## Build Instructions
 1. Install v142 build tools using Visual Studio Installer
