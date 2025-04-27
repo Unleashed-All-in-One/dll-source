@@ -42,26 +42,31 @@ namespace SUC::ImGuiMenu
 		//Sonic::Sequence::Main::ProcessMessage(&message);
 	}
 	std::string m_Moduletest;
-	void drawStageTreeNode(SUC::Project::DebugStageTree::DebugStageTreeNode node)
+	void drawStageTreeNode(SUC::Project::DebugStageTree::STreeNode node)
 	{
 		
 		ImGui::SetNextItemOpen(true, ImGuiCond_Appearing);
-		if (ImGui::TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_None))
+		if (ImGui::TreeNodeEx(node.Name.c_str(), ImGuiTreeNodeFlags_None))
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, { 0, 0 });
 			ImGui::Indent(16);
-			for (size_t x = 0; x < node.treeEntries.size(); x++)
+			for (size_t x = 0; x < node.TreeEntry.size(); x++)
 			{
 				ImGui::BeginGroup();
 				ImGui::Text("X");
 				ImGui::SameLine();
-				if (ImGui::Button(node.treeEntries[x].displayName.c_str()))
+				if (ImGui::Button(node.TreeEntry[x].DisplayName.c_str()))
 				{
-					sceneIndexToLoad = node.treeEntries[x].stage;
-					eventIndexToLoad = node.treeEntries[x].cutsceneID;
+					sceneIndexToLoad = node.TreeEntry[x].Stage;
+					eventIndexToLoad = node.TreeEntry[x].EventID;
 					DebugMenu::s_Visible = false;
 					std::string temp = sceneIndexToLoad.c_str();
-					System::StageManager::ConfigureNextStage(sceneIndexToLoad.c_str(), node.treeEntries[x].night ? System::SLoadInfo::WEREHOG : System::SLoadInfo::MODERN, false);
+					if(node.TreeEntry[x].Type == Project::DebugStageTree::STreeNode::SNodeEntry::eNodeType_Cutscene)
+					{
+						System::StageManager::ConfigureNextEvent(sceneIndexToLoad.c_str(), eventIndexToLoad.c_str());
+					}
+					else
+						System::StageManager::ConfigureNextStage(sceneIndexToLoad.c_str(), node.TreeEntry[x].IsNight ? System::SLoadInfo::WEREHOG : System::SLoadInfo::MODERN, false);
 					System::StageManager::TriggerStageLoad();
 					//if (!eventIndexToLoad.empty())
 					//	SUC::System::StageManager::ForcePlayCutscene(eventIndexToLoad, sceneIndexToLoad, false, 0);
@@ -69,9 +74,9 @@ namespace SUC::ImGuiMenu
 				ImGui::EndGroup();
 			}
 			ImGui::Unindent(16);
-			for (size_t i = 0; i < node.children.size(); i++)
+			for (size_t i = 0; i < node.Children.size(); i++)
 			{
-				drawStageTreeNode(node.children[i]);
+				drawStageTreeNode(node.Children[i]);
 			}
 			ImGui::PopStyleVar();
 			ImGui::TreePop();
@@ -104,9 +109,9 @@ namespace SUC::ImGuiMenu
 			if (ImGui::TreeNodeEx("StageArchives", ImGuiTreeNodeFlags_None))
 			{
 
-				for (size_t i = 0; i < SUC::Project::s_DebugStageTree.treeNodes.size(); i++)
+				for (size_t i = 0; i < SUC::Project::s_DebugStageTree.TreeNodes.size(); i++)
 				{
-					drawStageTreeNode(SUC::Project::s_DebugStageTree.treeNodes[i]);
+					drawStageTreeNode(SUC::Project::s_DebugStageTree.TreeNodes[i]);
 				}
 				ImGui::Unindent(16);
 				ImGui::TreePop();

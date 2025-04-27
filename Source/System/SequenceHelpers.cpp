@@ -52,6 +52,12 @@ namespace SUC::System
 			break;
 
 		}
+		case Event:
+		{
+			m_NewMode = "StageEvent";
+			break;
+
+		}
 		default:
 		{
 			m_NewMode = ((const char**)0x01A42760)[(int)in_Flow];

@@ -107,10 +107,10 @@ namespace SUC
 			}
 		}
 	}
-	void ParseStageTree(const Json::Value& in_JsonValue, SUC::Project::DebugStageTree::DebugStageTreeNode& in_StageTree)
+	void ParseStageTree(const Json::Value& in_JsonValue, SUC::Project::DebugStageTree::STreeNode& in_StageTree)
 	{
-		in_StageTree.name = in_JsonValue["name"].asString();
-		in_StageTree.children = std::vector<SUC::Project::DebugStageTree::DebugStageTreeNode>();
+		in_StageTree.Name = in_JsonValue["name"].asString();
+		in_StageTree.Children = std::vector<SUC::Project::DebugStageTree::STreeNode>();
 		const Json::Value& treeEntries = in_JsonValue["TreeEntry"];
 		if (!treeEntries.isArray())
 		{
@@ -121,65 +121,73 @@ namespace SUC
 		{
 			for (const auto& tree : in_JsonValue["children"])
 			{
-				SUC::Project::DebugStageTree::DebugStageTreeNode stageTreeC;
+				SUC::Project::DebugStageTree::STreeNode stageTreeC;
 				ParseStageTree(tree, stageTreeC);
-				in_StageTree.children.push_back(stageTreeC);
+				in_StageTree.Children.push_back(stageTreeC);
 			}
 		}
-		std::vector<SUC::Project::DebugStageTree::DebugStageTreeNode::DebugStageTreeNodeEntry> entries;
+		std::vector<SUC::Project::DebugStageTree::STreeNode::SNodeEntry> entries;
 		for (const auto& entry : treeEntries)
 		{
-			SUC::Project::DebugStageTree::DebugStageTreeNode::DebugStageTreeNodeEntry treeEntry;
-			treeEntry.stage = entry["stage"].asString();
+			SUC::Project::DebugStageTree::STreeNode::SNodeEntry treeEntry;
+			treeEntry.Stage = entry["stage"].asString();
 			if (entry["cutsceneID"])
-				treeEntry.cutsceneID = entry["cutsceneID"].asString();
+				treeEntry.EventID = entry["cutsceneID"].asString();
 
 			if (entry["displayName"])
 			{
-				treeEntry.displayName = entry["displayName"].asString();
+				treeEntry.DisplayName = entry["displayName"].asString();
 			}
 			else
 			{
-				if (!treeEntry.cutsceneID.empty())
-					treeEntry.displayName = std::format("{0} @{1}", treeEntry.cutsceneID, treeEntry.stage);
+				if (!treeEntry.EventID.empty())
+					treeEntry.DisplayName = std::format("{0} @{1}", treeEntry.EventID, treeEntry.Stage);
 				else
-					treeEntry.displayName = treeEntry.stage;
+					treeEntry.DisplayName = treeEntry.Stage;
 			}
 			entries.push_back(treeEntry);
 		}
-		in_StageTree.treeEntries = entries;
+		in_StageTree.TreeEntry = entries;
 	}
 	void SUC::Project::GetDebugTree(tinyxml2::XMLDocument& in_XmlDocument)
 	{
 		Project::s_DebugStageTree = Project::DebugStageTree();
-		std::vector<SUC::Project::DebugStageTree::DebugStageTreeNode> stageTrees;
+		std::vector<SUC::Project::DebugStageTree::STreeNode> stageTrees;
 
 		tinyxml2::XMLElement* m_XmlStageListRoot = in_XmlDocument.FirstChildElement("ModSchema")->FirstChildElement("StageSelectRoot");
 		for (tinyxml2::XMLElement* stageTreeNodeElem = m_XmlStageListRoot->FirstChildElement("StageTreeNode"); stageTreeNodeElem != nullptr; stageTreeNodeElem = stageTreeNodeElem->NextSiblingElement("StageTreeNode"))
 		{
-			SUC::Project::DebugStageTree::DebugStageTreeNode stageNode = SUC::Project::DebugStageTree::DebugStageTreeNode();
-			stageNode.name = stageTreeNodeElem->FirstChildElement("Name")->GetText() ? stageTreeNodeElem->FirstChildElement("Name")->GetText() : "";
+			DebugStageTree::STreeNode stageNode = DebugStageTree::STreeNode();
+			stageNode.Name = stageTreeNodeElem->FirstChildElement("Name")->GetText() ? stageTreeNodeElem->FirstChildElement("Name")->GetText() : "";
 
 			for (tinyxml2::XMLElement* nodeElem = stageTreeNodeElem->FirstChildElement("Node"); nodeElem != nullptr; nodeElem = nodeElem->NextSiblingElement("Node"))
 			{
-				auto node = SUC::Project::DebugStageTree::DebugStageTreeNode::DebugStageTreeNode();
-				node.name = nodeElem->FirstChildElement("Name")->GetText() ? nodeElem->FirstChildElement("Name")->GetText() : "";
+				auto node = DebugStageTree::STreeNode::STreeNode();
+				node.Name = nodeElem->FirstChildElement("Name")->GetText() ? nodeElem->FirstChildElement("Name")->GetText() : "";
 
 				for (tinyxml2::XMLElement* treeEntryElem = nodeElem->FirstChildElement("TreeEntry"); treeEntryElem != nullptr; treeEntryElem = treeEntryElem->NextSiblingElement("TreeEntry"))
 				{
-					SUC::Project::DebugStageTree::DebugStageTreeNode::DebugStageTreeNodeEntry entry = SUC::Project::DebugStageTree::DebugStageTreeNode::DebugStageTreeNodeEntry();
-					entry.stage = treeEntryElem->FirstChildElement("Archive")->GetText() ? treeEntryElem->FirstChildElement("Archive")->GetText() : "";
-					entry.cutsceneID = treeEntryElem->FirstChildElement("EventID")->GetText() ? treeEntryElem->FirstChildElement("EventID")->GetText() : "";
-					entry.displayName = treeEntryElem->FirstChildElement("DisplayName") ? treeEntryElem->FirstChildElement("DisplayName")->GetText() : entry.stage;
-					entry.night = treeEntryElem->FirstChildElement("Night") ? strcmp(treeEntryElem->FirstChildElement("Night")->GetText(), "true") == 0 : false;
-					node.treeEntries.push_back(entry);
+					DebugStageTree::STreeNode::SNodeEntry entry = DebugStageTree::STreeNode::SNodeEntry();
+					entry.Stage = treeEntryElem->FirstChildElement("Archive")->GetText() ? treeEntryElem->FirstChildElement("Archive")->GetText() : "";
+					entry.EventID = treeEntryElem->FirstChildElement("EventID")->GetText() ? treeEntryElem->FirstChildElement("EventID")->GetText() : "";
+					entry.DisplayName = treeEntryElem->FirstChildElement("DisplayName") ? treeEntryElem->FirstChildElement("DisplayName")->GetText() : entry.Stage;
+					entry.IsNight = treeEntryElem->FirstChildElement("Night") ? strcmp(treeEntryElem->FirstChildElement("Night")->GetText(), "true") == 0 : false;
+
+					if(entry.EventID.size() != 0 )					
+						entry.Type = DebugStageTree::STreeNode::SNodeEntry::eNodeType_Cutscene;					
+					else					
+						entry.Type = entry.IsNight
+							             ? DebugStageTree::STreeNode::SNodeEntry::eNodeType_StageNight
+							             : DebugStageTree::STreeNode::SNodeEntry::eNodeType_Stage;
+					
+					node.TreeEntry.push_back(entry);
 				}
 
-				stageNode.children.push_back(node);
+				stageNode.Children.push_back(node);
 			}
 			stageTrees.push_back(stageNode);
 		}
-		Project::s_DebugStageTree.treeNodes = stageTrees;
+		s_DebugStageTree.TreeNodes = stageTrees;
 
 	}
 	void SUC::Project::GetLevelQueue()
@@ -274,7 +282,7 @@ namespace SUC
 				}
 			}
 
-			Project::s_AdditionalArchiveTree.data.push_back(m_NewArchive);
+			Project::s_AdditionalArchiveTree.Dependencies.push_back(m_NewArchive);
 		}
 	}
 	

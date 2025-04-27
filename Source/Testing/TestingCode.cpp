@@ -308,9 +308,9 @@ HOOK(int, __fastcall, sub_7E27B0, 0x7E27B0, char* a1, ...)
 void TestingCode::applyPatches()
 {		
 	//INSTALL_HOOK(sub_7C931F);
-	INSTALL_HOOK(sub_7E27B0);
-	INSTALL_HOOK(sub_E8F330);
-	INSTALL_HOOK(A51CD0);
+	//INSTALL_HOOK(sub_7E27B0);
+	//INSTALL_HOOK(sub_E8F330);
+	//INSTALL_HOOK(A51CD0);
 	//
 	//INSTALL_HOOK(sub_42A710);
 	//INSTALL_HOOK(OpenStage);

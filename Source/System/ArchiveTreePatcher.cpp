@@ -95,9 +95,9 @@ namespace SUC::System
     void ArchiveTreePatcher::RegisterHooks()
     {
         std::vector<std::string> hubs = SUC::Project::GetAllWhiteWorld();
-        for (size_t i = 0; i < SUC::Project::s_AdditionalArchiveTree.data.size(); i++)
+        for (size_t i = 0; i < SUC::Project::s_AdditionalArchiveTree.Dependencies.size(); i++)
         {
-            s_ArchiveDependencies.push_back(SUC::Project::s_AdditionalArchiveTree.data[i]);
+            s_ArchiveDependencies.push_back(SUC::Project::s_AdditionalArchiveTree.Dependencies[i]);
         }
         for (size_t i = 0; i < hubs.size(); i++)
         {

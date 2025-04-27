@@ -10,6 +10,7 @@ namespace SUC::System
 			SUPER
 		};
 		std::string StageArchiveName;
+		std::string EventArchiveName;
 		SSonicType PlayerType;
 		bool IsHub;
 		SLoadInfo(std::string in_ArchiveName, SSonicType in_Type, bool in_IsHub) : StageArchiveName(in_ArchiveName), PlayerType(in_Type), IsHub(in_IsHub)
@@ -45,10 +46,12 @@ namespace SUC::System
 		static void SetETFInfo(std::string etfHubStageName);
 		static void Initialize();
 		static void TriggerStageLoad();
+		static void TriggerCutsceneLoad();
 		static std::string GetEventID();
 		static const char* GetStageToLoad();
 		static void SetCorrectStage();
-		static void ConfigureNextStage(std::string in_Stage, SLoadInfo::SSonicType in_Type, bool in_Hub);
+		static void ConfigureNextStage(const std::string& in_Stage, SLoadInfo::SSonicType in_Type, bool in_Hub);
+		static void ConfigureNextEvent(const std::string& in_Stage, const std::string& in_EventID);
 		static void SetOverrideStageIDProcessor(std::function<std::string()> in_Function, bool in_TriggerOnNextTick, const char* in_FileNameCode);
 
 		static std::string s_NextStage;

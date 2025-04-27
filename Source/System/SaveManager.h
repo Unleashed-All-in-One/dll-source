@@ -99,9 +99,12 @@ namespace SUC::System
 
 		static SaveObject* save;
 	public:
+		static inline bool s_IsSavingEnabled = false;
 		static void GenerationsSave();
 		static SaveObject* GetCurrentSave(bool returnNewIfNull = true)
 		{
+			if (!s_IsSavingEnabled)
+				return new SaveObject();
 			if (save == nullptr)
 			{
 				LoadFromDisk(returnNewIfNull);
@@ -110,6 +113,8 @@ namespace SUC::System
 		}
 		static bool SaveToDisk()
 		{
+			if (!s_IsSavingEnabled)
+				return true;
 			if (save == nullptr)
 			{
 				LoadFromDisk();
@@ -190,6 +195,8 @@ namespace SUC::System
 		}
 		static bool LoadFromDisk(bool returnNewIfNull = true)
 		{
+			if (!s_IsSavingEnabled)
+				return true;
 			std::ifstream inputFile(SAVE_FILE_NAME);
 			if (!inputFile.is_open())
 			{
@@ -266,6 +273,8 @@ namespace SUC::System
 		}
 		static bool DeleteSave(bool resetPointer = true)
 		{
+			if (!s_IsSavingEnabled)
+				return true;
 			if (resetPointer)
 				save = new SaveObject();
 			if (std::remove(SAVE_FILE_NAME) != 0)

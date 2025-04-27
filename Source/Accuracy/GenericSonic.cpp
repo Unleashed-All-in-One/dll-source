@@ -72,7 +72,7 @@ namespace SUC::Accuracy
 	void GenericSonic::RegisterHooks()
 	{
         //Patch out check for white world stage id for player changer
-        WRITE_JUMP(0x00D00E65, 0x00D00E76);
+        //WRITE_JUMP(0x00D00E65, 0x00D00E76);
         INSTALL_HOOK(G_InitializePlayer);
         INSTALL_HOOK(G_UpdateApplication);
 	}

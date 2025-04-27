@@ -30,7 +30,7 @@ namespace SUC::System
 	
 	SLoadInfo* m_CurrentLoadInfo;
 
-	void StageManager::ConfigureNextStage(std::string in_Stage, SLoadInfo::SSonicType in_Type, bool in_Hub)
+	void StageManager::ConfigureNextStage(const std::string& in_Stage, const SLoadInfo::SSonicType in_Type, const bool in_Hub)
 	{
 		DebugDrawText::log("Deleted old SLoadInfo", 10, 100, TEXT_RED);
 		m_CurrentLoadInfo = nullptr;
@@ -38,6 +38,17 @@ namespace SUC::System
 		m_CurrentLoadInfo = new SLoadInfo();
 		m_CurrentLoadInfo->IsHub = in_Hub;
 		m_CurrentLoadInfo->PlayerType = in_Type;
+		m_CurrentLoadInfo->StageArchiveName = _strdup(in_Stage.c_str());
+	}
+	void StageManager::ConfigureNextEvent(const std::string& in_Stage, const std::string& in_EventID)
+	{
+		DebugDrawText::log("Deleted old SLoadInfo", 10, 100, TEXT_RED);
+		m_CurrentLoadInfo = nullptr;
+
+		m_CurrentLoadInfo = new SLoadInfo();
+		m_CurrentLoadInfo->IsHub = false;
+		m_CurrentLoadInfo->PlayerType = SLoadInfo::SSonicType::MODERN;
+		m_CurrentLoadInfo->EventArchiveName = _strdup(in_EventID.c_str());
 		m_CurrentLoadInfo->StageArchiveName = _strdup(in_Stage.c_str());
 	}
 	void StageManager::SetOverrideStageIDProcessor(std::function<std::string()> in_Function, bool in_TriggerOnNextTick, const char* in_FileNameCode)
@@ -577,7 +588,13 @@ namespace SUC::System
 	{
 		expectingLoad = true;
 		SequenceHelpers::SetStageInfo(m_CurrentLoadInfo);
-		SequenceHelpers::ChangeModule(ModuleFlow::StageAct);
+		SequenceHelpers::ChangeModule(StageAct);
+	}
+	void StageManager::TriggerCutsceneLoad()
+	{
+		expectingLoad = true;
+		SequenceHelpers::SetStageInfo(m_CurrentLoadInfo);
+		SequenceHelpers::ChangeModule(Event);
 	}
 	//char __thiscall Sonic::Sequence::CSequenceMainImpl::ProcessMessage(MainSequenceActor *this, int a1, int a2)
 	void StageManager::Initialize()

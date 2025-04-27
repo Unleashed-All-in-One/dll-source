@@ -27,24 +27,31 @@ namespace SUC
 	public:
 		struct DebugStageTree
 		{
-			struct DebugStageTreeNode
+			struct STreeNode
 			{
-				struct DebugStageTreeNodeEntry
+				struct SNodeEntry
 				{
-					std::string stage;
-					std::string cutsceneID;
-					std::string displayName;
-					bool night;
+					enum ENodeType
+					{
+						eNodeType_Stage,
+						eNodeType_StageNight,
+						eNodeType_Cutscene
+					};
+					std::string Stage;
+					std::string EventID;
+					std::string DisplayName;
+					ENodeType Type;
+					bool IsNight;
 				};
-				std::string name;
-				std::vector<DebugStageTreeNodeEntry> treeEntries;
-				std::vector<DebugStageTreeNode> children;
+				std::string Name;
+				std::vector<SNodeEntry> TreeEntry;
+				std::vector<STreeNode> Children;
 			};
-			std::vector<DebugStageTreeNode> treeNodes;
+			std::vector<STreeNode> TreeNodes;
 		};
 		struct ArchiveTreeDefinitions
 		{
-			std::vector<System::ArchiveTreePatcher::ArchiveDependency> data;
+			std::vector<System::ArchiveTreePatcher::ArchiveDependency> Dependencies;
 		};
 		struct SequenceData
 		{

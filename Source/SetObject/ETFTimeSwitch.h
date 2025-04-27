@@ -58,8 +58,8 @@ namespace SUC::SetObject
 		{
 			classic = !classic;
 			Initialize();
-			Sonic::Player::CPlayerSpeedContext::GetInstance()->m_pPlayer->SendMessage("Player", boost::make_shared<MsgChangePlayer>(0));
-			Sonic::Player::CPlayerSpeedContext::GetInstance()->m_pPlayer->SendMessage("Player", boost::make_shared<MsgChangeHudMode>(3));
+			//Sonic::Player::CPlayerSpeedContext::GetInstance()->m_pPlayer->SendMessage("Player", boost::make_shared<MsgChangePlayer>(0));
+			//Sonic::Player::CPlayerSpeedContext::GetInstance()->m_pPlayer->SendMessage("Player", boost::make_shared<MsgChangeHudMode>(3));
 		}
 		bool ProcessMessage(Hedgehog::Universe::Message& in_rMsg, bool in_Flag) override
 		{
